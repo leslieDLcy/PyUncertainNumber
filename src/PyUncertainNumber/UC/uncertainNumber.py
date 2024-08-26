@@ -24,6 +24,16 @@ from .check import DistributionSpecification
 
 @dataclass
 class UncertainNumber:
+    # TODO add more metadata for the fields
+    """Uncertain Number class
+
+    note:
+
+    log:
+        - `interval_initialisation` changed to `bounds`;
+        - `distribution_initialisation` changed to `distribution_parameters`;
+        - `pbox_initialisation` changed to `pbox_parameters`;
+    """
     name: str = field(default=None)
     symbol: str = field(default=None)
     units: str = field(default=None)
@@ -32,9 +42,9 @@ class UncertainNumber:
     ensemble: Type[Ensemble] = field(default=None)
     uncertainty_type: Type[Uncertainty_types] = field(default=None)
     essence: str = field(default=None)  # [interval, distribution, pbox]
-    interval_initialisation: Union[List[float], str] = field(default=None)
-    distribution_initialisation: List[float] = field(default=None)
-    pbox_initialisation: List[float] = field(default=None)  # must be 2D array
+    bounds: Union[List[float], str] = field(default=None)
+    distribution_parameters: List[float] = field(default=None)
+    pbox_parameters: List[float] = field(default=None)  # must be 2D array
     hedge: str = field(default=None)
     # this is the deterministic numeric representation of the
     # UN object, which shall be linked with the 'pba' or `Intervals` package
@@ -44,8 +54,7 @@ class UncertainNumber:
     # lat: float = field(default=0.0, metadata={'unit': 'degrees'})
     justification: str = field(default=None)
 
-    # TODO add more metadata for the fields
-
+    # class variable
     instances = []
 
     ##### initialisation #####
@@ -55,8 +64,23 @@ class UncertainNumber:
 
         caveat:
             user needs to by themselves figure out the correct
-            shape of the 'distribution_initialisation', such as ['uniform', [1,2]]
+            shape of the 'distribution_parameters', such as ['uniform', [1,2]]
         """
+
+        if not self.essence:
+            check_initialisation_list = [
+                self.bounds,
+                self.distribution_parameters,
+                self.pbox_parameters,
+            ]
+            if any(v is not None for v in check_initialisation_list):
+                raise ValueError(
+                    "The 'essence' of the Uncertain Number is not specified"
+                )
+            else:
+                print("a vacuous interval is created")
+                self.essence = "interval"
+                self.bounds = [-np.inf, np.inf]
 
         """get the 'unit' representation of the uncertain number"""
         ureg = UnitRegistry()
@@ -71,27 +95,27 @@ class UncertainNumber:
 
         self._UnitsRep = 1 * ureg(self.units)
 
-        # temp logic for parsing `self.interval_initialisation` if it is a string
-
         # create the underlying math object
+        # temp logic for parsing `self.bounds` if it is a string
         match self.essence:
             case "interval":
+                # TODO change to a dispatcher
                 # the default way of instantiating
-                if isinstance(self.interval_initialisation, str):
-                    self._math_object = parse_description(self.interval_initialisation)
-                elif isinstance(self.interval_initialisation, list):
-                    self._math_object = I(*self.interval_initialisation)
-                elif isinstance(self.interval_initialisation, tuple):
-                    self._math_object = I(*self.interval_initialisation)
+                if isinstance(self.bounds, str):
+                    self._math_object = parse_description(self.bounds)
+                elif isinstance(self.bounds, list):
+                    self._math_object = I(*self.bounds)
+                elif isinstance(self.bounds, tuple):
+                    self._math_object = I(*self.bounds)
             case "distribution":
                 self._math_object = self.match_distribution(
-                    self.distribution_initialisation[0],
-                    self.distribution_initialisation[1],
+                    self.distribution_parameters[0],
+                    self.distribution_parameters[1],
                 )
             case "pbox":
                 self._math_object = self.match_distribution(
-                    self.distribution_initialisation[0],
-                    self.distribution_initialisation[1],
+                    self.distribution_parameters[0],
+                    self.distribution_parameters[1],
                 )
 
         """create a deterministic representation of the uncertain number"""
@@ -132,7 +156,7 @@ class UncertainNumber:
         note:
             a lot of things to double check. keep an growing list:
             1. unit
-            2. hedge: user cannot speficy both 'hedge' and 'interval_initialisation'. 'interval_initialisation' takes precedence.
+            2. hedge: user cannot speficy both 'hedge' and 'bounds'. 'bounds' takes precedence.
 
         """
         pass
@@ -163,9 +187,9 @@ class UncertainNumber:
                     case "interval":
                         return f"This is an {self.essence}-type Uncertain Number whose min value is {self._math_object.left:.2f} and max value is {self._math_object.right:.2f}. An interval is a range of values that are possible for the measurand whose value is unknown, which typically represents the epistemic uncertainty. The interval is defined by the minimum and maximum values (i.e. lower bound and upper bound) that the measurand could take on."
                     case "distribution":
-                        return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_initialisation[0]} distribution with parameters {self.distribution_initialisation[1]}. Probability distributios are typically empolyed to model aleatoric uncertainty, which represents inherent randomness. The distribution is defined by the probability density function (pdf) or cumulative distribution function (cdf)."
+                        return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}. Probability distributios are typically empolyed to model aleatoric uncertainty, which represents inherent randomness. The distribution is defined by the probability density function (pdf) or cumulative distribution function (cdf)."
                     case "pbox":
-                        return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_initialisation[0]} distribution with parameters {self.distribution_initialisation[1]}"
+                        return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}"
             case "one-number":
                 return f"This is an {self.essence}-type Uncertain Number whose naked value is {self.deter_value_rep:.2f}"
             case "concise":
@@ -185,7 +209,7 @@ class UncertainNumber:
                     case "distribution":
                         print(
                             f"This is an {self.essence}-type Uncertain Number whose statistical description is shown below:\n"
-                            f"- family: {self.distribution_initialisation[0]}\n"
+                            f"- family: {self.distribution_parameters[0]}\n"
                             f"- min: {self._math_object._range_list[0]:.2f}\n"
                             f"- Q1: something\n"
                             f"- mean: {self._math_object.mean_left}\n"
@@ -198,7 +222,7 @@ class UncertainNumber:
                         return "Will show a plot of the interval"
                     case "distribution":
                         print(
-                            f"This is an {self.essence}-type Uncertain Number of family '{self.distribution_initialisation[0]}' parameterised by {self.distribution_initialisation[1]}"
+                            f"This is an {self.essence}-type Uncertain Number of family '{self.distribution_parameters[0]}' parameterised by {self.distribution_parameters[1]}"
                         )
                         self._math_object.quick_plot()
 
@@ -218,9 +242,9 @@ class UncertainNumber:
             case "interval":
                 return [self._math_object.left, self._math_object.right]
             case "distribution":
-                which_dist = self.distribution_initialisation[0]
+                which_dist = self.distribution_parameters[0]
                 if which_dist == "norm":
-                    rv = norm(*self.distribution_initialisation[1])
+                    rv = norm(*self.distribution_parameters[1])
                     return [rv.ppf(0.025), rv.ppf(0.975)]
             case "pbox":
                 return "unfinshed"
@@ -244,17 +268,21 @@ class UncertainNumber:
         an_obj = hedge_interpret(hedged_language)
         essence = "interval"  # TODO: choose between interval, pbox
         left, right = an_obj.left, an_obj.right
-        return cls(essence=essence, interval_initialisation=[left, right])
+        return cls(essence=essence, bounds=[left, right])
 
     @classmethod
-    def from_distributionSetup(cls, dist_family, dist_params, **kwargs):
+    def from_distribution(cls, dist_family, dist_params, **kwargs):
         distSpec = DistributionSpecification(dist_family, dist_params)
         if "essence" not in kwargs:
             kwargs["essence"] = "distribution"
         return cls(
-            distribution_initialisation=distSpec.get_specification(),
+            distribution_parameters=distSpec.get_specification(),
             **kwargs,
         )
+
+    @classmethod
+    def from_range(cls):
+        pass
 
     ##############################
     ##### arithmetic operations ##
@@ -265,7 +293,7 @@ class UncertainNumber:
         left = (self._math_object + other._math_object).left
         right = (self._math_object + other._math_object).right
         essence = self.essence
-        return type(self)(essence=essence, interval_initialisation=[left, right])
+        return type(self)(essence=essence, bounds=[left, right])
 
     def __radd__(self, other):
         return self.__add__(other)
@@ -275,7 +303,7 @@ class UncertainNumber:
         left = (self._math_object - other._math_object).left
         right = (self._math_object - other._math_object).right
         essence = self.essence
-        return type(self)(essence=essence, interval_initialisation=[left, right])
+        return type(self)(essence=essence, bounds=[left, right])
 
     def __mul__(self, other):
         """multiply two uncertain numbers"""
@@ -284,12 +312,12 @@ class UncertainNumber:
             left = (self._math_object * other).left
             right = (self._math_object * other).right
             essence = self.essence
-            return type(self)(essence=essence, interval_initialisation=[left, right])
+            return type(self)(essence=essence, bounds=[left, right])
         elif isinstance(other, UncertainNumber):
             left = (self._math_object * other._math_object).left
             right = (self._math_object * other._math_object).right
             essence = self.essence
-            return type(self)(essence=essence, interval_initialisation=[left, right])
+            return type(self)(essence=essence, bounds=[left, right])
 
     def __rmul__(self, other):
         return self.__mul__(other)
@@ -301,12 +329,12 @@ class UncertainNumber:
             left = (self._math_object / other).left
             right = (self._math_object / other).right
             essence = self.essence
-            return type(self)(essence=essence, interval_initialisation=[left, right])
+            return type(self)(essence=essence, bounds=[left, right])
         elif isinstance(other, UncertainNumber):
             left = (self._math_object / other._math_object).left
             right = (self._math_object / other._math_object).right
             essence = self.essence
-            return type(self)(essence=essence, interval_initialisation=[left, right])
+            return type(self)(essence=essence, bounds=[left, right])
 
     def __rtruediv__(self, other):
         return self.__truediv__(other)
@@ -318,12 +346,12 @@ class UncertainNumber:
             left = (self._math_object**other).left
             right = (self._math_object**other).right
             essence = self.essence
-            return type(self)(essence=essence, interval_initialisation=[left, right])
+            return type(self)(essence=essence, bounds=[left, right])
         elif isinstance(other, UncertainNumber):
             left = (self._math_object**other._math_object).left
             right = (self._math_object**other._math_object).right
             essence = self.essence
-            return type(self)(essence=essence, interval_initialisation=[left, right])
+            return type(self)(essence=essence, bounds=[left, right])
 
     @classmethod
     def _toIntervalBackend(cls, vars=None):
@@ -343,7 +371,7 @@ class UncertainNumber:
         def as_interval(sth):
             """a helper function to convert to intervals"""
             if sth.essence == "interval":
-                return sth.interval_initialisation
+                return sth.bounds
             else:
                 return sth._math_object.rangel
 
@@ -368,13 +396,14 @@ class UncertainNumber:
 
         # from augument list to intervals list
         all_objs = {instance.symbol: instance for instance in cls.instances}
-        _intervals = [
-            all_objs[k].interval_initialisation for k in all_objs if k in vars
-        ]
+        _intervals = [all_objs[k].bounds for k in all_objs if k in vars]
         _UNintervals = np.array(_intervals).reshape(-1, 2)
         return _UNintervals
 
+    ######################
     ##### UP methods #####
+    ######################
+
     @classmethod
     def vertexMethod(cls, vars, func):
         """implementation of the endpoints method for the uncertain number
@@ -397,7 +426,7 @@ class UncertainNumber:
                 return [cls.from_hedge(f"{i}") for i in a_num_list]
 
             UN_list = get_hedgedUN(vars)
-            _UNintervals = [k.interval_initialisation for k in UN_list]
+            _UNintervals = [k.bounds for k in UN_list]
             _UNintervals = np.array(_UNintervals).reshape(-1, 2)
 
             df = vM(_UNintervals, func)
@@ -426,7 +455,7 @@ class UncertainNumber:
         )
         return cls(
             essence="interval",
-            interval_initialisation=(output_bounds_lo, output_bounds_hi),
+            bounds=(output_bounds_lo, output_bounds_hi),
             **kwargs,
         )
         # return endpoints_propagation_2n(_UNintervals, func)
