@@ -48,6 +48,8 @@ class UncertainNumber:
 
     instances = []
 
+    ##### initialisation #####
+
     def __post_init__(self):
         """the de facto initialisation method for the core math objects of the UN class
 
@@ -105,6 +107,36 @@ class UncertainNumber:
             case "pbox":
                 self.deter_value_rep = self._math_object.mean()
 
+    @staticmethod
+    def match_distribution(keyword, parameters):
+        """match the distribution keyword from the initialisation to create the underlying distribution object
+
+        args:
+            - keyword: (str) the distribution keyword
+            - parameters: (list) the parameters of the distribution
+
+        #TODO the original `pba` package is a mess for specifying and giving shortcuts to distributions
+        #TODO below is a temporary workaround
+        """
+        match keyword:
+            case "normal" | "norm" | "gaussian":
+                return pba.N(*parameters, steps=Params.steps)
+            case "uniform":
+                return pba.U(*parameters, steps=Params.steps)
+            case _:
+                print("Bad distribution specification")
+
+    def init_check(self):
+        """check if the UN initialisation specification is correct
+
+        note:
+            a lot of things to double check. keep an growing list:
+            1. unit
+            2. hedge: user cannot speficy both 'hedge' and 'interval_initialisation'. 'interval_initialisation' takes precedence.
+
+        """
+        pass
+
     ##### object representations #####
 
     def __str__(self):
@@ -117,14 +149,12 @@ class UncertainNumber:
         field_str = ", ".join(f"{k}={repr(v)}" for k, v in field_values.items())
         return f"{self.__class__.__name__}({field_str})"
 
-    """ new """
-
     def __repr__(self) -> str:
         """concise __repr__"""
         self._field_str = self._get_concise_representation()
         return f"{self.__class__.__name__}({self._field_str})"
 
-    def description(self, type="verbose"):
+    def describe(self, type="verbose"):
         """print out a verbose description of the uncertain number"""
 
         match type:
@@ -172,30 +202,9 @@ class UncertainNumber:
                         )
                         self._math_object.quick_plot()
 
-    @staticmethod
-    def match_distribution(keyword, parameters):
-        match keyword:
-            case "normal":
-                return pba.N(*parameters, steps=Params.steps)
-            case "uniform":
-                return pba.U(*parameters, steps=Params.steps)
-            case _:
-                print("Bad distribution specification")
-
     ##############################
     #######    some methods  #####
     ##############################
-
-    def init_check(self):
-        """check if the UN initialisation specification is correct
-
-        note:
-            a lot of things to double check. keep an growing list:
-            1. unit
-            2. hedge: user cannot speficy both 'hedge' and 'interval_initialisation'. 'interval_initialisation' takes precedence.
-
-        """
-        pass
 
     def _get_concise_representation(self):
         """get a concise representation of the UN object"""
@@ -216,6 +225,10 @@ class UncertainNumber:
             case "pbox":
                 return "unfinshed"
 
+    def quick_plot(self):
+        """quick plot of the uncertain number object"""
+        self._math_object.quick_plot()
+
     ##############################
     ##### other constructors #####
     ##############################
@@ -234,7 +247,7 @@ class UncertainNumber:
         return cls(essence=essence, interval_initialisation=[left, right])
 
     @classmethod
-    def from_distribution_setup(cls, dist_family, dist_params, **kwargs):
+    def from_distributionSetup(cls, dist_family, dist_params, **kwargs):
         distSpec = DistributionSpecification(dist_family, dist_params)
         if "essence" not in kwargs:
             kwargs["essence"] = "distribution"
