@@ -1,0 +1,3 @@
+# Uncertainty propagation module
+
+The UP module will include strategies for black box uncertainty propagation as well as a library of functions for PBA (Probability Bounds Analysis) if the code can be modified.

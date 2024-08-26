@@ -1,0 +1,20 @@
+# [build-system]
+# requires = ["poetry-core>=1.0.0"]
+# build-backend = "poetry.core.masonry.api"
+
+# [tool.poetry]
+# name = "PyUncertainNumber"
+# version = "0.0.1"
+# description = "DAWS2 related codes and docs in one repository"
+# authors = ["Leslie"]
+# license = "MIT"
+# readme = "README.md"
+# packages = [
+#     { include = "src" },
+# ]
+
+# [tool.poetry.dependencies]
+# python = "^3.9"
+# jupyterlab = "^4.2.3"
+# loguru = "^0.7.2"
+

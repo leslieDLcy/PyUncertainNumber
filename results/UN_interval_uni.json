@@ -1,0 +1,10 @@
+{
+    "name": "elas_modulus",
+    "symbol": "E",
+    "units": "pa",
+    "essence": "interval",
+    "interval_initialisation": [
+        2,
+        3
+    ]
+}

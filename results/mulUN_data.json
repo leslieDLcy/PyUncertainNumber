@@ -1,0 +1,327 @@
+
+    {
+        "140179249769600": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                1,
+                55
+            ],
+            "deter_value_rep": 28.0
+        }
+    },
+    {
+        "140179249355392": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                1,
+                65
+            ],
+            "deter_value_rep": 33.0
+        }
+    },
+    {
+        "140179251298512": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                1,
+                75
+            ],
+            "deter_value_rep": 38.0
+        }
+    },
+    {
+        "140179249772432": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                1,
+                85
+            ],
+            "deter_value_rep": 43.0
+        }
+    },
+    {
+        "140179251014976": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                1,
+                95
+            ],
+            "deter_value_rep": 48.0
+        }
+    },
+    {
+        "140179251457152": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                10,
+                55
+            ],
+            "deter_value_rep": 32.5
+        }
+    },
+    {
+        "140179256468448": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                10,
+                65
+            ],
+            "deter_value_rep": 37.5
+        }
+    },
+    {
+        "140179258025840": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                10,
+                75
+            ],
+            "deter_value_rep": 42.5
+        }
+    },
+    {
+        "140179259739488": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                10,
+                85
+            ],
+            "deter_value_rep": 47.5
+        }
+    },
+    {
+        "140179261323872": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                10,
+                95
+            ],
+            "deter_value_rep": 52.5
+        }
+    },
+    {
+        "140179261736512": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                20,
+                55
+            ],
+            "deter_value_rep": 37.5
+        }
+    },
+    {
+        "140179264330176": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                20,
+                65
+            ],
+            "deter_value_rep": 42.5
+        }
+    },
+    {
+        "140179265727520": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                20,
+                75
+            ],
+            "deter_value_rep": 47.5
+        }
+    },
+    {
+        "140178730822304": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                20,
+                85
+            ],
+            "deter_value_rep": 52.5
+        }
+    },
+    {
+        "140178732427456": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                20,
+                95
+            ],
+            "deter_value_rep": 57.5
+        }
+    },
+    {
+        "140178734612640": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                30,
+                55
+            ],
+            "deter_value_rep": 42.5
+        }
+    },
+    {
+        "140178736137360": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                30,
+                65
+            ],
+            "deter_value_rep": 47.5
+        }
+    },
+    {
+        "140178738516256": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                30,
+                75
+            ],
+            "deter_value_rep": 52.5
+        }
+    },
+    {
+        "140178740059280": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                30,
+                85
+            ],
+            "deter_value_rep": 57.5
+        }
+    },
+    {
+        "140178740906304": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                30,
+                95
+            ],
+            "deter_value_rep": 62.5
+        }
+    },
+    {
+        "140178738831776": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                40,
+                55
+            ],
+            "deter_value_rep": 47.5
+        }
+    },
+    {
+        "140178743693360": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                40,
+                65
+            ],
+            "deter_value_rep": 52.5
+        }
+    },
+    {
+        "140178745318160": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                40,
+                75
+            ],
+            "deter_value_rep": 57.5
+        }
+    },
+    {
+        "140178748378224": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                40,
+                85
+            ],
+            "deter_value_rep": 62.5
+        }
+    },
+    {
+        "140178748590880": {
+            "name": "elas_modulus",
+            "symbol": "E",
+            "units": "pa",
+            "essence": "interval",
+            "interval_initialisation": [
+                40,
+                95
+            ],
+            "deter_value_rep": 67.5
+        }
+    }
+]

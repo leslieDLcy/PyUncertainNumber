@@ -1,0 +1,10 @@
+- The **Measurand** field reveals the interpretation of what is being estimated or characterised with the number.
+
+- The **Variability**  field’s entry expresses what statement is being made about the variability, if any, that is represented by the uncertain number.
+
+- The **Ensemble** field specifies the population (or reference class) represented by the aleatory variation.
+
+- The **Dependence** field could be implemented in various ways.
+
+- The **Uncertainty** field identifies the nature of the epistemic uncertainty embodied in the uncertain number.
+

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Guide &mdash; py-pkgs-cookiecutter  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=eaac4085" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="&lt;no title&gt;" href="contributing.html" />
+    <link rel="prev" title="Quick Start" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            py-pkgs-cookiecutter
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#releasing-new-versions-of-your-package">Releasing new versions of your package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#continuous-integration-and-continuous-deployment">Continuous integration and continuous deployment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#no">No</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ci-continuous-integration">CI (continuous integration)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ci-cd-continuous-integration-continuous-deployment">CI+CD (continuous integration + continuous deployment)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="http://py-pkgs.org">Python Packages Book</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">py-pkgs-cookiecutter</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">User Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/user-guide.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading"></a></h1>
+<p>This section provides a high-level walk through of building a Python packge using the <code class="docutils literal notranslate"><span class="pre">py-pkgs-cookiecutter</span></code> template. For a much more detailed example see <a class="reference external" href="https://py-pkgs.org/03-how-to-package-a-python"><strong>Python Packages Chapter 3: How to package a Python</strong></a>.</p>
+<ol class="arabic">
+<li><p>Install <a class="reference external" href="https://cookiecutter.readthedocs.io/en/1.7.2/"><code class="docutils literal notranslate"><span class="pre">cookiecutter</span></code></a> using <code class="docutils literal notranslate"><span class="pre">pip</span></code> or <code class="docutils literal notranslate"><span class="pre">conda</span></code>:</p>
+<p><strong>Pip</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><style type="text/css">
+span.prompt1:before {
+  content: "$ ";
+}
+</style><span class="prompt1">pip<span class="w"> </span>install<span class="w"> </span>cookiecutter</span>
+</pre></div></div><p><strong>Conda</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">conda<span class="w"> </span>install<span class="w"> </span>cookiecutter</span>
+</pre></div></div></li>
+<li><p>Install <a class="reference external" href="https://python-poetry.org/docs/#installation"><code class="docutils literal notranslate"><span class="pre">poetry</span></code></a> for your operating system:</p>
+<p><strong>OS X / Linux / Bash on Windows</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">curl<span class="w"> </span>-sSL<span class="w"> </span>https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py<span class="w"> </span><span class="p">|</span><span class="w"> </span>python<span class="w"> </span>-</span>
+</pre></div></div><p><strong>Windows Powershell</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><style type="text/css">
+span.prompt2:before {
+  content: "PS C:\\> ";
+}
+</style><span class="prompt2"><span class="p">(</span><span class="nb">Invoke-WebRequest</span> <span class="n">-Uri</span> <span class="n">https</span><span class="p">://</span><span class="n">raw</span><span class="p">.</span><span class="n">githubusercontent</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">python-poetry</span><span class="p">/</span><span class="n">poetry</span><span class="p">/</span><span class="n">master</span><span class="p">/</span><span class="nb">install-poetry</span><span class="p">.</span><span class="n">py</span> <span class="n">-UseBasicParsing</span><span class="p">).</span><span class="n">Content</span> <span class="p">|</span> <span class="n">python</span> <span class="p">-</span></span>
+</pre></div></div></li>
+<li><p>Generate a Python package file and directory structure.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">cookiecutter<span class="w"> </span>https://github.com/py-pkgs/py-pkgs-cookiecutter.git</span>
+</pre></div></div><blockquote>
+<div><p>Note: one of the prompts the <code class="docutils literal notranslate"><span class="pre">cookiecutter</span></code> will ask you is if you want to include GitHub Actions (<code class="docutils literal notranslate"><span class="pre">include_github_actions</span></code>). This prompt allows to choose whether you want a continuous integration (CI) or continuous integration and continuous deployment (CI/CD) workflow file for use with GitHub Actions. If you choose to add CI or CI/CD please read <a class="reference internal" href="#continuous-integration-and-continuous-deployment"><span class="xref myst">Continuous integration and continuous deployment</span></a>.</p>
+</div></blockquote>
+</li>
+<li><p>Create and activate a virtual environment using <code class="docutils literal notranslate"><span class="pre">conda</span></code>. Read more in <a class="reference external" href="https://py-pkgs.org/03-how-to-package-a-python#create-a-virtual-environment">Section 3.5.1: Create a virtual environment</a> of the Python Packages book.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">conda<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span>&lt;your-env-name&gt;<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.9<span class="w"> </span>-y</span>
+<span class="prompt1">conda<span class="w"> </span>activate<span class="w"> </span>&lt;your-env-name&gt;</span>
+</pre></div></div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you don’t create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> virtual environment, <code class="docutils literal notranslate"><span class="pre">poetry</span></code>’s will create one for you using <code class="docutils literal notranslate"><span class="pre">venv</span></code>. You will have to explicitly tell <code class="docutils literal notranslate"><span class="pre">poetry</span></code> to use this virtual environment when runnings commands by prepending them with <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">run</span></code>. Read more in the <code class="docutils literal notranslate"><span class="pre">poetry</span></code> <a class="reference external" href="https://python-poetry.org/docs/managing-environments/">documentation</a>.</p>
+</div>
+</li>
+<li><p>Create a repository on GitHub and put your project under local and remote version control (see <a class="reference external" href="https://py-pkgs.org/03-how-to-package-a-python#put-your-package-under-version-control">Section 3.3: Put your package under version control</a> of the Python Packages book for help).</p></li>
+<li><p>Add Python code to module(s) in the <code class="docutils literal notranslate"><span class="pre">src/</span></code> directory. If your project has dependencies, add them using <code class="docutils literal notranslate"><span class="pre">poetry</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">poetry<span class="w"> </span>add<span class="w"> </span>&lt;dependency&gt;</span>
+</pre></div></div></li>
+<li><p>Install and try out your package in a Python interpreter.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">poetry<span class="w"> </span>install</span>
+</pre></div></div></li>
+<li><p>Write tests for your package in module(s) prefixed with <em><code class="docutils literal notranslate"><span class="pre">test_</span></code></em> in the <em><code class="docutils literal notranslate"><span class="pre">tests/</span></code></em> directory. Add <code class="docutils literal notranslate"><span class="pre">pytest</span></code> and <code class="docutils literal notranslate"><span class="pre">pytest-cov</span></code> as development dependencies and calcualte the coverage of your tests. Read more about testing and code coverage in <a class="reference external" href="https://py-pkgs.org/03-how-to-package-a-python#testing-your-package">Section 3.7: Testing your package</a> of the Python Packages book.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">poetry<span class="w"> </span>add<span class="w"> </span>--dev<span class="w"> </span>pytest<span class="w"> </span>pytest-cov</span>
+<span class="prompt1">pytest<span class="w"> </span>tests/<span class="w"> </span>--cov<span class="o">=</span>&lt;pkg-name&gt;</span>
+</pre></div></div></li>
+<li><p>Create documentation for your package. Add the necessary development depencies listed below and then compile and render documentation to HTML. Read more about testing and code coverage in <a class="reference external" href="https://py-pkgs.org/03-how-to-package-a-python#package-documentation">Section 3.8: Package documentation</a> of the Python Packages book.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">poetry<span class="w"> </span>add<span class="w"> </span>--dev<span class="w"> </span>myst-nb<span class="w"> </span>sphinx-autoapi<span class="w"> </span>sphinx-rtd-theme</span>
+<span class="prompt1">make<span class="w"> </span>html<span class="w"> </span>--directory<span class="w"> </span>docs/</span>
+</pre></div></div></li>
+<li><p>Host documentation online with <a class="reference external" href="https://readthedocs.org/">Read the Docs</a>. Read more about hosting on Read the Docs in <a class="reference external" href="https://py-pkgs.org/03-how-to-package-a-python#hosting-documentation-online">Section 3.8.5: Hosting documentation online</a> of the Python Packages book. Alternatively, you can host on <a class="reference external" href="https://pages.github.com">GitHub Pages</a> using the <a class="reference external" href="https://github.com/c-w/ghp-import">ghp-import</a> package as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">poetry<span class="w"> </span>add<span class="w"> </span>--dev<span class="w"> </span>ghp-import</span>
+<span class="prompt1">ghp-import<span class="w"> </span>-n<span class="w"> </span>-p<span class="w"> </span>-f<span class="w"> </span>docs/_build/html</span>
+</pre></div></div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The above command pushes your HTML files to the <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch of your repo. With the rendered site available at e.g., <code class="docutils literal notranslate"><span class="pre">https://&lt;user-name&gt;.github.io/&lt;repo-name&gt;/</span></code>. The <code class="docutils literal notranslate"><span class="pre">-n</span></code> argument includes a <em>.nojekyll</em> file in the branch. <code class="docutils literal notranslate"><span class="pre">-p</span> <span class="pre">-f</span></code> force pushes to the remote. Read more in the <a class="reference external" href="https://github.com/c-w/ghp-import">ghp-import</a> documentation.</p>
+</div>
+</li>
+<li><p>Tag a release of your package using Git and GitHub, or equivalent version control tools. Read more about tagging releases in <a class="reference external" href="https://py-pkgs.org/03-how-to-package-a-python#tagging-a-package-release-with-version-control">Section 3.8.5: Tagging a package release with version control</a> of the Python Packages book.</p></li>
+<li><p>Build sdist and wheel distributions for your package.  Read more in <a class="reference external" href="https://py-pkgs.org/03-how-to-package-a-python#building-and-distributing-your-package">Section 3.10: Building and distributing your package</a> of the Python Packages book.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">poetry<span class="w"> </span>build</span>
+</pre></div></div></li>
+<li><p>Publish your distributions to <a class="reference external" href="https://test.pypi.org/">TestPyPi</a> and try installing your package.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">poetry<span class="w"> </span>config<span class="w"> </span>repositories.test-pypi<span class="w"> </span>https://test.pypi.org/legacy/</span>
+<span class="prompt1">poetry<span class="w"> </span>publish<span class="w"> </span>-r<span class="w"> </span>test-pypi</span>
+<span class="prompt1">pip<span class="w"> </span>install<span class="w"> </span>--index-url<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span>&lt;pkg-name&gt;</span>
+</pre></div></div></li>
+<li><p>Publish your distributions to <a class="reference external" href="https://pypi.org/">PyPi</a>. Your package can now be installed by anyone using <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">poetry<span class="w"> </span>publish</span>
+<span class="prompt1">pip<span class="w"> </span>install<span class="w"> </span>&lt;pkg-name&gt;</span>
+</pre></div></div></li>
+</ol>
+<section id="releasing-new-versions-of-your-package">
+<h2>Releasing new versions of your package<a class="headerlink" href="#releasing-new-versions-of-your-package" title="Link to this heading"></a></h2>
+<p>The process for releasing new versions of your package is described in detail in <a class="reference external" href="https://py-pkgs.org/07-releasing-versioning">Chapter 7: Releasing and Versioning</a> of the Python Packages book.</p>
+</section>
+<section id="continuous-integration-and-continuous-deployment">
+<h2>Continuous integration and continuous deployment<a class="headerlink" href="#continuous-integration-and-continuous-deployment" title="Link to this heading"></a></h2>
+<p>One of the prompts the <code class="docutils literal notranslate"><span class="pre">cookiecutter</span></code> will ask you is if you want to include GitHub Actions (<code class="docutils literal notranslate"><span class="pre">include_github_actions</span></code>). This prompt allows to choose whether you want a continuous integration (CI) or continuous integration and continuous deployment (CI/CD) workflow file for use with GitHub Actions. The possible responses are described in the following sections. You can read more about CI/CD and these workflow files in <a class="reference external" href="https://py-pkgs.org/08-ci-cd">Chapter 8: Continuous integration and deployment</a> of the Python Packages book.</p>
+<section id="no">
+<h3>No<a class="headerlink" href="#no" title="Link to this heading"></a></h3>
+<p>A GitHub Actions workflow file won’t be included in your package structure.</p>
+</section>
+<section id="ci-continuous-integration">
+<h3>CI (continuous integration)<a class="headerlink" href="#ci-continuous-integration" title="Link to this heading"></a></h3>
+<p>A GitHub Actions workflow file for continuous integration will be included in your package structure at <code class="docutils literal notranslate"><span class="pre">.github/workflows/ci.yml</span></code>. It contains the following features:</p>
+<ul class="simple">
+<li><p>Triggered on “push” or “pull request” to the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch.</p></li>
+<li><p>Sets up a Ubuntu operating system, checks out your repository, installs Python 3.9, and installs the latest version of <code class="docutils literal notranslate"><span class="pre">poetry</span></code>.</p></li>
+<li><p>Installs your package with <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span></code></p></li>
+<li><p>Runs test with <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/</span></code></p></li>
+<li><p>Upload code coverage of tests to Codecov</p></li>
+<li><p>Builds documentation with <code class="docutils literal notranslate"><span class="pre">sphinx</span></code></p></li>
+</ul>
+</section>
+<section id="ci-cd-continuous-integration-continuous-deployment">
+<h3>CI+CD (continuous integration + continuous deployment)<a class="headerlink" href="#ci-cd-continuous-integration-continuous-deployment" title="Link to this heading"></a></h3>
+<p>A GitHub Actions workflow file for continuous integration and continuous deployment will be included in your package structure at <code class="docutils literal notranslate"><span class="pre">.github/workflows/ci-cd.yml</span></code>. It contains the following features:</p>
+<ul class="simple">
+<li><p>CI job:</p>
+<ul>
+<li><p>Same as described above.</p></li>
+</ul>
+</li>
+<li><p>CD job:</p>
+<ul>
+<li><p>Triggered on a “push” or merged “pull request” to the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch.</p></li>
+<li><p>Sets up a Ubuntu operating system, checks out your repository, installs Python 3.9.</p></li>
+<li><p>Uses <a class="reference external" href="https://github.com/relekang/python-semantic-release">Python Semantic Release (PSR)</a> to automatically bump version numbers based on commit messages. PSR will also update the CHANGELOG, tag a new release of the repository, and build new sdist and wheel distributions ready to upload to PyPI. Read more PSR in <a class="reference external" href="https://py-pkgs.org/08-ci-cd#automatically-creating-a-new-package-version">Section 8.5.2: Automatically creating a new package version</a> of the Python Packages book.</p></li>
+<li><p>Publishes new distributions to TestPyPI. For this to work, you’ll need to log-in to <a class="reference external" href="https://test.pypi.org">TestPyPI</a>, <a class="reference external" href="https://pypi.org/help/#apitoken">create an API token</a>, and <a class="reference external" href="https://docs.github.com/en/actions/reference/encrypted-secrets">add the token as a secret</a> called <code class="docutils literal notranslate"><span class="pre">TEST_PYPI_API_TOKEN</span></code> to your GitHub repository.</p></li>
+<li><p>Tests that the new distributions install successfuly from TestPyPI using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code></p></li>
+<li><p>Publishes distributions to PyPI. For this to work, you’ll need to log-in to <a class="reference external" href="https://pypi.org">PyPI</a>, <a class="reference external" href="https://pypi.org/help/#apitoken">create an API token</a>, and <a class="reference external" href="https://docs.github.com/en/actions/reference/encrypted-secrets">add the token as a secret</a> called <code class="docutils literal notranslate"><span class="pre">PYPI_API_TOKEN</span></code> to your GitHub repository.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quick Start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contributing.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tomas Beuzen &amp; Tiffany Timbers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
