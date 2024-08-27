@@ -1,11 +1,6 @@
-r"""
-
-"""
-
 from typing import Union
 import numpy as np
 import random as r
-import itertools
 import warnings
 
 
@@ -70,18 +65,16 @@ class Interval:
 
     def __init__(self, left=None, right=None):
         """
-        **Attributes**:
-
-            ``left``: The left boundary of the interval.
-
-            ``right``: The right boundary of the interval.
+        args:
+            - left: The left end of the interval.
+            - right: The right end of the interval.
 
         .. admonition:: Default values
-
-            If only 1 argument is given then the interval is assumed to be zero width around this value.
-
-            If no arguments are given then the interval is assumed to be vaccous (i.e. :math:`[-\infty,\infty]`). This is implemented as ``Interval(-np.inf,np.inf)``.
+        note:
+            - If only 1 argument is given then the interval is assumed to be zero width around this value.
+            - If no arguments are given then the interval is assumed to be vaccous (i.e. :math:`[-\infty,\infty]`). This is implemented as ``Interval(-np.inf,np.inf)``.
         """
+
         # disallow p-boxes
         if left.__class__.__name__ == "Pbox" or right.__class__.__name__ == "Pbox":
             raise ValueError(
@@ -114,8 +107,16 @@ class Interval:
             left = min(LowerUpper)
             right = max(LowerUpper)
 
-        self.left = left
-        self.right = right
+        self._left = left
+        self._right = right
+
+    @property
+    def left(self):
+        return self._left
+
+    @property
+    def right(self):
+        return self._right
 
     def __repr__(self) -> str:  # return
         return "Interval [%g, %g]" % (self.left, self.right)
@@ -139,6 +140,10 @@ class Interval:
 
     def __len__(self):
         return 2
+
+    ###############################
+    ##### interval arithmetic #####
+    ###############################
 
     def __radd__(self, left):
         return self.__add__(left)
@@ -317,8 +322,7 @@ class Interval:
         return self < other
 
     def __eq__(self, other):
-        # ==
-
+        """=="""
         if not isinstance(other, Interval):
             try:
                 other = Interval(other)
@@ -333,7 +337,7 @@ class Interval:
             return Interval(0, 0).to_logical()
 
     def __gt__(self, other):
-        # >
+        """>"""
         try:
             lt = self < other
         except:
@@ -346,7 +350,7 @@ class Interval:
         return self > other
 
     def __ne__(self, other):
-        # !=
+        """!="""
         try:
             eq = self == other
         except:
@@ -356,7 +360,7 @@ class Interval:
         return ~eq
 
     def __le__(self, other):
-        # <=
+        """<="""
         if not isinstance(other, Interval):
             try:
                 other = Interval(other)
@@ -764,7 +768,7 @@ class Interval:
             This function is redundant but exists to match Pbox class for possible internal reasons.
 
         """
-        return self.left
+        return self._left
 
     def hi(self):
         """
@@ -776,7 +780,7 @@ class Interval:
             This function is redundant but exists to match Pbox class for possible internal reasons.
 
         """
-        return self.right
+        return self._right
 
     def width(self) -> float:
         """
@@ -811,13 +815,15 @@ class Interval:
         return self.width() / 2
 
     def midpoint(self) -> float:
-        """
-        **Returns**:
+        """Returns the midpoint of the interval
 
-                ``float``: The midpoint of the interval, :math:`(\mathrm{right} + \mathrm{left})/2`
+        note:
+            - this serves as the deterministic value representation of the interval, a.k.a. the naked value for an interval
+
+        returns:
+            ``float``: The midpoint of the interval, :math:`(\mathrm{right} + \mathrm{left})/2`
 
         **Example**:
-
                 >>> pba.Interval(0,2).midpoint()
                 1.0
         """
@@ -846,8 +852,7 @@ class Interval:
         return Logical(self.left.__bool__(), self.right.__bool__())
 
     def env(self, other: Union[list, "Interval"]) -> "Interval":
-        """
-        Calculates the envelope between two intervals
+        """Calculates the envelope between two intervals
 
         **Parameters**:
 
@@ -945,8 +950,7 @@ class Interval:
         return self.straddles(0, endpoints)
 
     def intersection(self, other: Union["Interval", list]) -> "Interval":
-        """
-        Calculates the intersection between intervals
+        """Calculates the intersection between intervals
 
         **Parameters**:
 
@@ -962,8 +966,6 @@ class Interval:
             >>> b = Interval(0.5,1.5)
             >>> a.intersection(b)
             Interval [0.5, 1]
-
-
         """
         if isinstance(other, Interval):
             if self.straddles(other):
@@ -1053,8 +1055,6 @@ class Interval:
             >>> rng = np.random.default_rng(seed = 0)
             >>> pba.I(0,1).sample(numpy_rng = rng)
             0.6369616873214543
-
-
         """
 
         if numpy_rng is not None:
@@ -1064,16 +1064,34 @@ class Interval:
             r.seed(seed)
         return self.left + r.random() * self.width()
 
+    @classmethod
+    def from_midwith(cls, midpoint: float, halfwidth: float) -> "Interval":
+        """Creates an Interval object from a midpoint and half-width.
+
+        args:
+            - midpoint (float): The midpoint of the interval.
+            - halfwidth (float): The half-width of the interval.
+
+        returns:
+            - Interval: The interval with midpoint and half-width.
+
+        example:
+            >>> pba.Interval.from_midwith(0,1)
+            Interval [-1, 1]
+        """
+
+        return cls(midpoint - halfwidth, midpoint + halfwidth)
+
 
 # Alias
 I = Interval
 
 
 def PM(x, hw):
-    """
-    Create an interval centered around x with a half-width of hw.
+    """Create an interval centered around x with a half-width of hw.
 
-    # !INFO: a constructor for creating an interval from a midpoint and half-width
+    # TODO: a constructor for creating an interval from a midpoint and half-width
+    # ! this func is weird and I keep it only for not breaking the code in other places.
 
     **Parameters**:
 

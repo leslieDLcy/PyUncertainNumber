@@ -2,6 +2,15 @@ import json
 import numpy as np
 
 
+def _interval_list_to_array(l, left=True):
+    if left:
+        f = lambda x: x.left if isinstance(x, Interval) else x
+    else:  # must be right
+        f = lambda x: x.right if isinstance(x, Interval) else x
+
+    return np.array([f(i) for i in l])
+
+
 def read_json(file_name):
     f = open(file_name)
     data = json.load(f)

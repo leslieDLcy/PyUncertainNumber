@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from .interval import Interval
-from .utils import check_increasing, NotIncreasingError
+from .utils import check_increasing, NotIncreasingError, _interval_list_to_array
 
 
 __all__ = [
@@ -19,16 +19,8 @@ __all__ = [
 ]
 
 
-def _interval_list_to_array(l, left=True):
-    if left:
-        f = lambda x: x.left if isinstance(x, Interval) else x
-    else:  # must be right
-        f = lambda x: x.right if isinstance(x, Interval) else x
-
-    return np.array([f(i) for i in l])
-
-
 class Pbox:
+    """ not the main constructor """
     r"""
     A probability distribution is a mathematical function that gives the probabilities of occurrence for diﬀerent possible values of a variable. Probability boxes (p-boxes) represent interval bounds on probability distributions. The simplest kind of p-box can be expressed mathematically as
 
@@ -42,7 +34,6 @@ class Pbox:
     Naturally, precise probability distributions can be defined in PBA by defining a p-box with precise inputs. This means that within probability bounds analysis probability distributions are considered a special case of a p-box with zero width. Resultantly, all methodology that applies to p-boxes can also be applied to probability distributions.
 
     Distribution-free p-boxes can also be generated when the underlying distribution is unknown but parameters such as the mean, variance or minimum/maximum bounds are known. Such p-boxes make no assumption about the shape of the distribution and instead return bounds expressing all possible distributions that are valid given the known information. Such p-boxes can be constructed making use of Chebyshev, Markov and Cantelli inequalities from probability theory.
-
     """
 
     STEPS = 200
