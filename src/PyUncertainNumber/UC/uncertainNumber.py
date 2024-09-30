@@ -25,7 +25,6 @@ from .check import DistributionSpecification
 
 @dataclass
 class UncertainNumber:
-    # TODO add more metadata for the fields
     """Uncertain Number class
 
     note:
@@ -35,6 +34,7 @@ class UncertainNumber:
         - `distribution_initialisation` changed to `distribution_parameters`;
         - `pbox_initialisation` changed to `pbox_parameters`;
     """
+
     # ---------------------Basic---------------------#
     name: str = field(default=None)
     symbol: str = field(default=None)
@@ -244,9 +244,7 @@ class UncertainNumber:
                         )
                         self._math_object.quick_plot()
 
-    ##############################
-    #######    some methods  #####
-    ##############################
+    # ---------------------some class methods---------------------#
 
     def _get_concise_representation(self):
         """get a concise representation of the UN object"""
@@ -271,9 +269,7 @@ class UncertainNumber:
         """quick plot of the uncertain number object"""
         self._math_object.quick_plot()
 
-    ##############################
-    ##### other constructors #####
-    ##############################
+    # ---------------------other constructors---------------------#
 
     @classmethod
     def from_hedge(cls, hedged_language):
@@ -289,7 +285,15 @@ class UncertainNumber:
         return cls(essence=essence, bounds=[left, right])
 
     @classmethod
-    def from_distribution(cls, dist_family, dist_params, **kwargs):
+    def from_distribution(cls, dist_family: str, dist_params, **kwargs):
+        """create an Uncertain Number from specification of distribution
+
+        args:
+            dist_family: str
+                the distribution family
+            dist_params: list, tuple or string
+                the distribution parameters
+        """
         distSpec = DistributionSpecification(dist_family, dist_params)
         if "essence" not in kwargs:
             kwargs["essence"] = "distribution"
@@ -302,9 +306,7 @@ class UncertainNumber:
     def from_range(cls):
         pass
 
-    ##############################
-    ##### arithmetic operations ##
-    ##############################
+    # ---------------------arithmetic operations---------------------#
 
     def __add__(self, other):
         """add two uncertain numbers"""
@@ -418,9 +420,7 @@ class UncertainNumber:
         _UNintervals = np.array(_intervals).reshape(-1, 2)
         return _UNintervals
 
-    ######################
-    ##### UP methods #####
-    ######################
+    # ---------------------Uncertainty propatation methods---------------------#
 
     @classmethod
     def vertexMethod(cls, vars, func):
@@ -478,9 +478,7 @@ class UncertainNumber:
         )
         # return endpoints_propagation_2n(_UNintervals, func)
 
-    ###################################
-    ##### serialisation functions #####
-    ###################################
+    # ---------------------serialisation functions---------------------#
 
     def JSON_dump(self, filename="UN_data.json"):
         """the JSON serialisation of the UN object into the filesystem"""
@@ -493,7 +491,7 @@ class UncertainNumber:
 # TODO unfinished logic: currently if suffices in creating only `Interval` object
 # @classmethod
 def parse_description(description):
-    """Parse the description of the uncertain number
+    """Parse the description of the uncertain number when initialising an Uncertain Number object
 
     args:
         description: str
@@ -502,7 +500,6 @@ def parse_description(description):
     caveat:
         the description needs to have space between the values and the operators, such as '[15 +- 10%]'
     """
-    # return cls(radius=diameter / 2)
 
     ### type 1 ###
     # initial check if string-rep of list
@@ -527,33 +524,10 @@ def parse_description(description):
             # if we take the percentage based on the context
             return PM(parsed_mid_value, hw=parsed_mid_value * mid_range)
 
-    # @classmethod
-    # def from_diameter(cls, type, description):
-    #     """Scott desired way of instantiating
-
-    #     note:
-    #         parser from a description from the user
-
-    #     args:
-    #         type: str
-    #             the type of the uncertain number, ['interval', 'pbox', 'distribution']
-    #         description: str
-    #             the description of the uncertain number
-    #     """
-    #     match type:
-    #         case "interval":
-    #             return "Interval type selected"
-    #         case "distribution":
-    #             return "Distribution type selected"
-    #         case "pbox":
-    #             return "Pbox type selected"
-    #         case _:
-    #             return "Currently only {'interval', 'distribution', and 'pbox'} types are supported"
-    #     # return cls(radius=diameter / 2)
-
     # def __add__(self, other):
     #     """ Add two uncertain numbers.
     #     #TODO unfinished logic for adding uncertain numbers
+    # ! this code is kept for working with units
     #     """
 
     #     if not isinstance(other, type(self)):
