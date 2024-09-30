@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Type, Union
-from .measurand import Measurand
-from .variability import Variability
+
+# from .measurand import Measurand
+# from .variability import Variability
 from .uncertainty_types import Uncertainty_types
 from .ensemble import Ensemble
 from PyUncertainNumber.pba.interval import Interval as I
@@ -34,12 +35,13 @@ class UncertainNumber:
         - `distribution_initialisation` changed to `distribution_parameters`;
         - `pbox_initialisation` changed to `pbox_parameters`;
     """
+    # ---------------------Basic---------------------#
     name: str = field(default=None)
     symbol: str = field(default=None)
     units: str = field(default=None)
-    measurand: Type[Measurand] = field(default=None)
-    variability: Type[Variability] = field(default=None)
-    ensemble: Type[Ensemble] = field(default=None)
+
+    # ---------------------Value---------------------#
+    # ensemble: Type[Ensemble] = field(default=None)
     uncertainty_type: Type[Uncertainty_types] = field(default=None)
     essence: str = field(default=None)  # [interval, distribution, pbox]
     bounds: Union[List[float], str] = field(default=None)
@@ -50,9 +52,25 @@ class UncertainNumber:
     # UN object, which shall be linked with the 'pba' or `Intervals` package
     deter_value_rep: float = field(default=None)
 
-    # a simple boiler plate
+    # ---------------------auxlliary information---------------------#
+    # some simple boiler plates
     # lat: float = field(default=0.0, metadata={'unit': 'degrees'})
+    # ensemble: Type[Ensemble] = field(default=None)
+
+    measurand: str = field(default=None)
+    nature: str = field(default=None)
+    provenence: str = field(default=None)
     justification: str = field(default=None)
+    structure: str = field(default=None)
+    security: str = field(default=None)
+
+    # ---------------------aleatoric component---------------------#
+    ensemble: Type[Ensemble] = field(default=None)
+    variability: str = field(default=None)
+    dependence: str = field(default=None)
+
+    # ---------------------epistemic component---------------------#
+    uncertainty: str = field(default=None)
 
     # class variable
     instances = []

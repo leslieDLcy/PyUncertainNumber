@@ -26,11 +26,11 @@ def to_database(dict_list, db_name, col_name):
         return new_result
 
 
-def cd_root_dir():
+def cd_root_dir(depth=0):
     # change directory to the path of the root directory of the project
 
     ref_path = os.path.abspath("")
-    ref_path = pathlib.Path(ref_path).resolve().parents[0]
+    ref_path = pathlib.Path(ref_path).resolve().parents[depth]
     os.chdir(ref_path)
     print("current directory:", os.getcwd())
 
