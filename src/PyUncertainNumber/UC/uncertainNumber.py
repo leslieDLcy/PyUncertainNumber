@@ -50,7 +50,7 @@ class UncertainNumber:
     hedge: str = field(default=None)
     # this is the deterministic numeric representation of the
     # UN object, which shall be linked with the 'pba' or `Intervals` package
-    deter_value_rep: float = field(default=None)
+    naked_value: float = field(default=None)
 
     # ---------------------auxlliary information---------------------#
     # some simple boiler plates
@@ -100,14 +100,15 @@ class UncertainNumber:
                 self.essence = "interval"
                 self.bounds = [-np.inf, np.inf]
 
+        # TODO to create the Quantity object defined as <value * unit>
         """get the 'unit' representation of the uncertain number"""
         ureg = UnitRegistry()
         UncertainNumber.instances.append(self)
         # I can use the following logic to double check the arithmetic operations of the UN object
-        # if isinstance(self.deter_value_rep, float) or isinstance(
-        #     self.deter_value_rep, int
+        # if isinstance(self.naked_value, float) or isinstance(
+        #     self.naked_value, int
         # ):
-        #     self._UnitsRep = self.deter_value_rep * ureg(self.units)
+        #     self._UnitsRep = self.naked_value * ureg(self.units)
         # else:
         #     self._UnitsRep = 1 * ureg(self.units)
 
@@ -139,15 +140,15 @@ class UncertainNumber:
         """create a deterministic representation of the uncertain number"""
         match self.essence:
             case "interval":
-                self.deter_value_rep = self._math_object.midpoint()
+                self.naked_value = self._math_object.midpoint()
             case "distribution":
-                self.deter_value_rep = (
+                self.naked_value = (
                     self._math_object.mean_left
                 )  # TODO the error is here where the numeric value is NOT a value
                 # TODO continue getting familar with the 'pba' package for computing mean etc...
                 # TODO I've put `mean_left` there but unsure if correct or not
             case "pbox":
-                self.deter_value_rep = self._math_object.mean()
+                self.naked_value = self._math_object.mean()
 
     @staticmethod
     def match_distribution(keyword, parameters):
@@ -209,7 +210,7 @@ class UncertainNumber:
                     case "pbox":
                         return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}"
             case "one-number":
-                return f"This is an {self.essence}-type Uncertain Number whose naked value is {self.deter_value_rep:.2f}"
+                return f"This is an {self.essence}-type Uncertain Number whose naked value is {self.naked_value:.2f}"
             case "concise":
                 return self.__repr__()
             case "range":
