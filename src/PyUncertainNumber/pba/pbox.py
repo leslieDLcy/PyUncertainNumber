@@ -20,7 +20,8 @@ __all__ = [
 
 
 class Pbox:
-    """ not the main constructor """
+    """not the main constructor"""
+
     r"""
     A probability distribution is a mathematical function that gives the probabilities of occurrence for diﬀerent possible values of a variable. Probability boxes (p-boxes) represent interval bounds on probability distributions. The simplest kind of p-box can be expressed mathematically as
 
@@ -901,7 +902,7 @@ class Pbox:
             return fig, ax
 
     @mpl.rc_context({"text.usetex": True})
-    def quick_plot(self, title="", ax=None, **kwargs):
+    def quick_plot(self, title="", ax=None, display=True, style="simple", **kwargs):
         """quickly plot the pba object
 
         # !Leslie defined plotting function"""
@@ -915,7 +916,6 @@ class Pbox:
         steps = self.steps
 
         # flag: must be something wrong herein
-
         LL = np.concatenate((L, L, np.array([R[-1]])))
         RR = np.concatenate((np.array([L[0]]), R, R))
         ii = (
@@ -934,20 +934,29 @@ class Pbox:
         LL.sort()
         RR.sort()
 
-        if "color" in kwargs.keys():
-
-            ax.plot(LL, ii, **kwargs)
-            ax.plot(RR, jj, **kwargs)
-        else:
-            ax.plot(LL, ii, "g-", **kwargs)
-            ax.plot(RR, jj, "b-", **kwargs)
+        ax.plot(LL, ii, "g-", **kwargs)  # plot the upper bound
+        ax.plot(RR, jj, "b-", **kwargs)  # plot the lower bound
 
         if title != "":
             ax.set_title(title, **kwargs)
+        # TODO pbox add band plotting style
+        if style == "band":
+            dummy_x = np.linspace(L.min(), R.max(), len(LL))
+            ax.fill_between(
+                dummy_x,
+                ii,
+                jj,
+                where=(ii > jj),
+                interpolate=True,
+                color="red",
+            )
 
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(x \leq X)$")
-        return ax
+        if display:
+            plt.show()
+        else:
+            return ax
 
     plot = show
 

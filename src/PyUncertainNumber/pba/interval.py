@@ -2,6 +2,8 @@ from typing import Union
 import numpy as np
 import random as r
 import warnings
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 
 __all__ = ["Interval", "I", "PM"]
@@ -1016,6 +1018,39 @@ class Interval:
     # def tan(self):
     #     return Interval(np.tan(self.left),np.tan(self.right))
 
+    # ---------------------methods---------------------#
+    @mpl.rc_context({"text.usetex": True})
+    def quick_plot(self, title="", ax=None, style="simple", **kwargs):
+
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        if style == "simple":
+            # Plot the interval horizontally
+            ax.plot(
+                [self.left, self.right],
+                [
+                    1,
+                    1,
+                ],
+                "blue",
+                **kwargs,
+            )
+        elif style == "band":
+            # plot the band
+            ax.fill_between(
+                x=[self.left, self.right],
+                y1=0,
+                y2=1,
+                edgecolor="blue",
+                facecolor=("blue", 0.2),
+                **kwargs,
+            )
+        ax.margins(x=0.1)
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel("CDF")
+        plt.show()
+
     def sample(self, seed=None, numpy_rng: np.random.Generator = None) -> float:
         """
         Generate a random sample within the interval.
@@ -1063,6 +1098,8 @@ class Interval:
         if seed is not None:
             r.seed(seed)
         return self.left + r.random() * self.width()
+
+    # ---------------------Constructors---------------------#
 
     @classmethod
     def from_midwith(cls, midpoint: float, halfwidth: float) -> "Interval":

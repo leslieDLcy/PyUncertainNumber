@@ -114,7 +114,7 @@ class UncertainNumber:
 
         self._UnitsRep = 1 * ureg(self.units)
 
-        # create the underlying math object
+        ### create the underlying math object ###
         # temp logic for parsing `self.bounds` if it is a string
         match self.essence:
             case "interval":
@@ -137,7 +137,7 @@ class UncertainNumber:
                     self.distribution_parameters[1],
                 )
 
-        """create a deterministic representation of the uncertain number"""
+        ### create the naked value - deterministic representation of the uncertain number ###
         match self.essence:
             case "interval":
                 self.naked_value = self._math_object.midpoint()
@@ -266,9 +266,9 @@ class UncertainNumber:
             case "pbox":
                 return "unfinshed"
 
-    def quick_plot(self):
+    def quick_plot(self, **kwargs):
         """quick plot of the uncertain number object"""
-        self._math_object.quick_plot()
+        self._math_object.quick_plot(**kwargs)
 
     # ---------------------other constructors---------------------#
 
