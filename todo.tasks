@@ -4,6 +4,10 @@ UC module:
     ☐ unified style of plotting funcs for interval, pbox
     ☐ change to a dispatcher for bounds specification (i.e. work on `parse_description`)
 
+pbox:
+    ☐ drawing samples
+    ☐ propagating with pbox
+
 
 UP module:
     ☐ test the new functionality from Ioanna
