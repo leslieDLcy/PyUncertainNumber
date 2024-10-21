@@ -73,9 +73,9 @@ class UncertainNumber:
     uncertainty: str = field(default=None)
 
     # class variable
-    instances = []
+    instances = []  # TODO named as registry later on
 
-    ##### initialisation #####
+    # ---------------------more on initialisation---------------------#
 
     def __post_init__(self):
         """the de facto initialisation method for the core math objects of the UN class
@@ -304,7 +304,14 @@ class UncertainNumber:
         )
 
     @classmethod
-    def from_range(cls):
+    def from_distributionProperties(cls, min, max, mean, median, variance, **kwargs):
+        """to construct a pbox given the properties of the distribution
+
+        returns:
+            - a pbox-type UN object
+        note:
+            - whether differentiate explicitly if free/parametric pbox
+        """
         pass
 
     # ---------------------arithmetic operations---------------------#
