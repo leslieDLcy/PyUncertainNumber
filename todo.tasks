@@ -1,5 +1,5 @@
 UC module:
-    ☐ work on the functionality of units
+    ✔ work on the functionality of units @done (21/10/2024, 10:37:04)
     ✔ add the auxiliary information to UC module @done (30/09/2024, 07:12:12)
     ☐ unified style of plotting funcs for interval, pbox
     ☐ change to a dispatcher for bounds specification (i.e. work on `parse_description`)
@@ -10,11 +10,19 @@ pbox:
     ☐ construct pbox from data or from partial knowledge on the distribution property (i.e. min, max, mean, variance, etc.)?
 
 
-
-
-
 UP module:
     ☐ test the new functionality from Ioanna
     ☐ Test on the surrogate models
+
+
+preparation for the December workshop:
+    ☐ a personal notebook namned features
+    ☐ package documentation @high 
+    ☐ slides in Beams
+    ☐ notebook on installation
+    ☐ notebook on the Cantilever beam example
+
+
+
 
 

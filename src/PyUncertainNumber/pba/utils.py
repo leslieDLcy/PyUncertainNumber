@@ -1,6 +1,6 @@
 import json
 import numpy as np
-
+from .interval import Interval
 
 def _interval_list_to_array(l, left=True):
     if left:

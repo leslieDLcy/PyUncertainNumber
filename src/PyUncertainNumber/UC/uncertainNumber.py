@@ -314,6 +314,17 @@ class UncertainNumber:
         """
         pass
 
+
+    @classmethod
+    def I(cls, bounds, **kwargs):
+        """a shortcut for creating an interval-type Uncertain Number"""
+        return cls(essence="interval", bounds=bounds, **kwargs)
+
+
+
+
+
+
     # ---------------------arithmetic operations---------------------#
 
     def __add__(self, other):

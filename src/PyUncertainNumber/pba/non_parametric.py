@@ -1,6 +1,12 @@
 '''
-Functions that can be used to generate non-parametric p-boxes. These functions are used to generate p-boxes based upon the minimum, maximum, mean, median, mode, standard deviation, variance, and coefficient of variation of the variable.
+re: non-parametric pbox construction
+
+Functions that can be used to generate non-parametric p-boxes. 
+These functions are used to generate p-boxes based upon the minimum, maximum, mean, median, 
+mode, standard deviation, variance, and coefficient of variation of the variable.
 '''
+
+
 __all__ = [
     'what_I_know',
     'box',
