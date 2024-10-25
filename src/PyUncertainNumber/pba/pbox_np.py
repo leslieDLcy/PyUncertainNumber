@@ -8,10 +8,11 @@ mode, standard deviation, variance, and coefficient of variation of the variable
 
 
 __all__ = [
-    'what_I_know',
+    'known_properties',
     'box',
     'min_max',
     'min_max_mean',
+    'min_mean',
     'min_max_mean_std',
     'min_max_mean_var',
     'min_max_mode',
@@ -35,7 +36,7 @@ from typing import *
 from warnings import warn
 import numpy as np
 
-def what_I_know(
+def known_properties(
         minimum: Optional[Union[Interval,float,int]] = None,
         maximum: Optional[Union[Interval,float,int]] = None,
         mean: Optional[Union[Interval,float,int]] = None,
@@ -53,7 +54,9 @@ def what_I_know(
         steps: int = Pbox.STEPS
         ) -> Pbox:
     '''
-    Generates a distribution free p-box based upon the information given. This function works by calculating every possible non-parametric p-box that can be generated using the information provided. The returned p-box is the intersection of these p-boxes.
+    Generates a distribution free p-box based upon the information given. 
+    This function works by calculating every possible non-parametric p-box that can be generated using the information provided. 
+    The returned p-box is the intersection of these p-boxes.
     
     **Parameters**:
     
@@ -75,7 +78,6 @@ def what_I_know(
     **Returns**:
     
         ``Pbox``: Imposition of possible p-boxes
-    
     '''
     
     def _print_debug(skk): print("\033[93m {}\033[00m" .format(skk),end=' ')
@@ -259,8 +261,6 @@ def max_mean(
     '''
     return min_mean(-maximum,-mean).__neg__()
     
-
-
 def mean_std(
         mean: Union[Interval,float,int],
         std: Union[Interval,float,int],
@@ -538,8 +538,9 @@ def min_max_mean_std(
     '''
     if minimum == maximum:
         return box(minimum, maximum)
+    
     def _left(x): 
-        if type(x) in [int,float]:
+        if isinstance(x, (int, float, np.number)):
             return x
         if x.__class__.__name__ == "Interval":
             return x.left
@@ -547,7 +548,7 @@ def min_max_mean_std(
             return min(x.left)
         
     def _right(x): 
-        if type(x) in [int,float]:
+        if isinstance(x, (int, float, np.number)):
             return x
         if x.__class__.__name__ == "Interval":
             return x.right
@@ -566,8 +567,8 @@ def min_max_mean_std(
     
     zero = 0.0                          
     one = 1.0
-    ran = maximum - minimum;
-    m = _constrain(mean, Interval(minimum,maximum), "(mean)");
+    ran = maximum - minimum
+    m = _constrain(mean, Interval(minimum,maximum), "(mean)")
     s = _constrain(std, _env(Interval(0.0),(abs(ran*ran/4.0 - (maximum-mean-ran/2.0)**2))**0.5)," (dispersion)")
     ml = (m.left-minimum)/ran
     sl = s.left/ran

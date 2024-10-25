@@ -5,4 +5,4 @@ from .copula import *
 from .core import *
 from .logical import *
 from .dists import *
-from .non_parametric import *
+from .pbox_np import *

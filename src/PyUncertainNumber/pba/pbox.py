@@ -902,7 +902,7 @@ class Pbox:
             return fig, ax
 
     @mpl.rc_context({"text.usetex": True})
-    def quick_plot(self, title="", ax=None, display=True, style="simple", **kwargs):
+    def display(self, title="", ax=None, display=True, style="simple", **kwargs):
         """quickly plot the pba object
 
         # !Leslie defined plotting function"""
@@ -941,15 +941,25 @@ class Pbox:
             ax.set_title(title, **kwargs)
         # TODO pbox add band plotting style
         if style == "band":
+            # dummy_x = np.linspace(L.min(), R.max(), len(LL))
+            # ax.fill_between(
+            #     dummy_x,
+            #     ii,
+            #     jj,
+            #     where=(ii > jj),
+            #     interpolate=True,
+            #     color="red",
+            # )
+
+
             dummy_x = np.linspace(L.min(), R.max(), len(LL))
             ax.fill_between(
-                dummy_x,
+                LL,
                 ii,
-                jj,
                 where=(ii > jj),
-                interpolate=True,
-                color="red",
+                color="salmon",
             )
+
 
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(x \leq X)$")
@@ -957,6 +967,9 @@ class Pbox:
             plt.show()
         else:
             return ax
+
+
+
 
     plot = show
 

@@ -1020,7 +1020,7 @@ class Interval:
 
     # ---------------------methods---------------------#
     @mpl.rc_context({"text.usetex": True})
-    def quick_plot(self, title="", ax=None, style="simple", **kwargs):
+    def display(self, title="", ax=None, style="simple", **kwargs):
 
         if ax is None:
             fig, ax = plt.subplots()
