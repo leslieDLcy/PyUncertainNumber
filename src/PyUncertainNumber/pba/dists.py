@@ -1,158 +1,25 @@
 """
-Distribution based p-boxes
---------------------------
+Construct a pbox from the specification of distributional parameters in the form of intervals.
+In short, distribution-based p-boxes or parametric pboxes
 """
 
 from PyUncertainNumber.UC.params import Params
-
-# TODO the __repr__ of a distribution is still showing as pbox, need to fix this
-
-__all__ = [
-    "KM",
-    "KN",
-    "N",
-    "U",
-    "alpha",
-    "anglit",
-    "arcsine",
-    "argus",
-    "bernoulli",
-    "beta",
-    "betabinom",
-    # 'betapert',
-    "betaprime",
-    "binom",
-    "boltzmann",
-    "bradford",
-    "burr",
-    "burr12",
-    "cauchy",
-    "chi",
-    "chi2",
-    "cosine",
-    "crystalball",
-    "dgamma",
-    "dists",
-    "dlaplace",
-    "dweibull",
-    "erlang",
-    "expon",
-    "exponnorm",
-    "exponpow",
-    "exponweib",
-    "f",
-    "fatiguelife",
-    "fisk",
-    "foldcauchy",
-    "foldnorm",
-    "gamma",
-    "gausshyper",
-    "genexpon",
-    "genextreme",
-    "gengamma",
-    "genhalflogistic",
-    "geninvgauss",
-    "genlogistic",
-    "gennorm",
-    "genpareto",
-    "geom",
-    # 'gibrat',
-    "gompertz",
-    "gumbel_l",
-    "gumbel_r",
-    "halfcauchy",
-    "halfgennorm",
-    "halflogistic",
-    "halfnorm",
-    "hypergeom",
-    "hypsecant",
-    "invgamma",
-    "invgauss",
-    "invweibull",
-    "itertools",
-    "johnsonsb",
-    "johnsonsu",
-    "kappa3",
-    "kappa4",
-    "ksone",
-    "kstwobign",
-    "laplace",
-    "levy",
-    "levy_l",
-    "levy_stable",
-    "loggamma",
-    "logistic",
-    "loglaplace",
-    "lognorm",
-    "lognormal",
-    "logser",
-    "loguniform",
-    "lomax",
-    "maxwell",
-    "mielke",
-    "moyal",
-    "nakagami",
-    "nbinom",
-    "ncf",
-    "nct",
-    "ncx2",
-    "norm",
-    "normal",
-    "norminvgauss",
-    "np",
-    "pareto",
-    "pearson3",
-    "planck",
-    "poisson",
-    "powerlaw",
-    "powerlognorm",
-    "powernorm",
-    "randint",
-    "rayleigh",
-    "rdist",
-    "recipinvgauss",
-    "rice",
-    "semicircular",
-    "skellam",
-    "skewnorm",
-    "sps",
-    "t",
-    "trapz",
-    "triang",
-    "truncexpon",
-    "truncnorm",
-    "tukeylambda",
-    "unif",
-    "uniform",
-    "vonmises",
-    "vonmises_line",
-    "wald",
-    "weibull",
-    "weibull_max",
-    "weibull_min",
-    "wrapcauchy",
-    "yulesimon",
-    "zipf",
-]
-
-
-if __name__ is not None and "." in __name__:
-    from .interval import Interval
-else:
-    from interval import Interval
-
-if __name__ is not None and "." in __name__:
-    from .pbox import Pbox
-else:
-    from pbox import Pbox
-
+from .interval  import Interval
+from .pbox_base import Pbox
 import scipy.stats as sps
 import numpy as np
 import itertools
+from .params import Params
 
 from typing import *
 from warnings import *
 
+
+# TODO the __repr__ of a distribution is still showing as pbox, need to fix this
+
+
+
+# a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
 dists = {
     "alpha": sps.alpha,
     "anglit": sps.anglit,
@@ -271,8 +138,16 @@ dists = {
 }
 
 
-def __get_bounds(function_name=None, steps=200, *args):
+def __get_bounds(function_name=None, steps=Params.steps, *args):
 
+    """ heavy lifting function that returns the bounds of the distribution for defining pboxes
+    
+    returns:
+        Left: (array-like or list) left-bound of the pbox
+        Right: (array-like or list) right-bound of the pbox
+        mean: (Interval) mean of the pbox
+        var: (Interval) variance of the pbox
+    """
     # define support
     x = np.linspace(0.0001, 0.9999, steps)
 
@@ -287,7 +162,6 @@ def __get_bounds(function_name=None, steps=200, *args):
     var_hi = 0
 
     for a in new_args:
-
         bounds.append(dists[function_name].ppf(x, *a))
         bmean, bvar = dists[function_name].stats(*a, moments="mv")
 
@@ -312,9 +186,13 @@ def __get_bounds(function_name=None, steps=200, *args):
     return Left, Right, mean, var
 
 
+
+# ---------------------supported distribution objects for pboxes ---------------------#
+
 def lognormal(
     mean,
     var,
+    steps=Params.steps,
 ):
     """
     Creates a p-box for the lognormal distribution
@@ -368,10 +246,7 @@ def lognormal(
     return Pbox(Left, Right, steps=steps, shape="lognormal")
 
 
-lognorm = lognormal
-
-
-def alpha(*args, steps=200):
+def alpha(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -391,7 +266,7 @@ def alpha(*args, steps=200):
     )
 
 
-def anglit(*args, steps=200):
+def anglit(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -411,7 +286,7 @@ def anglit(*args, steps=200):
     )
 
 
-def arcsine(*args, steps=200):
+def arcsine(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -431,7 +306,7 @@ def arcsine(*args, steps=200):
     )
 
 
-def argus(*args, steps=200):
+def argus(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -451,7 +326,7 @@ def argus(*args, steps=200):
     )
 
 
-def beta(*args, steps=200):
+def beta(*args, steps=Params.steps):
     """
     Beta distribution
     """
@@ -478,7 +353,7 @@ def beta(*args, steps=200):
     )
 
 
-def betaprime(*args, steps=200):
+def betaprime(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -498,7 +373,7 @@ def betaprime(*args, steps=200):
     )
 
 
-def bradford(*args, steps=200):
+def bradford(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -518,7 +393,7 @@ def bradford(*args, steps=200):
     )
 
 
-def burr(*args, steps=200):
+def burr(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -538,7 +413,7 @@ def burr(*args, steps=200):
     )
 
 
-def burr12(*args, steps=200):
+def burr12(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -558,7 +433,7 @@ def burr12(*args, steps=200):
     )
 
 
-def cauchy(*args, steps=200):
+def cauchy(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -578,7 +453,7 @@ def cauchy(*args, steps=200):
     )
 
 
-def chi(*args, steps=200):
+def chi(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -598,7 +473,7 @@ def chi(*args, steps=200):
     )
 
 
-def chi2(*args, steps=200):
+def chi2(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -618,7 +493,7 @@ def chi2(*args, steps=200):
     )
 
 
-def cosine(*args, steps=200):
+def cosine(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -638,7 +513,7 @@ def cosine(*args, steps=200):
     )
 
 
-def crystalball(*args, steps=200):
+def crystalball(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -658,7 +533,7 @@ def crystalball(*args, steps=200):
     )
 
 
-def dgamma(*args, steps=200):
+def dgamma(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -678,7 +553,7 @@ def dgamma(*args, steps=200):
     )
 
 
-def dweibull(*args, steps=200):
+def dweibull(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -698,7 +573,7 @@ def dweibull(*args, steps=200):
     )
 
 
-def erlang(*args, steps=200):
+def erlang(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -718,7 +593,7 @@ def erlang(*args, steps=200):
     )
 
 
-def expon(*args, steps=200):
+def expon(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -738,7 +613,7 @@ def expon(*args, steps=200):
     )
 
 
-def exponnorm(*args, steps=200):
+def exponnorm(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -758,7 +633,7 @@ def exponnorm(*args, steps=200):
     )
 
 
-def exponweib(*args, steps=200):
+def exponweib(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -778,7 +653,7 @@ def exponweib(*args, steps=200):
     )
 
 
-def exponpow(*args, steps=200):
+def exponpow(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -798,7 +673,7 @@ def exponpow(*args, steps=200):
     )
 
 
-def f(*args, steps=200):
+def f(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -818,7 +693,7 @@ def f(*args, steps=200):
     )
 
 
-def fatiguelife(*args, steps=200):
+def fatiguelife(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -838,7 +713,7 @@ def fatiguelife(*args, steps=200):
     )
 
 
-def fisk(*args, steps=200):
+def fisk(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -858,7 +733,7 @@ def fisk(*args, steps=200):
     )
 
 
-def foldcauchy(*args, steps=200):
+def foldcauchy(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -878,7 +753,7 @@ def foldcauchy(*args, steps=200):
     )
 
 
-def foldnorm(mu, s, steps=200):
+def foldnorm(mu, s, steps=Params.steps):
 
     x = np.linspace(0.0001, 0.9999, steps)
     if mu.__class__.__name__ != "Interval":
@@ -935,7 +810,7 @@ def foldnorm(mu, s, steps=200):
     )
 
 
-# def frechet_r(*args, steps = 200):
+# def frechet_r(*args, steps = Params.steps):
 #     args = list(args)
 #     for i in range(0,len(args)):
 #         if args[i].__class__.__name__ != 'Interval':
@@ -954,7 +829,7 @@ def foldnorm(mu, s, steps=200):
 #           var_right  = var.right
 #           )
 
-# def frechet_l(*args, steps = 200):
+# def frechet_l(*args, steps = Params.steps):
 #     args = list(args)
 #     for i in range(0,len(args)):
 #         if args[i].__class__.__name__ != 'Interval':
@@ -974,7 +849,7 @@ def foldnorm(mu, s, steps=200):
 #           )
 
 
-def genlogistic(*args, steps=200):
+def genlogistic(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -994,7 +869,7 @@ def genlogistic(*args, steps=200):
     )
 
 
-def gennorm(*args, steps=200):
+def gennorm(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1014,7 +889,7 @@ def gennorm(*args, steps=200):
     )
 
 
-def genpareto(*args, steps=200):
+def genpareto(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1034,7 +909,7 @@ def genpareto(*args, steps=200):
     )
 
 
-def genexpon(*args, steps=200):
+def genexpon(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1054,7 +929,7 @@ def genexpon(*args, steps=200):
     )
 
 
-def genextreme(*args, steps=200):
+def genextreme(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1074,7 +949,7 @@ def genextreme(*args, steps=200):
     )
 
 
-def gausshyper(*args, steps=200):
+def gausshyper(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1094,7 +969,7 @@ def gausshyper(*args, steps=200):
     )
 
 
-def gamma(*args, steps=200):
+def gamma(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1114,7 +989,7 @@ def gamma(*args, steps=200):
     )
 
 
-def gengamma(*args, steps=200):
+def gengamma(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1134,7 +1009,7 @@ def gengamma(*args, steps=200):
     )
 
 
-def genhalflogistic(*args, steps=200):
+def genhalflogistic(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1154,7 +1029,7 @@ def genhalflogistic(*args, steps=200):
     )
 
 
-def geninvgauss(*args, steps=200):
+def geninvgauss(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1174,7 +1049,7 @@ def geninvgauss(*args, steps=200):
     )
 
 
-def gompertz(*args, steps=200):
+def gompertz(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1194,7 +1069,7 @@ def gompertz(*args, steps=200):
     )
 
 
-def gumbel_r(*args, steps=200):
+def gumbel_r(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1214,7 +1089,7 @@ def gumbel_r(*args, steps=200):
     )
 
 
-def gumbel_l(*args, steps=200):
+def gumbel_l(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1234,7 +1109,7 @@ def gumbel_l(*args, steps=200):
     )
 
 
-def halfcauchy(*args, steps=200):
+def halfcauchy(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1254,7 +1129,7 @@ def halfcauchy(*args, steps=200):
     )
 
 
-def halflogistic(*args, steps=200):
+def halflogistic(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1274,7 +1149,7 @@ def halflogistic(*args, steps=200):
     )
 
 
-def halfnorm(*args, steps=200):
+def halfnorm(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1294,7 +1169,7 @@ def halfnorm(*args, steps=200):
     )
 
 
-def halfgennorm(*args, steps=200):
+def halfgennorm(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1314,7 +1189,7 @@ def halfgennorm(*args, steps=200):
     )
 
 
-def hypsecant(*args, steps=200):
+def hypsecant(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1334,7 +1209,7 @@ def hypsecant(*args, steps=200):
     )
 
 
-def invgamma(*args, steps=200):
+def invgamma(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1354,7 +1229,7 @@ def invgamma(*args, steps=200):
     )
 
 
-def invgauss(*args, steps=200):
+def invgauss(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1374,7 +1249,7 @@ def invgauss(*args, steps=200):
     )
 
 
-def invweibull(*args, steps=200):
+def invweibull(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1394,7 +1269,7 @@ def invweibull(*args, steps=200):
     )
 
 
-def johnsonsb(*args, steps=200):
+def johnsonsb(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1414,7 +1289,7 @@ def johnsonsb(*args, steps=200):
     )
 
 
-def johnsonsu(*args, steps=200):
+def johnsonsu(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1434,7 +1309,7 @@ def johnsonsu(*args, steps=200):
     )
 
 
-def kappa4(*args, steps=200):
+def kappa4(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1454,7 +1329,7 @@ def kappa4(*args, steps=200):
     )
 
 
-def kappa3(*args, steps=200):
+def kappa3(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1474,7 +1349,7 @@ def kappa3(*args, steps=200):
     )
 
 
-def ksone(*args, steps=200):
+def ksone(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1494,7 +1369,7 @@ def ksone(*args, steps=200):
     )
 
 
-def kstwobign(*args, steps=200):
+def kstwobign(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1514,7 +1389,7 @@ def kstwobign(*args, steps=200):
     )
 
 
-def laplace(*args, steps=200):
+def laplace(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1534,7 +1409,7 @@ def laplace(*args, steps=200):
     )
 
 
-def levy(*args, steps=200):
+def levy(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1554,7 +1429,7 @@ def levy(*args, steps=200):
     )
 
 
-def levy_l(*args, steps=200):
+def levy_l(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1574,7 +1449,7 @@ def levy_l(*args, steps=200):
     )
 
 
-def levy_stable(*args, steps=200):
+def levy_stable(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1594,7 +1469,7 @@ def levy_stable(*args, steps=200):
     )
 
 
-def logistic(*args, steps=200):
+def logistic(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1614,7 +1489,7 @@ def logistic(*args, steps=200):
     )
 
 
-def loggamma(*args, steps=200):
+def loggamma(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1634,7 +1509,7 @@ def loggamma(*args, steps=200):
     )
 
 
-def loglaplace(*args, steps=200):
+def loglaplace(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1654,7 +1529,7 @@ def loglaplace(*args, steps=200):
     )
 
 
-def loguniform(*args, steps=200):
+def loguniform(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1674,7 +1549,7 @@ def loguniform(*args, steps=200):
     )
 
 
-def lomax(*args, steps=200):
+def lomax(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1694,7 +1569,7 @@ def lomax(*args, steps=200):
     )
 
 
-def maxwell(*args, steps=200):
+def maxwell(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1714,7 +1589,7 @@ def maxwell(*args, steps=200):
     )
 
 
-def mielke(*args, steps=200):
+def mielke(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1734,7 +1609,7 @@ def mielke(*args, steps=200):
     )
 
 
-def moyal(*args, steps=200):
+def moyal(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1754,7 +1629,7 @@ def moyal(*args, steps=200):
     )
 
 
-def nakagami(*args, steps=200):
+def nakagami(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1774,7 +1649,7 @@ def nakagami(*args, steps=200):
     )
 
 
-def ncx2(*args, steps=200):
+def ncx2(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1794,7 +1669,7 @@ def ncx2(*args, steps=200):
     )
 
 
-def ncf(*args, steps=200):
+def ncf(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1814,7 +1689,7 @@ def ncf(*args, steps=200):
     )
 
 
-def nct(*args, steps=200):
+def nct(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1834,7 +1709,7 @@ def nct(*args, steps=200):
     )
 
 
-def norm(*args, steps=200):
+def norm(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1854,7 +1729,7 @@ def norm(*args, steps=200):
     )
 
 
-def norminvgauss(*args, steps=200):
+def norminvgauss(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1874,7 +1749,7 @@ def norminvgauss(*args, steps=200):
     )
 
 
-def pareto(*args, steps=200):
+def pareto(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1894,7 +1769,7 @@ def pareto(*args, steps=200):
     )
 
 
-def pearson3(*args, steps=200):
+def pearson3(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1914,7 +1789,7 @@ def pearson3(*args, steps=200):
     )
 
 
-def powerlaw(*args, steps=200):
+def powerlaw(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1934,7 +1809,7 @@ def powerlaw(*args, steps=200):
     )
 
 
-def powerlognorm(*args, steps=200):
+def powerlognorm(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1954,7 +1829,7 @@ def powerlognorm(*args, steps=200):
     )
 
 
-def powernorm(*args, steps=200):
+def powernorm(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1974,7 +1849,7 @@ def powernorm(*args, steps=200):
     )
 
 
-def rdist(*args, steps=200):
+def rdist(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -1994,7 +1869,7 @@ def rdist(*args, steps=200):
     )
 
 
-def rayleigh(*args, steps=200):
+def rayleigh(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2014,7 +1889,7 @@ def rayleigh(*args, steps=200):
     )
 
 
-def rice(*args, steps=200):
+def rice(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2034,7 +1909,7 @@ def rice(*args, steps=200):
     )
 
 
-def recipinvgauss(*args, steps=200):
+def recipinvgauss(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2054,7 +1929,7 @@ def recipinvgauss(*args, steps=200):
     )
 
 
-def semicircular(*args, steps=200):
+def semicircular(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2074,7 +1949,7 @@ def semicircular(*args, steps=200):
     )
 
 
-def skewnorm(*args, steps=200):
+def skewnorm(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2094,7 +1969,7 @@ def skewnorm(*args, steps=200):
     )
 
 
-def t(*args, steps=200):
+def t(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2114,7 +1989,7 @@ def t(*args, steps=200):
     )
 
 
-def trapz(a, b, c, d, steps=200):
+def trapz(a, b, c, d, steps=Params.steps):
     if a.__class__.__name__ != "Interval":
         a = Interval(a)
     if b.__class__.__name__ != "Interval":
@@ -2135,7 +2010,7 @@ def trapz(a, b, c, d, steps=200):
     return Pbox(left, right, steps=steps, shape="trapz")
 
 
-def triang(*args, steps=200):
+def triang(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2155,7 +2030,7 @@ def triang(*args, steps=200):
     )
 
 
-def truncexpon(*args, steps=200):
+def truncexpon(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2175,7 +2050,7 @@ def truncexpon(*args, steps=200):
     )
 
 
-def truncnorm(left, right, mean=None, stddev=None, steps=200):
+def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
     if left.__class__.__name__ != "Interval":
         left = Interval(left)
@@ -2202,7 +2077,7 @@ def truncnorm(left, right, mean=None, stddev=None, steps=200):
     )
 
 
-def tukeylambda(*args, steps=200):
+def tukeylambda(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2222,7 +2097,7 @@ def tukeylambda(*args, steps=200):
     )
 
 
-def uniform(a, b, steps=200):
+def uniform(a, b, steps=Params.steps):
 
     # x = np.linspace(0, 1, steps)
     # !SOLUTION: found a solution and prepare to raise an issue and submit a solution to Nick
@@ -2270,7 +2145,7 @@ def vonmises(*args, steps=Pbox.STEPS):
     )
 
 
-def vonmises_line(*args, steps=200):
+def vonmises_line(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2290,7 +2165,7 @@ def vonmises_line(*args, steps=200):
     )
 
 
-def wald(*args, steps=200):
+def wald(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2310,7 +2185,7 @@ def wald(*args, steps=200):
     )
 
 
-def weibull_min(*args, steps=200):
+def weibull_min(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2330,7 +2205,7 @@ def weibull_min(*args, steps=200):
     )
 
 
-def weibull_max(*args, steps=200):
+def weibull_max(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2350,7 +2225,7 @@ def weibull_max(*args, steps=200):
     )
 
 
-def weibull(*args, steps=200):
+def weibull(*args, steps=Params.steps):
 
     wm = weibull_max(*args)
     wl = weibull_min(*args)
@@ -2358,7 +2233,7 @@ def weibull(*args, steps=200):
     return Pbox(left=wl.left, right=wm.right)
 
 
-def wrapcauchy(*args, steps=200):
+def wrapcauchy(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2378,7 +2253,7 @@ def wrapcauchy(*args, steps=200):
     )
 
 
-def bernoulli(*args, steps=200):
+def bernoulli(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2398,7 +2273,7 @@ def bernoulli(*args, steps=200):
     )
 
 
-def betabinom(*args, steps=200):
+def betabinom(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2418,7 +2293,7 @@ def betabinom(*args, steps=200):
     )
 
 
-def binom(*args, steps=200):
+def binom(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2438,7 +2313,7 @@ def binom(*args, steps=200):
     )
 
 
-def boltzmann(*args, steps=200):
+def boltzmann(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2458,7 +2333,7 @@ def boltzmann(*args, steps=200):
     )
 
 
-def dlaplace(*args, steps=200):
+def dlaplace(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2478,7 +2353,7 @@ def dlaplace(*args, steps=200):
     )
 
 
-def geom(*args, steps=200):
+def geom(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2498,7 +2373,7 @@ def geom(*args, steps=200):
     )
 
 
-def hypergeom(*args, steps=200):
+def hypergeom(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2518,7 +2393,7 @@ def hypergeom(*args, steps=200):
     )
 
 
-def logser(*args, steps=200):
+def logser(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2538,7 +2413,7 @@ def logser(*args, steps=200):
     )
 
 
-def nbinom(*args, steps=200):
+def nbinom(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2558,7 +2433,7 @@ def nbinom(*args, steps=200):
     )
 
 
-def planck(*args, steps=200):
+def planck(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2578,7 +2453,7 @@ def planck(*args, steps=200):
     )
 
 
-def poisson(*args, steps=200):
+def poisson(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2598,7 +2473,7 @@ def poisson(*args, steps=200):
     )
 
 
-def randint(*args, steps=200):
+def randint(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2618,7 +2493,7 @@ def randint(*args, steps=200):
     )
 
 
-def skellam(*args, steps=200):
+def skellam(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2638,7 +2513,7 @@ def skellam(*args, steps=200):
     )
 
 
-def zipf(*args, steps=200):
+def zipf(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2658,7 +2533,7 @@ def zipf(*args, steps=200):
     )
 
 
-def yulesimon(*args, steps=200):
+def yulesimon(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":
@@ -2679,21 +2554,25 @@ def yulesimon(*args, steps=200):
 
 
 ### Other distributions
-def KM(k, m, steps=200):
+def KM(k, m, steps=Params.steps):
     with catch_warnings():
         simplefilter("ignore")
         return beta(Interval(k, k + 1), Interval(m, m + 1), steps=steps)
 
 
-def KN(k, n, steps=200):
+def KN(k, n, steps=Params.steps):
     return KM(k, n - k, steps=steps)
 
+
+
+# ---------------------aliases---------------------#
 
 ### Alternate names
 normal = norm
 N = normal
 unif = uniform
 U = uniform
+lognorm = lognormal
 
 
 # def betapert(minimum, maximum, mode):
@@ -2701,3 +2580,133 @@ U = uniform
 #     alpha1 = (mu - minimum)*(2*mode - minimum - maximum)/((mode - mu)*(maximum - minimum))
 #     alpha2 = alpha1*(maximum - mu)/(mu - minimum)
 #     return minimum + (maximum - minimum) * beta(alpha1, alpha2)
+
+
+
+# __all__ = [
+#     "KM",
+#     "KN",
+#     "N",
+#     "U",
+#     "alpha",
+#     "anglit",
+#     "arcsine",
+#     "argus",
+#     "bernoulli",
+#     "beta",
+#     "betabinom",
+#     # 'betapert',
+#     "betaprime",
+#     "binom",
+#     "boltzmann",
+#     "bradford",
+#     "burr",
+#     "burr12",
+#     "cauchy",
+#     "chi",
+#     "chi2",
+#     "cosine",
+#     "crystalball",
+#     "dgamma",
+#     "dists",
+#     "dlaplace",
+#     "dweibull",
+#     "erlang",
+#     "expon",
+#     "exponnorm",
+#     "exponpow",
+#     "exponweib",
+#     "f",
+#     "fatiguelife",
+#     "fisk",
+#     "foldcauchy",
+#     "foldnorm",
+#     "gamma",
+#     "gausshyper",
+#     "genexpon",
+#     "genextreme",
+#     "gengamma",
+#     "genhalflogistic",
+#     "geninvgauss",
+#     "genlogistic",
+#     "gennorm",
+#     "genpareto",
+#     "geom",
+#     # 'gibrat',
+#     "gompertz",
+#     "gumbel_l",
+#     "gumbel_r",
+#     "halfcauchy",
+#     "halfgennorm",
+#     "halflogistic",
+#     "halfnorm",
+#     "hypergeom",
+#     "hypsecant",
+#     "invgamma",
+#     "invgauss",
+#     "invweibull",
+#     "itertools",
+#     "johnsonsb",
+#     "johnsonsu",
+#     "kappa3",
+#     "kappa4",
+#     "ksone",
+#     "kstwobign",
+#     "laplace",
+#     "levy",
+#     "levy_l",
+#     "levy_stable",
+#     "loggamma",
+#     "logistic",
+#     "loglaplace",
+#     "lognorm",
+#     "lognormal",
+#     "logser",
+#     "loguniform",
+#     "lomax",
+#     "maxwell",
+#     "mielke",
+#     "moyal",
+#     "nakagami",
+#     "nbinom",
+#     "ncf",
+#     "nct",
+#     "ncx2",
+#     "norm",
+#     "normal",
+#     "norminvgauss",
+#     "np",
+#     "pareto",
+#     "pearson3",
+#     "planck",
+#     "poisson",
+#     "powerlaw",
+#     "powerlognorm",
+#     "powernorm",
+#     "randint",
+#     "rayleigh",
+#     "rdist",
+#     "recipinvgauss",
+#     "rice",
+#     "semicircular",
+#     "skellam",
+#     "skewnorm",
+#     "sps",
+#     "t",
+#     "trapz",
+#     "triang",
+#     "truncexpon",
+#     "truncnorm",
+#     "tukeylambda",
+#     "unif",
+#     "uniform",
+#     "vonmises",
+#     "vonmises_line",
+#     "wald",
+#     "weibull",
+#     "weibull_max",
+#     "weibull_min",
+#     "wrapcauchy",
+#     "yulesimon",
+#     "zipf",
+# ]

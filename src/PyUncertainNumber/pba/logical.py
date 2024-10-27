@@ -2,7 +2,7 @@ from typing import *
 from numbers import Number
 import numpy as np
 
-from .pbox import Pbox
+from .pbox_base import Pbox
 from .interval import Interval
 
       

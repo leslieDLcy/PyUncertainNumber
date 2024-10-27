@@ -1,5 +1,5 @@
 if __name__ is not None and "." in __name__:
-    from .pbox import Pbox
+    from .pbox_base import Pbox
 else:
     from pbox import Pbox
     

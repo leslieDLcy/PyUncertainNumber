@@ -25,6 +25,7 @@ preparation for the December workshop:
 
 Overarching:
     ☐ plotting with range between the bounds
+    report a pba bug in the function `min_max_mean_var`
 
 
 

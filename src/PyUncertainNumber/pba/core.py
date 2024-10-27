@@ -1,6 +1,6 @@
 from typing import *
 from .interval import *
-from .pbox import Pbox
+from .pbox_base import Pbox
 from .cbox import *
 
 import numpy as np

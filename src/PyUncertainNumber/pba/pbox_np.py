@@ -25,16 +25,18 @@ __all__ = [
     'from_percentiles'
     ]
 
-from .pbox import Pbox, imposition, NotIncreasingError
+from .pbox_base import Pbox, imposition, NotIncreasingError
 from .interval import Interval
 from .dists import *
 from .core import *
 from .logical import *
 
-import itertools as it
 from typing import *
 from warnings import warn
 import numpy as np
+
+
+# ---------------------top level---------------------#
 
 def known_properties(
         minimum: Optional[Union[Interval,float,int]] = None,
@@ -140,7 +142,10 @@ def known_properties(
     if len(imp) == 0:
         raise Exception("No valid p-boxes found")
     return imposition(imp)
-    
+
+
+# ---------------------functions---------------------#
+
 def box(
         a: Union[Interval,float,int],
         b: Union[Interval,float,int] = None,

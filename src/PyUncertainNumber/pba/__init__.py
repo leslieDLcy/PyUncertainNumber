@@ -1,6 +1,6 @@
 from .interval import *
-# from .parametric import *
-from .pbox import *
+# from .pbox_parametric import *
+from .pbox_base import *
 from .copula import *
 from .core import *
 from .logical import *
