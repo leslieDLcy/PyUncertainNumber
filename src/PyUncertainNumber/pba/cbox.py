@@ -1,132 +1,189 @@
-if __name__ is not None and "." in __name__:
-    from .pbox_base import Pbox
-else:
-    from pbox import Pbox
-    
+""" the mattered cbox modules """
+
 import numpy as np
+from scipy.stats import beta, t, uniform, gamma, chisquare, betabinom, nbinom
+from .pbox_base import Pbox
+from .params import Params
 
-__all__ = ['Cbox']
 
-class Cbox(Pbox):
+def repre_cbox(cdfs, steps=200, shape="beta"):
+    """ transform into pbox object for cbox """
+    
+    # percentiles
+    p_values = np.linspace(0.0001, 0.9999, steps)
+    bounds = [cdf.ppf(p_values) for cdf in cdfs]
+    return Pbox(
+            left=bounds[0],
+            right=bounds[1],
+            steps=200,
+            shape=shape,
+        )
+
+# ---------------------Bernoulli---------------------#
+# TODO distribution not confirmed yet
+def nextvalue_bernoulli(x):
+    n = len(x)
+    k = np.sum(x)
+    return (beta(k / (n + 1), 1), beta((k + 1) / (n + 1), 1))
+
+def parameter_bernoulli(x):
+    n = len(x)
+    k = np.sum(x)
+    return (beta(k, n - k + 1), beta(k + 1, n - k))
+
+# ---------------------binomial---------------------#
+def nextvalue_binomial(x, N):
+    n = len(x)  
+    k = np.sum(x)
+    cdfs = (betabinom(N,k,n*N-k+1), betabinom(N,k+1, n*N-k))
+    return repre_cbox(cdfs, steps = Params.steps , shape="betanomial") 
+
+# TODO question: while the left/right bounds are defined by beta dist
+# does this mean that the cbox is a distibutional pbox?
+def parameter_binomial(x, N):
+    """ cbox for Bionomial parameter
+
+    args:
+        x (list): list of values
+        N (int): number of trials
+
+    return:
+        cbox: cbox object
     """
-    Confidence boxes (c-boxes) are imprecise generalisations of traditional confidence distributions
+    n = len(x)  #size
+    k = np.sum(x)
+    cdfs = (beta(k, n * N - k + 1), beta(k + 1, n * N - k))
+    return repre_cbox(cdfs, steps = Params.steps , shape="beta") 
 
-    They have a different interpretation to p-boxes but rely on the same underlying mathematics. As such in pba-for-python c-boxes inhert most of their methods from Pbox. 
 
-    Args:
-        Pbox (_type_): _description_
-    """
-    
-    def __init__(self,*args,**kwargs):
-        if len(args) == 1 and isinstance(args[0],Pbox):
-            
-                super().__init__(**vars(args[0]))
-                
-        else:
-            
-            super().__init__(*args,**kwargs)
-        
-    def __repr__(self):
-        if self.mean_left == self.mean_right:
-            mean_text = f'{round(self.mean_left, 4)}'
-        else:
-            mean_text = f'[{round(self.mean_left, 4)}, {round(self.mean_right, 4)}]'
+# ---------------------binomialnp---------------------#
+# x[i] ~ binomial(N, p), for unknown N, x[i] is a nonnegative integer
+# see https://sites.google.com/site/cboxbinomialnp/
+def nextvalue_binomialnp(x):
+    pass
 
-        if self.var_left == self.var_right:
-            var_text = f'{round(self.var_left, 4)}'
-        else:
-            var_text = f'[{round(self.var_left, 4)}, {round(self.var_right, 4)}]'
+def parameter_binomialnp_n(x):
+    pass
 
-        range_text = f'[{round(np.min([self.left, self.right]), 4), round(np.max([self.left, self.right]), 4)}'
+def parameter_binomialnp_p(x):
+    pass
 
-        if self.shape is None:
-            shape_text = ' '
-        else:
-            shape_text = f' {self.shape}' # space to start; see below lacking space
+# ---------------------Poisson---------------------#
+# x[i] ~ Poisson(parameter), x[i] is a nonnegative integer
 
-        return f'Cbox: ~ {shape_text} (range={range_text}, mean={mean_text}, var={var_text})'
+def nextvalue_poisson(x):
+    n = len(x)
+    k = np.sum(x)
+    # TODO arguments not confirmed yet
+    return (nbinom(size=k, prob=1-1/(n+1)),
+            nbinom(size=k+1, prob=1-1/(n+1)))
 
-    __str__ = __repr__
+def parameter_poisson(x):
+    n = len(x)
+    k = np.sum(x)
+    # TODO arguments not confirmed yet
+    return (gamma(k, scale=1/n), gamma(k + 1, scale=1/n))
 
-    def __add__(self, other):
-        if isinstance(other, Cbox):
-            return Cbox(super().__add__(other))
-        elif isinstance(other, Pbox):
-            raise NotImplementedError
-        else:
-            return Cbox(super().__add__(other))
 
-    def __radd__(self, other):
-        if isinstance(other, Cbox):
-            return Cbox(super().__radd__(other))
-        elif isinstance(other, Pbox):
-            raise NotImplementedError
-        else:
-            return Cbox(super().__radd__(other))
+# ---------------------exponential---------------------#
+# x[i] ~ exponential(parameter), x[i] is a nonnegative integer
+# TODO arguments not confirmed yet
+def nextvalue_exponential(x):
+    n = len(x)
+    k = np.sum(x)
+    return (gamma(n, scale=1/k))
 
-    def add(self,other, method = 'f'):
-        return Cbox(super().add(other, method = method))
+def parameter_exponential(x):
+    n = len(x)
+    k = np.sum(x)
+    return (gamma(n, scale=1/k))
 
-    def __sub__(self, other):
-        if isinstance(other, Cbox):
-            return Cbox(super().__sub__(other))
-        elif isinstance(other, Pbox):
-            raise NotImplementedError
-        else:
-            return Cbox(super().__sub__(other))
+def qgammaexponential(p, shape, rate=1, scale=1):
+    return rate * ((1 - p) ** (-1 / shape) - 1)
 
-    def __rsub__(self, other):
-        if isinstance(other, Cbox):
-            return Cbox(super().__rsub__(other))
-        elif isinstance(other, Pbox):
-            raise NotImplementedError
-        else:
-            return Cbox(super().__rsub__(other))
+def rgammaexponential(many, shape, rate=1, scale=1):
+    return qgammaexponential(np.random.uniform(size=many), shape, rate, scale)
 
-    def sub(self,other, method = 'f'):
-        return Cbox(super().sub(other, method = method))
 
-    def __mul__(self, other):
-        if isinstance(other, Cbox):
-            return Cbox(super().__mul__(other))
-        elif isinstance(other, Pbox):
-            raise NotImplementedError
-        else:
-            return Cbox(super().__mul__(other))
+# ---------------------normal---------------------#
+# ! what's the `student(n-1)` function in R? cannot find it online.
+def nextvalue_normal(x):
+    n = len(x)
+    return np.mean(x) + np.std(x, ddof=1) * t.ppf(0.975, n - 1) * np.sqrt(1 + 1 / n)
 
-    def __rmul__(self, other):
-        if isinstance(other, Cbox):
-            return Cbox(super().__rmul__(other))
-        elif isinstance(other, Pbox):
-            raise NotImplementedError
-        else:
-            return Cbox(super().__rmul__(other))
+def parameter_normal_mu(x):
+    n = len(x)
+    return np.mean(x) + np.std(x, ddof=1) * t.ppf(0.975, n - 1) / np.sqrt(n)
 
-    def mul(self,other, method = 'f'):
-        return Cbox(super().mul(other, method = method))
+def parameter_normal_sigma(x):
+    n = len(x)
+    return np.sqrt(np.var(x, ddof=1) * (n - 1) / chisquare(n - 1))
 
-    def __truediv__(self, other):
-        if isinstance(other, Cbox):
-            return Cbox(super().__truediv__(other))
-        elif isinstance(other, Pbox):
-            raise NotImplementedError
-        else:
-            return Cbox(super().__truediv__(other))
 
-    def __rtruediv__(self, other):
-        if isinstance(other, Cbox):
-            return Cbox(super().__rtruediv__(other))
-        elif isinstance(other, Pbox):
-            raise NotImplementedError
-        else:
-            return Cbox(super().__rtruediv__(other))
 
-    def div(self,other, method = 'f'):
-        return Cbox(super().div(other, method = method))
+# ---------------------lognormal---------------------#
+# TODO arguments not confirmed yet
+def nextvalue_lognormal(x):
+    n = len(x)
+    return np.exp(np.mean(np.log(x)) + np.std(np.log(x), ddof=1) * t.ppf(0.975, n - 1) * np.sqrt(1 + 1 / n))
 
-    def __neg__(self):
-        return Cbox(super().__neg__())
-    
-    def recip(self):
-        return Cbox(super().recip())
-    
+def parameter_lognormal_mu(x):
+    n = len(x)
+    return np.mean(np.log(x)) + np.std(np.log(x), ddof=1) * t.ppf(0.975, n - 1) / np.sqrt(n)
+
+def parameter_lognormal_sigma(x):
+    n = len(x)
+    return np.sqrt(np.var(np.log(x), ddof=1) * (n - 1) / chisquare(n - 1))
+
+
+# ---------------------uniform---------------------#
+# TODO arguments not confirmed yet
+def nextvalue_uniform(x):
+    n = len(x)
+    w = (np.max(x) - np.min(x)) / beta(n - 1, 2)
+    m = (np.max(x) - w / 2) + (w - (np.max(x) - np.min(x))) * uniform.rvs()
+    return uniform.rvs(loc=m - w / 2, scale=w)
+
+def parameter_uniform_minimum(x):
+    n = len(x)
+    w = (np.max(x) - np.min(x)) / beta(n - 1, 2)
+    m = (np.max(x) - w / 2) + (w - (np.max(x) - np.min(x))) * uniform.rvs()
+    return m - w / 2
+
+def parameter_uniform_maximum(x):
+    n = len(x)
+    w = (np.max(x) - np.min(x)) / beta(n - 1, 2)
+    m = (np.max(x) - w / 2) + (w - (np.max(x) - np.min(x))) * uniform.rvs()
+    return m + w / 2
+
+def parameter_uniform_width(x):
+    return (np.max(x) - np.min(x)) / beta(len(x) - 1, 2)
+
+def parameter_uniform_midpoint(x):
+    w = (np.max(x) - np.min(x)) / beta(len(x) - 1, 2)
+    return (np.max(x) - w / 2) + (w - (np.max(x) - np.min(x))) * uniform.rvs()
+
+
+
+
+# ---------------------nonparametric---------------------#
+# x[i] ~ F, a continuous but unknown distribution
+# TODO arguments not confirmed yet
+def nextvalue_nonparametric(x):
+    return (np.histogram(np.concatenate((x, [np.inf])), bins='auto'), 
+            np.histogram(np.concatenate((x, [-np.inf])), bins='auto'))
+
+def parameter_normal_meandifference(x, y):
+    return parameter_normal_mu(x) - parameter_normal_mu(y)
+
+# TODO arguments not confirmed yet
+# def parameter_nonparametric_deconvolution(x, error):
+#     z = []
+#     for jj in range(len(error)):
+#         z.extend(x - error[jj])
+#     z.sort()
+#     Q = Get_Q(len(x), len(error))
+#     w = Q / np.sum(Q)
+#     return (mixture(z, w), mixture(z[:-1] + [np.inf], w))
+
+

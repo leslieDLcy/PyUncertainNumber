@@ -66,6 +66,8 @@ class Pbox:
         :arg left: Left bound of the p-box. Can be a list, NumPy array, Interval or numeric type. If left is None, the left bound is set to -inf.
 
         """
+
+        # TODO: re-work on the initialisation logic as some arguments are not necessary
         if isinstance(left, np.ndarray) and isinstance(right, np.ndarray):
             if len(left) != len(right):
                 raise Exception("Left and right arrays must be the same length")
@@ -940,7 +942,7 @@ class Pbox:
                 x2 = RR_n,
                 interpolate=True,                
                 color="lightgray",
-                alpha=0.1,
+                alpha=0.3,
             )
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(x \leq X)$")
