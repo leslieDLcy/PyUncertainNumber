@@ -1,5 +1,5 @@
 """
-currently this file stores all the codes in the `.dist` module.
+currently this file stores all the codes in the `.dist` module as an attempt to replace the odd-naming `.dist` module
 two reasons:
 1. I keep the `.dist` module such that I won't break existing code;
 2. I'd like to reorganise the constructors for pbox, which is a mess now.

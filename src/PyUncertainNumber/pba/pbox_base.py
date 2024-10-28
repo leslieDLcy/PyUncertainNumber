@@ -188,6 +188,9 @@ class Pbox:
         for val in np.array([self.left, self.right]).flatten():
             yield val
 
+
+# ---------------------Basic arithmetics---------------------#
+
     def __neg__(self):
         if self.shape in ["uniform", "normal", "cauchy", "triangular", "skew-normal"]:
             s = self.shape
@@ -341,10 +344,13 @@ class Pbox:
             self.var_left = left(b)
             self.var_right = right(b)
 
+
+# ---------------------unary operations---------------------#
+
     def _unary(self, *args, function=lambda x: x):
 
         ints = [function(Interval(l, r), *args) for l, r in zip(self.left, self.right)]
-        print(ints)
+        print("'referred to ints'", ints)
         return Pbox(
             left=np.array([i.left for i in ints]),
             right=np.array([i.right for i in ints]),

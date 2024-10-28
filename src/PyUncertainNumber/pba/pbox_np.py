@@ -246,7 +246,7 @@ def min_max_mean(
     left = [minimum if i <= mid else ((mean-maximum)/i + maximum) for i in ii]
     jj = [j/steps for j in range(1,steps+1)]
     right = [maximum if mid <= j else (mean - minimum * j) / (1 - j) for j in jj]
-    print(len(left))
+    # print(len(left))
     return Pbox(
         left = np.array(left),
         right = np.array(right),

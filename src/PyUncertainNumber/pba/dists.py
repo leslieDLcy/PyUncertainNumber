@@ -1,4 +1,6 @@
 """
+Deprecated as the all the codes herein are already moved to pbox.py
+Kept for backward compatibility;
 Construct a pbox from the specification of distributional parameters in the form of intervals.
 In short, distribution-based p-boxes or parametric pboxes
 """
