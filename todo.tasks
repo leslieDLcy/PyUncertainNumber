@@ -5,9 +5,11 @@ UC module:
     ☐ change to a dispatcher for bounds specification (i.e. work on `parse_description`)
 
 pbox:
+    ☐ construct pbox(either distributional or nonparametric) from dataset 
     ☐ drawing samples from pbox
     ☐ propagating with pbox
     ☐ construct pbox from data or from partial knowledge on the distribution property (i.e. min, max, mean, variance, etc.)?
+    ☐ pbox arithmetic with various dependecy NOT finsihed
 
 
 UP module:

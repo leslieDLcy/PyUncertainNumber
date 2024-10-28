@@ -1,4 +1,6 @@
-""" the mattered cbox modules """
+""" the mattered cbox modules 
+Originally written by Scott in R and translated to Python also expanded functionality by Leslie
+"""
 
 import numpy as np
 from scipy.stats import beta, t, uniform, gamma, chisquare, betabinom, nbinom
@@ -6,16 +8,16 @@ from .pbox_base import Pbox
 from .params import Params
 
 
-def repre_cbox(cdfs, steps=200, shape="beta"):
+def repre_cbox(cdfs, steps=Params.steps, shape="beta"):
     """ transform into pbox object for cbox """
     
     # percentiles
-    p_values = np.linspace(0.0001, 0.9999, steps)
-    bounds = [cdf.ppf(p_values) for cdf in cdfs]
+    
+    bounds = [cdf.ppf(Params.p_values) for cdf in cdfs]
     return Pbox(
             left=bounds[0],
             right=bounds[1],
-            steps=200,
+            steps=steps,
             shape=shape,
         )
 

@@ -148,8 +148,6 @@ def __get_bounds(function_name=None, steps=Params.steps, *args):
         mean: (Interval) mean of the pbox
         var: (Interval) variance of the pbox
     """
-    # define support
-    x = np.linspace(0.0001, 0.9999, steps)
 
     # get bound arguments
     new_args = itertools.product(*args)
@@ -162,7 +160,7 @@ def __get_bounds(function_name=None, steps=Params.steps, *args):
     var_hi = 0
 
     for a in new_args:
-        bounds.append(dists[function_name].ppf(x, *a))
+        bounds.append(dists[function_name].ppf(Params.p_values, *a))
         bmean, bvar = dists[function_name].stats(*a, moments="mv")
 
         if bmean < mean_lo:

@@ -8,11 +8,8 @@
 #
 #       By: Ander Gray, University of Liverpool, ander.gray@liverpool.ac.uk
 ###
-if __name__ is not None and "." in __name__:
-    from .interval import *
-else:
-    from interval import *
     
+from .interval import *
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
