@@ -921,7 +921,6 @@ class Pbox:
         if ax is None:
             fig, ax = plt.subplots()
 
-        # now respects discretization
         L = self.left
         R = self.right
 
@@ -932,9 +931,8 @@ class Pbox:
         ax.plot(LL_n, p_axis, color='g')
         ax.plot(RR_n, p_axis, color='b')
 
-        if title != "":
+        if title is not None:
             ax.set_title(title, **kwargs)
-        # TODO pbox add band plotting style
         if style == "band":
             ax.fill_betweenx(
                 y= p_axis,
@@ -946,10 +944,10 @@ class Pbox:
             )
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(x \leq X)$")
-        if display:
-            plt.show()
-        else:
-            return ax
+        # if display:
+        #     # plt.show()
+        # else:
+        #     return ax
 
 
     def get_interval(self, *args) -> Interval:

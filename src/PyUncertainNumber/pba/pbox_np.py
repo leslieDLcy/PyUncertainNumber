@@ -4,6 +4,7 @@ re: non-parametric pbox construction
 Functions that can be used to generate non-parametric p-boxes. 
 These functions are used to generate p-boxes based upon the minimum, maximum, mean, median, 
 mode, standard deviation, variance, and coefficient of variation of the variable.
+- Leslie made many changes
 '''
 
 
@@ -34,9 +35,45 @@ from .logical import *
 from typing import *
 from warnings import warn
 import numpy as np
+import matplotlib.pyplot as plt
 
 
-# ---------------------top level---------------------#
+
+# ---------------------from data---------------------#
+def logical_bounding(a):
+    """ p16. eq(2.21) """
+    a = np.where(a<0, 0, a)
+    a = np.where(a<1, a, 1)
+    return a
+
+def c_data2freepbox(s, dn, display=True):
+    """ construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds 
+    
+    args:
+        - s (array-like): sample data;
+        - dn (scalar): KS critical value at significance level \alpha and sample size N;
+    """
+
+    # get the empirical cdf
+    empi_cdf = sps.ecdf(s)
+
+    # step 1:
+    ecdf_l, ecdf_r = empi_cdf.cdf.probabilities + dn, empi_cdf.cdf.probabilities - dn
+
+    # step 2:
+    ecdf_l, ecdf_r = logical_bounding(ecdf_l), logical_bounding(ecdf_r)
+
+    if display:
+        fig, ax = plt.subplots()
+        ax.plot(empi_cdf.cdf.quantiles, ecdf_l, label='upper bound', drawstyle='steps-post', color='g')
+        ax.plot(empi_cdf.cdf.quantiles, ecdf_r, label='lower bound', drawstyle='steps-post', color='b')
+        empi_cdf.cdf.plot(ax, label='empirical', ls=':', color='black')
+        ax.legend()
+    
+    return ecdf_l, ecdf_r
+
+
+# ---------------------top level func for known statistical properties---------------------#
 
 def known_properties(
         minimum: Optional[Union[Interval,float,int]] = None,

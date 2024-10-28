@@ -12,6 +12,9 @@ pbox:
     ☐ pbox arithmetic with various dependecy NOT finsihed
 
 
+hedge:
+    ☐ pbox construction from hedge language
+
 UP module:
     ☐ test the new functionality from Ioanna
     ☐ Test on the surrogate models
@@ -28,6 +31,10 @@ preparation for the December workshop:
 Overarching:
     ☐ plotting with range between the bounds
     report a pba bug in the function `min_max_mean_var`
+
+
+cbox:
+    ☐ ci function with arguments
 
 
 
