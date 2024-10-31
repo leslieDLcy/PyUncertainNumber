@@ -919,7 +919,7 @@ class Pbox:
 
 
     @mpl.rc_context({"text.usetex": True})
-    def display(self, title="", ax=None, display=True, style="simple", **kwargs):
+    def display(self, title="", ax=None, style="simple", **kwargs):
         """quickly plot the pba object
 
         # !Leslie defined plotting function"""
@@ -948,6 +948,10 @@ class Pbox:
                 color="lightgray",
                 alpha=0.3,
             )
+        elif style == "simple":
+            pass
+        else:
+            raise ValueError("style must be either 'simple' or 'band'")
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(x \leq X)$")
         # if display:

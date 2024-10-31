@@ -18,7 +18,7 @@ from PyUncertainNumber.UP.endpoints import endpoints_propagation_2n
 from PyUncertainNumber.NLP_constructor.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
-
+from PyUncertainNumber.pba.dists import named_pbox
 
 """ Uncertain Number class """
 
@@ -161,13 +161,20 @@ class UncertainNumber:
         #TODO the original `pba` package is a mess for specifying and giving shortcuts to distributions
         #TODO below is a temporary workaround
         """
-        match keyword:
-            case "normal" | "norm" | "gaussian":
-                return pba.N(*parameters, steps=Params.steps)
-            case "uniform":
-                return pba.U(*parameters, steps=Params.steps)
-            case _:
-                print("Bad distribution specification")
+
+        obj = named_pbox.get(keyword, 
+                       "You're lucky as the distribution is not supported")
+        if isinstance(obj, str):
+            print(obj)  # print the error message
+        return obj(*parameters)
+
+        # match keyword:
+        #     case "normal" | "norm" | "gaussian":
+        #         return pba.N(*parameters)
+        #     case "uniform":
+        #         return pba.U(*parameters)
+        #     case _:
+        #         print("Bad distribution specification")
 
     def init_check(self):
         """check if the UN initialisation specification is correct
@@ -266,9 +273,9 @@ class UncertainNumber:
             case "pbox":
                 return "unfinshed"
 
-    def quick_plot(self, **kwargs):
+    def display(self, **kwargs):
         """quick plot of the uncertain number object"""
-        self._math_object.quick_plot(**kwargs)
+        self._math_object.display(**kwargs)
 
     # ---------------------other constructors---------------------#
 
@@ -319,9 +326,6 @@ class UncertainNumber:
     def I(cls, bounds, **kwargs):
         """a shortcut for creating an interval-type Uncertain Number"""
         return cls(essence="interval", bounds=bounds, **kwargs)
-
-
-
 
 
 
