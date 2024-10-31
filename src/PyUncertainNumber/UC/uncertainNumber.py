@@ -157,9 +157,6 @@ class UncertainNumber:
         args:
             - keyword: (str) the distribution keyword
             - parameters: (list) the parameters of the distribution
-
-        #TODO the original `pba` package is a mess for specifying and giving shortcuts to distributions
-        #TODO below is a temporary workaround
         """
 
         obj = named_pbox.get(keyword, 
@@ -168,13 +165,6 @@ class UncertainNumber:
             print(obj)  # print the error message
         return obj(*parameters)
 
-        # match keyword:
-        #     case "normal" | "norm" | "gaussian":
-        #         return pba.N(*parameters)
-        #     case "uniform":
-        #         return pba.U(*parameters)
-        #     case _:
-        #         print("Bad distribution specification")
 
     def init_check(self):
         """check if the UN initialisation specification is correct
@@ -275,7 +265,8 @@ class UncertainNumber:
 
     def display(self, **kwargs):
         """quick plot of the uncertain number object"""
-        self._math_object.display(**kwargs)
+        
+        return self._math_object.display(**kwargs)
 
     # ---------------------other constructors---------------------#
 

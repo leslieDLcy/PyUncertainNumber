@@ -954,10 +954,7 @@ class Pbox:
             raise ValueError("style must be either 'simple' or 'band'")
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(x \leq X)$")
-        # if display:
-        #     # plt.show()
-        # else:
-        #     return ax
+        return ax
 
 
     def get_interval(self, *args) -> Interval:
