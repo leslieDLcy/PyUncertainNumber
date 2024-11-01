@@ -347,6 +347,7 @@ class Pbox:
 
 # ---------------------unary operations---------------------#
 
+    ##### the top-level functions for unary operations #####
     def _unary(self, *args, function=lambda x: x):
 
         ints = [function(Interval(l, r), *args) for l, r in zip(self.left, self.right)]
@@ -916,7 +917,6 @@ class Pbox:
         else:
             return fig, ax
     plot = show
-
 
     @mpl.rc_context({"text.usetex": True})
     def display(self, title="", ax=None, style="simple", **kwargs):

@@ -13,6 +13,13 @@ class Params:
     # the percentiles
     p_values = np.linspace(0.0001, 0.9999, steps)
 
+    # sample data for a go-to example
+    s = [4.02, 4.07, 4.25, 4.32, 4.36, 4.45, 4.47, 
+         4.57, 4.58, 4.62, 4.68, 4.71, 4.72, 4.79, 
+         4.85, 4.86, 4.88, 4.90, 5.08, 5.09, 5.29, 
+         5.30, 5.40, 5.44, 5.59, 5.59, 5.70, 5.89, 
+         5.89, 6.01]
+
     # @property
     # # template for property
     # def sth(self):
