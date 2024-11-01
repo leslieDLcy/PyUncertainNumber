@@ -1,9 +1,10 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 from .interval import Interval
 
-
+@mpl.rc_context({"text.usetex": True})
 def plot_intervals(interval_list, ax=None, **kwargs):
     # TODO finish the codes as this is temporary
     """ 
@@ -19,7 +20,7 @@ def plot_intervals(interval_list, ax=None, **kwargs):
     return ax
     
 
-
+@mpl.rc_context({"text.usetex": True})
 def plot_DS_structure(interval_list, weights, ax=None, **kwargs):
     ax = plot_intervals(interval_list, ax=ax, **kwargs)
 
