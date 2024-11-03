@@ -3,7 +3,8 @@ Originally written by Scott in R and translated to Python also expanded function
 """
 
 import numpy as np
-from scipy.stats import beta, t, uniform, gamma, chisquare, betabinom, nbinom
+from scipy.stats import beta, t, uniform, gamma, chi2, betabinom, nbinom
+from .pbox_base import Pbox
 from .params import Params
 from .cbox_Leslie import Cbox
 
@@ -11,10 +12,22 @@ def repre_cbox(cdfs, shape="beta", bound_params=None):
     """ transform into pbox object for cbox """
     
     # percentiles
-    
     bounds = [cdf.ppf(Params.p_values) for cdf in cdfs]
-    print(bound_params)
+    if bound_params is not None: print(bound_params)
     return Cbox(
+            left=bounds[0],
+            right=bounds[1],
+            shape=shape,
+        )
+
+# used for nextvalue distribution which by nature is pbox
+def repre_pbox(cdfs, shape="beta", bound_params=None):
+    """ transform into pbox object for cbox """
+    
+    # percentiles
+    bounds = [cdf.ppf(Params.p_values) for cdf in cdfs]
+    if bound_params is not None: print(bound_params)
+    return Pbox(
             left=bounds[0],
             right=bounds[1],
             shape=shape,
@@ -33,15 +46,10 @@ def parameter_bernoulli(x):
     k = np.sum(x)
     return (beta(k, n - k + 1), beta(k + 1, n - k))
 
-# ---------------------binomial---------------------#
-def nextvalue_binomial(x, N):
-    n = len(x)  
-    k = np.sum(x)
-    cdfs = (betabinom(N,k,n*N-k+1), betabinom(N,k+1, n*N-k))
-    return repre_cbox(cdfs, steps = Params.steps , shape="betanomial") 
 
-# TODO question: while the left/right bounds are defined by beta dist
-# does this mean that the cbox is a distibutional pbox?
+
+# ---------------------binomial---------------------#
+# x[i] ~ binomial(N, p), for known N, x[i] is a nonnegative integer less than or equal to N
 def parameter_binomial(x, N):
     """ cbox for Bionomial parameter
 
@@ -67,6 +75,13 @@ def parameter_binomial(x, N):
     return repre_cbox(cdfs, shape="beta", bound_params=[l_b_params, r_b_params]) 
 
 
+def nextvalue_binomial(x, N):
+    if isinstance(x, int):
+        x = [x]
+    n = len(x)  
+    k = np.sum(x)
+    cdfs = (betabinom(N, k,n*N-k+1), betabinom(N, k+1, n*N-k))
+    return repre_pbox(cdfs , shape="betanomial") 
 
 
 
@@ -85,56 +100,69 @@ def parameter_binomialnp_n(x):
 def parameter_binomialnp_p(x):
     pass
 
+
+
+
 # ---------------------Poisson---------------------#
 # x[i] ~ Poisson(parameter), x[i] is a nonnegative integer
-
-def nextvalue_poisson(x):
-    n = len(x)
-    k = np.sum(x)
-    # TODO arguments not confirmed yet
-    return (nbinom(size=k, prob=1-1/(n+1)),
-            nbinom(size=k+1, prob=1-1/(n+1)))
 
 def parameter_poisson(x):
     n = len(x)
     k = np.sum(x)
-    # TODO arguments not confirmed yet
-    return (gamma(k, scale=1/n), gamma(k + 1, scale=1/n))
+    l_b_params = [k, 1/n]
+    r_b_params = [k + 1, 1/n]
+    cdfs = (gamma(*l_b_params), gamma(*r_b_params))
+    return repre_cbox(cdfs, shape="gamma", bound_params=[l_b_params, r_b_params])  
+
+
+def nextvalue_poisson(x):
+    n = len(x)
+    k = np.sum(x)
+
+    cdfs = (nbinom(size=k, prob=1-1/(n+1)),
+            nbinom(size=k+1, prob=1-1/(n+1)))
+    return repre_pbox(cdfs , shape="nbinom") 
+
+
 
 
 # ---------------------exponential---------------------#
 # x[i] ~ exponential(parameter), x[i] is a nonnegative integer
-# TODO arguments not confirmed yet
+# TODO not returning bounds
 def nextvalue_exponential(x):
     n = len(x)
     k = np.sum(x)
     return (gamma(n, scale=1/k))
 
+    # TODO
 def parameter_exponential(x):
     n = len(x)
     k = np.sum(x)
     return (gamma(n, scale=1/k))
-
+    # TODO
 def qgammaexponential(p, shape, rate=1, scale=1):
     return rate * ((1 - p) ** (-1 / shape) - 1)
-
+    # TODO
 def rgammaexponential(many, shape, rate=1, scale=1):
     return qgammaexponential(np.random.uniform(size=many), shape, rate, scale)
 
 
 # ---------------------normal---------------------#
-# ! what's the `student(n-1)` function in R? cannot find it online.
-def nextvalue_normal(x):
-    n = len(x)
-    return np.mean(x) + np.std(x, ddof=1) * t.ppf(0.975, n - 1) * np.sqrt(1 + 1 / n)
 
 def parameter_normal_mu(x):
     n = len(x)
-    return np.mean(x) + np.std(x, ddof=1) * t.ppf(0.975, n - 1) / np.sqrt(n)
+    return np.mean(x) + np.std(x) * t.rvs(df=n-1, size=2000) / np.sqrt(1 + 1/n)
 
 def parameter_normal_sigma(x):
     n = len(x)
-    return np.sqrt(np.var(x, ddof=1) * (n - 1) / chisquare(n - 1))
+    return np.sqrt(
+        np.var(x) * (n - 1) / chi2.rvs(n - 1, size=2000)
+        )
+
+def nextvalue_normal(x):
+    # TODO
+    n = len(x)
+    return np.mean(x) + np.std(x, ddof=1) * t.ppf(0.975, n - 1) * np.sqrt(1 + 1 / n)
 
 
 
