@@ -46,6 +46,13 @@ class Pbox:
 
     STEPS = Params.steps
 
+    """ 
+    Leslie:
+    - Essentially, from the code implementation, a Pbox object is defined by the left and right bounds (i.e. nd.arrays).
+    - Advantage is that this unifies both parametric and non-parametric pboxes but disadvantage is it discards the parameter
+    information of the bounds which we may desire in the case of Cbox.
+    """
+
     def __init__(
         self,
         left=None,
@@ -189,7 +196,7 @@ class Pbox:
             yield val
 
 
-# ---------------------Basic arithmetics---------------------#
+    # ---------------------Basic arithmetics---------------------#
 
     def __neg__(self):
         if self.shape in ["uniform", "normal", "cauchy", "triangular", "skew-normal"]:
@@ -808,34 +815,6 @@ class Pbox:
         """
         return self.min(a, method=method).max(b, method=method)
 
-    def logicaland(self, other, method="f"):  # conjunction
-        if method == "i":
-            return self.mul(other, method)  # independence a * b
-        elif method == "p":
-            return self.min(other, method)  # perfect min(a, b)
-        elif method == "o":
-            return max(self.add(other, method) - 1, 0)  # opposite max(a + b – 1, 0)
-        elif method == "+":
-            return self.min(other, method)  # positive env(a * b, min(a, b))
-        elif method == "-":
-            return self.min(other, method)  # negative env(max(a + b – 1, 0), a * b)
-        else:
-            return env(max(0, self.add(other, method) - 1), self.min(other, method))
-
-    def logicalor(self, other, method="f"):  # disjunction
-        if method == "i":
-            return 1 - (1 - self) * (1 - other)  # independent 1 – (1 – a) * (1 – b)
-        elif method == "p":
-            return self.max(other, method)  # perfect max(a, b)
-        elif method == "o":
-            return min(self.add(other, method), 1)  # opposite min(1, a + b)
-        # elif method=='+':
-        #    return(env(,min(self.add(other,method),1))  # positive env(max(a, b), 1 – (1 – a) * (1 – b))
-        # elif method=='-':
-        #    return()  # negative env(1 – (1 – a) * (1 – b), min(1, a + b))
-        else:
-            return self.env(self.max(other, method), min(self.add(other, method), 1))
-
     def env(self, other):
         """
         .. _interval.env:
@@ -865,97 +844,33 @@ class Pbox:
 
         return Pbox(left=nleft, right=nright, steps=self.steps)
 
-    def show(self, figax=None, now=True, title="", x_axis_label="x", **kwargs):
-
-        if figax is None:
-            fig, ax = plt.subplots()
+    def logicaland(self, other, method="f"):  # conjunction
+        if method == "i":
+            return self.mul(other, method)  # independence a * b
+        elif method == "p":
+            return self.min(other, method)  # perfect min(a, b)
+        elif method == "o":
+            return max(self.add(other, method) - 1, 0)  # opposite max(a + b – 1, 0)
+        elif method == "+":
+            return self.min(other, method)  # positive env(a * b, min(a, b))
+        elif method == "-":
+            return self.min(other, method)  # negative env(max(a + b – 1, 0), a * b)
         else:
-            fig, ax = figax
+            return self.env(max(0, self.add(other, method) - 1), self.min(other, method))
 
-        # now respects discretization
-        L = self.left
-        R = self.right
-        steps = self.steps
-
-        # flag: must be something wrong herein
-
-        LL = np.concatenate((L, L, np.array([R[-1]])))
-        RR = np.concatenate((np.array([L[0]]), R, R))
-        ii = (
-            np.concatenate(
-                (np.arange(steps), np.arange(1, steps + 1), np.array([steps]))
-            )
-            / steps
-        )
-        jj = (
-            np.concatenate((np.array([0]), np.arange(steps + 1), np.arange(1, steps)))
-            / steps
-        )
-
-        ii.sort()
-        jj.sort()
-        LL.sort()
-        RR.sort()
-
-        if "color" in kwargs.keys():
-
-            ax.plot(LL, ii, **kwargs)
-            ax.plot(RR, jj, **kwargs)
+    def logicalor(self, other, method="f"):  # disjunction
+        if method == "i":
+            return 1 - (1 - self) * (1 - other)  # independent 1 – (1 – a) * (1 – b)
+        elif method == "p":
+            return self.max(other, method)  # perfect max(a, b)
+        elif method == "o":
+            return min(self.add(other, method), 1)  # opposite min(1, a + b)
+        # elif method=='+':
+        #    return(env(,min(self.add(other,method),1))  # positive env(max(a, b), 1 – (1 – a) * (1 – b))
+        # elif method=='-':
+        #    return()  # negative env(1 – (1 – a) * (1 – b), min(1, a + b))
         else:
-            ax.plot(LL, ii, "r-", **kwargs)
-            ax.plot(RR, jj, "k-", **kwargs)
-
-        if title != "":
-            ax.set_title(title, **kwargs)
-
-        ax.set_xlabel(x_axis_label)
-        ax.set_ylabel(r"$\Pr(x \leq X)$")
-
-        if now:
-            plt.show()
-            # fig.show() # keep the original figure open
-        else:
-            return fig, ax
-    plot = show
-
-    @mpl.rc_context({"text.usetex": True})
-    def display(self, title="", ax=None, style="simple", **kwargs):
-        """quickly plot the pba object
-
-        # !Leslie defined plotting function"""
-
-        if ax is None:
-            fig, ax = plt.subplots()
-
-        L = self.left
-        R = self.right
-
-        p_axis = np.linspace(0, 1, self.steps+1)
-        LL_n = np.concatenate((L, np.array([R[-1]])))
-        RR_n = np.concatenate((np.array([L[0]]), R))
-
-        ax.plot(LL_n, p_axis, color='g')
-        ax.plot(RR_n, p_axis, color='b')
-
-        if title is not None:
-            ax.set_title(title, **kwargs)
-        if style == "band":
-            ax.fill_betweenx(
-                y= p_axis,
-                x1 = LL_n,
-                x2 = RR_n,
-                interpolate=True,                
-                color="lightgray",
-                alpha=0.3,
-            )
-        elif style == "simple":
-            pass
-        else:
-            raise ValueError("style must be either 'simple' or 'band'")
-        ax.set_xlabel(r"$x$")
-        ax.set_ylabel(r"$\Pr(x \leq X)$")
-        return ax
-
+            return self.env(self.max(other, method), min(self.add(other, method), 1))
 
     def get_interval(self, *args) -> Interval:
 
@@ -1094,6 +1009,99 @@ class Pbox:
             d.append(min(sR, oR))
 
         return Pbox(left=u, right=d)
+
+
+    # ---------------------plotting stuff---------------------#
+    def show(self, figax=None, now=True, title="", x_axis_label="x", **kwargs):
+
+        if figax is None:
+            fig, ax = plt.subplots()
+        else:
+            fig, ax = figax
+
+        # now respects discretization
+        L = self.left
+        R = self.right
+        steps = self.steps
+
+        # flag: must be something wrong herein
+
+        LL = np.concatenate((L, L, np.array([R[-1]])))
+        RR = np.concatenate((np.array([L[0]]), R, R))
+        ii = (
+            np.concatenate(
+                (np.arange(steps), np.arange(1, steps + 1), np.array([steps]))
+            )
+            / steps
+        )
+        jj = (
+            np.concatenate((np.array([0]), np.arange(steps + 1), np.arange(1, steps)))
+            / steps
+        )
+
+        ii.sort()
+        jj.sort()
+        LL.sort()
+        RR.sort()
+
+        if "color" in kwargs.keys():
+
+            ax.plot(LL, ii, **kwargs)
+            ax.plot(RR, jj, **kwargs)
+        else:
+            ax.plot(LL, ii, "r-", **kwargs)
+            ax.plot(RR, jj, "k-", **kwargs)
+
+        if title != "":
+            ax.set_title(title, **kwargs)
+
+        ax.set_xlabel(x_axis_label)
+        ax.set_ylabel(r"$\Pr(x \leq X)$")
+
+        if now:
+            plt.show()
+            # fig.show() # keep the original figure open
+        else:
+            return fig, ax
+    plot = show
+
+    @mpl.rc_context({"text.usetex": True})
+    def display(self, title="", ax=None, style="simple", **kwargs):
+        """quickly plot the pba object
+
+        # !Leslie defined plotting function"""
+
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        L = self.left
+        R = self.right
+
+        p_axis = np.linspace(0, 1, self.steps+1)
+        LL_n = np.concatenate((L, np.array([R[-1]])))
+        RR_n = np.concatenate((np.array([L[0]]), R))
+
+        ax.plot(LL_n, p_axis, color='g')
+        ax.plot(RR_n, p_axis, color='b')
+
+        if title is not None:
+            ax.set_title(title, **kwargs)
+        if style == "band":
+            ax.fill_betweenx(
+                y= p_axis,
+                x1 = LL_n,
+                x2 = RR_n,
+                interpolate=True,                
+                color="lightgray",
+                alpha=0.3,
+            )
+        elif style == "simple":
+            pass
+        else:
+            raise ValueError("style must be either 'simple' or 'band'")
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$\Pr(x \leq X)$")
+        return ax
 
 
 ##### Functions #####
