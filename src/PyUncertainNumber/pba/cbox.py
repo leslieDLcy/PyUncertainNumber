@@ -4,22 +4,22 @@ Originally written by Scott in R and translated to Python also expanded function
 
 import numpy as np
 from scipy.stats import beta, t, uniform, gamma, chisquare, betabinom, nbinom
-from .pbox_base import Pbox
 from .params import Params
+from .cbox_Leslie import Cbox
 
-
-def repre_cbox(cdfs, steps=Params.steps, shape="beta"):
+def repre_cbox(cdfs, shape="beta", bound_params=None):
     """ transform into pbox object for cbox """
     
     # percentiles
     
     bounds = [cdf.ppf(Params.p_values) for cdf in cdfs]
-    return Pbox(
+    print(bound_params)
+    return Cbox(
             left=bounds[0],
             right=bounds[1],
-            steps=steps,
             shape=shape,
         )
+
 
 # ---------------------Bernoulli---------------------#
 # TODO distribution not confirmed yet
@@ -46,16 +46,31 @@ def parameter_binomial(x, N):
     """ cbox for Bionomial parameter
 
     args:
-        x (list): list of values
+        x (list or int): sample data as in a list of success or number of success or 
+            a single int as the number of success k
         N (int): number of trials
+
+    note:
+        x[i] ~ binomial(N, p), for unknown p, x[i] is a nonnegative integer
+        but x is a int number, it suggests the number of success as `k`.
 
     return:
         cbox: cbox object
     """
+    if isinstance(x, int):
+        x = [x]
     n = len(x)  #size
     k = np.sum(x)
-    cdfs = (beta(k, n * N - k + 1), beta(k + 1, n * N - k))
-    return repre_cbox(cdfs, steps = Params.steps , shape="beta") 
+    l_b_params = [k, n * N - k + 1]
+    r_b_params = [k + 1, n * N - k]
+    cdfs = (beta(*l_b_params), beta(*r_b_params))
+    return repre_cbox(cdfs, shape="beta", bound_params=[l_b_params, r_b_params]) 
+
+
+
+
+
+
 
 
 # ---------------------binomialnp---------------------#
@@ -189,3 +204,18 @@ def parameter_normal_meandifference(x, y):
 #     return (mixture(z, w), mixture(z[:-1] + [np.inf], w))
 
 
+
+# ---------------------pool---------------------#
+# # original cbox constructor by Leslie
+# def repre_cbox(cdfs, steps=Params.steps, shape="beta"):
+#     """ transform into pbox object for cbox """
+    
+#     # percentiles
+    
+#     bounds = [cdf.ppf(Params.p_values) for cdf in cdfs]
+#     return Pbox(
+#             left=bounds[0],
+#             right=bounds[1],
+#             steps=steps,
+#             shape=shape,
+#         )

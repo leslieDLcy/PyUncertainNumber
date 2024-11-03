@@ -36,6 +36,7 @@ Overarching:
 
 cbox:
     ☐ ci function with arguments
+    ☐ print out the bounds parameters when instantiating the cbox
 
 
 
