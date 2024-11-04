@@ -1025,6 +1025,9 @@ class Interval:
         if ax is None:
             fig, ax = plt.subplots()
 
+        if title is not None:
+            ax.set_title(title, **kwargs)
+            
         if style == "simple":
             # Plot the interval horizontally
             ax.plot(

@@ -8,9 +8,10 @@ pbox:
     ☐ construct pbox(either distributional or nonparametric) from dataset 
     ☐ drawing samples from pbox
     ☐ propagating with pbox
-    ☐ construct pbox from data or from partial knowledge on the distribution property (i.e. min, max, mean, variance, etc.)?
+    ✔ construct pbox from data or from partial knowledge on the distribution property (i.e. min, max, mean, variance, etc.)? @done (04/11/2024, 11:46:39)
     ☐ pbox arithmetic with various dependecy NOT finsihed
     ☐ pbox aggregation from multiple sources
+    ☐ unary functions are still lacking for e.g. sin(), cos(), etc..
 
 
 hedge:
@@ -31,7 +32,7 @@ preparation for the December workshop:
 
 Overarching:
     ☐ plotting with range between the bounds
-    report a pba bug in the function `min_max_mean_var`
+    ☐ report a pba bug in the function `min_max_mean_var`
 
 
 cbox:

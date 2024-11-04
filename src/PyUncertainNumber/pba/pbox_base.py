@@ -1066,7 +1066,7 @@ class Pbox:
     plot = show
 
     @mpl.rc_context({"text.usetex": True})
-    def display(self, title="", ax=None, style="simple", **kwargs):
+    def display(self, title="", ax=None, style="simple", fill_color='lightgray', **kwargs):
         """quickly plot the pba object
 
         # !Leslie defined plotting function"""
@@ -1092,7 +1092,7 @@ class Pbox:
                 x1 = LL_n,
                 x2 = RR_n,
                 interpolate=True,                
-                color="lightgray",
+                color=fill_color,
                 alpha=0.3,
             )
         elif style == "simple":
