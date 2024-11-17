@@ -4,7 +4,20 @@ import numpy as np
 
 
 def cantilever_beam_func(x):
-    """the function of the cantilever beam example"""
+    """Calculates deflection and stress for a cantilever beam.
+
+    Args:
+        x (np.array): Array of input parameters:
+            x[0]: Distance from the neutral axis to the point of interest (m)
+            x[1]: Length of the beam (m)
+            x[2]: Second moment of area (mm^4)
+            x[3]: Applied force (N)
+            x[4]: Young's modulus (MPa)
+
+    Returns:
+        np.array([deflection (m), stress (MPa)]) 
+               Returns np.array([np.nan, np.nan]) if calculation error occurs.
+    """
 
     y = x[0]
     beam_length = x[1]
@@ -13,36 +26,38 @@ def cantilever_beam_func(x):
     E = x[4]
     try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
         deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
-        stress = F * beam_length * y / I / 1000  # stress in MPa
-        # print(f'Successully completed eval #{i} of total {total}...')
+        stress     = F * beam_length * y / I / 1000  # stress in MPa
+        
     except:
-        # print(f'Error in eval #{i} of total {total}...')
         deflection = np.nan
         stress = np.nan
 
-    return [deflection, stress]
+    return np.array([deflection, stress])
 
 
-# return dictTuple
+def cantilever_beam_deflection(x):
+    """Calculates deflection and stress for a cantilever beam.
 
+    Args:
+        x (np.array): Array of input parameters:
+            x[0]: Length of the beam (m)
+            x[1]: Second moment of area (mm^4)
+            x[2]: Applied force (N)
+            x[3]: Young's modulus (MPa)
 
-def cantilever_beam_deflection(beam_length, I, F, E):
-    """to compute the deflection in the cantilever beam example"""
+    Returns:
+        float: deflection (m)
+               Returns np.nan if calculation error occurs.
+    """
 
-    try:
+    beam_length = x[0]
+    I = x[1]
+    F = x[2]
+    E = x[3]
+    try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
         deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+        
     except:
         deflection = np.nan
 
     return deflection
-
-
-def cantilever_beam_stress(y, beam_length, I, F):
-    """to compute bending stress in the cantilever beam example"""
-
-    try:
-        stress = F * beam_length * y / I / 1000  # stress in MPa
-    except:
-        stress = np.nan
-
-    return stress
