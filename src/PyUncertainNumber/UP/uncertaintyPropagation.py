@@ -10,27 +10,25 @@ from .cauchy_old import cauchydeviate_method
 from .utils import post_processing, create_folder
 
 
-
 # ---------------------the top level UP function ---------------------#
 
-def up_bb(vars, 
-          fun, 
-          n:np.integer = None, 
-          x0:np.ndarray = None, 
-          method= "endpoint",  
-          save_raw_data="no", 
+def up_bb(vars,
+          fun,
+          n: np.integer = None,
+          x0: np.ndarray = None,
+          method="endpoint",
+          save_raw_data="no",
           *,  # Keyword-only arguments start here
-          base_path=np.nan,  
-          tol_loc:np.ndarray = None, 
-          options_loc: dict = None, 
-          method_loc = "Nelder-Mead", 
-          objective='minimize', 
-          pop_size=1000, 
-          n_gen=100, 
-          tol=1e-3, 
-          n_gen_last=10, 
-          algorithm_type= "NSGA2"):
-    
+          base_path=np.nan,
+          tol_loc: np.ndarray = None,
+          options_loc: dict = None,
+          method_loc="Nelder-Mead",
+          objective='minimize',
+          pop_size=1000,
+          n_gen=100,
+          tol=1e-3,
+          n_gen_last=10,
+          algorithm_type="NSGA2"):
     """Performs uncertainty propagation (UP) using various methods.
 
     Args:
@@ -56,19 +54,22 @@ def up_bb(vars,
         #TODO update the description. 
         #TODO update the genetic optimisation technique to do both minimisation nad optimisation at the same time. 
     """
-    # Input validation 
+    # Input validation
     if vars.shape[1] != 2:
         raise ValueError("vars must be a 2D array with two columns per row (lower and upper bounds)")
     if not callable(fun):
         raise ValueError("f must be a callable function")
-    
 
     match method:
         case ("local_optimisation" | "genetic_optimisation"):  # Check for optimization methods
             if not callable(fun):
                 raise TypeError("fun must be a callable function for optimization methods. It cannot be None.")
-        
+
         case ("endpoint" | "endpoints" | "vertex"):
+            # TODO integrate the below into the one 'endpoints' function
+            # naive imple of hint on combination number of endpoints method
+            print(f"Total number of input combinations for the endpoint method: {(vars.shape[0])**2}") 
+
             if save_raw_data == "no":
                 return endpoints_method(vars, fun, save_raw_data='no')
             elif save_raw_data == "yes":
@@ -92,7 +93,7 @@ def up_bb(vars,
             else:
                 raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
 
-        case ("sampling"| "montecarlo"| "MonteCarlo"| "monte_carlo"| "latin_hypercube"| "latinhypercube"| "lhs"):
+        case ("sampling" | "montecarlo" | "MonteCarlo" | "monte_carlo" | "latin_hypercube" | "latinhypercube" | "lhs"):
             if n is None:
                 raise ValueError("n (number of samples) is required for sampling methods.")
             if save_raw_data == "no":
@@ -107,34 +108,34 @@ def up_bb(vars,
 
         case "local_optimisation":
             print("The intermediate steps cannot be saved for local optimisation")
-            
-            min_candidate, max_candidate, x_miny, x_maxy, message_miny, message_maxy, nit_miny, nit_maxy, nfev_miny, nfev_maxy, final_simplex_miny, final_simplex_maxy = local_optimisation_method(vars, fun, x0, tol_loc = tol_loc, options_loc = options_loc, method_loc = method_loc)
+
+            min_candidate, max_candidate, x_miny, x_maxy, message_miny, message_maxy, nit_miny, nit_maxy, nfev_miny, nfev_maxy, final_simplex_miny, final_simplex_maxy = local_optimisation_method(vars, fun, x0, tol_loc=tol_loc, options_loc=options_loc, method_loc=method_loc)
             print("minimisation:", message_miny)
             print("maximisation:", message_maxy)
             return min_candidate, max_candidate, x_miny, x_maxy, message_miny, message_maxy, nit_miny, nit_maxy, nfev_miny, nfev_maxy, final_simplex_miny, final_simplex_maxy
-        
+
         case "genetic_optimisation":
-            optimized_f, optimized_x, number_of_generations, number_of_iterations = genetic_optimization_method(vars, fun, objective, pop_size, 
-                                                                                                                    n_gen, tol, n_gen_last, 
-                                                                                                                                algorithm_type)
+            optimized_f, optimized_x, number_of_generations, number_of_iterations = genetic_optimization_method(vars, fun, objective, pop_size,
+                                                                                                                n_gen, tol, n_gen_last,
+                                                                                                                algorithm_type)
             return optimized_f, optimized_x, number_of_generations, number_of_iterations
-    
-        case _: 
+
+        case _:
             raise ValueError("Invalid UP method.")
 
 
 def main():
     """implementation of the vertex method on the cantilever beam example"""
 
-    y = np.array([0.145, 0.155]) #m
+    y = np.array([0.145, 0.155])  # m
 
-    L =  np.array([9.95, 10.05]) # m
+    L = np.array([9.95, 10.05])  # m
 
-    I =  np.array([0.0003861591, 0.0005213425])# m**4
+    I = np.array([0.0003861591, 0.0005213425])  # m**4
 
-    F =  np.array([11, 37]) # kN
+    F = np.array([11, 37])  # kN
 
-    E =  np.array([200, 220]) # GPa
+    E = np.array([200, 220])  # GPa
 
     # Create a 2D np.array with all uncertain input parameters in the **correct** order.
     xInt = np.array([L, I, F, E])
@@ -160,8 +161,8 @@ def main():
         F = x[2]
         E = x[3]
         try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
-          deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
-        
+            deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+
         except:
             deflection = np.nan
 
@@ -173,12 +174,11 @@ def main():
     # df_OUTPUT_INPUT = subintervalMethod(intervals, fun, n=2)
 
     method = "local_optimisation"
-    #base_path = "C:\\Users\\Ioanna\\Documents\\GitHub\\daws2\\cantilever_beam"
-    a = up_bb(xInt, cantilever_beam_deflection, x0 = None, method= method, save_raw_data="no")
+    # base_path = "C:\\Users\\Ioanna\\Documents\\GitHub\\daws2\\cantilever_beam"
+    a = up_bb(xInt, cantilever_beam_deflection, x0=None, method=method, save_raw_data="no")
 
-    print(a)       
-    return a 
-
+    print(a)
+    return a
 
 
 if __name__ == "__main__":

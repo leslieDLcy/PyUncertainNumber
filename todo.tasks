@@ -13,9 +13,13 @@ pbox:
     ☐ pbox aggregation from multiple sources
     ☐ unary functions are still lacking for e.g. sin(), cos(), etc..
 
+cbox:
+    ☐ ci function with arguments
+    ☐ print out the bounds parameters when instantiating the cbox
 
 hedge:
     ☐ pbox construction from hedge language
+
 
 UP module:
     ☐ test the new functionality from Ioanna
@@ -24,11 +28,21 @@ UP module:
     ☐ envelop the results of min and max y
     ☐ TODO add typing for UncertainNumber for the performance function;
 
+UP methods implementation checklist:
+
+
+integration of UP module with Ioanna:
+    ☐ For the top-level function, what are the returns for each option? are they consistent?
+    ☐ are the returns from calling `up_bb(method= xxx)` as in `xxx` in {} consistent?? @high
+    ☐ how does the METHOD = "montecarlo" work in the `up_bb()`. are they drawing samples from Uniform distribution?
+    ☐ change the name 'up_bb'@critical 
+    ☐ #TODO could Scott elaborate on envelop for mixed uncertainty propagation ?
+
 
 preparation for the December workshop:
-    ☐ a personal notebook namned features
+    ✔ a personal notebook named features @done (17/11/2024, 20:17:40)
     ☐ package documentation @high 
-    ☐ slides in Beams
+    ✔ slides in Beams @done (17/11/2024, 20:17:31)
     ☐ notebook on installation
     ☐ notebook on the Cantilever beam example
 
@@ -38,9 +52,7 @@ Overarching:
     ☐ report a pba bug in the function `min_max_mean_var`
 
 
-cbox:
-    ☐ ci function with arguments
-    ☐ print out the bounds parameters when instantiating the cbox
+
 
 
 
