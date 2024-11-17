@@ -61,3 +61,39 @@ def cantilever_beam_deflection(x):
         deflection = np.nan
 
     return deflection
+
+
+# --------------------- by Leslie ---------------------#
+
+def cantilever_beam_deflection(beam_length, I, F, E):
+    """compute the deflection in the cantilever beam example
+
+    # TODO add typing for UncertainNumber
+    Args:
+        beam_length (UncertainNumber): Length of the beam (m)
+        I: Second moment of area (mm^4)
+        F: Applied force (N)
+        E: Young's modulus (MPa)
+
+    Returns:
+        float: deflection (m)
+               Returns np.nan if calculation error occurs.
+    """
+
+    try:
+        deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+    except:
+        deflection = np.nan
+
+    return deflection
+
+
+def cantilever_beam_stress(y, beam_length, I, F):
+    """to compute bending stress in the cantilever beam example"""
+
+    try:
+        stress = F * beam_length * y / I / 1000  # stress in MPa
+    except:
+        stress = np.nan
+
+    return stress

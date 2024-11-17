@@ -22,6 +22,7 @@ UP module:
     ☐ Test on the surrogate models
     ☐ see how [Sympy](https://docs.sympy.org/latest/index.html) can help with arithmetic operations of PyUncertainNumber
     ☐ envelop the results of min and max y
+    ☐ TODO add typing for UncertainNumber for the performance function;
 
 
 preparation for the December workshop:

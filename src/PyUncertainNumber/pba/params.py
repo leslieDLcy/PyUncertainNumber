@@ -23,7 +23,7 @@ class Params:
 
 
      # by default
-     scott_hedged_interpretation = {}
+    scott_hedged_interpretation = {}
     
 
     # user-defined 
