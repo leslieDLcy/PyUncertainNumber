@@ -20,6 +20,18 @@ class Params:
          5.30, 5.40, 5.44, 5.59, 5.59, 5.70, 5.89, 
          5.89, 6.01]
 
+
+
+     # by default
+     scott_hedged_interpretation = {}
+    
+
+    # user-defined 
+    user_hedged_interpretation = {}
+
+
+
+
     # @property
     # # template for property
     # def sth(self):

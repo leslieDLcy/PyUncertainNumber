@@ -1,6 +1,8 @@
 
 from PyUncertainNumber import UncertainNumber as UN
 
+# ---------------------Interval instantiation---------------------#
+
 # vacuous instantiation
 un = UN(
     name='elas_modulus', 
@@ -14,6 +16,17 @@ un = UN(name='elas_modulus',
             essence='interval', 
             bounds=[2,3]
             )
+
+
+un = UN(name='elas_modulus', 
+        symbol='E', 
+        units='Pa', 
+        essence='interval', 
+        bounds='[3 +- 10%]')
+
+
+
+# ---------------------distribution instantiation---------------------#
 
 # distribution instantiation
 un = UN(

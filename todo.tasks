@@ -20,6 +20,8 @@ hedge:
 UP module:
     ☐ test the new functionality from Ioanna
     ☐ Test on the surrogate models
+    ☐ see how [Sympy](https://docs.sympy.org/latest/index.html) can help with arithmetic operations of PyUncertainNumber
+    ☐ envelop the results of min and max y
 
 
 preparation for the December workshop:
@@ -38,6 +40,9 @@ Overarching:
 cbox:
     ☐ ci function with arguments
     ☐ print out the bounds parameters when instantiating the cbox
+
+
+
 
 
 

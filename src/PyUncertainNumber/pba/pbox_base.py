@@ -352,8 +352,27 @@ class Pbox:
             self.var_right = right(b)
 
 
-# ---------------------unary operations---------------------#
 
+
+# ---------------------durl interpretation ---------------------#
+
+    def cut(self,):
+        pass
+
+
+    def cuth(self, x):
+        """ get the bounds on the cumulative probability associated with any x-value """
+        pass
+
+
+    def cutv(self, p=0.5):
+        """ get the bounds on the x-value at any particular probability level"""
+        pass
+
+
+
+
+# ---------------------unary operations---------------------#
     ##### the top-level functions for unary operations #####
     def _unary(self, *args, function=lambda x: x):
 
