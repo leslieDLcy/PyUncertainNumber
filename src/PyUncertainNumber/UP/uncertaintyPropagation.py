@@ -8,7 +8,7 @@ from .genetic_optimisation import genetic_optimization_method
 from .local_optimisation import local_optimisation_method
 from .cauchy_old import cauchydeviate_method
 from .utils import post_processing, create_folder
-
+from ..UC.uncertainNumber import _parse_interverl_inputs
 
 # ---------------------the top level UP function ---------------------#
 
@@ -32,7 +32,7 @@ def up_bb(vars,
     """Performs uncertainty propagation (UP) using various methods.
 
     Args:
-        vars (np.ndarray): Input intervals.
+        vars (np.ndarray or list of UN objects): Input intervals.
         fun (Callable): The function to propagate.
         n (np.integer, optional): Number of subintervals/samples. Defaults to None.
         method (str, optional): UP method. Defaults to "endpoint".
@@ -53,10 +53,12 @@ def up_bb(vars,
         ValueError: For invalid method, save_raw_data, or missing arguments.
         #TODO update the description. 
         #TODO update the genetic optimisation technique to do both minimisation nad optimisation at the same time. 
+        # TODO return either as namedTuple or dict to be explicit
     """
     # Input validation
-    if vars.shape[1] != 2:
-        raise ValueError("vars must be a 2D array with two columns per row (lower and upper bounds)")
+    
+    vars = _parse_interverl_inputs(vars)
+
     if not callable(fun):
         raise ValueError("f must be a callable function")
 

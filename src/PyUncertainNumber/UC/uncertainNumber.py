@@ -7,7 +7,6 @@ from .uncertainty_types import Uncertainty_types
 from .ensemble import Ensemble
 from PyUncertainNumber.pba.interval import Interval as I
 from PyUncertainNumber.pba.interval import PM
-from PyUncertainNumber import pba
 from .utils import *
 from .params import Params
 from typing import List
@@ -388,11 +387,16 @@ class UncertainNumber:
             return type(self)(essence=essence, bounds=[left, right])
 
     @classmethod
-    def _toIntervalBackend(cls, vars=None):
+    def _toIntervalBackend(cls, vars=None) -> np.array:
         """transform any UN object to an `interval`
+        #! currently in use
+        # TODO think if use Marco's Interval Vector object
 
         question:
             - what is the `interval` representation: list, nd.array or Interval object?
+
+        returns:
+            - 2D np.array representation for all the interval-typed UNs
         """
         all_objs = {instance.symbol: instance for instance in cls.instances}
 
@@ -419,6 +423,7 @@ class UncertainNumber:
 
         note:
             - it will automatically convert all the UN objects in array-like to the computational backend
+            - essentially vars shall be all interval-typed UNs by now;
 
         returns:
             - nd.array or Marco's Interval object
@@ -502,6 +507,9 @@ class UncertainNumber:
             json.dump(self, fp, cls=UNEncoder, indent=4)
 
 
+
+# ---------------------class related methods---------------------#
+
 # TODO unfinished logic: currently if suffices in creating only `Interval` object
 # @classmethod
 def parse_description(description):
@@ -555,3 +563,19 @@ def parse_description(description):
     #         )
 
     #     return type(self)(super().__add__(other), self.unit)
+
+
+def _parse_interverl_inputs(vars):
+    """ Parse the input intervals
+    
+    note:
+        - Ioanna's funcs typically take 2D NumPy arra
+    """
+    if isinstance(vars, np.ndarray):
+        if vars.shape[1] != 2:
+            raise ValueError("vars must be a 2D array with two columns per row (lower and upper bounds)")
+        else:
+            return vars
+        
+    if isinstance(vars, list):
+        return UncertainNumber._toIntervalBackend(vars)
