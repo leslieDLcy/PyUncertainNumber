@@ -1,20 +1,20 @@
 import numpy as np
+
+# from matplotlib import pyplot
+# from intervals.methods import intervalise as i
+
 from typing import Callable
 from numpy import ndarray
 
 ##### the module #####
 
+
 def endpoints_propagation_2n(
     x: ndarray, f: Callable
-):  
-    """ Marco's original implementation of the endpoints propagation method.
-    
-    note:
-        - Computes the min and max of a monotonic function with endpoints propagation
-        - "x has shape (n,2)."
-    """
+):  # Computes the min and max of a monotonic function with endpoints propagation
+    "x has shape (n,2)."
+
     # ! if it only works on monotonic functions, it should be called minmax_monotonic?
-    # I'm using it in the `UN.endpointMethod` method.
 
     n = x.shape[0]
     max_candidate = -np.inf

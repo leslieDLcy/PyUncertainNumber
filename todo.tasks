@@ -13,33 +13,61 @@ pbox:
     ☐ pbox aggregation from multiple sources
     ☐ unary functions are still lacking for e.g. sin(), cos(), etc..
 
+cbox:
+    ☐ ci function with arguments
+    ☐ print out the bounds parameters when instantiating the cbox
 
 hedge:
     ☐ pbox construction from hedge language
 
-UP module:
+
+UP module personal:
     ☐ test the new functionality from Ioanna
     ☐ Test on the surrogate models
     ☐ see how [Sympy](https://docs.sympy.org/latest/index.html) can help with arithmetic operations of PyUncertainNumber
     ☐ envelop the results of min and max y
+    ☐ TODO add typing for UncertainNumber for the performance function;
+
+
+
+UP methods implementation checklist:
+    ☐ endpoints
+    ☐ taylor expansion
+    ☐ subinterval
+    ☐ optimiation methods
+    ☐ cauchy deviate
+
+
+integration of UP module with Ioanna:
+    ☐ For the top-level function, what are the **returns** for each option? are they consistent?
+    ☐ are the returns from calling `up_bb(method= xxx)` as in `xxx` in {} consistent?? @high
+    ☐ how does the METHOD = "montecarlo" work in the `up_bb()`. are they drawing samples from Uniform distribution?
+    ☐ change the name 'up_bb'@critical 
+    ✔ the top-level func `up_bb()` takes in a list of UN objects @done (18/11/2024, 12:21:28)
+    ☐ the top-level func `up_bb()` outputs UN objects
+    ☐ #TODO could Scott elaborate on envelop for mixed uncertainty propagation ?
 
 
 preparation for the December workshop:
-    ☐ a personal notebook namned features
+    ✔ a personal notebook named features @done (17/11/2024, 20:17:40)
     ☐ package documentation @high 
-    ☐ slides in Beams
+    ✔ slides in Beams @done (17/11/2024, 20:17:31)
     ☐ notebook on installation
     ☐ notebook on the Cantilever beam example
 
 
+
+
+
+
+
+    
 Overarching:
     ☐ plotting with range between the bounds
     ☐ report a pba bug in the function `min_max_mean_var`
 
 
-cbox:
-    ☐ ci function with arguments
-    ☐ print out the bounds parameters when instantiating the cbox
+
 
 
 
