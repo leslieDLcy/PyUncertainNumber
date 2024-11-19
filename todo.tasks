@@ -46,6 +46,7 @@ integration of UP module with Ioanna:
     ✔ the top-level func `up_bb()` takes in a list of UN objects @done (18/11/2024, 12:21:28)
     ☐ the top-level func `up_bb()` outputs UN objects
     ☐ #TODO could Scott elaborate on envelop for mixed uncertainty propagation ?
+    ☐ what's the difference between the new 'endpoints_method' and Marco's `endpoints_*_2n` function?
 
 
 preparation for the December workshop:

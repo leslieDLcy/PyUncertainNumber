@@ -8,7 +8,7 @@ from .genetic_optimisation import genetic_optimization_method
 from .local_optimisation import local_optimisation_method
 from .cauchy_old import cauchydeviate_method
 from .utils import post_processing, create_folder
-from ..UC.uncertainNumber import _parse_interverl_inputs
+from ..UC.uncertainNumber import _parse_interverl_inputs, UncertainNumber
 
 # ---------------------the top level UP function ---------------------#
 
@@ -28,7 +28,9 @@ def up_bb(vars,
           n_gen=100,
           tol=1e-3,
           n_gen_last=10,
-          algorithm_type="NSGA2"):
+          algorithm_type="NSGA2",
+          **kwargs,
+          ):
     """Performs uncertainty propagation (UP) using various methods.
 
     Args:
@@ -75,10 +77,26 @@ def up_bb(vars,
             if save_raw_data == "no":
                 return endpoints_method(vars, fun, save_raw_data='no')
             elif save_raw_data == "yes":
+                # returned results
                 min_candidate, max_candidate, x_miny, x_maxy, all_input, all_output = endpoints_method(vars, fun, save_raw_data='yes')
+
+                un =  UncertainNumber(
+                    essence="interval",
+                    bounds=(min_candidate, max_candidate),
+                    **kwargs,
+                )
+
+                # saving to machine part
                 res_path = create_folder(base_path, method)
                 Results = post_processing(all_input, all_output, res_path)  # Assuming these functions are defined elsewhere
-                return min_candidate, max_candidate, x_miny, x_maxy, all_input, all_output
+
+                return {
+                        'UN': un,
+                        'lo_x': x_miny, 
+                        'hi_x': x_maxy, 
+                        'all_input': all_input, 
+                        'all_output': all_output
+                        }
             else:
                 raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
 
