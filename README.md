@@ -18,12 +18,15 @@ Uncertainty characterisation module, Uncertainty propagation module, Uncertainty
 `PyUncertainNumber` can be used to easily create a `PBox` or an `Interval` object:
 
 ```python
-from PyUncertainNumber.UN import UncertainNumber
+from PyUncertainNumber import UncertainNumber as UN
 
-pbox_ex = UncertainNumber(
-    name='elas_modulus', symbol='E', units='KPa', essence='distribution', 
-    distribution_initialisation=['uniform', [(0,1),(1,2)]])
-pbox_ex._math_object.show()
+un = UN(
+    name='elas_modulus', 
+    symbol='E', 
+    units='Pa', 
+    essence='pbox', 
+    distribution_parameters=['gaussian', [(0,12),(1,4)]])
+_ = un.display(style='band')
 ```
 
 
