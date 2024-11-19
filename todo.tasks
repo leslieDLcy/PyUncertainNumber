@@ -47,6 +47,12 @@ integration of UP module with Ioanna:
     ☐ the top-level func `up_bb()` outputs UN objects
     ☐ #TODO could Scott elaborate on envelop for mixed uncertainty propagation ?
     ☐ what's the difference between the new 'endpoints_method' and Marco's `endpoints_*_2n` function?
+    ☐ I'd assume that currently 'montecarlo' in the cases of intervals mean drawing samples from a Uniform distribution?
+    ☐ calling signatures of the umbrella top-level functions 'up_bb()' are not consistent. some return intermediate combinations such as endpoints while some do not as optimisation
+    ✔ the returns are fairly different @done (19/11/2024, 12:02:23) half-solved by all returning dict by now
+
+
+
 
 
 preparation for the December workshop:
