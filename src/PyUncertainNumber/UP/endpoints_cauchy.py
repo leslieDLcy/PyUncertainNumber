@@ -25,10 +25,11 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
 
     returns:
         dict: A dictionary containing the results:
-              - 'min': A dictionary for lower bound results (if f is not None)
+            - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None). 
+            - 'min': A dictionary for lower bound results (if f is not None).
                   - 'f': Minimum output value(s).
                   - 'x': None (as input values corresponding to min/max are not tracked in this method).
-              - 'max':  A dictionary for upper bound results (if f is not None)
+              - 'max':  A dictionary for upper bound results (if f is not None).
                   - 'f': Maximum output value(s).
                   - 'x': None (as input values corresponding to min/max are not tracked in this method).
               - 'raw_data': A dictionary containing raw data (if f is None):
@@ -37,7 +38,7 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
     """
 
     if save_raw_data != 'no':
-        print("Raw data in the Cauchy deviates method are not tractable")
+        print("Input-Output raw data are NOT available for the Cauchy method!")
 
     x = np.atleast_2d(x)  # Ensure x is 2D
     lo, hi = x.T  # Unpack lower and upper bounds directly
@@ -46,6 +47,7 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
     Delta = (hi - lo) / 2
 
     results = {
+        'bounds': None,
         'min': {'f': None, 'x': None},
         'max': {'f': None, 'x': None},
         'raw_data': {'x': None, 'K': None, 'f' : None}
@@ -68,6 +70,7 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
             zRoot = brentq(Z, 1e-6, max(deltaF)/2)  # Use a small value for the lower bound
             min_candidate = ytilde - zRoot
             max_candidate = ytilde + zRoot
+            bounds = np.array([min_candidate, max_candidate]) 
 
         else:  # Handle array output
             len_y = len(ytilde)
@@ -96,8 +99,12 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
                     zRoot = 0  # Or handle the error in another way
                 min_candidate[i] = ytilde[i] - zRoot
                 max_candidate[i] = ytilde[i] + zRoot
+           
+            # Create a 2D array for bounds in the array case
+            bounds = np.vstack([min_candidate, max_candidate]) 
 
         results = {
+            'bounds': bounds,
             'min': {
                 'f': min_candidate,
                 'x': None
@@ -112,7 +119,7 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
             }
         }
         if save_raw_data == 'yes':
-            print("No raw data are available for the Cauchy method.")
+            print("Input-Output raw data are NOT available for the Cauchy method!")
 
     elif  save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes' 
         x_samples = np.zeros((n, x.shape[0]))
@@ -125,10 +132,10 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
             x_samples[k] = xtilde - delta
             K_values[k] = K
 
-        results['min']['x'] = None
-        results['min']['f'] = None
-        results['max']['x'] = None
-        results['max']['f'] = None
+        # results['min']['x'] = None
+        # results['min']['f'] = None
+        # results['max']['x'] = None
+        # results['max']['f'] = None
         results['raw_data'] = {'x': x_samples, 'K': K_values}
     
     else:
@@ -136,26 +143,30 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
 
     return results
 
-# Example usage with different parameters for minimization and maximization
-f = lambda x: x[0] + x[1] + x[2]  # Example function
+# # Example usage with different parameters for minimization and maximization
+# f = lambda x: x[0] + x[1] + x[2]  # Example function
 
-# Determine input parameters for function and method
-x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-n=50
-# Call the method
-y = cauchydeviate_method(x_bounds,f, n=n, save_raw_data = 'yes')
+# # Determine input parameters for function and method
+# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+# n=50
+# # Call the method
+# y = cauchydeviate_method(x_bounds,f=None, n=n, save_raw_data = 'yes')
 
-print("-" * 30)
-print("Minimum:")
-print("x:", y['min']['x'])
-print("f:", y['min']['f'])
+# # print the results
+# print("-" * 30)
+# print("bounds:", y['bounds'])
+    
+# print("-" * 30)
+# print("Minimum:")
+# print("x:", y['min']['x'])
+# print("f:", y['min']['f'])
 
-print("-" * 30)
-print("Maximum:")
-print("x:", y['max']['x'])
-print("f:", y['max']['f'])
+# print("-" * 30)
+# print("Maximum:")
+# print("x:", y['max']['x'])
+# print("f:", y['max']['f'])
 
-print("-" * 30)
-print("Raw data:")
-print("x:", y['raw_data']['x'])
+# print("-" * 30)
+# print("Raw data:")
+# print("x:", y['raw_data']['x'])
  

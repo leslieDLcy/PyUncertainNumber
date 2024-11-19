@@ -42,8 +42,7 @@ def cartesian(*arrays):
 
 def subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no'):
 
-    """ Performs uncertainty propagation using the Subinterval Reconstitution Method.
-
+    """ 
     args:
         - x: A 2D NumPy array where each row represents an input variable and the two columns
            define its lower and upper bounds (interval).
@@ -60,29 +59,29 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no
             - 'yes': Returns the above, plus the full arrays of unique input combinations 
                      (`all_input`) and their corresponding output values (`all_output`).
 
-
     signature:
-        subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no') -> np.ndarray
+        subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no') -> dict
 
     note:
-        - The function assumes that the intervals in `x` represent uncertainties with some 
-          form of distribution (not necessarily uniform) and aims to provide conservative 
+        - The function assumes that the intervals in `x` represent uncertainties and aims to provide conservative 
           bounds on the output uncertainty.
         - The computational cost increases exponentially with the number of input variables 
           and the number of subintervals per variable.
         - If the `f` function returns multiple outputs, the `all_output` array will be 2-dimensional.
 
-    return:
+   return:
         - dict: A dictionary containing the results:
-            - 'min': A dictionary for lower bound results (if f in not None)
-                - 'x': Input values that produced the miminum output value(s) (if f is not None).
-                - 'f': Minimum output value(s) (if f is not None).
-            - 'max':  A dictionary for upper bound results (if f in not None)
-                - 'x': Input values that produced the maximum output value(s) (if f is not None).
-                - 'f': Maximum output value(s) (if f is not None).
-            - 'raw_data': A dictionary containing raw data (if save_raw_data is 'yes'):
-                - 'x': All generated input samples.
-                - 'f': Corresponding output values for each input sample.
+          - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None). 
+          - 'min': A dictionary for lower bound results (if f is not None):
+            - 'x': Input values that produced the minimum output value(s).
+            - 'f': Minimum output value(s).
+          - 'max': A dictionary for upper bound results (if f is not None):
+            - 'x': Input values that produced the maximum output value(s).
+            - 'f': Maximum output value(s).
+          - 'raw_data': A dictionary containing raw data (if `save_raw_data` is 'yes'):
+            - 'x': All generated input samples.
+            - 'f': Corresponding output values for each input sample.
+    
     example:
         #Define input intervals
         x = np.array([[1, 2], [3, 4], [5, 6]])
@@ -94,6 +93,9 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no
         y = subinterval_method(x, f, n, save_raw_data = 'yes')
 
         # Print the results
+        print("-" * 30)
+        print("bounds:", y['bounds'])
+
         print("-" * 30)
         print("Minimum:")
         print("x:", y['min']['x'])
@@ -133,7 +135,22 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no
         Xint = np.array(Xint, dtype=object) 
     # create an array with the unique combinations of all subintervals 
     X = cartesian(*Xint) 
-    results = {}
+    results = {
+        'bounds': None, 
+            'min': {
+                'x': None,
+                'f':  None
+            },
+            'max': {
+                'x': None,
+                'f':  None,
+                },
+            'raw_data': {
+                'f': None,
+                'x': None
+                }
+        }
+    
     # propagates the epistemic uncertainty through subinterval reconstitution   
     if f is not None:
         all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Evaluating samples")])
@@ -147,12 +164,15 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no
             },
             'max': {
                 'f': np.max(all_output, axis=0),
-            },
-            'raw_data': {
-                'f': None,
-                'x': None
             }
         }
+        if all_output.shape[1] == 1:  # Single output
+            results['bounds'] = np.array([results['min']['f'][0], results['max']['f'][0]])
+        else:  # Multiple outputs
+            bounds = []
+            for i in range(all_output.shape[1]):
+                bounds.append([results['min']['f'][i], results['max']['f'][i]])
+            results['bounds'] = np.array(bounds)
 
         results['min']['x'] = []
         results['max']['x'] = []
@@ -187,26 +207,30 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no
 
     return results
 
-# Example usage with different parameters for minimization and maximization
-f = lambda x: x[0] + x[1] + x[2]  # Example function
+# # Example usage with different parameters for minimization and maximization
+# f = lambda x: x[0] + x[1] + x[2]  # Example function
 
-# Determine input parameters for function and method
-x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-n=2
-# Call the method
-y = subinterval_method(x_bounds, f, n, save_raw_data = 'yes')
+# # Determine input parameters for function and method
+# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+# n=2
+# # Call the method
+# y = subinterval_method(x_bounds, f, n=n, save_raw_data = 'yes')
 
-print("-" * 30)
-print("Minimum:")
-print("x:", y['min']['x'])
-print("f:", y['min']['f'])
+# Print the results
+# print("-" * 30)
+# print("bounds:", y['bounds'])
 
-print("-" * 30)
-print("Maximum:")
-print("x:", y['max']['x'])
-print("f:", y['max']['f'])
+# print("-" * 30)
+# print("Minimum:")
+# print("x:", y['min']['x'])
+# print("f:", y['min']['f'])
 
-print("-" * 30)
-print("Raw data:")
-print("x:", y['raw_data']['x'])
-print("f:", y['raw_data']['f']) 
+# print("-" * 30)
+# print("Maximum:")
+# print("x:", y['max']['x'])
+# print("f:", y['max']['f'])
+
+# print("-" * 30)
+# print("Raw data:")
+# print("x:", y['raw_data']['x'])
+# print("f:", y['raw_data']['f']) 

@@ -75,6 +75,13 @@ def up_bb(vars,
             if save_raw_data == "no":
                 return endpoints_method(vars, fun, save_raw_data='no')
             elif save_raw_data == "yes":
+                results = endpoints_method(vars, fun, save_raw_data='yes')
+                res_path = create_folder(base_path, method)  # Assuming create_folder is defined elsewhere
+                Results = post_processing(results['raw_data']['x'],  all_output= None, method=method, res_path = res_path)  # Assuming post_processing is defined elsew
+                if fun is not None:  # Only call post_processing if fun is not None
+                    res_path = create_folder(base_path, method)  # Assuming create_folder is defined elsewhere
+                    Results = post_processing(results['raw_data']['x'], results['raw_data']['f'], method, res_path)  # Assuming post_processing is defined elsew
+            return results
                 # returned results
                 min_candidate, max_candidate, x_miny, x_maxy, all_input, all_output = endpoints_method(vars, fun, save_raw_data='yes')
 
@@ -129,7 +136,7 @@ def up_bb(vars,
                 raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
 
 
-        case ("sampling" | "montecarlo" | "MonteCarlo" | "monte_carlo" | "latin_hypercube" | "latinhypercube" | "lhs"):
+        case ( "monte_carlo" | "latin_hypercube" ):
             if n is None:
                 raise ValueError("n (number of samples) is required for sampling methods.")
             if save_raw_data == "no":
@@ -161,28 +168,19 @@ def up_bb(vars,
                 raise TypeError("fun must be a callable function for optimization methods. It cannot be None.")
             if not save_raw_data:
                 print("The intermediate steps cannot be saved for local optimisation")
-            return local_optimisation_method(vars, 
-                                             fun, 
-                                             x0, 
-                                             tol_loc=tol_loc, 
-                                             options_loc=options_loc, 
-                                             method_loc=method_loc
-                                             )
+            return local_optimisation_method(vars, fun, x0, 
+                                             tol_loc = tol_loc, 
+                                             options_loc = options_loc, 
+                                             method_loc = method_loc)
             
-
         case "genetic_optimisation":
             if not callable(fun):
                 raise TypeError("fun must be a callable function for optimization methods. It cannot be None.")
-            optimized_f, optimized_x, number_of_generations, number_of_iterations = genetic_optimization_method(vars, 
-                                                                                                                fun, 
-                                                                                                                objective, 
-                                                                                                                pop_size,
-                                                                                                                n_gen, 
-                                                                                                                tol, 
-                                                                                                                n_gen_last,
-                                                                                                                algorithm_type
-                                                                                                                )
-            return optimized_f, optimized_x, number_of_generations, number_of_iterations
+            if not save_raw_data:
+                print("The intermediate steps cannot be saved for genetic optimisation")
+            
+            return genetic_optimization_method(vars, fun, objective, pop_size, n_gen, tol, n_gen_last, 
+                                               algorithm_type)
 
 
         case _:
