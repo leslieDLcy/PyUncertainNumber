@@ -29,6 +29,7 @@ un = UN(
 _ = un.display(style='band')
 ```
 
+<!-- add some pbox plots herein -->
 
 ## Installation of the development version
 
@@ -36,11 +37,12 @@ _ = un.display(style='band')
 $ pip install -e .
 ```
 
-## Contributing
+<!-- ## Contributing
 
 Interested in contributing? Check out the contributing guidelines. 
 Please note that this project is released with a Code of Conduct. 
-By contributing to this project, you agree to abide by its terms.
+By contributing to this project, you agree to abide by its terms. -->
+
 
 ## License
 

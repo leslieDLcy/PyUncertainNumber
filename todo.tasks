@@ -39,18 +39,20 @@ UP methods implementation checklist:
 
 
 integration of UP module with Ioanna:
-    ☐ For the top-level function, what are the **returns** for each option? are they consistent?
-    ☐ are the returns from calling `up_bb(method= xxx)` as in `xxx` in {} consistent?? @high
-    ☐ how does the METHOD = "montecarlo" work in the `up_bb()`. are they drawing samples from Uniform distribution?
+    ✔ For the top-level function, what are the **returns** for each option? are they consistent? @done (19/11/2024, 13:25:25)
+    ✔ are the returns from calling `up_bb(method= xxx)` as in `xxx` in {} consistent?? @high @done (19/11/2024, 13:25:30)
     ☐ change the name 'up_bb'@critical 
     ✔ the top-level func `up_bb()` takes in a list of UN objects @done (18/11/2024, 12:21:28)
-    ☐ the top-level func `up_bb()` outputs UN objects
+    ✔ the top-level func `up_bb()` outputs UN objects @done (19/11/2024, 13:25:45)
     ☐ #TODO could Scott elaborate on envelop for mixed uncertainty propagation ?
     ☐ what's the difference between the new 'endpoints_method' and Marco's `endpoints_*_2n` function?
-    ☐ I'd assume that currently 'montecarlo' in the cases of intervals mean drawing samples from a Uniform distribution?
-    ☐ calling signatures of the umbrella top-level functions 'up_bb()' are not consistent. some return intermediate combinations such as endpoints while some do not as optimisation
+    ☐ ask Scott I'd assume that currently 'montecarlo' in the cases of intervals mean drawing samples from a Uniform distribution? (yes)
+    ✔ calling signatures of the umbrella top-level functions 'up_bb()' are not consistent. some return intermediate combinations such as endpoints while some do not as optimisation @done (19/11/2024, 14:15:49)
     ✔ the returns are fairly different @done (19/11/2024, 12:02:23) half-solved by all returning dict by now
-
+    ✔ some UP methods are still missing @done (19/11/2024, 14:14:56)
+    ☐ mixed uncertainty how to work with 'up_bb()'
+    ☐ cauchy deviate will be added by Ioanna
+    ☐ taylor expansion not 100 percent;
 
 
 

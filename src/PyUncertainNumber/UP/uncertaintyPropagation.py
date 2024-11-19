@@ -170,7 +170,6 @@ def up_bb(vars,
                                              )
             
 
-
         case "genetic_optimisation":
             if not callable(fun):
                 raise TypeError("fun must be a callable function for optimization methods. It cannot be None.")
