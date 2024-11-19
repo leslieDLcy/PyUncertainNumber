@@ -69,6 +69,7 @@ def up_bb(vars,
             if not callable(fun):
                 raise TypeError("fun must be a callable function for optimization methods. It cannot be None.")
 
+
         case ("endpoint" | "endpoints" | "vertex"):
             # TODO integrate the below into the one 'endpoints' function
             # naive imple of hint on combination number of endpoints method
@@ -100,18 +101,36 @@ def up_bb(vars,
             else:
                 raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
 
+
         case ("subinterval" | "subinterval_reconstitution"):
             if n is None:
                 raise ValueError("n (number of subintervals) is required for subinterval methods.")
+            if n is not None:
+                print(f"Total number of input combinations for the subinterval method: {(n+1)**vars.shape[0]}")
+
             if save_raw_data == "no":
                 return subinterval_method(vars, fun, n, save_raw_data='no')
             elif save_raw_data == "yes":
                 min_candidate, max_candidate, x_miny, x_maxy, all_input, all_output = subinterval_method(vars, fun, n, save_raw_data='yes')
+                
+                un =  UncertainNumber(
+                    essence="interval",
+                    bounds=(min_candidate, max_candidate),
+                    **kwargs,
+                )
+
                 res_path = create_folder(base_path, method)
                 Results = post_processing(all_input, all_output, res_path)
-                return min_candidate, max_candidate, x_miny, x_maxy, all_input, all_output
+                return {
+                        'UN': un,
+                        'lo_x': x_miny, 
+                        'hi_x': x_maxy, 
+                        'all_input': all_input, 
+                        'all_output': all_output
+                        }
             else:
                 raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
+
 
         case ("sampling" | "montecarlo" | "MonteCarlo" | "monte_carlo" | "latin_hypercube" | "latinhypercube" | "lhs"):
             if n is None:
@@ -126,6 +145,7 @@ def up_bb(vars,
             else:
                 raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
 
+
         case "local_optimisation":
             print("The intermediate steps cannot be saved for local optimisation")
 
@@ -134,18 +154,20 @@ def up_bb(vars,
             print("maximisation:", message_maxy)
             return min_candidate, max_candidate, x_miny, x_maxy, message_miny, message_maxy, nit_miny, nit_maxy, nfev_miny, nfev_maxy, final_simplex_miny, final_simplex_maxy
 
+
         case "genetic_optimisation":
             optimized_f, optimized_x, number_of_generations, number_of_iterations = genetic_optimization_method(vars, fun, objective, pop_size,
                                                                                                                 n_gen, tol, n_gen_last,
                                                                                                                 algorithm_type)
             return optimized_f, optimized_x, number_of_generations, number_of_iterations
 
+
         case _:
             raise ValueError("Invalid UP method.")
 
 
 def main():
-    """implementation of the vertex method on the cantilever beam example"""
+    """ (Ioanna style) implementation of the vertex method on the cantilever beam example"""
 
     y = np.array([0.145, 0.155])  # m
 
