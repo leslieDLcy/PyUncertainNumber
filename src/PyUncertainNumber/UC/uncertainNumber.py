@@ -12,8 +12,7 @@ from .params import Params
 from typing import List
 from pint import UnitRegistry
 from pathlib import Path
-from PyUncertainNumber.UP.vertex import vertexMethod as vM
-from PyUncertainNumber.UP.endpoints import endpoints_propagation_2n
+from PyUncertainNumber.UP.endpoint import endpoints_method
 from PyUncertainNumber.NLP_constructor.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
@@ -137,17 +136,17 @@ class UncertainNumber:
                 )
 
         ### create the naked value - deterministic representation of the uncertain number ###
-        match self.essence:
-            case "interval":
-                self.naked_value = self._math_object.midpoint()
-            case "distribution":
-                self.naked_value = (
-                    self._math_object.mean_left
-                )  # TODO the error is here where the numeric value is NOT a value
-                # TODO continue getting familar with the 'pba' package for computing mean etc...
-                # TODO I've put `mean_left` there but unsure if correct or not
-            case "pbox":
-                self.naked_value = self._math_object.mean()
+        # match self.essence:
+        #     case "interval":
+        #         self.naked_value = self._math_object.midpoint()
+        #     case "distribution":
+        #         self.naked_value = (
+        #             self._math_object.mean_left
+        #         )  # TODO the error is here where the numeric value is NOT a value
+        #         # TODO continue getting familar with the 'pba' package for computing mean etc...
+        #         # TODO I've put `mean_left` there but unsure if correct or not
+        #     case "pbox":
+        #         self.naked_value = self._math_object.mean()
 
     @staticmethod
     def match_distribution(keyword, parameters):

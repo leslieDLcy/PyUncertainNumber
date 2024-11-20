@@ -126,6 +126,7 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
 
     # Store results in a dictionary
     results = {
+        'un': None,
         'bounds' : np.array([min_y.fun, max_y.fun]),
         'min': {
             'x': min_y.x, #The input values that resulted in the minimum value.

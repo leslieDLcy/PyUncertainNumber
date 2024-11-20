@@ -4,37 +4,106 @@ import pandas as pd
 import numpy as np
 
 
-
-
-
-def header_results(all_output:np.ndarray, all_input:np.ndarray):
-    """ Generates generic header names for output and input dataframes.
-
-    This function creates a list of column names suitable for a combined DataFrame 
-    containing both output and input data. It dynamically generates header names based on 
-    the shapes of the `all_output` and `all_input` NumPy arrays. 
+def header_results(all_output, all_input, method = None):
+    """
+    Determine generic header for output and input.
 
     Args:
-        all_output: A NumPy array representing the output data. It can be 1-dimensional or 
-                2-dimensional. If 1D, it's assumed to represent a single output variable.
-        all_input: A NumPy array representing the input data. It's assumed to be 2-dimensional, 
-               where each row corresponds to a sample and each column represents an input variable.
+        all_output (np.ndarray): A NumPy array containing the output values.
+        all_input (np.ndarray): A NumPy array containing the input values.
 
     Returns:
-        - A list of strings representing the header names. The first part of the list 
-        contains headers for the output variables (e.g., 'y0', 'y1', ...), and the second
-        part contains headers for the input variables (e.g., 'x0', 'x1', ...).
+        list: A list of strings representing the header for the combined DataFrame.
     """
-    header = []
+    if all_output is None:
+        header_y = []
+    else:
+        if all_output.ndim == 1:
+            len_y = 1
+        else:
+            len_y = all_output.shape[1]
+        header_y = ["y" + str(i) for i in range(len_y)]
 
-    for i in range(0, len(all_output[1])):
-        output = "y" + str(i)
-        header.append(output)
-    for i in range(0, len(all_input[1])):
-        Input = "x" + str(i)
-        header.append(Input)
+    if method in "cauchy": 
+        m = all_input.shape[1] - 1  # Exclude 'K' from the count
+        header_x = ["x" + str(i) for i in range(m)] + ["K"]  # Add 'K' at the end
+    else:
+        m = all_input.shape[1]
+        header_x = ["x" + str(i) for i in range(m)]
 
+    header = header_y + header_x
     return header
+
+def post_processing(all_input: np.ndarray, all_output: np.ndarray = None, method = None, res_path=None):
+
+    """Post-processes the results of an uncertainty propagation (UP) method.
+
+    This function takes the input and output values from a UP method, combines them into a 
+    pandas DataFrame, and optionally saves the raw data to a CSV file. It also checks for 
+    NaN values in the output and logs them with their corresponding input values if found.
+    If all_output is None, it creates a DataFrame with only the input data.
+
+    Args:
+        all_input (np.ndarray): A NumPy array containing the input values used in the UP method.
+        all_output (np.ndarray, optional): A NumPy array containing the corresponding output 
+                                            values from the UP method. Defaults to None.
+        res_path (str, optional): The path to the directory where the results will be saved. 
+                                    Defaults to None.
+
+    Returns:
+        pandas.DataFrame: A pandas DataFrame containing the combined output and input data 
+                        (if all_output is provided). If all_output is None, it returns a 
+                        DataFrame with only the input data.
+    """
+
+    if all_output is None:
+        print("No function was evaluated. Only input is available")
+
+        df_input = pd.DataFrame(all_input)
+
+        # Handle Cauchy input with 'x' and 'K' (moved outside the if block)
+        # if method in ( "endpoints_cauchy"):  
+        #     x_fields = pd.DataFrame(all_input)  # Get all 'x' field names
+        #     print("x_fields", x_fields)
+        #     x_data = all_input[x_fields]  # Select only the 'x' fields
+        #     df_input = pd.DataFrame(x_data)
+        # else:
+        #     df_input = pd.DataFrame(all_input)
+
+        header = header_results(all_output=None, all_input=all_input, method = method)  
+        df_input.columns = header
+        df_output_input = df_input  
+
+    else:
+        # Transform np.array input-output into pandas data.frame 
+        df_input = pd.DataFrame(all_input)
+        df_output = pd.DataFrame(all_output)
+
+        # Create a single output input data.frame
+        df_output_input = pd.concat([df_output, df_input], axis=1)
+
+        # determine generic header for output and input
+        header = header_results(all_output, all_input, method)
+        df_output_input.columns = header
+
+    # Return .csv with raw data only if asked ###
+    if res_path is not None:
+        create_csv(res_path, "Raw_data.csv", df_output_input)
+
+    # Check for NaN values ONLY if all_output is provided
+    if all_output is not None:  
+        df_NA = df_output_input[df_output_input.isna().any(axis=1)]
+        if len(df_NA) != 0:
+            # The input values are rounded to ensure equality
+            df_NA = df_NA.apply(np.round, args=[4])
+            df_NA_unique = df_NA.drop_duplicates(keep="first", ignore_index=True)
+
+            create_csv(res_path, "NAlog.csv", df_NA_unique)
+        else:
+            print("There are no NA values produced by the input")
+
+    return df_output_input
+
 
 def create_folder(base_path, method):
     """Creates a folder named after the called UP method where the results files are stored
@@ -105,220 +174,3 @@ def create_csv(res_path, filename, data):
         print("The file does not exist.")
 
     return filename
-
-
-def Upper_lower_values_with_input(df_OUTPUT_INPUT, i):
-    # Removes possible NAN values from a given output QoI.
-    # Estimates the min and max for each output QoI from the remaining non NAN values.
-    # Creates a dataframe with the output-input for the min and max of each Qof.
-    ## Issues: if more than one combinations produce min/max it canot be recorded.
-    ## if some variables are responsible for one QoI and not hte others it cannot be accounted for
-    y = df_OUTPUT_INPUT[df_OUTPUT_INPUT.columns[i]]
-
-    # create a data.frame with one Qof and input
-    x = df_OUTPUT_INPUT.filter(regex="x")
-
-    filtered_df = pd.concat([y, x], axis=1)
-
-    filtered_df_OUTPUT_INPUT = filtered_df[filtered_df.iloc[:, 0].notnull()]
-    yint = [
-        min(filtered_df_OUTPUT_INPUT.iloc[:, 0]),
-        max(filtered_df_OUTPUT_INPUT.iloc[:, 0]),
-    ]
-
-    dat_ymin = filtered_df_OUTPUT_INPUT[filtered_df_OUTPUT_INPUT.iloc[:, 0] == yint[0]]
-    dat_ymax = filtered_df_OUTPUT_INPUT[filtered_df_OUTPUT_INPUT.iloc[:, 0] == yint[1]]
-
-    y_dat_com = pd.concat([dat_ymin, dat_ymax])
-    y_dat_com = y_dat_com.drop_duplicates(subset=[y_dat_com.columns[0]], keep="first")
-    y_dat_com = y_dat_com.rename(columns={y_dat_com.columns[0]: "y"})
-
-    y_dat_com.insert(0, "Name", df_OUTPUT_INPUT.columns[i])
-    y_dat_com.insert(1, "fun", ["min", "max"])
-
-    return y_dat_com
-
-def post_processing(all_input:np.ndarray, all_output:np.ndarray, res_path):
-    
-    """Post processing the results of a UP method
-
-    args:
-        - all_input: A NumPy array containing the input values used in the UP method.
-        - all_output: A NumPy array containing the corresponding output values from the UP method.
-        - res_path: The path to the directory where the results will be saved.
-
-    signature:
-        post_processing(all_input:np.ndarray, all_output:np.ndarray, res_path: path ) -> pandas.DataFrame
-
-    note:
-        - the augument `df_OUTPUT_INPUT` will specify pandas.dataframe of the min-max values for each output 
-        - arguement `res_path` will provide the location of the directory of the results. 
-
-    return:
-        - df_output_input: A pandas DataFrame containing the combined output and input data.
-        - Creates "Raw_data.csv" in `res_path` containing the raw output and input data.
-        - Creates "NAlog.csv" in `res_path` if any NaN values are present in the output, 
-          logging the corresponding input values.
-        - Prints a message if no NaN values are found.
-
-
-    example:
-        df = pd.DataFrame(
-         {"y0" : [4, 5, 5, 6],
-          "x0" : [1, 2, 1, 2],
-          "x1" : [3, 3, 4, 4]}, index = [1, 2, 3])
-        res_path = "C:/Users/DAWS2_code/UP/vertex"
-        y = post_processing(df, res_path)
-
-    # TODO create a .csv with all min,max and associated x values ...
-    # units ...
-    # fields: None...
-    """     
-    # Transform np.array input-output into pandas data.frame 
-    df_input = pd.DataFrame(all_input)
-    df_output = pd.DataFrame(all_output)
-    # Create a single output input data.frame
-    df_output_input = pd.concat([df_output, df_input], axis=1)
-    # determine generic header for output and input
-    header = header_results(all_output, all_input)
-    df_output_input.columns = header
-    #header = df_output_input.columns.values.tolist()
-    
-    # Return .csv with raw data only if asked ###
-    create_csv(res_path, "Raw_data.csv", df_output_input)
-
-    # if NA output create a log file with the input which caused these values.
-    df_NA = df_output_input[df_output_input.isna().any(axis=1)]
-    if len(df_NA) != 0:
-        # The input values are rounded to ensure equality
-        df_NA = df_NA.apply(np.round, args=[4])
-        df_NA_unique = df_NA.drop_duplicates(keep="first", ignore_index=True)
-
-        create_csv(res_path, "NAlog.csv", df_NA_unique)
-    else:
-        print("There are no NA values produced by the input")
-     
-
-  #       df_NA_unique = NA_values_with_input(df_output_input, res_path)
-   #  else:
-   #      print("Warning: NA values are produced with given input")
-
-   #  # min-max of all output QoI and corresponding input values
-   #  y_dat_all = []
-
-   #  for i in range(sum("y" in s for s in header)):
-   #      for j in range(2):
-   #          y_dat = Upper_lower_values_with_input(df_OUTPUT_INPUT, i)
-   #          y_dat_all.append(y_dat.values.tolist()[j])
-
-   #  df_y_dat_all = pd.DataFrame(y_dat_all)
-   #  df_y_dat_all.columns = y_dat.columns
-
-   #  create_csv(res_path, "min_max_input.csv", df_y_dat_all)
-
-   #  # keep only y values
-   #  min_max_y_values = df_y_dat_all[["Name", "fun", "y"]]
-
-    return df_output_input #min_max_y_values
-
-def NA_values_with_input(df_OUTPUT_INPUT, res_path):
-   """Searching for NAN values in the output of a called UP method and create .csv file to store them.
-
-    args:
-        - df_OUTPUT_INPUT: a pandas.DataFrame containing output and associated input produced by UP method
-        - res_path: The path, named after the UP method, where the results will be saved
-
-    signature:
-        post_processing(df_OUTPUT_INPUT: pandas.dataframe, res_path: path ) -> pandas.DataFrame
-
-    note:
-        - the augument `df_OUTPUT_INPUT` will specify pandas.dataframe of the min-max values for each output 
-        - arguement `res_path` will provide the location of the directory of the results. 
-
-    return:
-        -  A .csv file to store possible NAN output values and their associated input values.
-
-    example:
-        df = pd.DataFrame(
-         {"y0" : [4, 5, 5, 6],
-          "x0" : [1, 2, 1, 2],
-          "x1" : [3, 3, 4, 4]}, index = [1, 2, 3])
-        res_path = "C:/Users/DAWS2_code/UP/vertex"
-        y = post_processing(df, res_path)
-
-    """     
-   df_NA = df_OUTPUT_INPUT[df_OUTPUT_INPUT.isna().any(axis=1)]
-   # The input values are rounded to ensure equality
-   df_NA = df_NA.apply(np.round, args=[4])
-   df_NA_unique = df_NA.drop_duplicates(keep="first", ignore_index=True)
-
-   create_csv(res_path, "NAlog.csv", df_NA_unique, df_NA_unique.columns())
-
-   return df_NA_unique
-
-def post_processing_old(df_OUTPUT_INPUT, res_path):
-    """Post processing the results of a UP method
-
-    args:
-        - df_OUTPUT_INPUT: a pandas.DataFrame containing output and associated input produced by UP method
-        - res_path: The path, named after the UP method, where the results will be saved
-
-    signature:
-        post_processing(df_OUTPUT_INPUT: pandas.dataframe, res_path: path ) -> pandas.DataFrame
-
-    note:
-        - the augument `df_OUTPUT_INPUT` will specify pandas.dataframe of the min-max values for each output 
-        - arguement `res_path` will provide the location of the directory of the results. 
-
-    return:
-        -  A pandas.Dataframe with the min-max for each output QoI
-        -  A path, named after the called UP method 
-        -  A warning if input values produce NAN output. 
-        -  A .csv file to store a pandas dataframe of the raw results saved in the specified folder.
-        -  A .csv file  to store the min/max output values and their associated input values. 
-
-    example:
-        df = pd.DataFrame(
-         {"y0" : [4, 5, 5, 6],
-          "x0" : [1, 2, 1, 2],
-          "x1" : [3, 3, 4, 4]}, index = [1, 2, 3])
-        res_path = "C:/Users/DAWS2_code/UP/vertex"
-        y = post_processing(df, res_path)
-
-    # TODO post-process the df into UN objects ...
-    # units ...
-    # fields: None...
-    """     
-    # header
-    header = df_OUTPUT_INPUT.columns.values.tolist()
-
-    # Return .csv with raw data only if asked ###
-    create_csv(res_path, "Raw_data.csv", df_OUTPUT_INPUT)
-
-    # if NA output create a log file with the input which caused these values.
-    df_NA_unique = NA_values_with_input(df_OUTPUT_INPUT, res_path)
-    if df_NA_unique.empty == True:
-        print("NA values are NOT produced with given input")
-    else:
-        print("Warning: NA values are produced with given input")
-
-    # min-max of all output QoI and corresponding input values
-    y_dat_all = []
-
-    for i in range(sum("y" in s for s in header)):
-        for j in range(2):
-            y_dat = Upper_lower_values_with_input(df_OUTPUT_INPUT, i)
-            y_dat_all.append(y_dat.values.tolist()[j])
-
-    df_y_dat_all = pd.DataFrame(y_dat_all)
-    df_y_dat_all.columns = y_dat.columns
-
-    create_csv(res_path, "min_max_input.csv", df_y_dat_all)
-
-    # keep only y values
-    min_max_y_values = df_y_dat_all[["Name", "fun", "y"]]
-    
-    return min_max_y_values
-
-def post_process():
-    pass

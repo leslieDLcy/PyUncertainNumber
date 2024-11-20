@@ -116,7 +116,8 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no
     # Create a sequence of values for each interval based on the number of divisions provided 
     # The divisions may be the same for all intervals or they can vary.
     m = x.shape[0]
-
+    print(f"Total number of input combinations for the subinterval method: {(n+1)**m}")
+    
     if type(n) == int: #All inputs have identical division
         total = (n + 1)**m 
         Xint = np.zeros((0,n + 1), dtype=object )
@@ -136,6 +137,7 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no
     # create an array with the unique combinations of all subintervals 
     X = cartesian(*Xint) 
     results = {
+        'un': None,
         'bounds': None, 
             'min': {
                 'x': None,

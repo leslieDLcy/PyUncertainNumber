@@ -29,7 +29,7 @@ def index_to_bool_(index:np.ndarray,dim=2):
     return np.asarray([index==j for j in range(dim)],dtype=bool)
 
 def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo', 
-                    endpoints=False, save_raw_data='no'):
+                    save_raw_data='no', endpoints=False ):
     """
     args:
         x (np.ndarray): A 2D NumPy array where each row represents an input variable and 
@@ -116,6 +116,7 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo',
 
     #results = {'all_x': X}  # Initialize results with all_x
     results = {
+            'un': None, 
             'bounds': None,
             'min': {
                 'x': None,

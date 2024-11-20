@@ -1,206 +1,218 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jul 17 10:51:46 2024
-
-I have updated Marco's endpoint method to be used for funcitosn which yield more than one ys and asks the user how much data they need to see. 
-Works mostly with numpy.
-
-@author: ioanna, Leslie
-"""
 import numpy as np
 import tqdm
 from typing import Callable
 
-def index_to_bool_(index:np.ndarray,dim=2):
-
-    """ Converts a vector of indices to an array of boolean pairs for masking.
-
-  Args:
-    index: A NumPy array of integer indices representing selected elements or categories. 
-           The values in `index` should be in the range [0, dim-1].
-    dim: The number of categories or dimensions in the output boolean array. Defaults to 2  
-
-  signature:
-    index_to_bool_(index:np.ndarray,dim=2) -> tuple
-
-   note:
-        - the augument `index` is an np.ndaray of the index of intervals.
-        - the argument `dim` will specify the function mapping of variables to be propagated. 
-    
-    #If dim > 2,  e.g. (2,0,1,0) the array of booleans is [(0,0,1),(1,0,0),(0,1,0),(1,0,0)].
-
-  Returns:
-    - A NumPy array of boolean pairs representing the mask.
-  """
-    
-    index = np.asarray(index,dtype=int)
-    return np.asarray([index==j for j in range(dim)],dtype=bool)
-
-
-def endpoints_method(x:np.ndarray,f:Callable, save_raw_data = 'no'):
-    """Performs uncertainty propagation using the Vertex/Endpoints Method.
-
-    This function estimates the range of possible output values for a given function `f` 
-    when its input variables have uncertainties represented as intervals in a NumPy array `x`. 
-    It systematically evaluates the function at all combinations of interval endpoints (vertices) 
-    to determine the minimum and maximum output values.
+def cartesian(*arrays):
+    """ Computes the Cartesian product of multiple input arrays
 
     args:
-        - x: A 2D NumPy array where each row represents an input variable and the two columns
-           define its lower and upper bounds (interval).
-        - f: A callable function that takes a 1D NumPy array of input values and returns the
-           corresponding output(s).
-        - save_raw_data: Controls the amount of data returned:
-            - 'no': Returns only the minimum and maximum output values along with the 
-                   corresponding input values that produced them.
-            - 'yes': Returns the above, plus the full arrays of all endpoint combinations 
-                     (`all_input`) and their corresponding output values (`all_output`).
+       - *arrays: Variable number of np.arrays representing the sets of values for each dimension.
 
 
     signature:
-        Endpoints_Method(x:np.ndarray,f:Callable, save_raw_data = 'yes') -> np.ndarray
+       - cartesian(*x:np.array)  -> np.ndarray
 
     note:
-        - This method assumes that the function `f` is monotonic within the given intervals. 
-          If this assumption is not met, the results may not accurately represent the true
-          range of possible output values. 
-        - The computational cost of this method increases exponentially with the number of 
-          input variables (`2**m` evaluations, where `m` is the number of variables).
-        - If the `f` function returns multiple outputs, the `OUTPUT` array will be 2-dimensional.ombinations (x,y) for 'yes'
+       - The data type of the output array is determined based on the input arrays to ensure compatibility.
 
     return:
-        - If `save_raw_data == 'no'`: 
-            - min_candidate: 1D NumPy array containing the minimum output value(s).
-            - max_candidate: 1D NumPy array containing the maximum output value(s).
-            - x_miny: 2D NumPy array where each row represents the input values that produced 
-                      the corresponding minimum output value.
-            - x_maxy: 2D NumPy array where each row represents the input values that produced 
-                      the corresponding maximum output value.
-        - If `save_raw_data == 'yes'`: 
-            - The above four arrays, plus:
-            - all_input: 2D NumPy array containing all combinations of input interval endpoints.
-            - all_output: 1D or 2D NumPy array containing the corresponding output values 
-                      for each endpoint combination.
-
+        - darray: A NumPy array where each row represents one combination from the Cartesian product. 
+                  The number of columns equals the number of input arrays.
 
     example:
         x = np.array([1, 2], [3, 4], [5, 6])
-        fun = lambda x: x[0] + x[1] + x[2]
-        n = 2
-        miny, maxy, x_miny, x_maxy  = Endpoints_Method(x, fun, save_raw_data ='no')
-        miny, maxy, x_miny, x_maxy, all_input, all_output  = Endpoints_Method(x, fun, save_raw_data ='yes')
+        y = cartesian(*x)
+        # Output: 
+        # array([[1, 3, 5],
+        #        [1, 3, 6],
+        #        [1, 4, 5],
+        #        [1, 4, 6],
+        #        [2, 3, 5],
+        #        [2, 3, 6],
+        #        [2, 4, 5],
+        #        [2, 4, 6]])
 
-    #TODO test it in this platform 
+"""
+    la = len(arrays)
+    dtype = np.result_type(*arrays)
+    arr = np.empty([len(a) for a in arrays] + [la], dtype=dtype)
+    for i, a in enumerate(np.ix_(*arrays)):
+        arr[...,i] = a
+    return arr.reshape(-1, la)
+
+def endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
+
+    """ 
+    args:
+        - x: A 2D NumPy array where each row represents an input variable and 
+          the two columns define its lower and upper bounds (interval).
+        - f: A callable function that takes a 1D NumPy array of input values and 
+          returns the corresponding output(s).
+        - save_raw_data: Controls the amount of data returned.
+          - 'no': Returns only the minimum and maximum output values along with the 
+                  corresponding input values.
+          - 'yes': Returns the above, plus the full arrays of unique input combinations 
+                  (`all_input`) and their corresponding output values (`all_output`).
+
+
+    signature:
+        subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no') -> dict
+
+    note:
+        - Performs uncertainty propagation using the Subinterval Reconstitution Method. 
+        - The function assumes that the intervals in `x` represent uncertainties and aims to provide conservative
+          bounds on the output uncertainty.
+        - The computational cost increases exponentially with the number of input variables 
+          and the number of subintervals per variable.
+        - If the `f` function returns multiple outputs, the `all_output` array will be 2-dimensional.
+
+    return:
+        - dict: A dictionary containing the results:
+          - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None). 
+          - 'min': A dictionary for lower bound results (if f is not None):
+            - 'x': Input values that produced the minimum output value(s).
+            - 'f': Minimum output value(s).
+          - 'max': A dictionary for upper bound results (if f is not None):
+            - 'x': Input values that produced the maximum output value(s).
+            - 'f': Maximum output value(s).
+          - 'raw_data': A dictionary containing raw data (if `save_raw_data` is 'yes'):
+            - 'x': All generated input samples.
+            - 'f': Corresponding output values for each input sample.
+
+    example:
+        #Define input intervals
+        x = np.array([[1, 2], [3, 4], [5, 6]])
+
+        # Define the function
+        f = lambda x: x[0] + x[1] + x[2]
+        
+        # Run sampling method with n = 2
+        y = endpoints_method(x, f, save_raw_data = 'yes')
+        
+        # Print the results
+        print("-" * 30)
+        print("bounds:", y['bounds'])
+
+        print("-" * 30)
+        print("Minimum:")
+        print("x:", y['min']['x'])
+        print("f:", y['min']['f'])
+
+        print("-" * 30)
+        print("Maximum:")
+        print("x:", y['max']['x'])
+        print("f:", y['max']['f'])
+
+        print("-" * 30)
+        print("Raw data")
+        print("x:",y['raw_data']['x'])
+        print("type_x:",type(y['raw_data']['x']))
+        print("f:", y['raw_data']['f'])
+
     """
-
-    # Computes the min and max of a monotonic function with endpoints propagation
-    # "x has shape (n,2)."
-    m=x.shape[0]
-
-    Total = 2**m
+    # Create a sequence of values for each interval based on the number of divisions provided 
+    # The divisions may be the same for all intervals or they can vary.
+    m = x.shape[0]
+    print(f"Total number of input combinations for the endpoint method: {(m)**2}") 
     
-    if (save_raw_data == 'no'):
-        j = 0
-        index = tuple([j//2**h-(j//2**(h+1))*2 for h in range(m)]) # tuple of 0s and 1s
-        itb = index_to_bool_(index).T
-        new_f = f(x[itb])
-        print(type(new_f))
+    # create an array with the unique combinations of all intervals 
+    X = cartesian(*x) 
 
-        if isinstance(new_f, float) or isinstance(new_f, np.float64):
-            new_f = np.full((1,), new_f)
-            len_y = 1
+    results = {
+        'un': None,
+        'bounds': None, 
+            'min': {
+                'x': None,
+                'f':  None
+            },
+            'max': {
+                'x': None,
+                'f':  None,
+                },
+            'raw_data': {
+                'f': None,
+                'x': None
+                }
+        }
+    
+    # propagates the epistemic uncertainty through subinterval reconstitution   
+    if f is not None:
+        all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Evaluating samples")])
+
+        if all_output.ndim == 1:
+            all_output = all_output.reshape(-1, 1)
+
+        results = {
+            'min': {
+                'f': np.min(all_output, axis=0),
+            },
+            'max': {
+                'f': np.max(all_output, axis=0),
+            }
+        }
+        if all_output.shape[1] == 1:  # Single output
+            results['bounds'] = np.array([results['min']['f'][0], results['max']['f'][0]])
+        else:  # Multiple outputs
+            bounds = []
+            for i in range(all_output.shape[1]):
+                bounds.append([results['min']['f'][i], results['max']['f'][i]])
+            results['bounds'] = np.array(bounds)
+
+        results['min']['x'] = []
+        results['max']['x'] = []
+
+        for i in range(all_output.shape[1]):  # Iterate over outputs
+            min_indices = np.where(all_output[:, i] == results['min']['f'][i])[0]
+            max_indices = np.where(all_output[:, i] == results['max']['f'][i])[0]
+            
+            # Convert to 2D arrays (if necessary) and append
+            results['min']['x'].append(X[min_indices].reshape(-1, m))  # Reshape to (-1, m)
+            results['max']['x'].append(X[max_indices].reshape(-1, m))
+
+        # Concatenate the arrays in the lists into 2D arrays (if necessary)
+        if len(results['min']['x']) > 1:
+            results['min']['x'] = np.concatenate(results['min']['x'], axis=0)
         else:
-            len_y = len(new_f)
+            results['min']['x'] = results['min']['x'][0]  # Take the first (and only) array
 
-        max_candidate = np.full(( len_y ), -np.inf) 
-        min_candidate = np.full(( len_y ),  np.inf)
-        x_maxy = np.zeros(( len_y ,m))
-        x_miny = np.zeros(( len_y ,m))
+        if len(results['max']['x']) > 1:
+            results['max']['x'] = np.concatenate(results['max']['x'], axis=0)
+        else:
+            results['max']['x'] = results['max']['x'][0]  # Take the first (and only) array
+        
+        if save_raw_data == 'yes':
+            results['raw_data'] = {'f': all_output, 'x': X}
+
+    elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
+        results['raw_data'] = {'f': None, 'x': X}
     
-        for y_i in range( len_y ):
-            if new_f[y_i] > max_candidate[y_i]:
-                max_candidate[y_i] = new_f[y_i]
-                x_maxy[y_i] = x[itb]
-            if new_f[y_i] < min_candidate[y_i]:
-                min_candidate[y_i] =  new_f[y_i]
-                x_miny[y_i] = x[itb]
-            
-        for j in tqdm.tqdm(range(1,Total)):
-            index = tuple([j//2**h-(j//2**(h+1))*2 for h in range(m)]) # tuple of 0s and 1s
-            itb = index_to_bool_(index).T
-            
-            new_f = f(x[itb])
-            if isinstance(new_f, float) or isinstance(new_f, np.float64):
-                new_f = np.full((1,), new_f)
-                len_y = 1
-            else:
-                len_y = len(new_f)
-                
-            for y_i in range( len_y ):
-                if new_f[y_i] > max_candidate[y_i]:
-                    max_candidate[y_i] = new_f[y_i]
-                    x_maxy[y_i] = x[itb]
-                if new_f[y_i] < min_candidate[y_i]:
-                    min_candidate[y_i] =  new_f[y_i]
-                    x_miny[y_i] = x[itb]
-
-        return min_candidate, max_candidate, x_miny, x_maxy
     else:
-       j = 0
-       index = tuple([j//2**h-(j//2**(h+1))*2 for h in range(m)]) # tuple of 0s and 1s
-       itb = index_to_bool_(index).T
-       new_f = f(x[itb])
-       
-       if isinstance(new_f, float) or isinstance(new_f, np.float64):
-           new_f = np.full((1,), new_f)
-           len_y = 1
-       else:
-           len_y = len(new_f)
-           
-       if isinstance(new_f, np.ndarray) == False:
-           new_f = np.array(new_f, dtype = object)
-       
-       len_y = len(new_f)
-       
-       all_output = new_f.reshape(1,len_y)
-       all_input = x[itb].reshape(1,m)
+        print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
-       max_candidate = np.full((len_y), -np.inf) 
-       min_candidate = np.full((len_y),  np.inf)
-       x_maxy = np.zeros((len_y,m)) 
-       x_miny = np.zeros((len_y,m)) 
+    return results
 
-       for y_i in range(len_y):
-           if new_f[y_i] > max_candidate[y_i]:
-               max_candidate[y_i] = new_f[y_i]
-               x_maxy[y_i] = x[itb]
-           if new_f[y_i] < min_candidate[y_i]:
-               min_candidate[y_i] =  new_f[y_i]
-               x_miny[y_i] = x[itb]
-           
-       for j in tqdm.tqdm(range(1,Total)):
-           index = tuple([j//2**h-(j//2**(h+1))*2 for h in range(m)]) # tuple of 0s and 1s
-           itb = index_to_bool_(index).T
-           new_f = f(x[itb])
-           if isinstance(new_f, float) or isinstance(new_f, np.float64):
-               new_f = np.full((1,), new_f)
-               len_y = 1
-           else:
-               len_y = len(new_f)
-               
-           if isinstance(new_f, np.ndarray) == False:
-               new_f = np.array(new_f, dtype = object)
-  
-           all_output = np.concatenate((all_output, new_f.reshape(1,len_y)), axis=0)
-           all_input  = np.concatenate((all_input, x[itb].reshape(1,m)), axis=0)
+# # Example usage with different parameters for minimization and maximization
+# f = lambda x: x[0] + x[1] + x[2]  # Example function
 
-           for y_i in range(len_y):
-               if new_f[y_i] > max_candidate[y_i]:
-                   max_candidate[y_i] = new_f[y_i]
-                   x_maxy[y_i] = x[itb]
-                   
-               if new_f[y_i] < min_candidate[y_i]:
-                   min_candidate[y_i] =  new_f[y_i]
-                   x_miny[y_i] = x[itb]     
+# # Determine input parameters for function and method
+# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+# n=2
+# # Call the method
+# y = endpoints_method(x_bounds, f, n=n, save_raw_data = 'yes')
 
-       return min_candidate, max_candidate, x_miny, x_maxy, all_input, all_output 
+# print("-" * 30)
+# print("bounds:", y['bounds'])
+# print("-" * 30)
+# print("Minimum:")
+# print("x:", y['min']['x'])
+# print("f:", y['min']['f'])
+
+# print("-" * 30)
+# print("Maximum:")
+# print("x:", y['max']['x'])
+# print("f:", y['max']['f'])
+
+# print("-" * 30)
+# print("Raw data:")
+# print("x:", y['raw_data']['x'])
+# print("f:", y['raw_data']['f']) 

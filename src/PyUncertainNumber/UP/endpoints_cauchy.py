@@ -47,6 +47,7 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
     Delta = (hi - lo) / 2
 
     results = {
+        'un': None,
         'bounds': None,
         'min': {'f': None, 'x': None},
         'max': {'f': None, 'x': None},
