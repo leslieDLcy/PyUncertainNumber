@@ -9,7 +9,7 @@ import numpy as np
 class Params:
 
     steps = 200
-    
+    many = 2000
     # the percentiles
     p_values = np.linspace(0.0001, 0.9999, steps)
 

@@ -1,7 +1,7 @@
 from typing import *
 from .interval import *
 from .pbox_base import Pbox
-from .cbox_Nick import *
+from .cbox.cbox_Nick import *
 
 import numpy as np
 import warnings
