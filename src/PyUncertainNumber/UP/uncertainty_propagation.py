@@ -12,7 +12,7 @@ from PyUncertainNumber.UP.utils import post_processing, create_folder
 from PyUncertainNumber.UC.uncertainNumber import _parse_interverl_inputs, UncertainNumber
 
 # ---------------------the top level UP function ---------------------#
-
+#TODO expand to aleatory uncertianty propagation and mixed uncertainty propagation
 def up_bb(vars,
           fun,
           n: np.integer = None,
@@ -158,7 +158,7 @@ def up_bb(vars,
             raise ValueError("Invalid UP method.")
 
 def main():
-    """ (Ioanna style) implementation of the vertex method on the cantilever beam example"""
+    """ implementation of any method for epistemic uncertainty on the cantilever beam example"""
 
     y = np.array([0.145, 0.155])  # m
 
