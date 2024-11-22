@@ -3,12 +3,15 @@ Originally written by Scott in R and translated to Python also expanded function
 """
 
 import numpy as np
-from scipy.stats import beta, t, uniform, gamma, chi2, betabinom, nbinom
+from PyUncertainNumber import pba
+from scipy.stats import beta, t, uniform, gamma, betabinom, nbinom
 from ..pbox_base import Pbox
 from ..params import Params
 from .cbox_Leslie import Cbox
 import scipy
 
+
+# ---------------------constructors---------------------#
 def repre_cbox(cdfs, shape="beta", bound_params=None):
     """ transform into pbox object for cbox """
     
@@ -35,23 +38,27 @@ def repre_pbox(cdfs, shape="beta", bound_params=None):
         )
 
 
+
 # ---------------------Bernoulli---------------------#
-# TODO distribution not confirmed yet
-def nextvalue_bernoulli(x):
+
+def CBbernoulli_p(x):
     n = len(x)
     k = np.sum(x)
-    return (beta(k / (n + 1), 1), beta((k + 1) / (n + 1), 1))
+    l_b_params = [k, n - k + 1]
+    r_b_params = [k + 1, n - k]
+    cdfs = (beta(*l_b_params), beta(*r_b_params))
+    return repre_cbox(cdfs, shape="beta", bound_params=[l_b_params, r_b_params]) 
 
-def parameter_bernoulli(x):
+#nextvalue
+def CBbernoulli(x):
     n = len(x)
     k = np.sum(x)
-    return (beta(k, n - k + 1), beta(k + 1, n - k))
-
+    return pba.bernoulli(np.array([k, k+1])/(n+1))
 
 
 # ---------------------binomial---------------------#
 # x[i] ~ binomial(N, p), for known N, x[i] is a nonnegative integer less than or equal to N
-def parameter_binomial(x, N):
+def CBbinomial_p(x, N):
     """ cbox for Bionomial parameter
 
     args:
@@ -76,7 +83,7 @@ def parameter_binomial(x, N):
     return repre_cbox(cdfs, shape="beta", bound_params=[l_b_params, r_b_params]) 
 
 
-def nextvalue_binomial(x, N):
+def CBbinomial(x, N):
     if isinstance(x, int):
         x = [x]
     n = len(x)  
@@ -86,10 +93,8 @@ def nextvalue_binomial(x, N):
 
 
 
-
-
-
 # ---------------------binomialnp---------------------#
+# TODO not done yet
 # x[i] ~ binomial(N, p), for unknown N, x[i] is a nonnegative integer
 # see https://sites.google.com/site/cboxbinomialnp/
 def nextvalue_binomialnp(x):
@@ -102,12 +107,10 @@ def parameter_binomialnp_p(x):
     pass
 
 
-
-
 # ---------------------Poisson---------------------#
 # x[i] ~ Poisson(parameter), x[i] is a nonnegative integer
 
-def parameter_poisson(x):
+def CBpoisson_mean(x):
     n = len(x)
     k = np.sum(x)
     l_b_params = [k, 1/n]
@@ -116,55 +119,48 @@ def parameter_poisson(x):
     return repre_cbox(cdfs, shape="gamma", bound_params=[l_b_params, r_b_params])  
 
 
-def nextvalue_poisson(x):
+def CBpoisson(x):
     n = len(x)
     k = np.sum(x)
 
-    cdfs = (nbinom(size=k, prob=1-1/(n+1)),
-            nbinom(size=k+1, prob=1-1/(n+1)))
+    cdfs = (nbinom(k, 1 - 1/(n+1) ),
+            nbinom(k+1, 1 - 1/(n+1) ) 
+            )
     return repre_pbox(cdfs , shape="nbinom") 
-
 
 
 
 # ---------------------exponential---------------------#
 # x[i] ~ exponential(parameter), x[i] is a nonnegative integer
-# TODO not returning bounds
-def nextvalue_exponential(x):
+
+def CBexponential_lambda(x):
     n = len(x)
     k = np.sum(x)
-    return (gamma(n, scale=1/k))
+    return gamma(n, scale=1/k)
 
-    # TODO
-def parameter_exponential(x):
+def CBexponential(x) :
     n = len(x)
-    k = np.sum(x)
-    return (gamma(n, scale=1/k))
-    # TODO
-def qgammaexponential(p, shape, rate=1, scale=1):
-    return rate * ((1 - p) ** (-1 / shape) - 1)
-    # TODO
-def rgammaexponential(many, shape, rate=1, scale=1):
-    return qgammaexponential(np.random.uniform(size=Params.many), shape, rate, scale)
-
-
-
-
-
-
-
-
-
-
-
+    k = sum(x)
+    def gammaexponential(shape,rate=1,scale=None) :
+        if scale is None : scale = 1/rate
+        rate = 1/scale
+        #expon(scale=gamma(a=shape, scale=1/rate))
+        return scipy.stats.expon.rvs(
+            scale=1/scipy.stats.gamma.rvs(
+                a=shape,
+                scale=scale,
+                size=Params.many), 
+            size=Params.many
+            )
+    return gammaexponential(shape=n, rate=k)
 
 
 # ---------------------normal---------------------#
 
 # x[i] ~ normal(mu, sigma)
-def CBnormal(x) : 
-    n = len(x)
-    return(np.mean(x) + np.std(x) * student(n - 1) * np.sqrt(1 + 1 / n))# pop or sample std?
+# def CBnormal(x) : 
+#     n = len(x)
+#     return(np.mean(x) + np.std(x) * student(n - 1) * np.sqrt(1 + 1 / n))# pop or sample std?
 
 
 def CBnormal_mu(x, style='analytical', size=Params.many):
@@ -185,11 +181,14 @@ def CBnormal_mu(x, style='analytical', size=Params.many):
                 s = np.std(x)
                 rv = t(n-1, loc=xm, scale = s/np.sqrt(n))
                 x_support = np.linspace(rv.ppf(0.001), rv.ppf(0.999), size)
-                return x_support, rv.cdf(x_support)
+                # just for comparing with sample-based CDF below
+                # return x_support, rv.cdf(x_support)
+                return rv.cdf(x_support)
         case 'samples':
             n = len(x)
+            def student(v) : return(scipy.stats.t.rvs(v,size=Params.many))
             return(np.mean(x) + np.std(x) * student(n - 1) / np.sqrt(n)) # pop or sample std?
-        #  def student(v) : return(scipy.stats.t.rvs(v,size=Params.many))
+
 
 
 # ! test on interval-data
@@ -220,15 +219,11 @@ def CBnormal_mu_interval(x, style='analytical', size=Params.many):
         #  def student(v) : return(scipy.stats.t.rvs(v,size=Params.many))
 
 
-
-
 # TODO the analytical distribution equation?
 def CBnormal_sigma(x) :
     n = len(x) 
     return(np.sqrt(np.var(x)*(n-1)*inversechisquared(n-1))) # pop or sample var?
 # def inversechisquared(v) : return(1/chisquared(v))
-
-
 
 ### old Leslie implementation ###
 # def parameter_normal_mu(x):
@@ -276,6 +271,36 @@ def CBlognormal_sigma(x) :
 
 
 # ---------------------uniform---------------------#
+
+
+# x[i] ~ uniform(midpoint, width)
+# x[i] ~ uniform(minimum, maximum)
+def CBuniform(x) :
+    r=max(x)-min(x)
+    w=(r/beta(len(x)-1,2))/2
+    m=(max(x)-w)+(2*w-r)*uniform(0,1); 
+    return(uniform(m-w, m+w))
+def CBuniform_midpoint(x) : 
+    r = max(x)-min(x) 
+    w = r/beta(len(x)-1,2)
+    m = (max(x)-w/2)+(w-(max(x)-min(x)))*uniform(0,1)
+    return(m)
+def CBuniform_width(x) : 
+    r = max(x)-min(x) 
+    return(r/beta(len(x)-1,2))
+def CBuniform_minimum(x) : 
+    r=max(x)-min(x); 
+    w=r/beta(len(x)-1,2)
+    m=(max(x)-w/2)+(w-r)*uniform(0,1)
+    return(m-w/2)
+def CBuniform_maximum(x) : 
+    r=max(x)-min(x) 
+    w=r/beta(len(x)-1,2)
+    m=(max(x)-w/2)+(w-r)*uniform(0,1)
+    return(m+w/2)
+   
+
+
 # TODO arguments not confirmed yet
 def nextvalue_uniform(x):
     n = len(x)
@@ -359,155 +384,155 @@ def parameter_normal_meandifference(x, y):
 # rather than some semi-analytical or discrete representation used in Risk Calc.
 # See the preamble to https://sites.google.com/site/confidenceboxes/software        
 
-def bernoulli(p) : return(np.random.uniform(size=Params.many) < p)
+# def bernoulli(p) : return(np.random.uniform(size=Params.many) < p)
 
-def beta(a,b) :
-    #if (a==0) and (b==0) : return(env(np.repeat(0.0, many), np.repeat(1.0, many)))  # this is [0,1]
-    if (a==0) and (b==0) : return(bernoulli(0.5))  # or should it be [0,1]?
-    if (a==0) : return(np.repeat(0.0, many))
-    if (b==0) : return(np.repeat(1.0, many))            
-    return(scipy.stats.beta.rvs(a,b,size=Params.many))
+# # def beta(a,b) :
+# #     #if (a==0) and (b==0) : return(env(np.repeat(0.0, many), np.repeat(1.0, many)))  # this is [0,1]
+# #     if (a==0) and (b==0) : return(bernoulli(0.5))  # or should it be [0,1]?
+# #     if (a==0) : return(np.repeat(0.0, many))
+# #     if (b==0) : return(np.repeat(1.0, many))            
+# #     return(scipy.stats.beta.rvs(a,b,size=Params.many))
 
-def beta1(m,s) : return(beta(m * (m * (1 - m) / (s**2) - 1), (m * (m * (1 - m) / (s**2) - 1)) * (1/m - 1)))
+# def beta1(m,s) : return(beta(m * (m * (1 - m) / (s**2) - 1), (m * (m * (1 - m) / (s**2) - 1)) * (1/m - 1)))
 
-def betabinomial2(size,v,w) : return(scipy.stats.binom.rvs(size,beta(v,w),size=Params.many))
+# def betabinomial2(size,v,w) : return(scipy.stats.binom.rvs(size,beta(v,w),size=Params.many))
 
-def betabinomial(size,v,w) : return(scipy.stats.betabinom.rvs(size,v,w,size=Params.many))
+# def betabinomial(size,v,w) : return(scipy.stats.betabinom.rvs(size,v,w,size=Params.many))
 
-def binomial(size,p) : return(scipy.stats.binom.rvs(size,p,size=Params.many))
+# def binomial(size,p) : return(scipy.stats.binom.rvs(size,p,size=Params.many))
 
-def chisquared(v) : return(scipy.stats.chi2.rvs(v,size=Params.many))
+# def chisquared(v) : return(scipy.stats.chi2.rvs(v,size=Params.many))
 
-def delta(a) : return(np.repeat(a,many))
+# def delta(a) : return(np.repeat(a,many))
 
-def exponential(rate=1,mean=None) :
-    if mean is None : mean = 1/rate
-    #rate = 1/mean
-    return(scipy.stats.expon.rvs(scale=mean,size=Params.many))
+# def exponential(rate=1,mean=None) :
+#     if mean is None : mean = 1/rate
+#     #rate = 1/mean
+#     return(scipy.stats.expon.rvs(scale=mean,size=Params.many))
 
-def exponential1(mean=1) :
-    return(scipy.stats.expon.rvs(scale=mean,size=Params.many))
+# def exponential1(mean=1) :
+#     return(scipy.stats.expon.rvs(scale=mean,size=Params.many))
 
-def F(df1,df2) : return(scipy.stats.f.rvs(df1,df2,size=Params.many))
+# def F(df1,df2) : return(scipy.stats.f.rvs(df1,df2,size=Params.many))
 
-def gamma(shape,rate=1,scale=None) :
-    if scale is None : scale = 1/rate
-    rate = 1/scale
-    return(scipy.stats.gamma.rvs(a=shape,scale=1/rate,size=Params.many))
+# def gamma(shape,rate=1,scale=None) :
+#     if scale is None : scale = 1/rate
+#     rate = 1/scale
+#     return(scipy.stats.gamma.rvs(a=shape,scale=1/rate,size=Params.many))
 
-def gammaexponential(shape,rate=1,scale=None) :
-    if scale is None : scale = 1/rate
-    rate = 1/scale
-    #expon(scale=gamma(a=shape, scale=1/rate))
-    return(scipy.stats.expon.rvs(scale=1/scipy.stats.gamma.rvs(a=shape,scale=scale,size=Params.many),size=Params.many))
+# def gammaexponential(shape,rate=1,scale=None) :
+#     if scale is None : scale = 1/rate
+#     rate = 1/scale
+#     #expon(scale=gamma(a=shape, scale=1/rate))
+#     return(scipy.stats.expon.rvs(scale=1/scipy.stats.gamma.rvs(a=shape,scale=scale,size=Params.many),size=Params.many))
 
-def geometric(m) : return(scipy.stats.geom.rvs(m,size=Params.many))
+# def geometric(m) : return(scipy.stats.geom.rvs(m,size=Params.many))
 
-def gumbel(loc,scale) : return(scipy.stats.gumbel_r.rvs(loc,scale,size=Params.many))
+# def gumbel(loc,scale) : return(scipy.stats.gumbel_r.rvs(loc,scale,size=Params.many))
 
-def inversechisquared(v) : return(1/chisquared(v))
+# def inversechisquared(v) : return(1/chisquared(v))
     
-def inversegamma(shape, scale=None, rate=None) : 
-    if scale is None and not rate is None : scale = 1/rate
-    return(scipy.stats.invgamma.rvs(a=shape,scale=scale,size=Params.many))
+# def inversegamma(shape, scale=None, rate=None) : 
+#     if scale is None and not rate is None : scale = 1/rate
+#     return(scipy.stats.invgamma.rvs(a=shape,scale=scale,size=Params.many))
 
-def laplace(a,b) :  return(scipy.stats.laplace.rvs(a,b,size=Params.many))
+# def laplace(a,b) :  return(scipy.stats.laplace.rvs(a,b,size=Params.many))
 
-def logistic(loc,scale) : return(scipy.stats.logistic.rvs(loc,scale,size=Params.many))
+# def logistic(loc,scale) : return(scipy.stats.logistic.rvs(loc,scale,size=Params.many))
 
-def lognormal(m,s) : 
-    m2 = m**2; s2 = s**2
-    mlog = np.log(m2/np.sqrt(m2+s2))
-    slog = np.sqrt(np.log((m2+s2)/m2))
-    return(scipy.stats.lognorm.rvs(s=slog,scale=np.exp(mlog),size=Params.many))
+# def lognormal(m,s) : 
+#     m2 = m**2; s2 = s**2
+#     mlog = np.log(m2/np.sqrt(m2+s2))
+#     slog = np.sqrt(np.log((m2+s2)/m2))
+#     return(scipy.stats.lognorm.rvs(s=slog,scale=np.exp(mlog),size=Params.many))
 
-def lognormal2(mlog,slog) : return(scipy.stats.lognorm.rvs(s=slog,scale=np.exp(mlog),size=Params.many))
+# def lognormal2(mlog,slog) : return(scipy.stats.lognorm.rvs(s=slog,scale=np.exp(mlog),size=Params.many))
 
-#lognormal = function(mean=NULL, std=NULL, meanlog=NULL, stdlog=NULL, median=NULL, cv=NULL, name='', ...){
-#  if (is.null(meanlog) & !is.null(median)) meanlog = log(median)
-#  if (is.null(stdlog) & !is.null(cv)) stdlog = sqrt(log(cv^2 + 1))
-#  # lognormal(a, b) ~ lognormal2(log(a^2/sqrt(a^2+b^2)),sqrt(log((a^2+b^2)/a^2)))
-#  if (is.null(meanlog) & (!is.null(mean)) & (!is.null(std))) meanlog = log(mean^2/sqrt(mean^2+std^2))
-#  if (is.null(stdlog) & !is.null(mean) & !is.null(std)) stdlog = sqrt(log((mean^2+std^2)/mean^2))
-#  if (!is.null(meanlog) & !is.null(stdlog)) Slognormal0(meanlog,stdlog,name) else stop('not enough information to specify the lognormal distribution')
-#  }
+# #lognormal = function(mean=NULL, std=NULL, meanlog=NULL, stdlog=NULL, median=NULL, cv=NULL, name='', ...){
+# #  if (is.null(meanlog) & !is.null(median)) meanlog = log(median)
+# #  if (is.null(stdlog) & !is.null(cv)) stdlog = sqrt(log(cv^2 + 1))
+# #  # lognormal(a, b) ~ lognormal2(log(a^2/sqrt(a^2+b^2)),sqrt(log((a^2+b^2)/a^2)))
+# #  if (is.null(meanlog) & (!is.null(mean)) & (!is.null(std))) meanlog = log(mean^2/sqrt(mean^2+std^2))
+# #  if (is.null(stdlog) & !is.null(mean) & !is.null(std)) stdlog = sqrt(log((mean^2+std^2)/mean^2))
+# #  if (!is.null(meanlog) & !is.null(stdlog)) Slognormal0(meanlog,stdlog,name) else stop('not enough information to specify the lognormal distribution')
+# #  }
 
-def loguniform_solve(m,v) :
-  def loguniform_f(a,m,v) : return(a*m*np.exp(2*(v/(m**2)+1)) + np.exp(2*a/m)*(a*m - 2*((m**2) + v)))
-  def LUgrid(aa, w) : return(left(aa)+(right(aa)-left(aa))*w/100.0)
-  aa = (m - np.sqrt(4*v), m)   # interval
-  a = m
-  ss = loguniform_f(a,m,v)
-  for j in range(4) :
-    for i in range(101) :  # 0:100 
-      a = LUgrid( aa, i)
-      s = abs(loguniform_f(a,m,v))
-      if s < ss :
-          ss = s
-          si = i 
-    a = LUgrid(aa, si)
-    aa = (LUgrid(aa, si-1), LUgrid(aa, si+1))  # interval
-  return(a)
+# def loguniform_solve(m,v) :
+#   def loguniform_f(a,m,v) : return(a*m*np.exp(2*(v/(m**2)+1)) + np.exp(2*a/m)*(a*m - 2*((m**2) + v)))
+#   def LUgrid(aa, w) : return(left(aa)+(right(aa)-left(aa))*w/100.0)
+#   aa = (m - np.sqrt(4*v), m)   # interval
+#   a = m
+#   ss = loguniform_f(a,m,v)
+#   for j in range(4) :
+#     for i in range(101) :  # 0:100 
+#       a = LUgrid( aa, i)
+#       s = abs(loguniform_f(a,m,v))
+#       if s < ss :
+#           ss = s
+#           si = i 
+#     a = LUgrid(aa, si)
+#     aa = (LUgrid(aa, si-1), LUgrid(aa, si+1))  # interval
+#   return(a)
 
-def loguniform(min=None, max=None, minlog=None, maxlog=None, mean=None, std=None) :
-    if (min is None) and (not (minlog is None)) : min = np.exp(minlog)
-    if (max is None) and (not (maxlog is None)) : max = np.exp(maxlog)  
-    if (max is None) and (not (mean is None)) and (not (std is None)) and (not (min is None)) : max = 2*(mean**2 +std**2)/mean - min
-    if (min is None) and (max is None) and (not (mean is None)) and (not(std is None)) :
-        min = loguniform_solve(mean,std**2)
-        max = 2*(mean**2 +std**2)/mean - min
-    return(scipy.stats.loguniform.rvs(min, max, size=Params.many))
+# def loguniform(min=None, max=None, minlog=None, maxlog=None, mean=None, std=None) :
+#     if (min is None) and (not (minlog is None)) : min = np.exp(minlog)
+#     if (max is None) and (not (maxlog is None)) : max = np.exp(maxlog)  
+#     if (max is None) and (not (mean is None)) and (not (std is None)) and (not (min is None)) : max = 2*(mean**2 +std**2)/mean - min
+#     if (min is None) and (max is None) and (not (mean is None)) and (not(std is None)) :
+#         min = loguniform_solve(mean,std**2)
+#         max = 2*(mean**2 +std**2)/mean - min
+#     return(scipy.stats.loguniform.rvs(min, max, size=Params.many))
 
-def loguniform1(m,s) : return(loguniform(mean=m, std=s))
+# def loguniform1(m,s) : return(loguniform(mean=m, std=s))
 
-def negativebinomial(size,prob) : return(scipy.stats.nbinom.rvs(size,prob,size=Params.many))
+# def negativebinomial(size,prob) : return(scipy.stats.nbinom.rvs(size,prob,size=Params.many))
 
-def normal(m,s) : return(scipy.stats.norm.rvs(m,s, size=Params.many))
+# def normal(m,s) : return(scipy.stats.norm.rvs(m,s, size=Params.many))
 
-def pareto(mode, c) : return(scipy.stats.pareto.rvs(c,scale=mode,size=Params.many))
+# def pareto(mode, c) : return(scipy.stats.pareto.rvs(c,scale=mode,size=Params.many))
 
-def poisson(m) : return(scipy.stats.poisson.rvs(m,size=Params.many))
+# def poisson(m) : return(scipy.stats.poisson.rvs(m,size=Params.many))
 
-def powerfunction(b,c) : return(scipy.stats.powerlaw.rvs(c,scale=b,size=Params.many))
+# def powerfunction(b,c) : return(scipy.stats.powerlaw.rvs(c,scale=b,size=Params.many))
 
-# parameterisation of rayleigh differs from that in pba.r
-def rayleigh(loc,scale) : return(scipy.stats.rayleigh.rvs(loc,scale,size=Params.many))
+# # parameterisation of rayleigh differs from that in pba.r
+# def rayleigh(loc,scale) : return(scipy.stats.rayleigh.rvs(loc,scale,size=Params.many))
 
-def sawinconrad(min, mu, max) : # WHAT are the 'implicit constraints' doing?     
-  def sawinconradalpha01(mu) :
-      def f(alpha) : return(1/(1-1/np.exp(alpha)) - 1/alpha - mu)
-      if np.abs(mu-0.5)<0.000001 : return(0)      
-      return(uniroot(f,np.array((-500,500))))
-  def qsawinconrad(p, min, mu, max) : 
-        alpha = sawinconradalpha01((mu-min)/(max-min))
-        if np.abs(alpha)<0.000001 : return(min+(max-min)*p) 
-        else : min+(max-min)*((np.log(1+p*(np.exp(alpha)-1)))/alpha)
-  a = left(min);   b = right(max)
-  c = left(mu);    d = right(mu)
-  if c<a : c = a   # implicit constraints
-  if b<d : d = b
-  #return(qsawinconrad(np.random.uniform(size=Params.many), min, mu, max))
-  return(qsawinconrad(np.random.uniform(size=Params.many), min, mu, max))
+# def sawinconrad(min, mu, max) : # WHAT are the 'implicit constraints' doing?     
+#   def sawinconradalpha01(mu) :
+#       def f(alpha) : return(1/(1-1/np.exp(alpha)) - 1/alpha - mu)
+#       if np.abs(mu-0.5)<0.000001 : return(0)      
+#       return(uniroot(f,np.array((-500,500))))
+#   def qsawinconrad(p, min, mu, max) : 
+#         alpha = sawinconradalpha01((mu-min)/(max-min))
+#         if np.abs(alpha)<0.000001 : return(min+(max-min)*p) 
+#         else : min+(max-min)*((np.log(1+p*(np.exp(alpha)-1)))/alpha)
+#   a = left(min);   b = right(max)
+#   c = left(mu);    d = right(mu)
+#   if c<a : c = a   # implicit constraints
+#   if b<d : d = b
+#   #return(qsawinconrad(np.random.uniform(size=Params.many), min, mu, max))
+#   return(qsawinconrad(np.random.uniform(size=Params.many), min, mu, max))
   
-def student(v, size=Params.many) : return(scipy.stats.t.rvs(v,size=size))
+# def student(v, size=Params.many) : return(scipy.stats.t.rvs(v,size=size))
 
-def uniform(a,b, size=Params.many) : return(scipy.stats.uniform.rvs(a, b-a, size=size)) # who parameterizes like this?!?!
+# def uniform(a,b, size=Params.many) : return(scipy.stats.uniform.rvs(a, b-a, size=size)) # who parameterizes like this?!?!
 
-def triangular(min,mode,max, size=Params.many) : return(np.random.triangular(min, mode, max, size=size)) # cheating: uses random rather than scipy.stats
+# def triangular(min,mode,max, size=Params.many) : return(np.random.triangular(min, mode, max, size=size)) # cheating: uses random rather than scipy.stats
 
-def histogram(x) : return(x[(np.trunc(scipy.stats.uniform.rvs(size=Params.many)*len(x))).astype(int)])
+# def histogram(x) : return(x[(np.trunc(scipy.stats.uniform.rvs(size=Params.many)*len(x))).astype(int)])
 
-def mixture(x,w=None) :
-    if w is None : w = np.repeat(1,len(x))
-    print(Params.many)
-    r = np.sort(scipy.stats.uniform.rvs(size=Params.many))[::-1]
-    x = np.concatenate(([x[0]],x))
-    w = np.cumsum(np.concatenate(([0],w)))/np.sum(w)
-    u = []
-    j = len(x)-1
-    for p in r : 
-        while True :
-            if w[j] <= p : break
-            j = j - 1
-        u = np.concatenate(([x[j+1]],u))
-    return(u[np.argsort(scipy.stats.uniform.rvs(size=len(u)))])
+# def mixture(x,w=None) :
+#     if w is None : w = np.repeat(1,len(x))
+#     print(Params.many)
+#     r = np.sort(scipy.stats.uniform.rvs(size=Params.many))[::-1]
+#     x = np.concatenate(([x[0]],x))
+#     w = np.cumsum(np.concatenate(([0],w)))/np.sum(w)
+#     u = []
+#     j = len(x)-1
+#     for p in r : 
+#         while True :
+#             if w[j] <= p : break
+#             j = j - 1
+#         u = np.concatenate(([x[j+1]],u))
+#     return(u[np.argsort(scipy.stats.uniform.rvs(size=len(u)))])

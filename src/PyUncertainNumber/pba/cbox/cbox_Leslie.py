@@ -2,7 +2,6 @@
 
 
 from ..pbox_base import Pbox
-import numpy as np
 
 __all__ = ['Cbox']
 
@@ -19,9 +18,15 @@ class Cbox(Pbox):
     
     def __init__(self,*args,**kwargs):            
         super().__init__(*args,**kwargs)
-        print('cbox generated')
-        
+
+
+    def __repr__(self):
+        return f"Cbox ~ {self.shape}[xx, xx]"
     
+    def display(self, parameter_name=None, **kwargs):
+        super().display(title=f'Cbox {parameter_name}', fill_color='salmon', **kwargs)
+
+
     # def query_confidence(self, level=None, low=None, upper=None):
         
     #     """ or simply the `ci` function 
