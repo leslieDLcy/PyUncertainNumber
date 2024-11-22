@@ -8,12 +8,15 @@ from PyUncertainNumber.UP.sampling import sampling_method
 from PyUncertainNumber.UP.genetic_optimisation import genetic_optimization_method
 from PyUncertainNumber.UP.local_optimisation import local_optimisation_method
 from PyUncertainNumber.UP.endpoints_cauchy import cauchydeviate_method
+from PyUncertainNumber.UP.sampling_aleatory import sampling_alea_method
 from PyUncertainNumber.UP.utils import post_processing, create_folder
 from PyUncertainNumber.UC.uncertainNumber import _parse_interverl_inputs, UncertainNumber
 
 # ---------------------the top level UP function ---------------------#
 #TODO expand to aleatory uncertianty propagation and mixed uncertainty propagation
-def up_bb(vars,
+#TODO add the samplign methods for the aleatory uncertainty 
+
+def epistemic_propagation(vars,
           fun,
           n: np.integer = None,
           x0: np.ndarray = None,
@@ -221,8 +224,8 @@ def main():
 
     method = "endpoint_cauchy"
     base_path = "C:\\Users\\Ioanna\\Documents\\GitHub\\PyUncertainNumber\\cantilever_beam"
-    #a = up_bb(xInt, fun= None, method=method, save_raw_data="yes", base_path=base_path)
-    a = up_bb(xInt, fun= None, n=10, method=method,save_raw_data="yes", base_path=base_path )
+    #a = epistemic_propagation(xInt, fun= None, method=method, save_raw_data="yes", base_path=base_path)
+    a = epistemic_propagation(xInt, fun= None, n=10, method=method,save_raw_data="yes", base_path=base_path )
     #pprint.pprint(a['un'])
     #pprint.pprint(a)
     #pprint.pprint(a)

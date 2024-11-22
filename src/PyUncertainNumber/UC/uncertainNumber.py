@@ -3,20 +3,20 @@ from typing import Type, Union
 
 # from .measurand import Measurand
 # from .variability import Variability
-from .uncertainty_types import Uncertainty_types
-from .ensemble import Ensemble
+from PyUncertainNumber.UC.uncertainty_types import Uncertainty_types
+from PyUncertainNumber.UC.ensemble import Ensemble
 from PyUncertainNumber.pba.interval import Interval as I
 from PyUncertainNumber.pba.interval import PM
-from .utils import *
-from .params import Params
+from PyUncertainNumber.UC.utils import *
+from PyUncertainNumber.UC.params import Params
 from typing import List
 from pint import UnitRegistry
 from pathlib import Path
 from PyUncertainNumber.UP.endpoint import endpoints_method
 from PyUncertainNumber.NLP_constructor.language_parsing import hedge_interpret
 from scipy.stats import norm
-from .check import DistributionSpecification
-from PyUncertainNumber.pba.dists import named_pbox
+from PyUncertainNumber.UC.check import DistributionSpecification
+from PyUncertainNumber.pba.dists import named_pbox, dists
 
 """ Uncertain Number class """
 
@@ -168,7 +168,7 @@ class UncertainNumber:
         """check if the UN initialisation specification is correct
 
         note:
-            a lot of things to double check. keep an growing list:
+            a lot of things to double check. keep a growing list:
             1. unit
             2. hedge: user cannot speficy both 'hedge' and 'bounds'. 'bounds' takes precedence.
 
@@ -201,7 +201,7 @@ class UncertainNumber:
                     case "interval":
                         return f"This is an {self.essence}-type Uncertain Number whose min value is {self._math_object.left:.2f} and max value is {self._math_object.right:.2f}. An interval is a range of values that are possible for the measurand whose value is unknown, which typically represents the epistemic uncertainty. The interval is defined by the minimum and maximum values (i.e. lower bound and upper bound) that the measurand could take on."
                     case "distribution":
-                        return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}. Probability distributios are typically empolyed to model aleatoric uncertainty, which represents inherent randomness. The distribution is defined by the probability density function (pdf) or cumulative distribution function (cdf)."
+                        return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}. Probability distributios are typically employed to model aleatoric uncertainty, which represents inherent randomness. The distribution is defined by the probability density function (pdf) or cumulative distribution function (cdf)."
                     case "pbox":
                         return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}"
             case "one-number":
@@ -255,7 +255,7 @@ class UncertainNumber:
                 return [self._math_object.left, self._math_object.right]
             case "distribution":
                 which_dist = self.distribution_parameters[0]
-                if which_dist == "norm":
+                if which_dist == "gaussian":
                     rv = norm(*self.distribution_parameters[1])
                     return [rv.ppf(0.025), rv.ppf(0.975)]
             case "pbox":
@@ -315,7 +315,6 @@ class UncertainNumber:
     def I(cls, bounds, **kwargs):
         """a shortcut for creating an interval-type Uncertain Number"""
         return cls(essence="interval", bounds=bounds, **kwargs)
-
 
 
     # ---------------------arithmetic operations---------------------#
@@ -505,7 +504,33 @@ class UncertainNumber:
         with open(filepath, "w") as fp:
             json.dump(self, fp, cls=UNEncoder, indent=4)
 
+    def random(self, size=None):
+        """Generate random samples from the distribution."""
+        match self.essence:
+            case "interval":
+                return ValueError("Random sampling is only supported for distribution-type UncertainNumbers.") 
+            case "distribution":
+                which_dist = self.distribution_parameters[0]
+                # if which_dist == "gaussian":
+                #     rv = norm(*self.distribution_parameters[1])
+                #     return rv.rvs(size=size)  # Use .rvs() for sampling
+                # else:
+                #     print("Unfinished")
+                return dists[which_dist].rvs(*self.distribution_parameters[1], size = size)
+            case "pbox":
+                return ValueError("Random sampling is only supported for distribution-type UncertainNumbers.") 
 
+    def ppf(self, q=None):
+        """"Calculate the percent point function (inverse of CDF) at quantile q."""
+        match self.essence:
+            case "interval":
+                return ValueError("PPF calculation is not supported for interval-type UncertainNumbers.")
+            case "distribution":
+                which_dist = self.distribution_parameters[0]
+                dist = dists[which_dist](*self.distribution_parameters[1])  # Define the distribution
+                return dist.ppf(q)
+            case "pbox":
+                return ValueError("PPF calculation is not supported for interval-type UncertainNumbers.")          
 
 # ---------------------class related methods---------------------#
 
@@ -578,3 +603,4 @@ def _parse_interverl_inputs(vars):
         
     if isinstance(vars, list):
         return UncertainNumber._toIntervalBackend(vars)
+    

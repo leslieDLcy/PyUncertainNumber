@@ -58,6 +58,8 @@ dists = {
     "genextreme": sps.genextreme,
     "gausshyper": sps.gausshyper,
     "gamma": sps.gamma,
+    "gaussian": sps.norm,
+    "normal": sps.norm,
     "gengamma": sps.gengamma,
     "genhalflogistic": sps.genhalflogistic,
     "geninvgauss": sps.geninvgauss,
