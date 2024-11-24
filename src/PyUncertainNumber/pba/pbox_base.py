@@ -1096,6 +1096,7 @@ class Pbox:
         L = self.left
         R = self.right
 
+        # percentiles axis
         p_axis = np.linspace(0, 1, self.steps+1)
         LL_n = np.concatenate((L, np.array([R[-1]])))
         RR_n = np.concatenate((np.array([L[0]]), R))

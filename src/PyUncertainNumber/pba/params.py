@@ -13,6 +13,10 @@ class Params:
     # the percentiles
     p_values = np.linspace(0.0001, 0.9999, steps)
 
+    p_lboundary = 0.0001
+    p_hboundary = 0.9999
+    
+
     # sample data for a go-to example
     s = [4.02, 4.07, 4.25, 4.32, 4.36, 4.45, 4.47, 
          4.57, 4.58, 4.62, 4.68, 4.71, 4.72, 4.79, 

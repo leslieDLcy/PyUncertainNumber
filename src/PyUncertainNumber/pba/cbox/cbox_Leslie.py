@@ -16,15 +16,20 @@ class Cbox(Pbox):
         Pbox (_type_): _description_
     """
     
-    def __init__(self,*args,**kwargs):            
+    def __init__(self, *args, bound_params=None, **kwargs):            
+        self.bound_params = bound_params
         super().__init__(*args,**kwargs)
 
 
     def __repr__(self):
-        return f"Cbox ~ {self.shape}[xx, xx]"
+        # msg = 
+        return f"Cbox ~ {self.shape}{self.bound_params}"
     
+
     def display(self, parameter_name=None, **kwargs):
-        super().display(title=f'Cbox {parameter_name}', fill_color='salmon', **kwargs)
+        ax = super().display(title=f'Cbox {parameter_name}', fill_color='salmon', **kwargs)
+        ax.set_ylabel('Confidence')
+        return ax
 
 
     # def query_confidence(self, level=None, low=None, upper=None):
