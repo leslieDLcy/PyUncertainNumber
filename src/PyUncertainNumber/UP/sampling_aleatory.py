@@ -5,7 +5,7 @@ from statsmodels.distributions.empirical_distribution import ECDF
 from scipy.stats import kstwobign
 from scipy.stats import qmc  # Import Latin Hypercube Sampling from SciPy
 
-def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', conf_level=0.95, 
+def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', conf_level=0.95, ks_bound_points: int =100,
                     save_raw_data='no'):
     """
     args:
@@ -23,12 +23,14 @@ def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', con
                                                       sampling for better space coverage)
                                 Defaults to 'monte_carlo'.
         conf_level (float, optional): The confidence level for calculating the K-S bounds. 
-                                       Defaults to 0.95 (95% confidence).
+                                    Defaults to 0.95 (95% confidence).
+        ks_bound_points (integer, optional): The number of points to evaluate K-S bounds at. 
+                                    Defaults to 100.
         save_raw_data (str, optional): Whether to save raw data. Options: 'yes', 'no'. 
-                                        Defaults to 'no'.
+                                    Defaults to 'no'.
     
     signature:
-        sampling_method(x:list, f:Callable, n:int, method ='montecarlo', endpoints=False, save_raw_data = 'no') -> dict of np.ndarrays
+        sampling_method(x:list, f:Callable, n:int, method ='montecarlo',  conf_level=0.95, ks_bound_points=100, save_raw_data = 'no') -> dict of np.ndarrays
 
     note:
         - Performs uncertainty propagation using Monte Carlo or Latin Hypercube sampling, 
@@ -73,7 +75,6 @@ def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', con
         # Now we need to calculate the ppf for each q value in the q_values array
         ppf_values = []  # Initialize an empty list to store the ppf values for this UncertainNumber
         for q in q_values:  # Iterate over each individual q value
-            print(q, i , un)
             ppf_value = un.ppf(q)  # Calculate the ppf value for this q
             ppf_values.append(ppf_value)  # Add the calculated ppf value to the list
 
@@ -108,7 +109,7 @@ def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', con
         for i in range(num_outputs):
             data = all_output[:, i]
             ecdf = ECDF(data)
-            x_vals = np.linspace(min(data), max(data), 100)
+            x_vals = np.linspace(min(data), max(data), ks_bound_points)
             cdf_vals = ecdf(x_vals)
             critical_D = kstwobign.ppf(1 - alpha / 2) / np.sqrt(n)
             upper_bound = np.clip(cdf_vals + critical_D, 0, 1)
@@ -133,51 +134,51 @@ def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', con
 
     return results
 
-# example
-from PyUncertainNumber import UncertainNumber as UN
+# # example
+# from PyUncertainNumber import UncertainNumber as UN
 
-def cantilever_beam_deflection(x):
-    """Calculates deflection and stress for a cantilever beam.
+# def cantilever_beam_deflection(x):
+#     """Calculates deflection and stress for a cantilever beam.
 
-    Args:
+#     Args:
 
-        x (np.array): Array of input parameters:
-            x[0]: Length of the beam (m)
-            x[1]: Second moment of area (mm^4)
-            x[2]: Applied force (N)
-            x[3]: Young's modulus (MPa)
+#         x (np.array): Array of input parameters:
+#             x[0]: Length of the beam (m)
+#             x[1]: Second moment of area (mm^4)
+#             x[2]: Applied force (N)
+#             x[3]: Young's modulus (MPa)
 
-    Returns:
-        float: deflection (m)
-               Returns np.nan if calculation error occurs.
-    """
+#     Returns:
+#         float: deflection (m)
+#                Returns np.nan if calculation error occurs.
+#     """
 
-    beam_length = x[0]
-    I = x[1]
-    F = x[2]
-    E = x[3]
-    try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
-        deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+#     beam_length = x[0]
+#     I = x[1]
+#     F = x[2]
+#     E = x[3]
+#     try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
+#         deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
         
-    except:
-        deflection = np.nan
+#     except:
+#         deflection = np.nan
 
-    return deflection
+#     return deflection
 
-L = UN(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
-I = UN(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
-F = UN(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
-E = UN(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
+# L = UN(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
+# I = UN(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
+# F = UN(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
+# E = UN(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
 
-METHOD = "latin_hypercube"
-base_path = ""
+# METHOD = "latin_hypercube"
+# base_path = ""
 
-a = sampling_alea_method(x=[L, I, F, E], #['L', 'I', 'F', 'E'], 
-          f = cantilever_beam_deflection, 
-          n = 300, 
-          method = METHOD, 
-          save_raw_data = "no"
-         )
+# a = sampling_alea_method(x=[L, I, F, E], #['L', 'I', 'F', 'E'], 
+#           f = cantilever_beam_deflection, 
+#           n = 300, 
+#           method = METHOD, 
+#           save_raw_data = "no"
+#          )
 
-print(a)
+# print(a)
 

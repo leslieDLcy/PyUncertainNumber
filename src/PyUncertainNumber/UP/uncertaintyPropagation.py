@@ -13,9 +13,92 @@ from PyUncertainNumber.UP.utils import post_processing, create_folder
 from PyUncertainNumber.UC.uncertainNumber import _parse_interverl_inputs, UncertainNumber
 
 # ---------------------the top level UP function ---------------------#
-#TODO expand to aleatory uncertianty propagation and mixed uncertainty propagation
-#TODO add the samplign methods for the aleatory uncertainty 
+#TODO expand to mixed uncertainty propagation
+#TODO for leslie: How do you construct an uncertain number where the distribtuion is in the form of K-S bounds?
 
+def aleatory_propagation(vars,
+        fun,
+        n: np.integer = None,
+        method = "monte_carlo",     
+        conf_level = 0.95,
+        ks_bound_points = 100, 
+        save_raw_data="no",
+        *,  # Keyword-only arguments start here
+        base_path=np.nan,
+        **kwargs,
+    ):
+    
+    """
+
+    args:
+        - vars (list): A list of UncertainNumber objects, each representing an input 
+                    variable with its associated uncertainty.
+        - fun (Callable): The function to propagate uncertainty through.
+        - n (int): The number of samples to generate.
+        - conf_level (float, optional): The confidence level for K-S bounds. Defaults to 0.95.
+        - ks_bound_points (int, optional): The number of points to evaluate K-S bounds at. Defaults to 100.
+        - method (str, optional): The sampling method ('monte_carlo' or 'latin_hypercube'). Defaults to 'monte_carlo'.
+        - save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). Defaults to 'no'.
+        - base_path (str, optional): Path for saving results (if save_raw_data is 'yes'). Defaults to np.nan.
+        - **kwargs: Additional keyword arguments to be passed to the UncertainNumber constructor.
+
+    signature:
+        aleatory_propagation(x:np.ndarray, f:Callable, n:int, method ='montecarlo', conf_level = 0.95, ks_bound_points = 100, save_raw_data = 'no') -> dict of np.ndarrays
+
+    note:
+        - This function propagates uncertainty through a given function (`fun`) using either 
+            Monte Carlo or Latin Hypercube sampling, considering the aleatory uncertainty 
+            represented by a list of `UncertainNumber` objects (`vars`). 
+        - It calculates Kolmogorov-Smirnov (K-S) bounds for the output(s) to provide a non-parametric 
+            confidence region.
+        - If the `f` function returns multiple outputs, the `all_output` array will be 2-dimensional y and x for all x samples.
+
+    returns:
+        dict: A dictionary containing:
+            - 'un': A list of UncertainNumber objects, each representing the output(s)
+                    of the function with K-S bounds as uncertainty.
+            - 'ks_bounds': A list of dictionaries, one for each output of fun, containing the K-S bounds.
+            - 'raw_data': A dictionary containing raw data (if save_raw_data is 'yes'):
+                - 'x': All generated input samples.
+                - 'f': Corresponding output values for each input sample.
+
+    Raises:
+        ValueError: For invalid method, save_raw_data, or missing arguments.
+ 
+    """
+    # Input validation
+   
+    if save_raw_data not in ("yes", "no"):  # Input validation
+        raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
+    
+    def process_alea_results(results):
+        if results['ks_bounds'] is None:
+            results['un'] = UncertainNumber(essence="distribution", distribution_parameters=None, **kwargs)
+        else:
+            # 'ks_bounds' is a list of dictionaries, create one UncertainNumber for each dictionary
+            results['un'] = [UncertainNumber(essence="distribution", distribution_parameters=ks_bound, **kwargs) 
+                    for ks_bound in results['ks_bounds']]
+
+        if save_raw_data == "yes":
+            res_path = create_folder(base_path, method)
+            # Handle the case where fun is None:
+            if fun is None:
+                Results = post_processing(results['raw_data']['x'], all_output=None, method=method, res_path=res_path)
+            else:
+                Results = post_processing(results['raw_data']['x'], results['raw_data'].get('f'), method, res_path)
+
+        return results
+        
+    match method:
+           
+        case ("monte_carlo" | "latin_hypercube"): 
+            if n is None:
+                raise ValueError("n (number of samples) is required for sampling methods.")
+            results= sampling_alea_method(vars, fun, n, method=method.lower(), conf_level = conf_level, ks_bound_points = ks_bound_points, save_raw_data= save_raw_data)    
+            return process_alea_results(results)
+        case _:
+            raise ValueError("Invalid UP method.")
+        
 def epistemic_propagation(vars,
           fun,
           n: np.integer = None,
@@ -221,16 +304,35 @@ def main():
 
         return np.array([deflection, stress])
 
+    y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
+    L = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
+    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
+    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
+    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
 
-    method = "endpoint_cauchy"
-    base_path = "C:\\Users\\Ioanna\\Documents\\GitHub\\PyUncertainNumber\\cantilever_beam"
-    #a = epistemic_propagation(xInt, fun= None, method=method, save_raw_data="yes", base_path=base_path)
-    a = epistemic_propagation(xInt, fun= None, n=10, method=method,save_raw_data="yes", base_path=base_path )
-    #pprint.pprint(a['un'])
-    #pprint.pprint(a)
-    #pprint.pprint(a)
-    print(a['un'])
+    METHOD = "latin_hypercube"
+    base_path = ""
+
+    a = sampling_alea_method(x= [y,L, I, F, E], #['L', 'I', 'F', 'E'], 
+                            f= cantilever_beam_func, 
+                            n= 30, 
+                            method= METHOD, 
+                            save_raw_data= "no"
+                        )
+    a['un']
+    print(a["ks_bounds"][0])
+
     return a
+
+    # method = "endpoint_cauchy"
+    # base_path = "C:\\Users\\Ioanna\\Documents\\GitHub\\PyUncertainNumber\\cantilever_beam"
+    # #a = epistemic_propagation(xInt, fun= None, method=method, save_raw_data="yes", base_path=base_path)
+    # a = epistemic_propagation(xInt, fun= None, n=10, method=method,save_raw_data="yes", base_path=base_path )
+    # #pprint.pprint(a['un'])
+    # #pprint.pprint(a)
+    # #pprint.pprint(a)
+    # print(a['un'])
+    # return a
 
 if __name__ == "__main__":
     main()
