@@ -1,0 +1,6 @@
+PyUncertainNumber.pba.pbox_parametric
+=====================================
+
+.. py:module:: PyUncertainNumber.pba.pbox_parametric
+
+

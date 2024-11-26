@@ -1,0 +1,316 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PyUncertainNumber.UP.subinterval_old &mdash; PyUncertainNumber  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=eaac4085" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="PyUncertainNumber.UP.uncertaintyPropagation" href="../uncertaintyPropagation/index.html" />
+    <link rel="prev" title="PyUncertainNumber.UP.subinterval" href="../subinterval/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            PyUncertainNumber
+              <img src="../../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">PyUncertainNumber</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../NLP_constructor/index.html">PyUncertainNumber.NLP_constructor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../UC/index.html">PyUncertainNumber.UC</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">PyUncertainNumber.UP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../UV/index.html">PyUncertainNumber.UV</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/index.html">PyUncertainNumber.pba</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#package-contents">Package Contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">PyUncertainNumber</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">PyUncertainNumber</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">PyUncertainNumber.UP</a></li>
+      <li class="breadcrumb-item active">PyUncertainNumber.UP.subinterval_old</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/PyUncertainNumber/UP/subinterval_old/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-PyUncertainNumber.UP.subinterval_old">
+<span id="pyuncertainnumber-up-subinterval-old"></span><h1>PyUncertainNumber.UP.subinterval_old<a class="headerlink" href="#module-PyUncertainNumber.UP.subinterval_old" title="Link to this heading"></a></h1>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.UP.subinterval_old.cartesian" title="PyUncertainNumber.UP.subinterval_old.cartesian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cartesian</span></code></a>(*arrays)</p></td>
+<td><p>Computes the Cartesian product of multiple input arrays</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.UP.subinterval_old.subinterval_method" title="PyUncertainNumber.UP.subinterval_old.subinterval_method"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subinterval_method</span></code></a>(x, f, n[, save_raw_data])</p></td>
+<td><p>Performs uncertainty propagation using the Subinterval Reconstitution Method.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.UP.subinterval_old.cartesian">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.UP.subinterval_old.</span></span><span class="sig-name descname"><span class="pre">cartesian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">arrays</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.UP.subinterval_old.cartesian" title="Link to this definition"></a></dt>
+<dd><p>Computes the Cartesian product of multiple input arrays</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*arrays</strong> (<em>-</em>) – <p>Variable number of np.arrays representing the sets of values for each dimension.</p>
+</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>signature:</dt><dd><ul class="simple">
+<li><p>cartesian(<a href="#id3"><span class="problematic" id="id4">*</span></a>x:np.array)  -&gt; np.ndarray</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The data type of the output array is determined based on the input arrays to ensure compatibility.</p></li>
+</ul>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A NumPy array where each row represents one combination from the Cartesian product.</dt><dd><p>The number of columns equals the number of input arrays.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>darray</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>x = np.array([1, 2], [3, 4], [5, 6])
+y = cartesian(<a href="#id5"><span class="problematic" id="id6">*</span></a>x)
+# Output:
+# array([[1, 3, 5],
+#        [1, 3, 6],
+#        [1, 4, 5],
+#        [1, 4, 6],
+#        [2, 3, 5],
+#        [2, 3, 6],
+#        [2, 4, 5],
+#        [2, 4, 6]])</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.UP.subinterval_old.subinterval_method">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.UP.subinterval_old.</span></span><span class="sig-name descname"><span class="pre">subinterval_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_raw_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'no'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.UP.subinterval_old.subinterval_method" title="Link to this definition"></a></dt>
+<dd><p>Performs uncertainty propagation using the Subinterval Reconstitution Method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>-</em>) – A 2D NumPy array where each row represents an input variable and the two columns
+define its lower and upper bounds (interval).</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – A callable function that takes a 1D NumPy array of input values and returns the
+corresponding output(s).</p></li>
+<li><p><strong>n</strong> (<em>-</em>) – <p>A scalar (integer) or a 1D NumPy array specifying the number of subintervals for
+each input variable.</p>
+<blockquote>
+<div><ul>
+<li><p>If a scalar, all input variables are divided into the same number of subintervals.</p></li>
+<li><p>If an array, each element specifies the number of subintervals for the
+corresponding input variable.</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>save_raw_data</strong> (<em>-</em>) – <p>Controls the amount of data returned:
+- ‘no’: Returns only the minimum and maximum output values along with the</p>
+<blockquote>
+<div><p>corresponding input values.</p>
+</div></blockquote>
+<ul>
+<li><dl class="simple">
+<dt>’yes’: Returns the above, plus the full arrays of unique input combinations</dt><dd><p>(<cite>all_input</cite>) and their corresponding output values (<cite>all_output</cite>).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>signature:</dt><dd><p>subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = ‘no’) -&gt; np.ndarray</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The function assumes that the intervals in <cite>x</cite> represent uncertainties with some
+form of distribution (not necessarily uniform) and aims to provide conservative
+bounds on the output uncertainty.</p></li>
+<li><p>The computational cost increases exponentially with the number of input variables
+and the number of subintervals per variable.</p></li>
+<li><p>If the <cite>f</cite> function returns multiple outputs, the <cite>all_output</cite> array will be 2-dimensional.</p></li>
+</ul>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><dl class="simple">
+<dt>min_candidate: 1D NumPy array containing the minimum output value(s).</dt><dd><ul>
+<li><p>max_candidate: 1D NumPy array containing the maximum output value(s).</p></li>
+<li><dl class="simple">
+<dt>x_miny: 2D NumPy array where each row represents the input values that produced</dt><dd><p>the corresponding minimum output value.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>x_maxy: 2D NumPy array where each row represents the input values that produced</dt><dd><p>the corresponding maximum output value.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>If <cite>save_raw_data == ‘yes’</cite>:</dt><dd><ul>
+<li><p>The above four arrays, plus:</p></li>
+<li><dl class="simple">
+<dt>INPUT: 2D NumPy array containing all unique combinations of input subinterval</dt><dd><p>endpoints.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>OUTPUT: 1D or 2D NumPy array containing the corresponding output values</dt><dd><p>for each input combination.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>If <cite>save_raw_data == ‘no’</cite></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>x = np.array([1, 2], [3, 4], [5, 6])
+fun = lambda x: x[0] + x[1] + x[2]
+n = 2
+miny, maxy, x_miny, x_maxy  = subinterval_method(x, fun, n, save_raw_data =’no’)
+# OR
+#miny, maxy, x_miny, x_maxy, all_input, all_output  = subinterval_method(x, fun, n, save_raw_data =’yes’)</p>
+<p>miny = array([9.])
+maxy = array([12.])
+x_miny = array([[1., 3., 5.]])
+x_maxy = array([[2., 4., 6.]]))</p>
+<p># TODO to test the code here,</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../subinterval/index.html" class="btn btn-neutral float-left" title="PyUncertainNumber.UP.subinterval" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../uncertaintyPropagation/index.html" class="btn btn-neutral float-right" title="PyUncertainNumber.UP.uncertaintyPropagation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yu Chen (Leslie).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

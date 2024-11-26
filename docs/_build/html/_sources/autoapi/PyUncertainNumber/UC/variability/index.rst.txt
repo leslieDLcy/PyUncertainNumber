@@ -1,0 +1,37 @@
+PyUncertainNumber.UC.variability
+================================
+
+.. py:module:: PyUncertainNumber.UC.variability
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PyUncertainNumber.UC.variability.Variability
+
+
+Module Contents
+---------------
+
+.. py:class:: Variability
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Generic enumeration.
+
+   Derive from this class to define new enumerations.
+
+
+   .. py:attribute:: point_estimate
+      :value: 'point estimate'
+
+
+
+   .. py:attribute:: confidence
+      :value: 'Confidence'
+
+
+

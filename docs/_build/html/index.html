@@ -6,9 +6,11 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PyUncertainNumber &mdash; py-pkgs-cookiecutter  documentation</title>
+  <title>PyUncertainNumber &mdash; PyUncertainNumber  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=eaac4085" />
 
@@ -20,6 +22,7 @@
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -35,7 +38,7 @@
           
           
           <a href="#" class="icon icon-home">
-            py-pkgs-cookiecutter
+            PyUncertainNumber
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -50,7 +53,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-guide.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference external" href="http://py-pkgs.org&gt; --">&lt;!-- Python Packages Book</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
 </ul>
 
         </div>
@@ -59,7 +62,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">py-pkgs-cookiecutter</a>
+          <a href="#">PyUncertainNumber</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -85,37 +88,46 @@
 :align: center
 ``` -->
 <br>
-<p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> is a Python function library for generic computational tasks focussing on aleatory and epistemic uncertainty, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation.</p>
+<!-- `PyUncertainNumber` is a Python function library for generic computational tasks focussing on aleatory and epistemic uncertainty, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation. -->
 </section>
+<section id="daws2">
+<h1>DAWS2<a class="headerlink" href="#daws2" title="Link to this heading"></a></h1>
+<a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
+    <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
+</a>
 <section id="id1">
-<h1>PyUncertainNumber<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h2>PyUncertainNumber<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
 <p>PyUncertainNumber is an generic computational tasks focusing on uncertainty quantification.
 It provides a research-grade computing environment for uncertainty characterisation, propagation, validation
 and uncertainty extrapolation. Four key modules comprised of the UQ ecosystem:
 Uncertainty characterisation module, Uncertainty propagation module, Uncertainty validation module and Uncertainty extrapolation module.</p>
+</section>
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> can be used to easily create a <code class="docutils literal notranslate"><span class="pre">PBox</span></code> or an <code class="docutils literal notranslate"><span class="pre">Interval</span></code> object:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PyUncertainNumber.UN</span> <span class="kn">import</span> <span class="n">UncertainNumber</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PyUncertainNumber</span> <span class="kn">import</span> <span class="n">UncertainNumber</span> <span class="k">as</span> <span class="n">UN</span>
 
-<span class="n">pbox_ex</span> <span class="o">=</span> <span class="n">UncertainNumber</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;elas_modulus&#39;</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;KPa&#39;</span><span class="p">,</span> <span class="n">essence</span><span class="o">=</span><span class="s1">&#39;distribution&#39;</span><span class="p">,</span> 
-    <span class="n">distribution_initialisation</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)]])</span>
-<span class="n">pbox_ex</span><span class="o">.</span><span class="n">_math_object</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">un</span> <span class="o">=</span> <span class="n">UN</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;elas_modulus&#39;</span><span class="p">,</span> 
+    <span class="n">symbol</span><span class="o">=</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> 
+    <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Pa&#39;</span><span class="p">,</span> 
+    <span class="n">essence</span><span class="o">=</span><span class="s1">&#39;pbox&#39;</span><span class="p">,</span> 
+    <span class="n">distribution_parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)]])</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">un</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;band&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+<!-- add some pbox plots herein -->
 </section>
 <section id="installation-of-the-development-version">
 <h2>Installation of the development version<a class="headerlink" href="#installation-of-the-development-version" title="Link to this heading"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </pre></div>
 </div>
-</section>
-<section id="contributing">
-<h2>Contributing<a class="headerlink" href="#contributing" title="Link to this heading"></a></h2>
-<p>Interested in contributing? Check out the contributing guidelines.
-Please note that this project is released with a Code of Conduct.
-By contributing to this project, you agree to abide by its terms.</p>
+<!-- ## Contributing
+
+Interested in contributing? Check out the contributing guidelines. 
+Please note that this project is released with a Code of Conduct. 
+By contributing to this project, you agree to abide by its terms. -->
 </section>
 <section id="license">
 <h2>License<a class="headerlink" href="#license" title="Link to this heading"></a></h2>
@@ -206,7 +218,7 @@ span.prompt1:before {
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Tomas Beuzen &amp; Tiffany Timbers.</p>
+    <p>&#169; Copyright 2024, Yu Chen (Leslie).</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

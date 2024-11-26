@@ -1,0 +1,348 @@
+PyUncertainNumber.pba.pbox_np
+=============================
+
+.. py:module:: PyUncertainNumber.pba.pbox_np
+
+.. autoapi-nested-parse::
+
+   re: non-parametric pbox construction
+
+   Functions that can be used to generate non-parametric p-boxes.
+   These functions are used to generate p-boxes based upon the minimum, maximum, mean, median,
+   mode, standard deviation, variance, and coefficient of variation of the variable.
+   - Leslie made many changes
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   PyUncertainNumber.pba.pbox_np.min_max
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PyUncertainNumber.pba.pbox_np.known_properties
+   PyUncertainNumber.pba.pbox_np.box
+   PyUncertainNumber.pba.pbox_np.min_max_mean
+   PyUncertainNumber.pba.pbox_np.min_mean
+   PyUncertainNumber.pba.pbox_np.mean_std
+   PyUncertainNumber.pba.pbox_np.mean_var
+   PyUncertainNumber.pba.pbox_np.pos_mean_std
+   PyUncertainNumber.pba.pbox_np.min_max_mode
+   PyUncertainNumber.pba.pbox_np.min_max_median
+   PyUncertainNumber.pba.pbox_np.min_max_median_is_mode
+   PyUncertainNumber.pba.pbox_np.symmetric_mean_std
+   PyUncertainNumber.pba.pbox_np.min_max_mean_std
+   PyUncertainNumber.pba.pbox_np.min_max_mean_var
+   PyUncertainNumber.pba.pbox_np.from_percentiles
+
+
+Module Contents
+---------------
+
+.. py:function:: known_properties(minimum: Optional[Union[PyUncertainNumber.pba.logical.Interval, float, int]] = None, maximum: Optional[Union[PyUncertainNumber.pba.logical.Interval, float, int]] = None, mean: Optional[Union[PyUncertainNumber.pba.logical.Interval, float, int]] = None, median: Optional[Union[PyUncertainNumber.pba.logical.Interval, float, int]] = None, mode: Optional[Union[PyUncertainNumber.pba.logical.Interval, float, int]] = None, std: Optional[Union[PyUncertainNumber.pba.logical.Interval, float, int]] = None, var: Optional[Union[PyUncertainNumber.pba.logical.Interval, float, int]] = None, cv: Optional[Union[PyUncertainNumber.pba.logical.Interval, float, int]] = None, percentiles: Optional[dict[Union[PyUncertainNumber.pba.logical.Interval, float, int]]] = None, debug: bool = False, steps: int = Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution free p-box based upon the information given.
+   This function works by calculating every possible non-parametric p-box that can be generated using the information provided.
+   The returned p-box is the intersection of these p-boxes.
+
+   **Parameters**:
+
+       ``minimum``: Minimum value of the variable
+       ``maximum``: Maximum value of the variable
+       ``mean``: Mean value of the variable
+       ``median``: Median value of the variable
+       ``mode``: Mode value of the variable
+       ``std``: Standard deviation of the variable
+       ``var``: Variance of the variable
+       ``cv``: Coefficient of variation of the variable
+       ``percentiles``: Dictionary of percentiles and their values (e.g. {0.1: 1, 0.5: 2, 0.9: Interval(3,4)})
+       ``steps``: Number of steps to use in the p-box
+
+   .. error::
+
+       ``ValueError``: If any of the arguments are not consistent with each other. (i.e. if ``std`` and ``var`` are both given, but ``std != sqrt(var)``)
+
+   **Returns**:
+
+       ``Pbox``: Imposition of possible p-boxes
+
+
+.. py:function:: box(a: Union[PyUncertainNumber.pba.logical.Interval, float, int], b: Union[PyUncertainNumber.pba.logical.Interval, float, int] = None, steps=Pbox.STEPS, shape='box') -> PyUncertainNumber.pba.logical.Pbox
+
+   Returns a box shaped Pbox. This is equivalent to an Interval expressed as a Pbox.
+
+   **Parameters**:
+
+       ``a`` : Left side of box
+       ``b``: Right side of box
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:data:: min_max
+
+.. py:function:: min_max_mean(minimum: Union[PyUncertainNumber.pba.logical.Interval, float, int], maximum: Union[PyUncertainNumber.pba.logical.Interval, float, int], mean: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps: int = Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum and mean of the variable
+
+   **Parameters**:
+
+       ``minimum`` : minimum value of the variable
+
+       ``maximum`` : maximum value of the variable
+
+       ``mean`` : mean value of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+.. py:function:: min_mean(minimum: Union[PyUncertainNumber.pba.logical.Interval, float, int], mean: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps=Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution-free p-box based upon the minimum and mean of the variable
+
+   **Parameters**:
+
+       ``minimum`` : minimum value of the variable
+
+       ``mean`` : mean value of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+.. py:function:: mean_std(mean: Union[PyUncertainNumber.pba.logical.Interval, float, int], std: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps=Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution-free p-box based upon the mean and standard deviation of the variable
+
+   **Parameters**:
+
+       ``mean`` : mean of the variable
+
+       ``std`` : standard deviation of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: mean_var(mean: Union[PyUncertainNumber.pba.logical.Interval, float, int], var: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps=Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution-free p-box based upon the mean and variance of the variable
+
+   Equivalent to `mean_std(mean,np.sqrt(var))`
+
+   **Parameters**:
+
+       ``mean`` : mean of the variable
+
+       ``var`` : variance of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: pos_mean_std(mean: Union[PyUncertainNumber.pba.logical.Interval, float, int], std: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps=Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a positive distribution-free p-box based upon the mean and standard deviation of the variable
+
+   **Parameters**:
+
+       ``mean`` : mean of the variable
+
+       ``std`` : standard deviation of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: min_max_mode(minimum: Union[PyUncertainNumber.pba.logical.Interval, float, int], maximum: Union[PyUncertainNumber.pba.logical.Interval, float, int], mode: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps: int = Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum, and mode of the variable
+
+   **Parameters**:
+
+       ``minimum`` : minimum value of the variable
+
+       ``maximum`` : maximum value of the variable
+
+       ``mode`` : mode value of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: min_max_median(minimum: Union[PyUncertainNumber.pba.logical.Interval, float, int], maximum: Union[PyUncertainNumber.pba.logical.Interval, float, int], median: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps: int = Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum and median of the variable
+
+   **Parameters**:
+
+       ``minimum`` : minimum value of the variable
+
+       ``maximum`` : maximum value of the variable
+
+       ``median`` : median value of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: min_max_median_is_mode(minimum: Union[PyUncertainNumber.pba.logical.Interval, float, int], maximum: Union[PyUncertainNumber.pba.logical.Interval, float, int], m: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps: int = Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum and median/mode of the variable when median = mode.
+
+   **Parameters**:
+
+       ``minimum`` : minimum value of the variable
+
+       ``maximum`` : maximum value of the variable
+
+       ``m`` : m = median = mode value of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: symmetric_mean_std(mean: Union[PyUncertainNumber.pba.logical.Interval, float, int], std: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps: int = Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a symmetrix distribution-free p-box based upon the mean and standard deviation of the variable
+
+   **Parameters**:
+
+   ``mean`` :  mean value of the variable
+   ``std`` : standard deviation of the variable
+
+   **Returns**
+
+       ``Pbox``
+
+
+
+.. py:function:: min_max_mean_std(minimum: Union[PyUncertainNumber.pba.logical.Interval, float, int], maximum: Union[PyUncertainNumber.pba.logical.Interval, float, int], mean: Union[PyUncertainNumber.pba.logical.Interval, float, int], std: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps: int = Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
+
+   **Parameters**
+
+       ``minimum`` : minimum value of the variable
+       ``maximum`` : maximum value of the variable
+       ``mean`` : mean value of the variable
+       ``std`` :standard deviation of the variable
+
+   **Returns**
+
+       ``Pbox``
+
+   .. seealso::
+
+       :func:`min_max_mean_var`
+
+
+
+.. py:function:: min_max_mean_var(minimum: Union[PyUncertainNumber.pba.logical.Interval, float, int], maximum: Union[PyUncertainNumber.pba.logical.Interval, float, int], mean: Union[PyUncertainNumber.pba.logical.Interval, float, int], var: Union[PyUncertainNumber.pba.logical.Interval, float, int], steps: int = Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
+
+   **Parameters**
+
+       ``minimum`` : minimum value of the variable
+       ``maximum`` : maximum value of the variable
+       ``mean`` : mean value of the variable
+       ``var`` :variance of the variable
+
+   **Returns**
+
+       ``Pbox``
+
+
+   .. admonition:: Implementation
+
+       Equivalent to ``min_max_mean_std(minimum,maximum,mean,np.sqrt(var))``
+
+   .. seealso::
+
+       :func:`min_max_mean_std`
+
+
+
+.. py:function:: from_percentiles(percentiles: dict, steps: int = Pbox.STEPS) -> PyUncertainNumber.pba.logical.Pbox
+
+   Generates a distribution-free p-box based upon percentiles of the variable
+
+   **Parameters**
+
+       ``percentiles`` : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: Interval(3,4), 1:5})
+
+       ``steps`` : number of steps to use in the p-box
+
+   .. important::
+
+       The percentiles dictionary is of the form {percentile: value}. Where value can either be a number or an Interval. If value is a number, the percentile is assumed to be a point percentile. If value is an Interval, the percentile is assumed to be an interval percentile.
+
+   .. warning::
+
+       If no keys for 0 and 1 are given, ``-np.inf`` and ``np.inf`` are used respectively. This will result in a p-box that is not bounded and raise a warning.
+
+       If the percentiles are not increasing, the percentiles will be intersected. This may not be desired behaviour.
+
+   .. error::
+
+       ``ValueError``: If any of the percentiles are not between 0 and 1.
+
+   **Returns**
+
+       ``Pbox``
+
+
+   **Example**:
+
+   .. code-block:: python
+
+       pba.from_percentiles(
+           {0: 0,
+           0.25: 0.5,
+           0.5: pba.I(1,2),
+           0.75: pba.I(1.5,2.5),
+           1: 3}
+       ).show()
+
+   .. image:: https://github.com/Institute-for-Risk-and-Uncertainty/pba-for-python/blob/master/docs/images/from_percentiles.png?raw=true
+       :scale: 35 %
+       :align: center
+       :alt: Pbox generated from percentiles
+
+
+

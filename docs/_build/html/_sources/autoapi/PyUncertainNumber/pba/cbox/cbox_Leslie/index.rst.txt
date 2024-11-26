@@ -1,0 +1,58 @@
+PyUncertainNumber.pba.cbox.cbox_Leslie
+======================================
+
+.. py:module:: PyUncertainNumber.pba.cbox.cbox_Leslie
+
+.. autoapi-nested-parse::
+
+   a Cbox constructor by Leslie
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PyUncertainNumber.pba.cbox.cbox_Leslie.Cbox
+
+
+Module Contents
+---------------
+
+.. py:class:: Cbox(*args, bound_params=None, **kwargs)
+
+   Bases: :py:obj:`PyUncertainNumber.pba.pbox_base.Pbox`
+
+
+   Confidence boxes (c-boxes) are imprecise generalisations of traditional confidence distributions
+
+   They have a different interpretation to p-boxes but rely on the same underlying mathematics.
+   As such in pba-for-python c-boxes inhert most of their methods from Pbox.
+
+   :param Pbox: _description_
+   :type Pbox: _type_
+
+
+   .. py:attribute:: bound_params
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: display(parameter_name=None, **kwargs)
+
+      quickly plot the pba object
+
+      # !Leslie defined plotting function
+
+
+
+   .. py:method:: from_cd()
+      :classmethod:
+
+
+      constructor from a confidence distribution
+
+
+

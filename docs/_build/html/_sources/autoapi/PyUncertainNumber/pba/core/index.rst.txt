@@ -1,0 +1,99 @@
+PyUncertainNumber.pba.core
+==========================
+
+.. py:module:: PyUncertainNumber.pba.core
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PyUncertainNumber.pba.core.envelope
+   PyUncertainNumber.pba.core.env
+   PyUncertainNumber.pba.core.sum
+   PyUncertainNumber.pba.core.mean
+   PyUncertainNumber.pba.core.mul
+   PyUncertainNumber.pba.core.sqrt
+
+
+Module Contents
+---------------
+
+.. py:function:: envelope(*args: PyUncertainNumber.pba.interval.Union[PyUncertainNumber.pba.interval.Interval, PyUncertainNumber.pba.cbox.cbox_Nick.Pbox, float]) -> PyUncertainNumber.pba.interval.Union[PyUncertainNumber.pba.interval.Interval, PyUncertainNumber.pba.cbox.cbox_Nick.Pbox]
+
+   .. _core.envelope:
+
+   Allows the envelope to be calculated for intervals and p-boxes.
+
+   The envelope is the smallest interval/pbox that contains all values within the arguments.
+
+   **Parameters**:
+       ``*args``: The arguments for which the envelope needs to be calculated. The arguments can be intervals, p-boxes, or floats.
+
+   **Returns**:
+       ``Pbox|Interval``: The envelope of the given arguments, which can be an interval or a p-box.
+
+   .. error::
+
+       ``ValueError``: If less than two arguments are given.
+
+       ``TypeError``: If none of the arguments are intervals or p-boxes.
+
+
+
+.. py:function:: env(*args)
+
+   .. warning::
+
+       Deprecated function, use envelope() instead.
+
+
+
+.. py:function:: sum(*args: PyUncertainNumber.pba.interval.Union[list, tuple], method='f')
+
+   Allows the sum to be calculated for intervals and p-boxes
+
+   **Parameters**:
+
+       ``*args``: pboxes or intervals
+       ``method`` (``f,i,o,p``): addition method to be used
+
+   **Returns**:
+
+       ``Interval | Pbox``: sum of interval or pbox objects within ``*args``
+
+   .. note::
+
+       If a list or tuple is given as the first argument, the elements of the list or tuple are used as arguments.
+       If only one (non-list) argument is given, the argument is returned.
+
+
+
+
+.. py:function:: mean(*args: PyUncertainNumber.pba.interval.Union[list, tuple], method='f')
+
+   Allows the mean to be calculated for intervals and p-boxes
+
+   **Parameters**:
+
+       l : list of pboxes or intervals
+
+       method : pbox addition method to be used
+
+   **Output**:
+
+        ``Interval | Pbox``: mean of interval or pbox objects within ``*args``
+
+   .. important::
+
+       Implemented as
+
+       >>> pba.sum(*args,method = method)/len(args)
+
+
+
+.. py:function:: mul(*args, method=None)
+
+.. py:function:: sqrt(a)
+

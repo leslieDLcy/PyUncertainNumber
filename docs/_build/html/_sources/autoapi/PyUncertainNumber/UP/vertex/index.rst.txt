@@ -1,0 +1,76 @@
+PyUncertainNumber.UP.vertex
+===========================
+
+.. py:module:: PyUncertainNumber.UP.vertex
+
+.. autoapi-nested-parse::
+
+   Created on Wed Jul 17 10:51:46 2024
+
+   I have created the first UP method: the vertex propagation.  It works for a list of intervals as input .  It produces three .csv files as output. It will not fail if  there the function yields NA.
+
+   @author: ioanna, Leslie
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PyUncertainNumber.UP.vertex.header_results
+   PyUncertainNumber.UP.vertex.Upper_lower_values_with_input
+   PyUncertainNumber.UP.vertex.NA_values_with_input
+   PyUncertainNumber.UP.vertex.create_csv
+   PyUncertainNumber.UP.vertex.create_folder
+   PyUncertainNumber.UP.vertex.listit
+   PyUncertainNumber.UP.vertex.BB_results
+   PyUncertainNumber.UP.vertex.vertexMethod
+
+
+Module Contents
+---------------
+
+.. py:function:: header_results(OUTPUT, INPUT)
+
+.. py:function:: Upper_lower_values_with_input(df_OUTPUT_INPUT, i)
+
+.. py:function:: NA_values_with_input(df_OUTPUT_INPUT, header, res_path)
+
+.. py:function:: create_csv(res_path, filename, data, header)
+
+.. py:function:: create_folder(base_path, method)
+
+.. py:function:: listit(t)
+
+.. py:function:: BB_results(df_OUTPUT_INPUT, res_path)
+
+.. py:function:: vertexMethod(x, fun)
+
+   the vertex method for uncertainty propagation
+
+   :param - intervals: list of lists, the intervals for each input variable
+   :param - x: np.ndarray, the transformed nd.array for each input variable such as (5, 2)
+   :param - fun: function, the performance function to be propagated
+
+   signature:
+       vertexMethod(intervals: List[List[float]], fun: Callable) -> pd.DataFrame
+
+   .. note::
+
+      - the augument `intervals` will specify the list of input intervals while the
+      - arguement `fun` will specify the function mapping of variables to be propagated.
+
+   :rtype: - pd.DataFrame
+
+   .. rubric:: Example
+
+   x = [[1, 2], [3, 4], [5, 6]]
+   fun = lambda x: x[0] + x[1] + x[2]
+   y = vertexMethod(x, fun)
+
+   # TODO post-process the df into UN objects ...
+   # units ...
+   # fields: None...
+
+

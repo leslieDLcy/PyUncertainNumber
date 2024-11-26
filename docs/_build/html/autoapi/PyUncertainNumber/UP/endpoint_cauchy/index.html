@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PyUncertainNumber.UP.endpoint_cauchy &mdash; PyUncertainNumber  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=eaac4085" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="PyUncertainNumber.UP.endpoints" href="../endpoints/index.html" />
+    <link rel="prev" title="PyUncertainNumber.UP.endpoint" href="../endpoint/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            PyUncertainNumber
+              <img src="../../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">PyUncertainNumber</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../NLP_constructor/index.html">PyUncertainNumber.NLP_constructor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../UC/index.html">PyUncertainNumber.UC</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">PyUncertainNumber.UP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../UV/index.html">PyUncertainNumber.UV</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/index.html">PyUncertainNumber.pba</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#package-contents">Package Contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">PyUncertainNumber</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">PyUncertainNumber</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">PyUncertainNumber.UP</a></li>
+      <li class="breadcrumb-item active">PyUncertainNumber.UP.endpoint_cauchy</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/PyUncertainNumber/UP/endpoint_cauchy/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-PyUncertainNumber.UP.endpoint_cauchy">
+<span id="pyuncertainnumber-up-endpoint-cauchy"></span><h1>PyUncertainNumber.UP.endpoint_cauchy<a class="headerlink" href="#module-PyUncertainNumber.UP.endpoint_cauchy" title="Link to this heading"></a></h1>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.UP.endpoint_cauchy.f" title="PyUncertainNumber.UP.endpoint_cauchy.f"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.UP.endpoint_cauchy.x_bounds" title="PyUncertainNumber.UP.endpoint_cauchy.x_bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x_bounds</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.UP.endpoint_cauchy.n" title="PyUncertainNumber.UP.endpoint_cauchy.n"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.UP.endpoint_cauchy.y" title="PyUncertainNumber.UP.endpoint_cauchy.y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.UP.endpoint_cauchy.cauchydeviate_method" title="PyUncertainNumber.UP.endpoint_cauchy.cauchydeviate_method"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cauchydeviate_method</span></code></a>(x, f, n[, save_raw_data])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.UP.endpoint_cauchy.cauchydeviate_method">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.UP.endpoint_cauchy.</span></span><span class="sig-name descname"><span class="pre">cauchydeviate_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_raw_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'no'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.UP.endpoint_cauchy.cauchydeviate_method" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – A 2D NumPy array representing the intervals for each input variable.
+Each row should contain two elements: the lower and upper bounds of the interval.</p></li>
+<li><p><strong>f</strong> (<em>Callable</em>) – A callable function that takes a 1D NumPy array of input values
+and returns a single output value or an array of output values.
+Can be None, in which case only the Cauchy deviates (x) and the
+maximum Cauchy deviate (K) are returned.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – The number of samples (Cauchy deviates) to generate for each input variable.</p></li>
+<li><p><strong>save_raw_data</strong> (<em>str</em><em>, </em><em>optional</em>) – Whether to save raw data. Defaults to ‘no’.
+Currently not supported by this method.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>signature:</dt><dd><p>cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data=’no’) -&gt; dict</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>This method propagates intervals through a balck box model with the endpoint Cauchy deviate method.</p></li>
+<li><p>It is an approximate method, so the user should expect non-identical results for different runs.</p></li>
+</ul>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A dictionary containing the results:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>’min’: A dictionary for lower bound results (if f is not None)</dt><dd><ul>
+<li><p>’f’: Minimum output value(s).</p></li>
+<li><p>’x’: None (as input values corresponding to min/max are not tracked in this method).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’max’:  A dictionary for upper bound results (if f is not None)</dt><dd><ul>
+<li><p>’f’: Maximum output value(s).</p></li>
+<li><p>’x’: None (as input values corresponding to min/max are not tracked in this method).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’raw_data’: A dictionary containing raw data (if f is None):</dt><dd><ul>
+<li><p>’x’: Cauchy deviates (x).</p></li>
+<li><p>’K’: Maximum Cauchy deviate (K).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.UP.endpoint_cauchy.f">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.UP.endpoint_cauchy.</span></span><span class="sig-name descname"><span class="pre">f</span></span><a class="headerlink" href="#PyUncertainNumber.UP.endpoint_cauchy.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.UP.endpoint_cauchy.x_bounds">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.UP.endpoint_cauchy.</span></span><span class="sig-name descname"><span class="pre">x_bounds</span></span><a class="headerlink" href="#PyUncertainNumber.UP.endpoint_cauchy.x_bounds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.UP.endpoint_cauchy.n">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.UP.endpoint_cauchy.</span></span><span class="sig-name descname"><span class="pre">n</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></em><a class="headerlink" href="#PyUncertainNumber.UP.endpoint_cauchy.n" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.UP.endpoint_cauchy.y">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.UP.endpoint_cauchy.</span></span><span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#PyUncertainNumber.UP.endpoint_cauchy.y" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../endpoint/index.html" class="btn btn-neutral float-left" title="PyUncertainNumber.UP.endpoint" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../endpoints/index.html" class="btn btn-neutral float-right" title="PyUncertainNumber.UP.endpoints" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yu Chen (Leslie).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

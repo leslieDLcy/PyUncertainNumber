@@ -1,0 +1,11 @@
+PyUncertainNumber.UC.characterisation
+=====================================
+
+.. py:module:: PyUncertainNumber.UC.characterisation
+
+.. autoapi-nested-parse::
+
+   a temp place for characterisation functions
+
+
+

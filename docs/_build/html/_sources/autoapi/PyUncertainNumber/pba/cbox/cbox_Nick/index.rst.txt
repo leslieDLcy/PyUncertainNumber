@@ -1,0 +1,84 @@
+PyUncertainNumber.pba.cbox.cbox_Nick
+====================================
+
+.. py:module:: PyUncertainNumber.pba.cbox.cbox_Nick
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PyUncertainNumber.pba.cbox.cbox_Nick.Cbox
+
+
+Module Contents
+---------------
+
+.. py:class:: Cbox(*args, **kwargs)
+
+   Bases: :py:obj:`PyUncertainNumber.pba.pbox_base.Pbox`
+
+
+   Confidence boxes (c-boxes) are imprecise generalisations of traditional confidence distributions
+
+   They have a different interpretation to p-boxes but rely on the same underlying mathematics.
+   As such in pba-for-python c-boxes inhert most of their methods from Pbox.
+
+   :param Pbox: _description_
+   :type Pbox: _type_
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:attribute:: __str__
+
+
+   .. py:method:: __add__(other)
+
+
+   .. py:method:: __radd__(other)
+
+
+   .. py:method:: add(other, method='f')
+
+      Adds to Pbox to other using the defined dependency method
+
+
+
+
+
+   .. py:method:: __sub__(other)
+
+
+   .. py:method:: __rsub__(other)
+
+
+   .. py:method:: sub(other, method='f')
+
+
+   .. py:method:: __mul__(other)
+
+
+   .. py:method:: __rmul__(other)
+
+
+   .. py:method:: mul(other, method='f')
+
+
+   .. py:method:: __truediv__(other)
+
+
+   .. py:method:: __rtruediv__(other)
+
+
+   .. py:method:: div(other, method='f')
+
+
+   .. py:method:: __neg__()
+
+
+   .. py:method:: recip()
+
+

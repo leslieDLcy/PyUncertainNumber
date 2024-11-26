@@ -1,0 +1,482 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PyUncertainNumber.pba.pbox_np &mdash; PyUncertainNumber  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=eaac4085" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="PyUncertainNumber.pba.pbox_parametric" href="../pbox_parametric/index.html" />
+    <link rel="prev" title="PyUncertainNumber.pba.pbox_base" href="../pbox_base/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            PyUncertainNumber
+              <img src="../../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">PyUncertainNumber</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../NLP_constructor/index.html">PyUncertainNumber.NLP_constructor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../UC/index.html">PyUncertainNumber.UC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../UP/index.html">PyUncertainNumber.UP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../UV/index.html">PyUncertainNumber.UV</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">PyUncertainNumber.pba</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#package-contents">Package Contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">PyUncertainNumber</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">PyUncertainNumber</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">PyUncertainNumber.pba</a></li>
+      <li class="breadcrumb-item active">PyUncertainNumber.pba.pbox_np</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/PyUncertainNumber/pba/pbox_np/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-PyUncertainNumber.pba.pbox_np">
+<span id="pyuncertainnumber-pba-pbox-np"></span><h1>PyUncertainNumber.pba.pbox_np<a class="headerlink" href="#module-PyUncertainNumber.pba.pbox_np" title="Link to this heading"></a></h1>
+<p>re: non-parametric pbox construction</p>
+<p>Functions that can be used to generate non-parametric p-boxes.
+These functions are used to generate p-boxes based upon the minimum, maximum, mean, median,
+mode, standard deviation, variance, and coefficient of variation of the variable.
+- Leslie made many changes</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.min_max" title="PyUncertainNumber.pba.pbox_np.min_max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_max</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.known_properties" title="PyUncertainNumber.pba.pbox_np.known_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">known_properties</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a distribution free p-box based upon the information given.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.box" title="PyUncertainNumber.pba.pbox_np.box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">box</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Returns a box shaped Pbox. This is equivalent to an Interval expressed as a Pbox.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.min_max_mean" title="PyUncertainNumber.pba.pbox_np.min_max_mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_max_mean</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a distribution-free p-box based upon the minimum, maximum and mean of the variable</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.min_mean" title="PyUncertainNumber.pba.pbox_np.min_mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_mean</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a distribution-free p-box based upon the minimum and mean of the variable</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.mean_std" title="PyUncertainNumber.pba.pbox_np.mean_std"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_std</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a distribution-free p-box based upon the mean and standard deviation of the variable</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.mean_var" title="PyUncertainNumber.pba.pbox_np.mean_var"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_var</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a distribution-free p-box based upon the mean and variance of the variable</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.pos_mean_std" title="PyUncertainNumber.pba.pbox_np.pos_mean_std"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos_mean_std</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a positive distribution-free p-box based upon the mean and standard deviation of the variable</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.min_max_mode" title="PyUncertainNumber.pba.pbox_np.min_max_mode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_max_mode</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a distribution-free p-box based upon the minimum, maximum, and mode of the variable</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.min_max_median" title="PyUncertainNumber.pba.pbox_np.min_max_median"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_max_median</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a distribution-free p-box based upon the minimum, maximum and median of the variable</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.min_max_median_is_mode" title="PyUncertainNumber.pba.pbox_np.min_max_median_is_mode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_max_median_is_mode</span></code></a>(...)</p></td>
+<td><p>Generates a distribution-free p-box based upon the minimum, maximum and median/mode of the variable when median = mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.symmetric_mean_std" title="PyUncertainNumber.pba.pbox_np.symmetric_mean_std"><code class="xref py py-obj docutils literal notranslate"><span class="pre">symmetric_mean_std</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a symmetrix distribution-free p-box based upon the mean and standard deviation of the variable</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.min_max_mean_std" title="PyUncertainNumber.pba.pbox_np.min_max_mean_std"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_max_mean_std</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.min_max_mean_var" title="PyUncertainNumber.pba.pbox_np.min_max_mean_var"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_max_mean_var</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.from_percentiles" title="PyUncertainNumber.pba.pbox_np.from_percentiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_percentiles</span></code></a>(→ PyUncertainNumber.pba.logical.Pbox)</p></td>
+<td><p>Generates a distribution-free p-box based upon percentiles of the variable</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.known_properties">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">known_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.known_properties" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution free p-box based upon the information given.
+This function works by calculating every possible non-parametric p-box that can be generated using the information provided.
+The returned p-box is the intersection of these p-boxes.</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">minimum</span></code>: Minimum value of the variable
+<code class="docutils literal notranslate"><span class="pre">maximum</span></code>: Maximum value of the variable
+<code class="docutils literal notranslate"><span class="pre">mean</span></code>: Mean value of the variable
+<code class="docutils literal notranslate"><span class="pre">median</span></code>: Median value of the variable
+<code class="docutils literal notranslate"><span class="pre">mode</span></code>: Mode value of the variable
+<code class="docutils literal notranslate"><span class="pre">std</span></code>: Standard deviation of the variable
+<code class="docutils literal notranslate"><span class="pre">var</span></code>: Variance of the variable
+<code class="docutils literal notranslate"><span class="pre">cv</span></code>: Coefficient of variation of the variable
+<code class="docutils literal notranslate"><span class="pre">percentiles</span></code>: Dictionary of percentiles and their values (e.g. {0.1: 1, 0.5: 2, 0.9: Interval(3,4)})
+<code class="docutils literal notranslate"><span class="pre">steps</span></code>: Number of steps to use in the p-box</p>
+</div></blockquote>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p><code class="docutils literal notranslate"><span class="pre">ValueError</span></code>: If any of the arguments are not consistent with each other. (i.e. if <code class="docutils literal notranslate"><span class="pre">std</span></code> and <code class="docutils literal notranslate"><span class="pre">var</span></code> are both given, but <code class="docutils literal notranslate"><span class="pre">std</span> <span class="pre">!=</span> <span class="pre">sqrt(var)</span></code>)</p>
+</div>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code>: Imposition of possible p-boxes</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.box">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'box'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.box" title="Link to this definition"></a></dt>
+<dd><p>Returns a box shaped Pbox. This is equivalent to an Interval expressed as a Pbox.</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">a</span></code> : Left side of box
+<code class="docutils literal notranslate"><span class="pre">b</span></code>: Right side of box</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.min_max">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">min_max</span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.min_max" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.min_max_mean">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">min_max_mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.min_max_mean" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution-free p-box based upon the minimum, maximum and mean of the variable</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">minimum</span></code> : minimum value of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">maximum</span></code> : maximum value of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">mean</span></code> : mean value of the variable</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.min_mean">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">min_mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.min_mean" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution-free p-box based upon the minimum and mean of the variable</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">minimum</span></code> : minimum value of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">mean</span></code> : mean value of the variable</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.mean_std">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">mean_std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.mean_std" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution-free p-box based upon the mean and standard deviation of the variable</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">mean</span></code> : mean of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">std</span></code> : standard deviation of the variable</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.mean_var">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">mean_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.mean_var" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution-free p-box based upon the mean and variance of the variable</p>
+<p>Equivalent to <cite>mean_std(mean,np.sqrt(var))</cite></p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">mean</span></code> : mean of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">var</span></code> : variance of the variable</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.pos_mean_std">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">pos_mean_std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.pos_mean_std" title="Link to this definition"></a></dt>
+<dd><p>Generates a positive distribution-free p-box based upon the mean and standard deviation of the variable</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">mean</span></code> : mean of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">std</span></code> : standard deviation of the variable</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.min_max_mode">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">min_max_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.min_max_mode" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution-free p-box based upon the minimum, maximum, and mode of the variable</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">minimum</span></code> : minimum value of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">maximum</span></code> : maximum value of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">mode</span></code> : mode value of the variable</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.min_max_median">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">min_max_median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.min_max_median" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution-free p-box based upon the minimum, maximum and median of the variable</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">minimum</span></code> : minimum value of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">maximum</span></code> : maximum value of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">median</span></code> : median value of the variable</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.min_max_median_is_mode">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">min_max_median_is_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.min_max_median_is_mode" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution-free p-box based upon the minimum, maximum and median/mode of the variable when median = mode.</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">minimum</span></code> : minimum value of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">maximum</span></code> : maximum value of the variable</p>
+<p><code class="docutils literal notranslate"><span class="pre">m</span></code> : m = median = mode value of the variable</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.symmetric_mean_std">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">symmetric_mean_std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.symmetric_mean_std" title="Link to this definition"></a></dt>
+<dd><p>Generates a symmetrix distribution-free p-box based upon the mean and standard deviation of the variable</p>
+<p><strong>Parameters</strong>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">mean</span></code> :  mean value of the variable
+<code class="docutils literal notranslate"><span class="pre">std</span></code> : standard deviation of the variable</p>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.min_max_mean_std">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">min_max_mean_std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.min_max_mean_std" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable</p>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">minimum</span></code> : minimum value of the variable
+<code class="docutils literal notranslate"><span class="pre">maximum</span></code> : maximum value of the variable
+<code class="docutils literal notranslate"><span class="pre">mean</span></code> : mean value of the variable
+<code class="docutils literal notranslate"><span class="pre">std</span></code> :standard deviation of the variable</p>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.min_max_mean_var" title="PyUncertainNumber.pba.pbox_np.min_max_mean_var"><code class="xref py py-func docutils literal notranslate"><span class="pre">min_max_mean_var()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.min_max_mean_var">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">min_max_mean_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PyUncertainNumber.pba.logical.Interval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.min_max_mean_var" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable</p>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">minimum</span></code> : minimum value of the variable
+<code class="docutils literal notranslate"><span class="pre">maximum</span></code> : maximum value of the variable
+<code class="docutils literal notranslate"><span class="pre">mean</span></code> : mean value of the variable
+<code class="docutils literal notranslate"><span class="pre">var</span></code> :variance of the variable</p>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+<div class="admonition-implementation admonition">
+<p class="admonition-title">Implementation</p>
+<p>Equivalent to <code class="docutils literal notranslate"><span class="pre">min_max_mean_std(minimum,maximum,mean,np.sqrt(var))</span></code></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#PyUncertainNumber.pba.pbox_np.min_max_mean_std" title="PyUncertainNumber.pba.pbox_np.min_max_mean_std"><code class="xref py py-func docutils literal notranslate"><span class="pre">min_max_mean_std()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.pbox_np.from_percentiles">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.pbox_np.</span></span><span class="sig-name descname"><span class="pre">from_percentiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percentiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PyUncertainNumber.pba.logical.Pbox</span></span></span><a class="headerlink" href="#PyUncertainNumber.pba.pbox_np.from_percentiles" title="Link to this definition"></a></dt>
+<dd><p>Generates a distribution-free p-box based upon percentiles of the variable</p>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">percentiles</span></code> : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: Interval(3,4), 1:5})</p>
+<p><code class="docutils literal notranslate"><span class="pre">steps</span></code> : number of steps to use in the p-box</p>
+</div></blockquote>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The percentiles dictionary is of the form {percentile: value}. Where value can either be a number or an Interval. If value is a number, the percentile is assumed to be a point percentile. If value is an Interval, the percentile is assumed to be an interval percentile.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If no keys for 0 and 1 are given, <code class="docutils literal notranslate"><span class="pre">-np.inf</span></code> and <code class="docutils literal notranslate"><span class="pre">np.inf</span></code> are used respectively. This will result in a p-box that is not bounded and raise a warning.</p>
+<p>If the percentiles are not increasing, the percentiles will be intersected. This may not be desired behaviour.</p>
+</div>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p><code class="docutils literal notranslate"><span class="pre">ValueError</span></code>: If any of the percentiles are not between 0 and 1.</p>
+</div>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Pbox</span></code></p>
+</div></blockquote>
+<p><strong>Example</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pba</span><span class="o">.</span><span class="n">from_percentiles</span><span class="p">(</span>
+    <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mf">0.25</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="mf">0.5</span><span class="p">:</span> <span class="n">pba</span><span class="o">.</span><span class="n">I</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+    <span class="mf">0.75</span><span class="p">:</span> <span class="n">pba</span><span class="o">.</span><span class="n">I</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">),</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+<span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="https://github.com/Institute-for-Risk-and-Uncertainty/pba-for-python/blob/master/docs/images/from_percentiles.png?raw=true"><img alt="Pbox generated from percentiles" class="align-center" src="https://github.com/Institute-for-Risk-and-Uncertainty/pba-for-python/blob/master/docs/images/from_percentiles.png?raw=true" />
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">/Users/lesliec/Documents/Github_repos/PyUncertainNumber/docs/source/autoapi/PyUncertainNumber/pba/pbox_np/index.rst</span>, line 342)</p>
+<p>Cannot scale image!
+  Could not get size from &quot;https://github.com/Institute-for-Risk-and-Uncertainty/pba-for-python/blob/master/docs/images/from_percentiles.png?raw=true&quot;:
+  Can only read local images.</p>
+</aside>
+</a>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../pbox_base/index.html" class="btn btn-neutral float-left" title="PyUncertainNumber.pba.pbox_base" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../pbox_parametric/index.html" class="btn btn-neutral float-right" title="PyUncertainNumber.pba.pbox_parametric" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yu Chen (Leslie).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

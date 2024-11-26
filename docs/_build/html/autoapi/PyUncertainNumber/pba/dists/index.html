@@ -1,0 +1,1163 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PyUncertainNumber.pba.dists &mdash; PyUncertainNumber  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=eaac4085" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="PyUncertainNumber.pba.interval" href="../interval/index.html" />
+    <link rel="prev" title="PyUncertainNumber.pba.core" href="../core/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            PyUncertainNumber
+              <img src="../../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">PyUncertainNumber</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../NLP_constructor/index.html">PyUncertainNumber.NLP_constructor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../UC/index.html">PyUncertainNumber.UC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../UP/index.html">PyUncertainNumber.UP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../UV/index.html">PyUncertainNumber.UV</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">PyUncertainNumber.pba</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#package-contents">Package Contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">PyUncertainNumber</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">PyUncertainNumber</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">PyUncertainNumber.pba</a></li>
+      <li class="breadcrumb-item active">PyUncertainNumber.pba.dists</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/PyUncertainNumber/pba/dists/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-PyUncertainNumber.pba.dists">
+<span id="pyuncertainnumber-pba-dists"></span><h1>PyUncertainNumber.pba.dists<a class="headerlink" href="#module-PyUncertainNumber.pba.dists" title="Link to this heading"></a></h1>
+<p>Deprecated as the all the codes herein are already moved to pbox.py
+Kept for backward compatibility;
+Construct a pbox from the specification of distributional parameters in the form of intervals.
+In short, distribution-based p-boxes or parametric pboxes</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.dists" title="PyUncertainNumber.pba.dists.dists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dists</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.named_pbox" title="PyUncertainNumber.pba.dists.named_pbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">named_pbox</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.normal" title="PyUncertainNumber.pba.dists.normal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.N" title="PyUncertainNumber.pba.dists.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.unif" title="PyUncertainNumber.pba.dists.unif"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unif</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.U" title="PyUncertainNumber.pba.dists.U"><code class="xref py py-obj docutils literal notranslate"><span class="pre">U</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.lognorm" title="PyUncertainNumber.pba.dists.lognorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lognorm</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.__get_bounds" title="PyUncertainNumber.pba.dists.__get_bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__get_bounds</span></code></a>([function_name, steps])</p></td>
+<td><p>heavy lifting function that returns the bounds of the distribution for defining pboxes</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.lognormal" title="PyUncertainNumber.pba.dists.lognormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lognormal</span></code></a>(mean, var[, steps])</p></td>
+<td><p>Creates a p-box for the lognormal distribution</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.alpha" title="PyUncertainNumber.pba.dists.alpha"><code class="xref py py-obj docutils literal notranslate"><span class="pre">alpha</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.anglit" title="PyUncertainNumber.pba.dists.anglit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anglit</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.arcsine" title="PyUncertainNumber.pba.dists.arcsine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">arcsine</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.argus" title="PyUncertainNumber.pba.dists.argus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">argus</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.beta" title="PyUncertainNumber.pba.dists.beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beta</span></code></a>(*args[, steps])</p></td>
+<td><p>Beta distribution</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.betaprime" title="PyUncertainNumber.pba.dists.betaprime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">betaprime</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.bradford" title="PyUncertainNumber.pba.dists.bradford"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bradford</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.burr" title="PyUncertainNumber.pba.dists.burr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">burr</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.burr12" title="PyUncertainNumber.pba.dists.burr12"><code class="xref py py-obj docutils literal notranslate"><span class="pre">burr12</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.cauchy" title="PyUncertainNumber.pba.dists.cauchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cauchy</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.chi" title="PyUncertainNumber.pba.dists.chi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chi</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.chi2" title="PyUncertainNumber.pba.dists.chi2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chi2</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.cosine" title="PyUncertainNumber.pba.dists.cosine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cosine</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.crystalball" title="PyUncertainNumber.pba.dists.crystalball"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crystalball</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.dgamma" title="PyUncertainNumber.pba.dists.dgamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dgamma</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.dweibull" title="PyUncertainNumber.pba.dists.dweibull"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dweibull</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.erlang" title="PyUncertainNumber.pba.dists.erlang"><code class="xref py py-obj docutils literal notranslate"><span class="pre">erlang</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.expon" title="PyUncertainNumber.pba.dists.expon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expon</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.exponnorm" title="PyUncertainNumber.pba.dists.exponnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exponnorm</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.exponweib" title="PyUncertainNumber.pba.dists.exponweib"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exponweib</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.exponpow" title="PyUncertainNumber.pba.dists.exponpow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exponpow</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.f" title="PyUncertainNumber.pba.dists.f"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.fatiguelife" title="PyUncertainNumber.pba.dists.fatiguelife"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fatiguelife</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.fisk" title="PyUncertainNumber.pba.dists.fisk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fisk</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.foldcauchy" title="PyUncertainNumber.pba.dists.foldcauchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foldcauchy</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.foldnorm" title="PyUncertainNumber.pba.dists.foldnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foldnorm</span></code></a>(mu, s[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.genlogistic" title="PyUncertainNumber.pba.dists.genlogistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genlogistic</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.gennorm" title="PyUncertainNumber.pba.dists.gennorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gennorm</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.genpareto" title="PyUncertainNumber.pba.dists.genpareto"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genpareto</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.genexpon" title="PyUncertainNumber.pba.dists.genexpon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genexpon</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.genextreme" title="PyUncertainNumber.pba.dists.genextreme"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genextreme</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.gausshyper" title="PyUncertainNumber.pba.dists.gausshyper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gausshyper</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.gamma" title="PyUncertainNumber.pba.dists.gamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gamma</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.gengamma" title="PyUncertainNumber.pba.dists.gengamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gengamma</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.genhalflogistic" title="PyUncertainNumber.pba.dists.genhalflogistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genhalflogistic</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.geninvgauss" title="PyUncertainNumber.pba.dists.geninvgauss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geninvgauss</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.gompertz" title="PyUncertainNumber.pba.dists.gompertz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gompertz</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.gumbel_r" title="PyUncertainNumber.pba.dists.gumbel_r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gumbel_r</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.gumbel_l" title="PyUncertainNumber.pba.dists.gumbel_l"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gumbel_l</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.halfcauchy" title="PyUncertainNumber.pba.dists.halfcauchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">halfcauchy</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.halflogistic" title="PyUncertainNumber.pba.dists.halflogistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">halflogistic</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.halfnorm" title="PyUncertainNumber.pba.dists.halfnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">halfnorm</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.halfgennorm" title="PyUncertainNumber.pba.dists.halfgennorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">halfgennorm</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.hypsecant" title="PyUncertainNumber.pba.dists.hypsecant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hypsecant</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.invgamma" title="PyUncertainNumber.pba.dists.invgamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invgamma</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.invgauss" title="PyUncertainNumber.pba.dists.invgauss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invgauss</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.invweibull" title="PyUncertainNumber.pba.dists.invweibull"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invweibull</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.johnsonsb" title="PyUncertainNumber.pba.dists.johnsonsb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">johnsonsb</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.johnsonsu" title="PyUncertainNumber.pba.dists.johnsonsu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">johnsonsu</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.kappa4" title="PyUncertainNumber.pba.dists.kappa4"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kappa4</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.kappa3" title="PyUncertainNumber.pba.dists.kappa3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kappa3</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.ksone" title="PyUncertainNumber.pba.dists.ksone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ksone</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.kstwobign" title="PyUncertainNumber.pba.dists.kstwobign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kstwobign</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.laplace" title="PyUncertainNumber.pba.dists.laplace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">laplace</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.levy" title="PyUncertainNumber.pba.dists.levy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">levy</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.levy_l" title="PyUncertainNumber.pba.dists.levy_l"><code class="xref py py-obj docutils literal notranslate"><span class="pre">levy_l</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.levy_stable" title="PyUncertainNumber.pba.dists.levy_stable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">levy_stable</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.logistic" title="PyUncertainNumber.pba.dists.logistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logistic</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.loggamma" title="PyUncertainNumber.pba.dists.loggamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggamma</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.loglaplace" title="PyUncertainNumber.pba.dists.loglaplace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loglaplace</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.loguniform" title="PyUncertainNumber.pba.dists.loguniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loguniform</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.lomax" title="PyUncertainNumber.pba.dists.lomax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lomax</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.maxwell" title="PyUncertainNumber.pba.dists.maxwell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maxwell</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.mielke" title="PyUncertainNumber.pba.dists.mielke"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mielke</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.moyal" title="PyUncertainNumber.pba.dists.moyal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moyal</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.nakagami" title="PyUncertainNumber.pba.dists.nakagami"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nakagami</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.ncx2" title="PyUncertainNumber.pba.dists.ncx2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ncx2</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.ncf" title="PyUncertainNumber.pba.dists.ncf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ncf</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.nct" title="PyUncertainNumber.pba.dists.nct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nct</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.norm" title="PyUncertainNumber.pba.dists.norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">norm</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.norminvgauss" title="PyUncertainNumber.pba.dists.norminvgauss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">norminvgauss</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.pareto" title="PyUncertainNumber.pba.dists.pareto"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pareto</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.pearson3" title="PyUncertainNumber.pba.dists.pearson3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pearson3</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.powerlaw" title="PyUncertainNumber.pba.dists.powerlaw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">powerlaw</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.powerlognorm" title="PyUncertainNumber.pba.dists.powerlognorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">powerlognorm</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.powernorm" title="PyUncertainNumber.pba.dists.powernorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">powernorm</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.rdist" title="PyUncertainNumber.pba.dists.rdist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rdist</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.rayleigh" title="PyUncertainNumber.pba.dists.rayleigh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rayleigh</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.rice" title="PyUncertainNumber.pba.dists.rice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rice</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.recipinvgauss" title="PyUncertainNumber.pba.dists.recipinvgauss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recipinvgauss</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.semicircular" title="PyUncertainNumber.pba.dists.semicircular"><code class="xref py py-obj docutils literal notranslate"><span class="pre">semicircular</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.skewnorm" title="PyUncertainNumber.pba.dists.skewnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skewnorm</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.t" title="PyUncertainNumber.pba.dists.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.trapz" title="PyUncertainNumber.pba.dists.trapz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trapz</span></code></a>(a, b, c, d[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.triang" title="PyUncertainNumber.pba.dists.triang"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triang</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.truncexpon" title="PyUncertainNumber.pba.dists.truncexpon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncexpon</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.truncnorm" title="PyUncertainNumber.pba.dists.truncnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncnorm</span></code></a>(left, right[, mean, stddev, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.tukeylambda" title="PyUncertainNumber.pba.dists.tukeylambda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tukeylambda</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.uniform" title="PyUncertainNumber.pba.dists.uniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform</span></code></a>(a, b[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.vonmises" title="PyUncertainNumber.pba.dists.vonmises"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vonmises</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.vonmises_line" title="PyUncertainNumber.pba.dists.vonmises_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vonmises_line</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.wald" title="PyUncertainNumber.pba.dists.wald"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wald</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.weibull_min" title="PyUncertainNumber.pba.dists.weibull_min"><code class="xref py py-obj docutils literal notranslate"><span class="pre">weibull_min</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.weibull_max" title="PyUncertainNumber.pba.dists.weibull_max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">weibull_max</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.weibull" title="PyUncertainNumber.pba.dists.weibull"><code class="xref py py-obj docutils literal notranslate"><span class="pre">weibull</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.wrapcauchy" title="PyUncertainNumber.pba.dists.wrapcauchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wrapcauchy</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.bernoulli" title="PyUncertainNumber.pba.dists.bernoulli"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bernoulli</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.betabinom" title="PyUncertainNumber.pba.dists.betabinom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">betabinom</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.binom" title="PyUncertainNumber.pba.dists.binom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binom</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.boltzmann" title="PyUncertainNumber.pba.dists.boltzmann"><code class="xref py py-obj docutils literal notranslate"><span class="pre">boltzmann</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.dlaplace" title="PyUncertainNumber.pba.dists.dlaplace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dlaplace</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.geom" title="PyUncertainNumber.pba.dists.geom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geom</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.hypergeom" title="PyUncertainNumber.pba.dists.hypergeom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hypergeom</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.logser" title="PyUncertainNumber.pba.dists.logser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logser</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.nbinom" title="PyUncertainNumber.pba.dists.nbinom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nbinom</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.planck" title="PyUncertainNumber.pba.dists.planck"><code class="xref py py-obj docutils literal notranslate"><span class="pre">planck</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.poisson" title="PyUncertainNumber.pba.dists.poisson"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poisson</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.randint" title="PyUncertainNumber.pba.dists.randint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randint</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.skellam" title="PyUncertainNumber.pba.dists.skellam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skellam</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.zipf" title="PyUncertainNumber.pba.dists.zipf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zipf</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.yulesimon" title="PyUncertainNumber.pba.dists.yulesimon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">yulesimon</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.KM" title="PyUncertainNumber.pba.dists.KM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KM</span></code></a>(k, m[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.dists.KN" title="PyUncertainNumber.pba.dists.KN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KN</span></code></a>(k, n[, steps])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.dists">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">dists</span></span><a class="headerlink" href="#PyUncertainNumber.pba.dists.dists" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.__get_bounds">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">__get_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.__get_bounds" title="Link to this definition"></a></dt>
+<dd><p>heavy lifting function that returns the bounds of the distribution for defining pboxes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(array-like or list) left-bound of the pbox
+Right: (array-like or list) right-bound of the pbox
+mean: (Interval) mean of the pbox
+var: (Interval) variance of the pbox</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Left</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.lognormal">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">lognormal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.lognormal" title="Link to this definition"></a></dt>
+<dd><p>Creates a p-box for the lognormal distribution</p>
+<p><em>Note: the parameters used are the mean and variance of the lognormal distribution
+not the mean and variance of the underlying normal</em>
+See:
+<cite>[1]&lt;https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters&gt;</cite>
+<cite>[2]&lt;https://stackoverflow.com/questions/51906063/distribution-mean-and-standard-deviation-using-scipy-stats&gt;</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mean</strong> – mean of the lognormal distribution</p></li>
+<li><p><strong>var</strong> – variance of the lognormal distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../index.html#id376" title="PyUncertainNumber.pba.Pbox">Pbox</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.alpha">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.alpha" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.anglit">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">anglit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.anglit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.arcsine">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">arcsine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.arcsine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.argus">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">argus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.argus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.beta">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.beta" title="Link to this definition"></a></dt>
+<dd><p>Beta distribution</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.betaprime">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">betaprime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.betaprime" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.bradford">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">bradford</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.bradford" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.burr">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">burr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.burr" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.burr12">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">burr12</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.burr12" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.cauchy">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">cauchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.cauchy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.chi">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">chi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.chi" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.chi2">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">chi2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.chi2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.cosine">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.cosine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.crystalball">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">crystalball</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.crystalball" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.dgamma">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">dgamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.dgamma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.dweibull">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">dweibull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.dweibull" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.erlang">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">erlang</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.erlang" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.expon">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">expon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.expon" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.exponnorm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">exponnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.exponnorm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.exponweib">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">exponweib</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.exponweib" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.exponpow">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">exponpow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.exponpow" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.f">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.fatiguelife">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">fatiguelife</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.fatiguelife" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.fisk">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">fisk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.fisk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.foldcauchy">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">foldcauchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.foldcauchy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.foldnorm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">foldnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.foldnorm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.genlogistic">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">genlogistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.genlogistic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.gennorm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">gennorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.gennorm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.genpareto">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">genpareto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.genpareto" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.genexpon">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">genexpon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.genexpon" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.genextreme">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">genextreme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.genextreme" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.gausshyper">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">gausshyper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.gausshyper" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.gamma">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.gamma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.gengamma">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">gengamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.gengamma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.genhalflogistic">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">genhalflogistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.genhalflogistic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.geninvgauss">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">geninvgauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.geninvgauss" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.gompertz">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">gompertz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.gompertz" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.gumbel_r">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">gumbel_r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.gumbel_r" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.gumbel_l">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">gumbel_l</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.gumbel_l" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.halfcauchy">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">halfcauchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.halfcauchy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.halflogistic">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">halflogistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.halflogistic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.halfnorm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">halfnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.halfnorm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.halfgennorm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">halfgennorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.halfgennorm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.hypsecant">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">hypsecant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.hypsecant" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.invgamma">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">invgamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.invgamma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.invgauss">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">invgauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.invgauss" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.invweibull">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">invweibull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.invweibull" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.johnsonsb">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">johnsonsb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.johnsonsb" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.johnsonsu">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">johnsonsu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.johnsonsu" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.kappa4">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">kappa4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.kappa4" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.kappa3">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">kappa3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.kappa3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.ksone">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">ksone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.ksone" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.kstwobign">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">kstwobign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.kstwobign" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.laplace">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">laplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.laplace" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.levy">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">levy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.levy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.levy_l">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">levy_l</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.levy_l" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.levy_stable">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">levy_stable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.levy_stable" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.logistic">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">logistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.logistic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.loggamma">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">loggamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.loggamma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.loglaplace">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">loglaplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.loglaplace" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.loguniform">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">loguniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.loguniform" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.lomax">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">lomax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.lomax" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.maxwell">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">maxwell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.maxwell" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.mielke">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">mielke</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.mielke" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.moyal">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">moyal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.moyal" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.nakagami">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">nakagami</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.nakagami" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.ncx2">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">ncx2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.ncx2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.ncf">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">ncf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.ncf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.nct">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">nct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.nct" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.norm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.norm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.norminvgauss">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">norminvgauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.norminvgauss" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.pareto">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">pareto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.pareto" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.pearson3">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">pearson3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.pearson3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.powerlaw">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">powerlaw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.powerlaw" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.powerlognorm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">powerlognorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.powerlognorm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.powernorm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">powernorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.powernorm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.rdist">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">rdist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.rdist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.rayleigh">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">rayleigh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.rayleigh" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.rice">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">rice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.rice" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.recipinvgauss">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">recipinvgauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.recipinvgauss" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.semicircular">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">semicircular</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.semicircular" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.skewnorm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">skewnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.skewnorm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.t">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">t</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.t" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.trapz">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">trapz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.trapz" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.triang">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">triang</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.triang" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.truncexpon">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">truncexpon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.truncexpon" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.truncnorm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">truncnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.truncnorm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.tukeylambda">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">tukeylambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.tukeylambda" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.uniform">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">uniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.uniform" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.vonmises">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">vonmises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Pbox.STEPS</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.vonmises" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.vonmises_line">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">vonmises_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.vonmises_line" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.wald">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">wald</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.wald" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.weibull_min">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">weibull_min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.weibull_min" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.weibull_max">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">weibull_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.weibull_max" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.weibull">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">weibull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.weibull" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.wrapcauchy">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">wrapcauchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.wrapcauchy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.bernoulli">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">bernoulli</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.bernoulli" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.betabinom">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">betabinom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.betabinom" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.binom">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">binom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.binom" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.boltzmann">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">boltzmann</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.boltzmann" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.dlaplace">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">dlaplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.dlaplace" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.geom">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">geom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.geom" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.hypergeom">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">hypergeom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.hypergeom" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.logser">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">logser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.logser" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.nbinom">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">nbinom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.nbinom" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.planck">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">planck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.planck" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.poisson">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">poisson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.poisson" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.randint">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">randint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.randint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.skellam">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">skellam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.skellam" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.zipf">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">zipf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.zipf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.yulesimon">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">yulesimon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.yulesimon" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.KM">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">KM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.KM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.KN">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">KN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.dists.KN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.named_pbox">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">named_pbox</span></span><a class="headerlink" href="#PyUncertainNumber.pba.dists.named_pbox" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.normal">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">normal</span></span><a class="headerlink" href="#PyUncertainNumber.pba.dists.normal" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.N">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">N</span></span><a class="headerlink" href="#PyUncertainNumber.pba.dists.N" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.unif">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">unif</span></span><a class="headerlink" href="#PyUncertainNumber.pba.dists.unif" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.U">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">U</span></span><a class="headerlink" href="#PyUncertainNumber.pba.dists.U" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.dists.lognorm">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.dists.</span></span><span class="sig-name descname"><span class="pre">lognorm</span></span><a class="headerlink" href="#PyUncertainNumber.pba.dists.lognorm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../core/index.html" class="btn btn-neutral float-left" title="PyUncertainNumber.pba.core" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../interval/index.html" class="btn btn-neutral float-right" title="PyUncertainNumber.pba.interval" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yu Chen (Leslie).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

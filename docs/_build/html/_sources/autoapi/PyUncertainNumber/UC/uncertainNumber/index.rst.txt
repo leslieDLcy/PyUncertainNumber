@@ -1,0 +1,377 @@
+PyUncertainNumber.UC.uncertainNumber
+====================================
+
+.. py:module:: PyUncertainNumber.UC.uncertainNumber
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PyUncertainNumber.UC.uncertainNumber.UncertainNumber
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PyUncertainNumber.UC.uncertainNumber.parse_description
+   PyUncertainNumber.UC.uncertainNumber._parse_interverl_inputs
+
+
+Module Contents
+---------------
+
+.. py:class:: UncertainNumber
+
+   Uncertain Number class
+
+   note:
+
+   log:
+       - `interval_initialisation` changed to `bounds`;
+       - `distribution_initialisation` changed to `distribution_parameters`;
+       - `pbox_initialisation` changed to `pbox_parameters`;
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: symbol
+      :type:  str
+
+
+   .. py:attribute:: units
+      :type:  str
+
+
+   .. py:attribute:: uncertainty_type
+      :type:  Type[PyUncertainNumber.UC.uncertainty_types.Uncertainty_types]
+
+
+   .. py:attribute:: essence
+      :type:  str
+
+
+   .. py:attribute:: bounds
+      :type:  Union[List[float], str]
+
+
+   .. py:attribute:: distribution_parameters
+      :type:  List[float]
+
+
+   .. py:attribute:: pbox_parameters
+      :type:  List[float]
+
+
+   .. py:attribute:: hedge
+      :type:  str
+
+
+   .. py:attribute:: naked_value
+      :type:  float
+
+
+   .. py:attribute:: measurand
+      :type:  str
+
+
+   .. py:attribute:: nature
+      :type:  str
+
+
+   .. py:attribute:: provenence
+      :type:  str
+
+
+   .. py:attribute:: justification
+      :type:  str
+
+
+   .. py:attribute:: structure
+      :type:  str
+
+
+   .. py:attribute:: security
+      :type:  str
+
+
+   .. py:attribute:: ensemble
+      :type:  Type[PyUncertainNumber.UC.ensemble.Ensemble]
+
+
+   .. py:attribute:: variability
+      :type:  str
+
+
+   .. py:attribute:: dependence
+      :type:  str
+
+
+   .. py:attribute:: uncertainty
+      :type:  str
+
+
+   .. py:attribute:: instances
+      :value: []
+
+
+
+   .. py:method:: __post_init__()
+
+      the de facto initialisation method for the core math objects of the UN class
+
+      caveat:
+          user needs to by themselves figure out the correct
+          shape of the 'distribution_parameters', such as ['uniform', [1,2]]
+
+
+
+   .. py:method:: match_distribution(keyword, parameters)
+      :staticmethod:
+
+
+      match the distribution keyword from the initialisation to create the underlying distribution object
+
+      :param - keyword: (str) the distribution keyword
+      :param - parameters: (list) the parameters of the distribution
+
+
+
+   .. py:method:: init_check()
+
+      check if the UN initialisation specification is correct
+
+      .. note::
+
+         a lot of things to double check. keep an growing list:
+         1. unit
+         2. hedge: user cannot speficy both 'hedge' and 'bounds'. 'bounds' takes precedence.
+
+
+
+   .. py:method:: __str__()
+
+      the verbose user-friendly string representation
+      .. note::
+
+         this has nothing to do with the logic of JSON serialisation
+         ergo, do whatever you fancy;
+
+
+
+   .. py:method:: __repr__() -> str
+
+      concise __repr__
+
+
+
+   .. py:method:: describe(type='verbose')
+
+      print out a verbose description of the uncertain number
+
+
+
+   .. py:method:: _get_concise_representation()
+
+      get a concise representation of the UN object
+
+
+
+   .. py:method:: ci()
+
+      get 95% range confidence interval
+
+
+
+   .. py:method:: display(**kwargs)
+
+      quick plot of the uncertain number object
+
+
+
+   .. py:method:: from_hedge(hedged_language)
+      :classmethod:
+
+
+      create an Uncertain Number from hedged language
+
+      .. note::
+
+         # if interval or pbox, to be implemented later on
+         #  currently only Interval is supported
+
+
+
+   .. py:method:: from_distribution(dist_family: str, dist_params, **kwargs)
+      :classmethod:
+
+
+      create an Uncertain Number from specification of distribution
+
+      :param dist_family: str
+                          the distribution family
+      :param dist_params: list, tuple or string
+                          the distribution parameters
+
+
+
+   .. py:method:: from_distributionProperties(min, max, mean, median, variance, **kwargs)
+      :classmethod:
+
+
+      to construct a pbox given the properties of the distribution
+
+      :returns:
+
+                - a pbox-type UN object
+
+      .. note:: - whether differentiate explicitly if free/parametric pbox
+
+
+
+   .. py:method:: I(bounds, **kwargs)
+      :classmethod:
+
+
+      a shortcut for creating an interval-type Uncertain Number
+
+
+
+   .. py:method:: __add__(other)
+
+      add two uncertain numbers
+
+
+
+   .. py:method:: __radd__(other)
+
+
+   .. py:method:: __sub__(other)
+
+      subtract two uncertain numbers
+
+
+
+   .. py:method:: __mul__(other)
+
+      multiply two uncertain numbers
+
+
+
+   .. py:method:: __rmul__(other)
+
+
+   .. py:method:: __truediv__(other)
+
+      divide two uncertain numbers
+
+
+
+   .. py:method:: __rtruediv__(other)
+
+
+   .. py:method:: __pow__(other)
+
+      power of two uncertain numbers
+
+
+
+   .. py:method:: _toIntervalBackend(vars=None) -> PyUncertainNumber.UC.utils.np.array
+      :classmethod:
+
+
+      transform any UN object to an `interval`
+      #! currently in use
+      # TODO think if use Marco's Interval Vector object
+
+      question:
+          - what is the `interval` representation: list, nd.array or Interval object?
+
+      :returns:
+
+                - 2D np.array representation for all the interval-typed UNs
+
+
+
+   .. py:method:: _IntervaltoCompBackend(vars)
+      :classmethod:
+
+
+      convert the interval-tupe UNs instantiated to the computational backend
+
+      .. note::
+
+         - it will automatically convert all the UN objects in array-like to the computational backend
+         - essentially vars shall be all interval-typed UNs by now;
+
+      :returns:
+
+                - nd.array or Marco's Interval object
+
+      thoughts:
+          - if Marco's, then we'd use `intervalise` func to get all interval objects
+          and then to create another func to convert the interval objects to np.array to do endpoints method
+
+
+
+   .. py:method:: vertexMethod(vars, func)
+      :classmethod:
+
+
+      implementation of the endpoints method for the uncertain number
+
+      :param vars: list
+                   the selected list of the symbols of UN or a list of arrays
+      :param func: function
+                   the function to be applied to the uncertain number
+
+
+
+   .. py:method:: endpointsMethod(vars, func, **kwargs)
+      :classmethod:
+
+
+      implementation of the endpoints method for the uncertain number using
+      Marco's implementation
+
+      .. note::
+
+         `vars` shall be consistent with the signature of `func`. This means that
+         only a selected list of uncertain numbers will be used according to the func provided.
+
+      :param vars: list
+                   the chosen list of uncertain numbers
+      :param func: function
+                   the function to be applied to the uncertain number
+
+
+
+   .. py:method:: JSON_dump(filename='UN_data.json')
+
+      the JSON serialisation of the UN object into the filesystem
+
+
+
+.. py:function:: parse_description(description)
+
+   Parse the description of the uncertain number when initialising an Uncertain Number object
+
+   :param description: str
+                       the flexible string desired by Scott to instantiate a Uncertain Number
+
+   caveat:
+       the description needs to have space between the values and the operators, such as '[15 +- 10%]'
+
+
+.. py:function:: _parse_interverl_inputs(vars)
+
+   Parse the input intervals
+
+   .. note:: - Ioanna's funcs typically take 2D NumPy arra
+
+
