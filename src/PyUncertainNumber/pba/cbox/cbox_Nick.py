@@ -1,4 +1,4 @@
-from .pbox_base import Pbox
+from ..pbox_base import Pbox
 import numpy as np
 
 __all__ = ['Cbox']

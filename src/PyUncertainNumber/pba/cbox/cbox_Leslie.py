@@ -1,8 +1,7 @@
 """ a Cbox constructor by Leslie"""
 
 
-from .pbox_base import Pbox
-import numpy as np
+from ..pbox_base import Pbox
 
 __all__ = ['Cbox']
 
@@ -17,11 +16,32 @@ class Cbox(Pbox):
         Pbox (_type_): _description_
     """
     
-    def __init__(self,*args,**kwargs):            
+    def __init__(self, *args, bound_params=None, **kwargs):            
+        self.bound_params = bound_params
         super().__init__(*args,**kwargs)
-        print('cbox generated')
-        
+
+
+    def __repr__(self):
+        # msg = 
+        return f"Cbox ~ {self.shape}{self.bound_params}"
     
+
+    def display(self, parameter_name=None, **kwargs):
+        ax = super().display(title=f'Cbox {parameter_name}', fill_color='salmon', **kwargs)
+        ax.set_ylabel('Confidence')
+        return ax
+
+
+
+    @classmethod
+    def from_cd(cls):
+        """ constructor from a confidence distribution """
+
+        pass
+
+
+
+
     # def query_confidence(self, level=None, low=None, upper=None):
         
     #     """ or simply the `ci` function 
