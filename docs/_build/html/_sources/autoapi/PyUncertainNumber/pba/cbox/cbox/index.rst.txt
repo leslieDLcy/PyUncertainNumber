@@ -1,0 +1,174 @@
+PyUncertainNumber.pba.cbox.cbox
+===============================
+
+.. py:module:: PyUncertainNumber.pba.cbox.cbox
+
+.. autoapi-nested-parse::
+
+   the mattered cbox modules
+   Originally written by Scott in R and translated to Python also expanded functionality by Leslie
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PyUncertainNumber.pba.cbox.cbox.repre_cbox
+   PyUncertainNumber.pba.cbox.cbox.repre_pbox
+   PyUncertainNumber.pba.cbox.cbox.pbox_from_pseudosamples
+   PyUncertainNumber.pba.cbox.cbox.interval_measurements
+   PyUncertainNumber.pba.cbox.cbox.CBbernoulli_p
+   PyUncertainNumber.pba.cbox.cbox.CBbernoulli
+   PyUncertainNumber.pba.cbox.cbox.CBbinomial_p
+   PyUncertainNumber.pba.cbox.cbox.CBbinomial
+   PyUncertainNumber.pba.cbox.cbox.nextvalue_binomialnp
+   PyUncertainNumber.pba.cbox.cbox.parameter_binomialnp_n
+   PyUncertainNumber.pba.cbox.cbox.parameter_binomialnp_p
+   PyUncertainNumber.pba.cbox.cbox.CBpoisson_mean
+   PyUncertainNumber.pba.cbox.cbox.CBpoisson
+   PyUncertainNumber.pba.cbox.cbox.CBexponential_lambda
+   PyUncertainNumber.pba.cbox.cbox.CBexponential
+   PyUncertainNumber.pba.cbox.cbox.cboxNormalMu_base
+   PyUncertainNumber.pba.cbox.cbox.CBnormal_mu
+   PyUncertainNumber.pba.cbox.cbox.CBnormal_sigma
+   PyUncertainNumber.pba.cbox.cbox.CBlognormal
+   PyUncertainNumber.pba.cbox.cbox.CBlognormal_mu
+   PyUncertainNumber.pba.cbox.cbox.CBlognormal_sigma
+   PyUncertainNumber.pba.cbox.cbox.CBuniform
+   PyUncertainNumber.pba.cbox.cbox.CBuniform_midpoint
+   PyUncertainNumber.pba.cbox.cbox.CBuniform_width
+   PyUncertainNumber.pba.cbox.cbox.CBuniform_minimum
+   PyUncertainNumber.pba.cbox.cbox.CBuniform_maximum
+   PyUncertainNumber.pba.cbox.cbox.nextvalue_uniform
+   PyUncertainNumber.pba.cbox.cbox.parameter_uniform_minimum
+   PyUncertainNumber.pba.cbox.cbox.parameter_uniform_maximum
+   PyUncertainNumber.pba.cbox.cbox.parameter_uniform_width
+   PyUncertainNumber.pba.cbox.cbox.parameter_uniform_midpoint
+   PyUncertainNumber.pba.cbox.cbox.nextvalue_nonparametric
+   PyUncertainNumber.pba.cbox.cbox.parameter_normal_meandifference
+   PyUncertainNumber.pba.cbox.cbox.tranform_ecdf
+
+
+Module Contents
+---------------
+
+.. py:function:: repre_cbox(rvs, shape=None, bound_params=None)
+
+   transform into pbox object for cbox
+
+   :param rvs: list of `scipy.stats.rv_continuous` objects
+   :type rvs: list
+
+
+.. py:function:: repre_pbox(rvs, shape='beta', bound_params=None)
+
+   transform into pbox object for cbox
+
+   :param rvs: list of scipy.stats.rv_continuous objects
+   :type rvs: list
+
+
+.. py:function:: pbox_from_pseudosamples(samples)
+
+   a tmp constructor for pbox/cbox from approximate solution of the confidence/next value distribution
+
+   :param samples: the approximate Monte Carlo samples of the confidence/next value distribution
+
+   .. note:: ecdf is estimted from the samples and bridge to pbox/cbox
+
+
+.. py:function:: interval_measurements(func)
+
+.. py:function:: CBbernoulli_p(x)
+
+.. py:function:: CBbernoulli(x)
+
+.. py:function:: CBbinomial_p(x, N)
+
+   cbox for Bionomial parameter
+
+   :param x: sample data as in a list of success or number of success or
+             a single int as the number of success k
+   :type x: list or int
+   :param N: number of trials
+   :type N: int
+
+   .. note::
+
+      x[i] ~ binomial(N, p), for unknown p, x[i] is a nonnegative integer
+      but x is a int number, it suggests the number of success as `k`.
+
+   :returns: cbox object
+   :rtype: cbox
+
+
+.. py:function:: CBbinomial(x, N)
+
+.. py:function:: nextvalue_binomialnp(x)
+
+.. py:function:: parameter_binomialnp_n(x)
+
+.. py:function:: parameter_binomialnp_p(x)
+
+.. py:function:: CBpoisson_mean(x)
+
+.. py:function:: CBpoisson(x)
+
+.. py:function:: CBexponential_lambda(x)
+
+.. py:function:: CBexponential(x)
+
+.. py:function:: cboxNormalMu_base(x)
+
+.. py:function:: CBnormal_mu(x, style='analytical')
+
+   :param x: (array-like) the sample data
+   :param style: (str) the style of the output CDF, either 'analytical' or 'samples'
+   :param size: (int) the discritisation size.
+                meaning the no of ppf in analytical style and the no of MC samples in samples style
+
+   :returns: (array-like) the CDF of the normal distribution
+   :rtype: CDF
+
+
+.. py:function:: CBnormal_sigma(x)
+
+.. py:function:: CBlognormal(x)
+
+.. py:function:: CBlognormal_mu(x)
+
+.. py:function:: CBlognormal_sigma(x)
+
+.. py:function:: CBuniform(x)
+
+.. py:function:: CBuniform_midpoint(x)
+
+.. py:function:: CBuniform_width(x)
+
+.. py:function:: CBuniform_minimum(x)
+
+.. py:function:: CBuniform_maximum(x)
+
+.. py:function:: nextvalue_uniform(x)
+
+.. py:function:: parameter_uniform_minimum(x)
+
+.. py:function:: parameter_uniform_maximum(x)
+
+.. py:function:: parameter_uniform_width(x)
+
+.. py:function:: parameter_uniform_midpoint(x)
+
+.. py:function:: nextvalue_nonparametric(x)
+
+.. py:function:: parameter_normal_meandifference(x, y)
+
+.. py:function:: tranform_ecdf(s, display=False, **kwargs)
+
+   plot the CDF
+
+   :param s: sample
+
+

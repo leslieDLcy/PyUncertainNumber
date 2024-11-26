@@ -1,0 +1,112 @@
+PyUncertainNumber.UP.subinterval_old
+====================================
+
+.. py:module:: PyUncertainNumber.UP.subinterval_old
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PyUncertainNumber.UP.subinterval_old.cartesian
+   PyUncertainNumber.UP.subinterval_old.subinterval_method
+
+
+Module Contents
+---------------
+
+.. py:function:: cartesian(*arrays)
+
+   Computes the Cartesian product of multiple input arrays
+
+   :param - *arrays: Variable number of np.arrays representing the sets of values for each dimension.
+
+   signature:
+      - cartesian(*x:np.array)  -> np.ndarray
+
+   .. note:: - The data type of the output array is determined based on the input arrays to ensure compatibility.
+
+   :returns:
+
+             A NumPy array where each row represents one combination from the Cartesian product.
+                       The number of columns equals the number of input arrays.
+   :rtype: - darray
+
+   .. rubric:: Example
+
+   x = np.array([1, 2], [3, 4], [5, 6])
+   y = cartesian(*x)
+   # Output:
+   # array([[1, 3, 5],
+   #        [1, 3, 6],
+   #        [1, 4, 5],
+   #        [1, 4, 6],
+   #        [2, 3, 5],
+   #        [2, 3, 6],
+   #        [2, 4, 5],
+   #        [2, 4, 6]])
+
+
+.. py:function:: subinterval_method(x: numpy.ndarray, f: Callable, n: numpy.array, save_raw_data='no')
+
+   Performs uncertainty propagation using the Subinterval Reconstitution Method.
+
+   :param - x: A 2D NumPy array where each row represents an input variable and the two columns
+               define its lower and upper bounds (interval).
+   :param - f: A callable function that takes a 1D NumPy array of input values and returns the
+               corresponding output(s).
+   :param - n: A scalar (integer) or a 1D NumPy array specifying the number of subintervals for
+               each input variable.
+                - If a scalar, all input variables are divided into the same number of subintervals.
+                - If an array, each element specifies the number of subintervals for the
+                  corresponding input variable.
+   :param - save_raw_data: Controls the amount of data returned:
+                           - 'no': Returns only the minimum and maximum output values along with the
+                                  corresponding input values.
+                           - 'yes': Returns the above, plus the full arrays of unique input combinations
+                                    (`all_input`) and their corresponding output values (`all_output`).
+
+   signature:
+       subinterval_method(x:np.ndarray, f:Callable, n:np.array, save_raw_data = 'no') -> np.ndarray
+
+   .. note::
+
+      - The function assumes that the intervals in `x` represent uncertainties with some
+        form of distribution (not necessarily uniform) and aims to provide conservative
+        bounds on the output uncertainty.
+      - The computational cost increases exponentially with the number of input variables
+        and the number of subintervals per variable.
+      - If the `f` function returns multiple outputs, the `all_output` array will be 2-dimensional.
+
+   :returns:     - min_candidate: 1D NumPy array containing the minimum output value(s).
+                 - max_candidate: 1D NumPy array containing the maximum output value(s).
+                 - x_miny: 2D NumPy array where each row represents the input values that produced
+                           the corresponding minimum output value.
+                 - x_maxy: 2D NumPy array where each row represents the input values that produced
+                           the corresponding maximum output value.
+             - If `save_raw_data == 'yes'`:
+                 - The above four arrays, plus:
+                 - INPUT: 2D NumPy array containing all unique combinations of input subinterval
+                          endpoints.
+                 - OUTPUT: 1D or 2D NumPy array containing the corresponding output values
+                           for each input combination.
+   :rtype: - If `save_raw_data == 'no'`
+
+   .. rubric:: Example
+
+   x = np.array([1, 2], [3, 4], [5, 6])
+   fun = lambda x: x[0] + x[1] + x[2]
+   n = 2
+   miny, maxy, x_miny, x_maxy  = subinterval_method(x, fun, n, save_raw_data ='no')
+   # OR
+   #miny, maxy, x_miny, x_maxy, all_input, all_output  = subinterval_method(x, fun, n, save_raw_data ='yes')
+
+   miny = array([9.])
+   maxy = array([12.])
+   x_miny = array([[1., 3., 5.]])
+   x_maxy = array([[2., 4., 6.]]))
+
+   # TODO to test the code here,
+
+

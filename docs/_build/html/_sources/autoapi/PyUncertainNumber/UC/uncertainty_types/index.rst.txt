@@ -1,0 +1,62 @@
+PyUncertainNumber.UC.uncertainty_types
+======================================
+
+.. py:module:: PyUncertainNumber.UC.uncertainty_types
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PyUncertainNumber.UC.uncertainty_types.Uncertainty_types
+
+
+Module Contents
+---------------
+
+.. py:class:: Uncertainty_types
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Generic enumeration.
+
+   Derive from this class to define new enumerations.
+
+
+   .. py:attribute:: Certain
+      :value: 'certain'
+
+
+
+   .. py:attribute:: Aleatory
+      :value: 'aleatory'
+
+
+
+   .. py:attribute:: Epistemic
+      :value: 'epistemic'
+
+
+
+   .. py:attribute:: Inferential
+      :value: 'inferential'
+
+
+
+   .. py:attribute:: Design_uncertainty
+      :value: 'design uncertainty'
+
+
+
+   .. py:attribute:: Vagueness
+      :value: 'vagueness'
+
+
+
+   .. py:attribute:: Mixture
+      :value: 'mixture'
+
+
+

@@ -9,16 +9,24 @@ import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
-project = "py-pkgs-cookiecutter"
-author = "Tomas Beuzen & Tiffany Timbers"
-copyright = f"{datetime.datetime.now().year}, Tomas Beuzen & Tiffany Timbers"
+project = "PyUncertainNumber"
+author = "Yu Chen (Leslie) & Ioanna Ioannou & Scott Ferson"
+copyright = f"{datetime.datetime.now().year}, Yu Chen (Leslie)"
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["myst_parser", "sphinx_rtd_theme", "sphinx-prompt", "sphinx_copybutton"]
+extensions = [
+              "myst_nb",
+              "autoapi.extension", 
+              "sphinx_rtd_theme", 
+              "sphinx.ext.napoleon",
+              "sphinx-prompt", 
+              "sphinx_copybutton"]
+
+autoapi_dirs = ["../../src"]  # location to parse for API reference
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

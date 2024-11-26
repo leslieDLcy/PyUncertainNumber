@@ -1,0 +1,31 @@
+PyUncertainNumber.UP
+====================
+
+.. py:module:: PyUncertainNumber.UP
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/PyUncertainNumber/UP/Taylor_series/index
+   /autoapi/PyUncertainNumber/UP/cauchy_old/index
+   /autoapi/PyUncertainNumber/UP/endpoint/index
+   /autoapi/PyUncertainNumber/UP/endpoint_cauchy/index
+   /autoapi/PyUncertainNumber/UP/endpoints/index
+   /autoapi/PyUncertainNumber/UP/endpoints_old/index
+   /autoapi/PyUncertainNumber/UP/genetic_optimisation/index
+   /autoapi/PyUncertainNumber/UP/local_optimisation/index
+   /autoapi/PyUncertainNumber/UP/performance_func/index
+   /autoapi/PyUncertainNumber/UP/sampling/index
+   /autoapi/PyUncertainNumber/UP/sampling_old/index
+   /autoapi/PyUncertainNumber/UP/subinterval/index
+   /autoapi/PyUncertainNumber/UP/subinterval_old/index
+   /autoapi/PyUncertainNumber/UP/uncertaintyPropagation/index
+   /autoapi/PyUncertainNumber/UP/utils/index
+   /autoapi/PyUncertainNumber/UP/vertex/index
+   /autoapi/PyUncertainNumber/UP/vertex_old/index
+
+

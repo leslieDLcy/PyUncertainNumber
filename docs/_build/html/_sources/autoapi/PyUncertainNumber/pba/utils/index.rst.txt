@@ -1,0 +1,50 @@
+PyUncertainNumber.pba.utils
+===========================
+
+.. py:module:: PyUncertainNumber.pba.utils
+
+
+Exceptions
+----------
+
+.. autoapisummary::
+
+   PyUncertainNumber.pba.utils.NotIncreasingError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PyUncertainNumber.pba.utils.plot_intervals
+   PyUncertainNumber.pba.utils.plot_DS_structure
+   PyUncertainNumber.pba.utils._interval_list_to_array
+   PyUncertainNumber.pba.utils.read_json
+   PyUncertainNumber.pba.utils.check_increasing
+
+
+Module Contents
+---------------
+
+.. py:function:: plot_intervals(interval_list, ax=None, **kwargs)
+
+   :param interval_list: list of Interval objects
+
+
+.. py:function:: plot_DS_structure(interval_list, weights, ax=None, **kwargs)
+
+.. py:function:: _interval_list_to_array(l, left=True)
+
+.. py:function:: read_json(file_name)
+
+.. py:function:: check_increasing(arr)
+
+.. py:exception:: NotIncreasingError
+
+   Bases: :py:obj:`Exception`
+
+
+   Common base class for all non-exit exceptions.
+
+

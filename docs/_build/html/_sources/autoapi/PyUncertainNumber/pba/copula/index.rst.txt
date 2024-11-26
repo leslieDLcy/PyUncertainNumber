@@ -1,0 +1,101 @@
+PyUncertainNumber.pba.copula
+============================
+
+.. py:module:: PyUncertainNumber.pba.copula
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PyUncertainNumber.pba.copula.Copula
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PyUncertainNumber.pba.copula.ClaGen
+   PyUncertainNumber.pba.copula.ClaInv
+   PyUncertainNumber.pba.copula.FGen
+   PyUncertainNumber.pba.copula.FInv
+   PyUncertainNumber.pba.copula.indep
+   PyUncertainNumber.pba.copula.perf
+   PyUncertainNumber.pba.copula.opp
+   PyUncertainNumber.pba.copula.Cla
+   PyUncertainNumber.pba.copula.F
+   PyUncertainNumber.pba.copula.Gau
+   PyUncertainNumber.pba.copula.pi
+   PyUncertainNumber.pba.copula.M
+   PyUncertainNumber.pba.copula.W
+   PyUncertainNumber.pba.copula.Frank
+   PyUncertainNumber.pba.copula.Clayton
+   PyUncertainNumber.pba.copula.Gaussian
+
+
+Module Contents
+---------------
+
+.. py:class:: Copula(cdf=None, func=None, param=None)
+
+   Bases: :py:obj:`object`
+
+
+   .. py:attribute:: cdf
+
+
+   .. py:attribute:: func
+
+
+   .. py:attribute:: param
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: get_cdf(x, y)
+
+
+   .. py:method:: get_mass(x, y)
+
+
+   .. py:method:: show(pn=50, fontsize=20, cols=cm.RdGy)
+
+
+   .. py:method:: showContour(fontsize=20, cols=cm.coolwarm)
+
+
+.. py:function:: ClaGen(x, t=1)
+
+.. py:function:: ClaInv(x, t=1)
+
+.. py:function:: FGen(x, s=1)
+
+.. py:function:: FInv(x, s=1)
+
+.. py:function:: indep(x, y)
+
+.. py:function:: perf(x, y)
+
+.. py:function:: opp(x, y)
+
+.. py:function:: Cla(x, y, t=1)
+
+.. py:function:: F(x, y, s=1)
+
+.. py:function:: Gau(x, y, r=0)
+
+.. py:function:: pi(steps=200)
+
+.. py:function:: M(steps=200)
+
+.. py:function:: W(steps=200)
+
+.. py:function:: Frank(s=0, steps=200)
+
+.. py:function:: Clayton(t=1, steps=200)
+
+.. py:function:: Gaussian(r=0, steps=200)
+

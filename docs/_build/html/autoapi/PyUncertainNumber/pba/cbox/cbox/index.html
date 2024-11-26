@@ -1,0 +1,488 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PyUncertainNumber.pba.cbox.cbox &mdash; PyUncertainNumber  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=eaac4085" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="PyUncertainNumber.pba.cbox.cbox_Leslie" href="../cbox_Leslie/index.html" />
+    <link rel="prev" title="PyUncertainNumber.pba.cbox" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            PyUncertainNumber
+              <img src="../../../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../user-guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html">PyUncertainNumber</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../NLP_constructor/index.html">PyUncertainNumber.NLP_constructor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../UC/index.html">PyUncertainNumber.UC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../UP/index.html">PyUncertainNumber.UP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../UV/index.html">PyUncertainNumber.UV</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">PyUncertainNumber.pba</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#package-contents">Package Contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">PyUncertainNumber</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">PyUncertainNumber</a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">PyUncertainNumber.pba</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">PyUncertainNumber.pba.cbox</a></li>
+      <li class="breadcrumb-item active">PyUncertainNumber.pba.cbox.cbox</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../../_sources/autoapi/PyUncertainNumber/pba/cbox/cbox/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-PyUncertainNumber.pba.cbox.cbox">
+<span id="pyuncertainnumber-pba-cbox-cbox"></span><h1>PyUncertainNumber.pba.cbox.cbox<a class="headerlink" href="#module-PyUncertainNumber.pba.cbox.cbox" title="Link to this heading"></a></h1>
+<p>the mattered cbox modules
+Originally written by Scott in R and translated to Python also expanded functionality by Leslie</p>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.repre_cbox" title="PyUncertainNumber.pba.cbox.cbox.repre_cbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">repre_cbox</span></code></a>(rvs[, shape, bound_params])</p></td>
+<td><p>transform into pbox object for cbox</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.repre_pbox" title="PyUncertainNumber.pba.cbox.cbox.repre_pbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">repre_pbox</span></code></a>(rvs[, shape, bound_params])</p></td>
+<td><p>transform into pbox object for cbox</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.pbox_from_pseudosamples" title="PyUncertainNumber.pba.cbox.cbox.pbox_from_pseudosamples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pbox_from_pseudosamples</span></code></a>(samples)</p></td>
+<td><p>a tmp constructor for pbox/cbox from approximate solution of the confidence/next value distribution</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.interval_measurements" title="PyUncertainNumber.pba.cbox.cbox.interval_measurements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interval_measurements</span></code></a>(func)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBbernoulli_p" title="PyUncertainNumber.pba.cbox.cbox.CBbernoulli_p"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBbernoulli_p</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBbernoulli" title="PyUncertainNumber.pba.cbox.cbox.CBbernoulli"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBbernoulli</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBbinomial_p" title="PyUncertainNumber.pba.cbox.cbox.CBbinomial_p"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBbinomial_p</span></code></a>(x, N)</p></td>
+<td><p>cbox for Bionomial parameter</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBbinomial" title="PyUncertainNumber.pba.cbox.cbox.CBbinomial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBbinomial</span></code></a>(x, N)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.nextvalue_binomialnp" title="PyUncertainNumber.pba.cbox.cbox.nextvalue_binomialnp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextvalue_binomialnp</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.parameter_binomialnp_n" title="PyUncertainNumber.pba.cbox.cbox.parameter_binomialnp_n"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameter_binomialnp_n</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.parameter_binomialnp_p" title="PyUncertainNumber.pba.cbox.cbox.parameter_binomialnp_p"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameter_binomialnp_p</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBpoisson_mean" title="PyUncertainNumber.pba.cbox.cbox.CBpoisson_mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBpoisson_mean</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBpoisson" title="PyUncertainNumber.pba.cbox.cbox.CBpoisson"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBpoisson</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBexponential_lambda" title="PyUncertainNumber.pba.cbox.cbox.CBexponential_lambda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBexponential_lambda</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBexponential" title="PyUncertainNumber.pba.cbox.cbox.CBexponential"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBexponential</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.cboxNormalMu_base" title="PyUncertainNumber.pba.cbox.cbox.cboxNormalMu_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cboxNormalMu_base</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBnormal_mu" title="PyUncertainNumber.pba.cbox.cbox.CBnormal_mu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBnormal_mu</span></code></a>(x[, style])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBnormal_sigma" title="PyUncertainNumber.pba.cbox.cbox.CBnormal_sigma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBnormal_sigma</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBlognormal" title="PyUncertainNumber.pba.cbox.cbox.CBlognormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBlognormal</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBlognormal_mu" title="PyUncertainNumber.pba.cbox.cbox.CBlognormal_mu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBlognormal_mu</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBlognormal_sigma" title="PyUncertainNumber.pba.cbox.cbox.CBlognormal_sigma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBlognormal_sigma</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBuniform" title="PyUncertainNumber.pba.cbox.cbox.CBuniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBuniform</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBuniform_midpoint" title="PyUncertainNumber.pba.cbox.cbox.CBuniform_midpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBuniform_midpoint</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBuniform_width" title="PyUncertainNumber.pba.cbox.cbox.CBuniform_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBuniform_width</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBuniform_minimum" title="PyUncertainNumber.pba.cbox.cbox.CBuniform_minimum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBuniform_minimum</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.CBuniform_maximum" title="PyUncertainNumber.pba.cbox.cbox.CBuniform_maximum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBuniform_maximum</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.nextvalue_uniform" title="PyUncertainNumber.pba.cbox.cbox.nextvalue_uniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextvalue_uniform</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.parameter_uniform_minimum" title="PyUncertainNumber.pba.cbox.cbox.parameter_uniform_minimum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameter_uniform_minimum</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.parameter_uniform_maximum" title="PyUncertainNumber.pba.cbox.cbox.parameter_uniform_maximum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameter_uniform_maximum</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.parameter_uniform_width" title="PyUncertainNumber.pba.cbox.cbox.parameter_uniform_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameter_uniform_width</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.parameter_uniform_midpoint" title="PyUncertainNumber.pba.cbox.cbox.parameter_uniform_midpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameter_uniform_midpoint</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.nextvalue_nonparametric" title="PyUncertainNumber.pba.cbox.cbox.nextvalue_nonparametric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextvalue_nonparametric</span></code></a>(x)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.parameter_normal_meandifference" title="PyUncertainNumber.pba.cbox.cbox.parameter_normal_meandifference"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameter_normal_meandifference</span></code></a>(x, y)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PyUncertainNumber.pba.cbox.cbox.tranform_ecdf" title="PyUncertainNumber.pba.cbox.cbox.tranform_ecdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tranform_ecdf</span></code></a>(s[, display])</p></td>
+<td><p>plot the CDF</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.repre_cbox">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">repre_cbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rvs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.repre_cbox" title="Link to this definition"></a></dt>
+<dd><p>transform into pbox object for cbox</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rvs</strong> (<em>list</em>) – list of <cite>scipy.stats.rv_continuous</cite> objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.repre_pbox">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">repre_pbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rvs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'beta'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.repre_pbox" title="Link to this definition"></a></dt>
+<dd><p>transform into pbox object for cbox</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rvs</strong> (<em>list</em>) – list of scipy.stats.rv_continuous objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.pbox_from_pseudosamples">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">pbox_from_pseudosamples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.pbox_from_pseudosamples" title="Link to this definition"></a></dt>
+<dd><p>a tmp constructor for pbox/cbox from approximate solution of the confidence/next value distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>samples</strong> – the approximate Monte Carlo samples of the confidence/next value distribution</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>ecdf is estimted from the samples and bridge to pbox/cbox</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.interval_measurements">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">interval_measurements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.interval_measurements" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBbernoulli_p">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBbernoulli_p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBbernoulli_p" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBbernoulli">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBbernoulli</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBbernoulli" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBbinomial_p">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBbinomial_p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBbinomial_p" title="Link to this definition"></a></dt>
+<dd><p>cbox for Bionomial parameter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>list</em><em> or </em><em>int</em>) – sample data as in a list of success or number of success or
+a single int as the number of success k</p></li>
+<li><p><strong>N</strong> (<em>int</em>) – number of trials</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>x[i] ~ binomial(N, p), for unknown p, x[i] is a nonnegative integer
+but x is a int number, it suggests the number of success as <cite>k</cite>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cbox object</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>cbox</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBbinomial">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBbinomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBbinomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.nextvalue_binomialnp">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">nextvalue_binomialnp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.nextvalue_binomialnp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.parameter_binomialnp_n">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">parameter_binomialnp_n</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.parameter_binomialnp_n" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.parameter_binomialnp_p">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">parameter_binomialnp_p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.parameter_binomialnp_p" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBpoisson_mean">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBpoisson_mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBpoisson_mean" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBpoisson">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBpoisson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBpoisson" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBexponential_lambda">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBexponential_lambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBexponential_lambda" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBexponential">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBexponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBexponential" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.cboxNormalMu_base">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">cboxNormalMu_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.cboxNormalMu_base" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBnormal_mu">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBnormal_mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'analytical'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBnormal_mu" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – (array-like) the sample data</p></li>
+<li><p><strong>style</strong> – (str) the style of the output CDF, either ‘analytical’ or ‘samples’</p></li>
+<li><p><strong>size</strong> – (int) the discritisation size.
+meaning the no of ppf in analytical style and the no of MC samples in samples style</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(array-like) the CDF of the normal distribution</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>CDF</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBnormal_sigma">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBnormal_sigma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBnormal_sigma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBlognormal">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBlognormal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBlognormal" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBlognormal_mu">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBlognormal_mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBlognormal_mu" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBlognormal_sigma">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBlognormal_sigma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBlognormal_sigma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBuniform">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBuniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBuniform" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBuniform_midpoint">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBuniform_midpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBuniform_midpoint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBuniform_width">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBuniform_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBuniform_width" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBuniform_minimum">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBuniform_minimum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBuniform_minimum" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.CBuniform_maximum">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">CBuniform_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.CBuniform_maximum" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.nextvalue_uniform">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">nextvalue_uniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.nextvalue_uniform" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.parameter_uniform_minimum">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">parameter_uniform_minimum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.parameter_uniform_minimum" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.parameter_uniform_maximum">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">parameter_uniform_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.parameter_uniform_maximum" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.parameter_uniform_width">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">parameter_uniform_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.parameter_uniform_width" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.parameter_uniform_midpoint">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">parameter_uniform_midpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.parameter_uniform_midpoint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.nextvalue_nonparametric">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">nextvalue_nonparametric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.nextvalue_nonparametric" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.parameter_normal_meandifference">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">parameter_normal_meandifference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.parameter_normal_meandifference" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PyUncertainNumber.pba.cbox.cbox.tranform_ecdf">
+<span class="sig-prename descclassname"><span class="pre">PyUncertainNumber.pba.cbox.cbox.</span></span><span class="sig-name descname"><span class="pre">tranform_ecdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyUncertainNumber.pba.cbox.cbox.tranform_ecdf" title="Link to this definition"></a></dt>
+<dd><p>plot the CDF</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>s</strong> – sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="PyUncertainNumber.pba.cbox" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../cbox_Leslie/index.html" class="btn btn-neutral float-right" title="PyUncertainNumber.pba.cbox.cbox_Leslie" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yu Chen (Leslie).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

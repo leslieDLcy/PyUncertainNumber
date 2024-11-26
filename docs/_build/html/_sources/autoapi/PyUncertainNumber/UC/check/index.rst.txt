@@ -1,0 +1,32 @@
+PyUncertainNumber.UC.check
+==========================
+
+.. py:module:: PyUncertainNumber.UC.check
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PyUncertainNumber.UC.check.DistributionSpecification
+
+
+Module Contents
+---------------
+
+.. py:class:: DistributionSpecification(dist_family, dist_params)
+
+   an attempt to double check the user specification for a pbox or dist
+   # TODO: unfinished logic
+
+
+   .. py:attribute:: dist_family
+
+
+   .. py:attribute:: dist_params
+
+
+   .. py:method:: get_specification()
+
+

@@ -1,0 +1,72 @@
+PyUncertainNumber.UP.sampling_old
+=================================
+
+.. py:module:: PyUncertainNumber.UP.sampling_old
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PyUncertainNumber.UP.sampling_old.sampling_method
+
+
+Module Contents
+---------------
+
+.. py:function:: sampling_method(x: numpy.ndarray, f: Callable, n: int, method='montecarlo', endpoints=False, save_raw_data='no')
+
+   Performs uncertainty propagation through sampling-based methods.
+
+   :param - x: A 2D NumPy array where each row represents an input variable and the two columns
+               define its lower and upper bounds (interval).
+   :param - fun: A callable function that takes a 1D NumPy array of input values and returns the
+                 corresponding output(s).
+   :param - n: The number of samples to generate for the chosen sampling method.
+   :param - method: The sampling method to use. Choose from:
+                    - 'montecarlo': Monte Carlo sampling (random sampling from uniform distributions)
+                    - 'lhs': Latin Hypercube sampling (stratified sampling for better space coverage)
+   :param - endpoints: If True, include the interval endpoints in the sampling. Defaults to False.
+   :param - method: 'montecarlo' or 'lhs'
+   :param - save_raw_data: Controls the amount of data returned:
+                           - 'no': Returns only the minimum and maximum output values along with the
+                                  corresponding input values.
+                           - 'yes': Returns the above, plus the full arrays of input samples (`all_input`) and
+                                    output values (`all_output`).
+
+   signature:
+       sampling_method(x:np.ndarray, f:Callable, n:int, method ='montecarlo', endpoints=False, save_raw_data = 'no') -> np.ndarray
+
+   .. note::
+
+      - The function assumes that the intervals in `x` represent uniform distributions.
+      - The implementation for including endpoints (`endpoints=True`) is not provided
+        and needs to be added based on specific requirements.
+      - If the `f` function returns multiple outputs, the `all_output` array will be 2-dimensional y and x for all x samples.
+
+   :returns:     - min_candidate: 1D NumPy array containing the minimum output value(s).
+                 - max_candidate: 1D NumPy array containing the maximum output value(s).
+                 - x_miny: 2D NumPy array where each row represents the input values that produced
+                           the corresponding minimum output value.
+                 - x_maxy: 2D NumPy array wher e each row represents the input values that produced
+                           the corresponding maximum output value.
+             - If `save_raw_data == 'yes'`:
+                 - The above four arrays, plus:
+                 - all_input: 2D NumPy array containing all generated input samples.
+                 - all_output: 1D or 2D NumPy array containing the corresponding output values
+                           for each input sample.
+   :rtype: - If `save_raw_data == 'no'`
+
+   .. rubric:: Example
+
+   x = np.array([1, 2], [3, 4], [5, 6])
+   fun = lambda x: x[0] + x[1] + x[2]
+   n = 5
+   miny, maxy, x_miny, x_maxy  = sampling_method(x fun, n, method ='montecarlo', endpoints=False, save_raw_data = 'no')
+   miny, maxy, x_miny, x_maxy, all_input, all_output  = sampling_method(x fun, n, method ='montecarlo', endpoints=False, save_raw_data = 'yes')
+
+   #TODO test it in this platform and see what to be done for the endpoints= True,
+   # it is valid only for monotonic functions, if there are more than one input with the same min or max it cannot cope, i could highlight that in the postprocessing stage.
+
+

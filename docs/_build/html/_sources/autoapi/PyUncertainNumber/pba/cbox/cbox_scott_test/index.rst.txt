@@ -1,0 +1,6 @@
+PyUncertainNumber.pba.cbox.cbox_scott_test
+==========================================
+
+.. py:module:: PyUncertainNumber.pba.cbox.cbox_scott_test
+
+
