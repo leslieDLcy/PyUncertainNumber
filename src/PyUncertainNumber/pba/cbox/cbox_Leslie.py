@@ -32,6 +32,16 @@ class Cbox(Pbox):
         return ax
 
 
+
+    @classmethod
+    def from_cd(cls):
+        """ constructor from a confidence distribution """
+
+        pass
+
+
+
+
     # def query_confidence(self, level=None, low=None, upper=None):
         
     #     """ or simply the `ci` function 

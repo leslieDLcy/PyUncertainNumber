@@ -6,8 +6,24 @@ import json
 import dataclasses
 import numpy as np
 from pymongo import MongoClient
+import matplotlib.pyplot as plt
 
 # TODO create a defending mechanism for parsing '[15+-10%]' as only '[15 +- 10%]' works now
+
+
+from scipy.stats import ecdf
+
+def plot_ecdf(s, **kwargs):
+    """ plot the CDF
+    
+    args:
+        s: sample
+    """
+    sth = ecdf(s)
+    fig, ax = plt.subplots()
+    # ax.plot(x_support, p_values, color='g')
+    ax.step(sth.cdf.quantiles, sth.cdf.probabilities, color='red', zorder=10, **kwargs)
+    return ax
 
 
 def to_database(dict_list, db_name, col_name):
