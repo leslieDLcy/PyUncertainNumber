@@ -1,20 +1,40 @@
-# [build-system]
-# requires = ["poetry-core>=1.0.0"]
-# build-backend = "poetry.core.masonry.api"
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
 
-# [tool.poetry]
-# name = "PyUncertainNumber"
-# version = "0.0.1"
-# description = "DAWS2 related codes and docs in one repository"
-# authors = ["Leslie"]
-# license = "MIT"
-# readme = "README.md"
-# packages = [
-#     { include = "src" },
-# ]
+[project]
+name = "PyUncertainNumber"
+version = "0.0.2"
+description = "Rigorous computation with Uncertain Number in Python"
+authors = [
+  {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
+  {name = "Ioanna Ioannou", email = "Ioanna.Ioannou@liverpool.ac.uk"},
+  {name = "Scott Ferson", email = "sandp8@gmail.com"},
+]
+maintainers = [
+  {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"}
+]
+license = {text = "MIT License"}
+readme = "README.md"
+packages = [
+    { include = "src" },
+]
+requires-python = ">= 3.10"
+dependencies = [
+  "intervals.egg==info",
+  "matplotlib",
+  "numpy",
+  "pandas",
+  "Pint",
+  "pymongo",
+  "pymoo",
+  "scipy",
+  "tqdm"
+]
 
-# [tool.poetry.dependencies]
-# python = "^3.9"
-# jupyterlab = "^4.2.3"
-# loguru = "^0.7.2"
+
+[project.urls]
+Homepage = "https://example.com"
+Documentation = "https://readthedocs.org"
+
 
