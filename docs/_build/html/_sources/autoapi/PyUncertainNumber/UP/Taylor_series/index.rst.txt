@@ -1,6 +1,0 @@
-PyUncertainNumber.UP.Taylor_series
-==================================
-
-.. py:module:: PyUncertainNumber.UP.Taylor_series
-
-

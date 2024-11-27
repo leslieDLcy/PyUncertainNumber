@@ -5,7 +5,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import datetime
-import sphinx_rtd_theme
+# import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
@@ -19,14 +19,14 @@ copyright = f"{datetime.datetime.now().year}, Yu Chen (Leslie)"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-              "myst_nb",
-              "autoapi.extension", 
-              "sphinx_rtd_theme", 
+            #   "myst_nb",
+              "myst_parser",
+              # "autoapi.extension", 
               "sphinx.ext.napoleon",
               "sphinx-prompt", 
               "sphinx_copybutton"]
 
-autoapi_dirs = ["../../src"]  # location to parse for API reference
+# autoapi_dirs = ["../../src"]  # location to parse for API reference
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -38,10 +38,13 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-def setup(app):
-    app.add_css_file("custom.css")  # may also be an URL
+# def setup(app):
+#     app.add_css_file("custom.css")  # may also be an URL
 
 
 html_static_path = ["_static"]
-html_theme = "sphinx_rtd_theme"
-html_logo = "_static/logo.png"
+# html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
+
+
+# html_logo = "_static/logo.png"
