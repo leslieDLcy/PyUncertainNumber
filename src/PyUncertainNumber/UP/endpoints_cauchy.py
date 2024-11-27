@@ -36,10 +36,6 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
                   - 'x': Cauchy deviates (x).
                   - 'K': Maximum Cauchy deviate (K).
     """
-
-    if save_raw_data != 'no':
-        print("Input-Output raw data are NOT available for the Cauchy method!")
-
     x = np.atleast_2d(x)  # Ensure x is 2D
     lo, hi = x.T  # Unpack lower and upper bounds directly
 
@@ -104,6 +100,7 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
             # Create a 2D array for bounds in the array case
             bounds = np.vstack([min_candidate, max_candidate]) 
 
+        print("Input x for min max y are NOT available for the Cauchy method!")
         results = {
             'bounds': bounds,
             'min': {
@@ -120,7 +117,7 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
             }
         }
         if save_raw_data == 'yes':
-            print("Input-Output raw data are NOT available for the Cauchy method!")
+            print("Input-Output raw data are NOT provided for the Cauchy method!")
 
     elif  save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes' 
         x_samples = np.zeros((n, x.shape[0]))

@@ -224,6 +224,7 @@ def epistemic_propagation(vars,
 
             if save_raw_data == 'yes':
                 print("The intermediate steps cannot be saved for local optimisation")
+                
             results = local_optimisation_method(vars, fun, x0, 
                                              tol_loc = tol_loc, 
                                              options_loc = options_loc, 
@@ -313,7 +314,7 @@ def main():
     METHOD = "latin_hypercube"
     base_path = ""
 
-    a = sampling_alea_method(x= [y,L, I, F, E], #['L', 'I', 'F', 'E'], 
+    a = sampling_alea_method(x= ['y', 'L', 'I', 'F', 'E'], 
                             f= cantilever_beam_func, 
                             n= 30, 
                             method= METHOD, 

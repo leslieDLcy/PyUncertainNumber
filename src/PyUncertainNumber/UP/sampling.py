@@ -3,6 +3,31 @@ from scipy.stats import qmc
 import tqdm
 from typing import Callable
 
+def index_to_bool_(index:np.ndarray,dim=2):
+
+    """ Converts a vector of indices to an array of boolean pairs for masking.
+
+  Args:
+    index: A NumPy array of integer indices representing selected elements or categories. 
+           The values in `index` should be in the range [0, dim-1].
+    dim: The number of categories or dimensions in the output boolean array. Defaults to 2  
+
+  signature:
+    index_to_bool_(index:np.ndarray,dim=2) -> tuple
+
+   note:
+        - the augument `index` is an np.ndaray of the index of intervals.
+        - the argument `dim` will specify the function mapping of variables to be propagated. 
+    
+    #If dim > 2,  e.g. (2,0,1,0) the array of booleans is [(0,0,1),(1,0,0),(0,1,0),(1,0,0)].
+
+  Returns:
+    - A NumPy array of boolean pairs representing the mask.
+  """
+    
+    index = np.asarray(index,dtype=int)
+    return np.asarray([index==j for j in range(dim)],dtype=bool)
+
 def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo', 
                     save_raw_data='no', endpoints=False ):
     """

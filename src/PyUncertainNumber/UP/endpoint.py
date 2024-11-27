@@ -113,7 +113,7 @@ def endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
     # Create a sequence of values for each interval based on the number of divisions provided 
     # The divisions may be the same for all intervals or they can vary.
     m = x.shape[0]
-    print(f"Total number of input combinations for the endpoint method: {(m)**2}") 
+    print(f"Total number of input combinations for the endpoint method: {2**m}") 
     
     # create an array with the unique combinations of all intervals 
     X = cartesian(*x) 
