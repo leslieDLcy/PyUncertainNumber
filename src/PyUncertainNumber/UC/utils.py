@@ -13,16 +13,23 @@ import matplotlib.pyplot as plt
 
 from scipy.stats import ecdf
 
+
+def pl_pcdf():
+    """ plot CDF from parametric distribution objects """
+    pass
+
+
 def plot_ecdf(s, **kwargs):
-    """ plot the CDF
-    
+    """ plot the CDF given samples
+
     args:
         s: sample
     """
     sth = ecdf(s)
     fig, ax = plt.subplots()
     # ax.plot(x_support, p_values, color='g')
-    ax.step(sth.cdf.quantiles, sth.cdf.probabilities, color='red', zorder=10, **kwargs)
+    ax.step(sth.cdf.quantiles, sth.cdf.probabilities,
+            color='red', zorder=10, **kwargs)
     return ax
 
 
@@ -136,7 +143,8 @@ class PBAEncoder(json.JSONEncoder):
         # if any(isinstance(value, np.ndarray) for value in o.__dict__.values()):
         # TODO to use __slot__ later on to save disk space
         removed_dict = o.__dict__.copy()
-        entries_to_remove(remove_entries=["left", "right"], the_dict=removed_dict)
+        entries_to_remove(
+            remove_entries=["left", "right"], the_dict=removed_dict)
         return removed_dict
 
 
