@@ -1,4 +1,3 @@
-# PyUncertainNumber
 
 <!-- ```{image} _static/hex.png
 :alt: The Py-Pkgs-Cookiecutter logo.
@@ -45,11 +44,27 @@ To learn more, checkout the sections below.
 `PyUncertainNumber` was originally developed for use in the DAWS2 project. It has the capacity serve as a full-fleged UQ softwware to work beyond to fulfill general UQ challenges.
 
 ```{toctree}
+:hidden:
+Home <self>
+```
+
+```{toctree}
 :maxdepth: 2
+:caption: User Guides
 :hidden:
 
-Home <self>
-Quick Start <quickstart>
-User Guide <user-guide>
-autoapi/index
+guides/installation
+guides/uc
+guides/up
+```
+
+
+```{toctree}
+:caption: probability bounds analysis
+:hidden:
+
+pbox
+cbox
+interval_analysis
+<!-- autoapi/index -->
 ```
