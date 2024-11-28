@@ -1,27 +1,14 @@
 [build-system]
-requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
+requires = ["setuptools >= 61.0"]
 
 [project]
-name = "PyUncertainNumber"
-version = "0.0.2"
-description = "Rigorous computation with Uncertain Number in Python"
 authors = [
   {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
   {name = "Ioanna Ioannou", email = "Ioanna.Ioannou@liverpool.ac.uk"},
   {name = "Scott Ferson", email = "sandp8@gmail.com"},
 ]
-maintainers = [
-  {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"}
-]
-license = {text = "MIT License"}
-readme = "README.md"
-packages = [
-    { include = "src" },
-]
-requires-python = ">= 3.10"
 dependencies = [
-  "intervals.egg==info",
   "matplotlib",
   "numpy",
   "pandas",
@@ -29,12 +16,23 @@ dependencies = [
   "pymongo",
   "pymoo",
   "scipy",
-  "tqdm"
+  "tqdm",
+  "jupyterlab ",
 ]
+description = "Rigorous computation with Uncertain Number in Python"
+license = {text = "MIT License"}
+maintainers = [
+  {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
+]
+name = "PyUncertainNumber"
+readme = "README.md"
+requires-python = ">= 3.10"
+version = "0.0.2"
 
+[tool.setuptools.packages.find]
+# All the following settings are optional:
+where = ["src"] # ["."] by default   
 
 [project.urls]
-Homepage = "https://example.com"
 Documentation = "https://readthedocs.org"
-
-
+Homepage = "https://example.com"
