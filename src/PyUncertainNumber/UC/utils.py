@@ -19,18 +19,22 @@ def pl_pcdf():
     pass
 
 
-def plot_ecdf(s, **kwargs):
-    """ plot the CDF given samples
+def plot_ecdf(s, ax, return_value, **kwargs):
+    """ plot the empirical CDF given samples
 
     args:
-        s: sample
+        s (array-like): sample which can be either raw data 
+            or deviates as a representation of dist construct
     """
     sth = ecdf(s)
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots()
     # ax.plot(x_support, p_values, color='g')
-    ax.step(sth.cdf.quantiles, sth.cdf.probabilities,
-            color='red', zorder=10, **kwargs)
-    return ax
+    ax.step(sth.cdf.quantiles, sth.cdf.probabilities, **kwargs)
+    if not return_value:
+        return ax
+    else:
+        return ax, sth.cdf.quantiles, sth.cdf.probabilities
 
 
 def to_database(dict_list, db_name, col_name):
