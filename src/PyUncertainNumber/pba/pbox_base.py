@@ -1127,7 +1127,7 @@ class Pbox:
         else:
             raise ValueError("style must be either 'simple' or 'band'")
         ax.set_xlabel(r"$x$")
-        ax.set_ylabel(r"$\Pr(x \leq X)$")
+        ax.set_ylabel(r"$\Pr(X \leq x)$")
         return ax
 
 

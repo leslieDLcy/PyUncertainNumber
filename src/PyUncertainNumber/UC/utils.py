@@ -24,7 +24,7 @@ def pl_pcdf(dist: type[sps.rv_continuous | sps.rv_discrete], ax=None, **kwargs):
     return ax
 
 
-def pl_ecdf(s, ax, return_value, **kwargs):
+def pl_ecdf(s, ax=None, return_value=False, **kwargs):
     """ plot the empirical CDF given samples
 
     args:
