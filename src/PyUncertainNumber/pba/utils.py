@@ -6,9 +6,12 @@ from .interval import Interval
 
 
 def find_nearest(array, value):
+    """ find the index of the nearest value in the array to the given value """
+
     array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return array[idx]
+    # find the nearest value
+    ind = (np.abs(array - value)).argmin()
+    return ind
 
 
 @mpl.rc_context({"text.usetex": True})
