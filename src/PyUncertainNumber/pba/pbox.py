@@ -1730,6 +1730,26 @@ def norm(*args, steps=Params.steps):
     )
 
 
+def norm_debug(*args, steps=Params.steps):
+    args = list(args)
+    for i in range(0, len(args)):
+        if args[i].__class__.__name__ != "Interval":
+            args[i] = Interval(args[i])
+
+    Left, Right, mean, var = __get_bounds("norm", steps, *args)
+    return Left, Right, mean, var
+    # return Pbox(
+    #     Left,
+    #     Right,
+    #     steps=steps,
+    #     shape="norm",
+    #     mean_left=mean.left,
+    #     mean_right=mean.right,
+    #     var_left=var.left,
+    #     var_right=var.right,
+    # )
+
+
 def norminvgauss(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
