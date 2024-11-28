@@ -1,3 +1,4 @@
+from scipy.stats import ecdf
 import os
 import pathlib
 import re
@@ -7,23 +8,38 @@ import dataclasses
 import numpy as np
 from pymongo import MongoClient
 import matplotlib.pyplot as plt
+import scipy.stats as sps
+from ..pba.params import Params
 
 # TODO create a defending mechanism for parsing '[15+-10%]' as only '[15 +- 10%]' works now
 
 
-from scipy.stats import ecdf
+def pl_pcdf(dist: type[sps.rv_continuous | sps.rv_discrete], ax=None, **kwargs):
+    """ plot CDF from parametric distribution objects """
 
-def plot_ecdf(s, **kwargs):
-    """ plot the CDF
-    
+    x_values = dist.ppf(Params.p_values)
+    if ax is None:
+        fig, ax = plt.subplots()
+    ax.plot(x_values, Params.p_values, **kwargs)
+    return ax
+
+
+def pl_ecdf(s, ax, return_value, **kwargs):
+    """ plot the empirical CDF given samples
+
     args:
-        s: sample
+        s (array-like): sample which can be either raw data 
+            or deviates as a representation of dist construct
     """
     sth = ecdf(s)
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots()
     # ax.plot(x_support, p_values, color='g')
-    ax.step(sth.cdf.quantiles, sth.cdf.probabilities, color='red', zorder=10, **kwargs)
-    return ax
+    ax.step(sth.cdf.quantiles, sth.cdf.probabilities, **kwargs)
+    if not return_value:
+        return ax
+    else:
+        return ax, sth.cdf.quantiles, sth.cdf.probabilities
 
 
 def to_database(dict_list, db_name, col_name):
@@ -136,7 +152,8 @@ class PBAEncoder(json.JSONEncoder):
         # if any(isinstance(value, np.ndarray) for value in o.__dict__.values()):
         # TODO to use __slot__ later on to save disk space
         removed_dict = o.__dict__.copy()
-        entries_to_remove(remove_entries=["left", "right"], the_dict=removed_dict)
+        entries_to_remove(
+            remove_entries=["left", "right"], the_dict=removed_dict)
         return removed_dict
 
 

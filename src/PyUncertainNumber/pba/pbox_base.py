@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from .interval import Interval
-from .utils import check_increasing, NotIncreasingError, _interval_list_to_array
+from .utils import find_nearest, check_increasing, NotIncreasingError, _interval_list_to_array
 from .params import Params
 
 __all__ = [
@@ -77,7 +77,8 @@ class Pbox:
         # TODO: re-work on the initialisation logic as some arguments are not necessary
         if isinstance(left, np.ndarray) and isinstance(right, np.ndarray):
             if len(left) != len(right):
-                raise Exception("Left and right arrays must be the same length")
+                raise Exception(
+                    "Left and right arrays must be the same length")
             else:
                 steps = len(left)
 
@@ -124,7 +125,8 @@ class Pbox:
             )
 
         if not check_increasing(left) or not check_increasing(right):
-            raise NotIncreasingError("Left and right arrays must be increasing")
+            raise NotIncreasingError(
+                "Left and right arrays must be increasing")
 
         l, r = zip(*[(min(i), max(i)) for i in zip(left, right)])
         self.left = np.array(l)
@@ -183,7 +185,8 @@ class Pbox:
         if self.shape is None:
             shape_text = " "
         else:
-            shape_text = f" {self.shape}"  # space to start; see below lacking space
+            # space to start; see below lacking space
+            shape_text = f" {self.shape}"
 
         return (
             f"Pbox: ~{shape_text}(range={range_text}, mean={mean_text}, var={var_text})"
@@ -194,7 +197,6 @@ class Pbox:
     def __iter__(self):
         for val in np.array([self.left, self.right]).flatten():
             yield val
-
 
     # ---------------------Basic arithmetics---------------------#
 
@@ -352,38 +354,32 @@ class Pbox:
             self.var_right = right(b)
 
 
-
-
-# ---------------------durl interpretation ---------------------#
-
-    def cut(self,):
-        pass
+# ---------------------dual interpretation ---------------------#
 
 
     def cuth(self, x):
         """ get the bounds on the cumulative probability associated with any x-value """
         pass
 
-
     def cutv(self, p=0.5):
         """ get the bounds on the x-value at any particular probability level"""
         pass
 
 
-
-
 # ---------------------unary operations---------------------#
     ##### the top-level functions for unary operations #####
+
     def _unary(self, *args, function=lambda x: x):
 
-        ints = [function(Interval(l, r), *args) for l, r in zip(self.left, self.right)]
+        ints = [function(Interval(l, r), *args)
+                for l, r in zip(self.left, self.right)]
         print("'referred to ints'", ints)
         return Pbox(
             left=np.array([i.left for i in ints]),
             right=np.array([i.right for i in ints]),
         )
 
-    ### Access Functions
+    # Access Functions
     def add(self, other: Union["Pbox", Interval, float, int], method="f") -> "Pbox":
         """
         Adds to Pbox to other using the defined dependency method
@@ -399,7 +395,8 @@ class Pbox:
         if other.__class__.__name__ == "Pbox":
 
             if self.steps != other.steps:
-                raise ArithmeticError("Both Pboxes must have the same number of steps")
+                raise ArithmeticError(
+                    "Both Pboxes must have the same number of steps")
 
             if method == "f":
 
@@ -491,7 +488,8 @@ class Pbox:
         if other.__class__.__name__ == "Pbox":
 
             if self.steps != other.steps:
-                raise ArithmeticError("Both Pboxes must have the same number of steps")
+                raise ArithmeticError(
+                    "Both Pboxes must have the same number of steps")
 
             if method == "f":
 
@@ -583,7 +581,8 @@ class Pbox:
         if other.__class__.__name__ == "Pbox":
 
             if self.steps != other.steps:
-                raise ArithmeticError("Both Pboxes must have the same number of steps")
+                raise ArithmeticError(
+                    "Both Pboxes must have the same number of steps")
 
             if method == "f":
 
@@ -854,7 +853,8 @@ class Pbox:
 
         if other.__class__.__name__ == "Pbox":
             if self.steps != other.steps:
-                raise ArithmeticError("Both Pboxes must have the same number of steps")
+                raise ArithmeticError(
+                    "Both Pboxes must have the same number of steps")
         else:
             other = Pbox(other, steps=self.steps)
 
@@ -869,17 +869,20 @@ class Pbox:
         elif method == "p":
             return self.min(other, method)  # perfect min(a, b)
         elif method == "o":
-            return max(self.add(other, method) - 1, 0)  # opposite max(a + b – 1, 0)
+            # opposite max(a + b – 1, 0)
+            return max(self.add(other, method) - 1, 0)
         elif method == "+":
             return self.min(other, method)  # positive env(a * b, min(a, b))
         elif method == "-":
-            return self.min(other, method)  # negative env(max(a + b – 1, 0), a * b)
+            # negative env(max(a + b – 1, 0), a * b)
+            return self.min(other, method)
         else:
             return self.env(max(0, self.add(other, method) - 1), self.min(other, method))
 
     def logicalor(self, other, method="f"):  # disjunction
         if method == "i":
-            return 1 - (1 - self) * (1 - other)  # independent 1 – (1 – a) * (1 – b)
+            # independent 1 – (1 – a) * (1 – b)
+            return 1 - (1 - self) * (1 - other)
         elif method == "p":
             return self.max(other, method)  # perfect max(a, b)
         elif method == "o":
@@ -963,8 +966,10 @@ class Pbox:
 
     def get_x(self):
         """returns the x values for plotting"""
-        left = np.append(np.insert(self.left, 0, min(self.left)), max(self.right))
-        right = np.append(np.insert(self.right, 0, min(self.left)), max(self.right))
+        left = np.append(
+            np.insert(self.left, 0, min(self.left)), max(self.right))
+        right = np.append(
+            np.insert(self.right, 0, min(self.left)), max(self.right))
         return left, right
 
     def get_y(self):
@@ -1011,7 +1016,8 @@ class Pbox:
                 pbox = Pbox(pbox)
             except:
                 raise TypeError(
-                    "Unable to convert %s object (%s) to Pbox" % (type(pbox), pbox)
+                    "Unable to convert %s object (%s) to Pbox" % (
+                        type(pbox), pbox)
                 )
 
         u = []
@@ -1029,8 +1035,8 @@ class Pbox:
 
         return Pbox(left=u, right=d)
 
-
     # ---------------------plotting stuff---------------------#
+
     def show(self, figax=None, now=True, title="", x_axis_label="x", **kwargs):
 
         if figax is None:
@@ -1054,7 +1060,8 @@ class Pbox:
             / steps
         )
         jj = (
-            np.concatenate((np.array([0]), np.arange(steps + 1), np.arange(1, steps)))
+            np.concatenate((np.array([0]), np.arange(
+                steps + 1), np.arange(1, steps)))
             / steps
         )
 
@@ -1108,10 +1115,10 @@ class Pbox:
             ax.set_title(title, **kwargs)
         if style == "band":
             ax.fill_betweenx(
-                y= p_axis,
-                x1 = LL_n,
-                x2 = RR_n,
-                interpolate=True,                
+                y=p_axis,
+                x1=LL_n,
+                x2=RR_n,
+                interpolate=True,
                 color=fill_color,
                 alpha=0.3,
             )
@@ -1358,7 +1365,8 @@ def imposition(*args: Union[Pbox, Interval, float, int]):
                 pbox = Pbox(pbox)
             except:
                 raise TypeError(
-                    "Unable to convert %s object (%s) to Pbox" % (type(pbox), pbox)
+                    "Unable to convert %s object (%s) to Pbox" % (
+                        type(pbox), pbox)
                 )
         x.append(pbox)
 
@@ -1397,7 +1405,8 @@ def mixture(
                 pbox = Pbox(pbox)
             except:
                 raise TypeError(
-                    "Unable to convert %s object (%s) to Pbox" % (type(pbox), pbox)
+                    "Unable to convert %s object (%s) to Pbox" % (
+                        type(pbox), pbox)
                 )
         x.append(pbox)
 
