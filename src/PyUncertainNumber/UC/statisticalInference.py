@@ -18,6 +18,11 @@ examples:
     - Fermi methods
 '''
 
+""" ongoing notes
+- the return from the constructors below are `scipy.stats.dist` objects
+
+"""
+
 
 ###############################################################################
 # Method-of-Moment distribution constructors (matching central moments of x)

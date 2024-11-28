@@ -1,3 +1,4 @@
+from scipy.stats import ecdf
 import os
 import pathlib
 import re
@@ -7,19 +8,23 @@ import dataclasses
 import numpy as np
 from pymongo import MongoClient
 import matplotlib.pyplot as plt
+import scipy.stats as sps
+from ..pba.params import Params
 
 # TODO create a defending mechanism for parsing '[15+-10%]' as only '[15 +- 10%]' works now
 
 
-from scipy.stats import ecdf
-
-
-def pl_pcdf():
+def pl_pcdf(dist: type[sps.rv_continuous | sps.rv_discrete], ax=None, **kwargs):
     """ plot CDF from parametric distribution objects """
-    pass
+
+    x_values = dist.ppf(Params.p_values)
+    if ax is None:
+        fig, ax = plt.subplots()
+    ax.plot(x_values, Params.p_values, **kwargs)
+    return ax
 
 
-def plot_ecdf(s, ax, return_value, **kwargs):
+def pl_ecdf(s, ax, return_value, **kwargs):
     """ plot the empirical CDF given samples
 
     args:
