@@ -14,12 +14,16 @@ from ..pba.params import Params
 # TODO create a defending mechanism for parsing '[15+-10%]' as only '[15 +- 10%]' works now
 
 
-def pl_pcdf(dist: type[sps.rv_continuous | sps.rv_discrete], ax=None, **kwargs):
+def pl_pcdf(dist: type[sps.rv_continuous | sps.rv_discrete], ax=None, title=None, **kwargs):
     """ plot CDF from parametric distribution objects """
 
-    x_values = dist.ppf(Params.p_values)
     if ax is None:
         fig, ax = plt.subplots()
+    if title is not None:
+        ax.set_title(title)
+
+    x_values = dist.ppf(Params.p_values)
+
     ax.plot(x_values, Params.p_values, **kwargs)
     return ax
 

@@ -5,6 +5,10 @@ import matplotlib as mpl
 from .interval import Interval
 
 
+def round():
+    pass
+
+
 def find_nearest(array, value):
     """ find the index of the nearest value in the array to the given value """
 

@@ -2,8 +2,8 @@ import numpy as np
 from scipy.stats import (bernoulli, beta, betabinom, binom, chi2,
                          expon, gamma, norm, poisson, uniform, t,
                          gumbel_r, lognorm, laplace, logistic,
-                         pareto, powerlaw, triangular,
-                         geometric, loguniform, f as F)
+                         pareto, powerlaw, triang,
+                         geom, loguniform, f as F)
 import scipy.stats as sps
 ''' Here we define the statistical inference functions from data for the UncertainNumber class. 
 
@@ -30,8 +30,8 @@ examples:
 
 # TODO Some of tThese functions may not support intervals in the data x          #**
 
-def MMbernoulli(x: np.ndarray): return (
-    bernoulli(x.mean()))  # assumes x is zeros and ones
+def MMbernoulli(x: np.ndarray):
+    return bernoulli(x.mean())  # assumes x is zeros and ones
 
 
 def MMbeta(x: np.ndarray):
@@ -50,13 +50,13 @@ def MMbetabinomial(n, x):  # **
     m1 = x.mean()
     m2 = (x**2).mean()
     d = n * (m2 / m1 - m1 - 1) + m1
-    return (betabinom(n, (n*m1 - m2) / d, (n-m1)*(n - m2/m1) / d))
+    return betabinom(n, (n*m1 - m2) / d, (n-m1)*(n - m2/m1) / d)
 
 
 def MMbinomial(x):  # **
     a = x.mean()
     b = x.std()
-    return (binom(int(np.abs(np.round(a/(1-b**2/a)))), np.abs(1-b**2/a)))
+    return binom(int(np.abs(np.round(a/(1-b**2/a)))), np.abs(1-b**2/a))
 
 
 def MMchisquared(x): return (chi2(np.round(x.mean())))
@@ -76,10 +76,10 @@ def MMgamma(x):  # **
     return (gamma(b**2/a, 1/(a/b)**2))  # gamma1(a, b) ~ gamma(b²/a, (a/b)²)
 
 
-def MMgeometric(x): return (geometric(1/(1+x.mean())))
+def MMgeometric(x): return (geom(1/(1+x.mean())))
 
 
-def MMpascal(x): return (geometric(1/(1+x.mean())))
+def MMpascal(x): return (geom(1/(1+x.mean())))
 
 # def MMgumbel0(x) : return(gumbel(x.mean() - 0.57721 * x.std() * np.sqrt(6)/ np.pi, x.std() * np.sqrt(6)/ np.pi))       #**  # https://stackoverflow.com/questions/51427764/using-method-of-moments-with-gumbel-r-in-python-scipy-stats-gumbel-r
 
@@ -191,7 +191,7 @@ def MMtriangular(x, iters=100, dives=10):  # **
     # -#green(triangular(aa,bb,cc))
     # -#A;aa; B;bb; C;cc  # the order is min, max, mode
     print(aa, bb, cc)
-    return (triangular(aa, cc, bb))
+    return (triang(aa, cc, bb))
 
 
 ###############################################################################
@@ -202,6 +202,8 @@ def MMtriangular(x, iters=100, dives=10):  # **
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rv_continuous.fit.html#scipy.stats.rv_continuous.fit
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.CensoredData.html#scipy.stats.CensoredData
 
+#! note below all return `scipy.stats.dist` objects
+
 def MLbernoulli(x): return (bernoulli(x.mean()))
 def MLbeta(x): return (beta(*sps.beta.fit(x)))
 def MLbetabinomial(x): return (betabinom(*sps.betabinom.fit(x)))
@@ -211,30 +213,32 @@ def MLexponential(x): return (expon(*sps.expon.fit(x)))
 def MLF(x): return (F(*sps.f.fit(x)))
 def MLgamma(x): return (gamma(*sps.gamma.fit(x)))
 def MLgammaexponential(x): return (
-    gammaexponential(*sps.gammaexpon.fit(x)))
+    sps.gammaexpon(*sps.gammaexpon.fit(x)))
 
 
-def MLgeometric(x): return (geometric(*sps.geom.fit(x)))
+def MLgeometric(x): return (geom(*sps.geom.fit(x)))
 def MLgumbel(x): return (gumbel_r(*sps.gumbel_r.fit(x)))
 def MLlaplace(x): return (laplace(*sps.laplace.fit(x)))
 def MLlogistic(x): return (logistic(*sps.logistic.fit(x)))
-# def MLlognormal(x) : return(lognormal(*sps.lognorm.fit(x)))
-def MLlognormal(x): return (sps.lognorm.rvs(
-    *sps.lognorm.fit(x), size=many))
+def MLlognormal(x): return (lognorm(*sps.lognorm.fit(x)))
+
+# TODO why not use `sps.lognorm.fit(x)`` directly?
+# def MLlognormal(x): return (sps.lognorm.rvs(
+#     *sps.lognorm.fit(x), size=many))
 
 
 def MLloguniform(x): return (loguniform(*sps.loguniform.fit(x)))
 def MLnegativebinomial(x): return (
-    negativebinomial(*sps.nbinom.fit(x)))
+    sps.nbinom(*sps.nbinom.fit(x)))
 
 
 def MLnormal(x): return (norm(*sps.norm.fit(x)))
 def MLpareto(x): return (pareto(*sps.pareto.fit(x)))
 def MLpoisson(x): return (poisson(*sps.poisson.fit(x)))
 def MLpowerfunction(x): return (powerlaw(*sps.powerlaw.fit(x)))
-def MLrayleigh(x): return (rayleigh(*sps.rayleigh.fit(x)))
+def MLrayleigh(x): return (sps.rayleigh(*sps.rayleigh.fit(x)))
 def MLstudent(x): return (t(*sps.t.fit(x)))
-def MLtriangular(x): return (triangular(*sps.t.fit(x)))
+def MLtriangular(x): return (triang(*sps.t.fit(x)))
 def MLuniform(x): return (uniform(*sps.uniform.fit(x)))
 
 
@@ -259,7 +263,7 @@ def sMLexponential(x): return expon(x.mean())
 def sMLpoisson(x): return (poisson(x.mean()))
 
 
-def sMLgeometric(x): return (geometric(1/(1+x.mean())))
+def sMLgeometric(x): return (geom(1/(1+x.mean())))
 
 
 def sMLgumbel(x):
@@ -420,7 +424,7 @@ def MEminmaxmeanvar(min, max, mean, var): return (
 ###############################################################################
 
 # https://wernerantweiler.ca/blog.php?item=2019-06-05       #**
-def antweiler(x): return (triangular(
+def antweiler(x): return (triang(
     min=min(x), mode=3*np.mean(x)-max(x)-min(x), max=max(x)))
 
 
