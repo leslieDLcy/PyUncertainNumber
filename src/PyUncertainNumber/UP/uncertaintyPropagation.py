@@ -16,12 +16,63 @@ from PyUncertainNumber.UC.uncertainNumber import _parse_interverl_inputs, Uncert
 #TODO expand to mixed uncertainty propagation
 #TODO for leslie: How do you construct an uncertain number where the distribtuion is in the form of K-S bounds?
 
+def propagation(vars,
+          fun,
+          n: np.integer = None,
+          x0: np.ndarray = None,
+          method="endpoint",
+          save_raw_data="no",
+          *,  # Keyword-only arguments start here
+          base_path=np.nan,
+          tol_loc: np.ndarray = None,
+          options_loc: dict = None,
+          method_loc="Nelder-Mead",
+          pop_size=1000,
+          n_gen=100,
+          tol=1e-3,
+          n_gen_last=10,
+          algorithm_type="NSGA2",
+          **kwargs,
+          ):
+    essences = [un.essence for un in vars]  # Get a list of all essences
+
+    # Determine the plotting strategy based on essences
+    if all(essence == "interval" for essence in essences):
+        
+        results = epistemic_propagation(vars = vars,
+                                        fun = fun,
+                                        n = n,
+                                        x0 = x0,
+                                        method = method,
+                                        save_raw_data = save_raw_data,
+                                        base_path = base_path ,
+                                        tol_loc= tol_loc,
+                                        options_loc = options_loc,
+                                        method_loc= method_loc,
+                                        pop_size = pop_size, 
+                                        n_gen= n_gen,
+                                        tol= tol,
+                                        n_gen_last=n_gen_last,
+                                        algorithm_type= algorithm_type,
+                                        **kwargs,
+                                        )
+        # Print interval information (e.g., ranges)
+
+
+    elif all(essence == "distribution" for essence in essences):
+        results = aleatory_propagation()
+
+    else:  # Mixed case or at least one p-box
+        #results = mixed_propagation()
+        pass
+
+
+    return results 
+
 def aleatory_propagation(vars,
         fun,
         n: np.integer = None,
         method = "monte_carlo",     
-        conf_level = 0.95,
-        ks_bound_points = 100, 
         save_raw_data="no",
         *,  # Keyword-only arguments start here
         base_path=np.nan,

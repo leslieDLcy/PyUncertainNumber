@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Type, Union
-
+import itertools
 # from .measurand import Measurand
 # from .variability import Variability
 from PyUncertainNumber.UC.uncertainty_types import Uncertainty_types
@@ -511,11 +511,6 @@ class UncertainNumber:
                 return ValueError("Random sampling is only supported for distribution-type UncertainNumbers.") 
             case "distribution":
                 which_dist = self.distribution_parameters[0]
-                # if which_dist == "gaussian":
-                #     rv = norm(*self.distribution_parameters[1])
-                #     return rv.rvs(size=size)  # Use .rvs() for sampling
-                # else:
-                #     print("Unfinished")
                 return dists[which_dist].rvs(*self.distribution_parameters[1], size = size)
             case "pbox":
                 return ValueError("Random sampling is only supported for distribution-type UncertainNumbers.") 
@@ -530,7 +525,46 @@ class UncertainNumber:
                 dist = dists[which_dist](*self.distribution_parameters[1])  # Define the distribution
                 return dist.ppf(q)
             case "pbox":
-                return ValueError("PPF calculation is not supported for interval-type UncertainNumbers.")          
+                which_dist = self.distribution_parameters[0]
+                # Assuming the p-box parameters are stored as a list of intervals
+                param_specs = self.distribution_parameters[1] 
+            
+                # Helper function to create parameter lists from specs
+                def get_param_list(spec):
+                    if isinstance(spec, list):
+                        return spec  # Already a list
+                    else:
+                        return [spec, spec]  # Create a list with repeated value
+
+                # Generate parameter lists
+                param_lists = [get_param_list(spec) for spec in param_specs]
+
+                # Generate all combinations of lower and upper bounds for each parameter
+                param_combinations = list(itertools.product(*param_lists))
+
+                # Calculate the PPF for each combination (handling array q)
+                if isinstance(q, np.ndarray):
+                    ppf_values = np.array([
+                        [
+                            dists[which_dist](*params).ppf(qi) 
+                            for qi in q
+                        ]
+                        for params in param_combinations
+                    ])
+                    return np.array([np.min(ppf_values, axis=0), np.max(ppf_values, axis=0)])
+
+                else:  # If q is a single value
+                    ppf_values = []
+                    for params in param_combinations:
+                        dist = dists[which_dist](*params)
+                        ppf_value = dist.ppf(q)
+
+                        if isinstance(ppf_value, np.ndarray):
+                            ppf_values.extend(ppf_value)
+                        else:
+                            ppf_values.append(ppf_value)
+
+                    return [min(ppf_values), max(ppf_values)]
 
 # ---------------------class related methods---------------------#
 
