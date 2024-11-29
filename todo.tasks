@@ -4,6 +4,17 @@ UC module:
     ☐ unified style of plotting funcs for interval, pbox
     ☐ change to a dispatcher for bounds specification (i.e. work on `parse_description`)
 
+
+other:
+    ☐ plot function
+    ☐ matplotlib what if `latex` not installed
+
+
+
+DS structure:
+    ☐ create a class for that
+
+
 pbox:
     ☐ construct pbox(either distributional or nonparametric) from dataset 
     ☐ drawing samples from pbox
@@ -13,9 +24,14 @@ pbox:
     ☐ pbox aggregation from multiple sources
     ☐ unary functions are still lacking for e.g. sin(), cos(), etc..
 
+
+
 cbox:
     ☐ ci function with arguments
     ☐ print out the bounds parameters when instantiating the cbox
+    ☐ interval statistics
+
+
 
 hedge:
     ☐ pbox construction from hedge language
@@ -31,10 +47,10 @@ UP module personal:
 
 
 UP methods implementation checklist:
-    ☐ endpoints
+    ✔ endpoints @done (27/11/2024, 11:46:08)
     ☐ taylor expansion
-    ☐ subinterval
-    ☐ optimiation methods
+    ✔ subinterval @done (27/11/2024, 11:46:11)
+    ✔ optimiation methods @done (27/11/2024, 11:46:12)
     ☐ cauchy deviate
 
 
@@ -63,6 +79,9 @@ preparation for the December workshop:
     ✔ slides in Beams @done (17/11/2024, 20:17:31)
     ☐ notebook on installation
     ☐ notebook on the Cantilever beam example
+
+
+
 
 
 

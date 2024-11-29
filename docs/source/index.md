@@ -1,4 +1,3 @@
-# PyUncertainNumber
 
 <!-- ```{image} _static/hex.png
 :alt: The Py-Pkgs-Cookiecutter logo.
@@ -8,8 +7,11 @@
 
 <br>
 
-`PyUncertainNumber` is a Python function library for generic computational tasks focussing on aleatory and epistemic uncertainty, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation.
+<!-- `PyUncertainNumber` is a Python function library for generic computational tasks focussing on aleatory and epistemic uncertainty, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation. -->
 
+
+```{include} ../../README.md
+```
 
 ## Features
 
@@ -42,13 +44,27 @@ To learn more, checkout the sections below.
 `PyUncertainNumber` was originally developed for use in the DAWS2 project. It has the capacity serve as a full-fleged UQ softwware to work beyond to fulfill general UQ challenges.
 
 ```{toctree}
+:hidden:
+Home <self>
+```
+
+```{toctree}
 :maxdepth: 2
+:caption: User Guides
 :hidden:
 
-Home <self>
-Quick Start <quickstart>
-User Guide <user-guide>
-Contributing <contributing>
-Code of Conduct <conduct>
-<!-- Python Packages Book <http://py-pkgs.org> -->
+guides/installation
+guides/uc
+guides/up
+```
+
+
+```{toctree}
+:caption: probability bounds analysis
+:hidden:
+
+pbox
+cbox
+interval_analysis
+<!-- autoapi/index -->
 ```

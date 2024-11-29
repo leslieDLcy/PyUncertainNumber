@@ -1,4 +1,5 @@
 """
+the parametric pbox constructors
 currently this file stores all the codes in the `.dist` module as an attempt to replace the odd-naming `.dist` module
 two reasons:
 1. I keep the `.dist` module such that I won't break existing code;
@@ -6,7 +7,7 @@ two reasons:
 """
 
 from PyUncertainNumber.UC.params import Params
-from .interval  import Interval
+from .interval import Interval
 from .pbox_base import Pbox
 import scipy.stats as sps
 import numpy as np
@@ -18,7 +19,6 @@ from warnings import *
 
 
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
-
 
 
 # a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
@@ -141,13 +141,12 @@ dists = {
 
 
 def __get_bounds(function_name=None, steps=Params.steps, *args):
-
     """ from distribution specification to define the lower and upper bounds of the p-box
-    
+
     args:
         - function_name: (str) the name of the distribution
     """
-    
+
     # TODO logically speaking, it can be (0,1) ergo support will be [-inf, inf] see it works with other part codes
     # define percentile range thus getting the support
     p = np.linspace(0.0001, 0.9999, steps)
@@ -185,7 +184,6 @@ def __get_bounds(function_name=None, steps=Params.steps, *args):
     Right = np.array(Right)
 
     return Left, Right, mean, var
-
 
 
 # ---------------------supported distribution objects for pboxes ---------------------#
@@ -239,8 +237,10 @@ def lognormal(
     bound2 = __lognorm(mean.left, var.right).ppf(x)
     bound3 = __lognorm(mean.right, var.right).ppf(x)
 
-    Left = [min(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
-    Right = [max(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
+    Left = [min(bound0[i], bound1[i], bound2[i], bound3[i])
+            for i in range(steps)]
+    Right = [max(bound0[i], bound1[i], bound2[i], bound3[i])
+             for i in range(steps)]
 
     Left = np.array(Left)
     Right = np.array(Right)
@@ -1730,6 +1730,26 @@ def norm(*args, steps=Params.steps):
     )
 
 
+def norm_debug(*args, steps=Params.steps):
+    args = list(args)
+    for i in range(0, len(args)):
+        if args[i].__class__.__name__ != "Interval":
+            args[i] = Interval(args[i])
+
+    Left, Right, mean, var = __get_bounds("norm", steps, *args)
+    return Left, Right, mean, var
+    # return Pbox(
+    #     Left,
+    #     Right,
+    #     steps=steps,
+    #     shape="norm",
+    #     mean_left=mean.left,
+    #     mean_right=mean.right,
+    #     var_left=var.left,
+    #     var_right=var.right,
+    # )
+
+
 def norminvgauss(*args, steps=Params.steps):
     args = list(args)
     for i in range(0, len(args)):
@@ -2064,7 +2084,8 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
     a, b = (left - mean) / stddev, (right - mean) / stddev
 
-    Left, Right, mean, var = __get_bounds("truncnorm", steps, a, b, mean, stddev)
+    Left, Right, mean, var = __get_bounds(
+        "truncnorm", steps, a, b, mean, stddev)
 
     return Pbox(
         Left,
@@ -2554,7 +2575,7 @@ def yulesimon(*args, steps=Params.steps):
     )
 
 
-### Other distributions
+# Other distributions
 def KM(k, m, steps=Params.steps):
     with catch_warnings():
         simplefilter("ignore")
@@ -2565,10 +2586,8 @@ def KN(k, n, steps=Params.steps):
     return KM(k, n - k, steps=steps)
 
 
-
 # ---------------------aliases---------------------#
-
-### Alternate names
+# Alternate names
 normal = norm
 N = normal
 unif = uniform
