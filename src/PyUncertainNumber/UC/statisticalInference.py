@@ -202,7 +202,7 @@ def MMtriangular(x, iters=100, dives=10):  # **
 
 
 ###############################################################################
-# Alternative maximum likelihood estimation constructors using scipy.stats
+# * Alternative maximum likelihood estimation constructors using scipy.stats  *#
 ###############################################################################
 
 # Some of these functions may support intervals in the data x.  See
@@ -219,7 +219,7 @@ def MLchisquared(x): return (chi2(*sps.chi2.fit(x)))
 
 
 def MLexponential(x):
-    #! test on interval data
+    # * test on interval data --> succeeds
     if isinstance(x, sps.CensoredData | np.ndarray | list):
         return expon(*sps.expon.fit(x))
     elif isinstance(x, Interval):
