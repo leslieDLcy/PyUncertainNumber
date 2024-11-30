@@ -1,8 +1,8 @@
 '''
 re: non-parametric pbox construction
 
-Functions that can be used to generate non-parametric p-boxes. 
-These functions are used to generate p-boxes based upon the minimum, maximum, mean, median, 
+Functions that can be used to generate non-parametric p-boxes.
+These functions are used to generate p-boxes based upon the minimum, maximum, mean, median,
 mode, standard deviation, variance, and coefficient of variation of the variable.
 - Leslie made many changes
 '''
@@ -26,51 +26,81 @@ __all__ = [
     'from_percentiles'
 ]
 
+from intervals import Interval
 from .pbox_base import Pbox, imposition, NotIncreasingError
-from .interval import Interval
-from .dists import *
-from .core import *
-from .logical import *
-
 from typing import *
 from warnings import warn
 import numpy as np
 import matplotlib.pyplot as plt
-
+import scipy.stats as sps
 
 # ---------------------from data---------------------#
+
+
 def logical_bounding(a):
-    """ p16. eq(2.21) """
+    """ Sudret p16. eq(2.21) """
     a = np.where(a < 0, 0, a)
     a = np.where(a < 1, a, 1)
     return a
 
 
-def c_data2freepbox(s, dn, display=True):
-    """ construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds 
+def d_alpha(n, alpha):
+    """ compute the Smirnov critical value for a given sample size and significance level
+
+    note:
+        Tretiak p12. eq(8): alpha = (1-c) / 2 where c is the confidence level
+
+    args:
+        - n (int): sample size;
+        - alpha (float): significance level;
+    """
+
+    A = {0.1: 0.00256, 0.05: 0.05256, 0.025: 0.11282}
+    return np.sqrt(np.log(1/alpha) / (2*n)) - 0.16693 * (1/n) - A.get(alpha, 1000) * (n ** (-3/2))
+
+
+def KS_bounds(s, alpha: float, display=True) -> Tuple[np.ndarray, np.ndarray]:
+    """ construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
 
     args:
         - s (array-like): sample data;
         - dn (scalar): KS critical value at significance level \alpha and sample size N;
     """
+    dn = d_alpha(len(s), alpha)
+    if isinstance(s, list | np.ndarray):
+        ecdf = sps.ecdf(s)
+        ecdf_l, ecdf_r = ecdf.cdf.probabilities + dn, ecdf.cdf.probabilities - dn
+        ecdf_l, ecdf_r = logical_bounding(ecdf_l), logical_bounding(ecdf_r)
 
-    # get the empirical cdf
-    empi_cdf = sps.ecdf(s)
+        if display:
+            fig, ax = plt.subplots()
+            ax.plot(ecdf.cdf.quantiles, ecdf_l, label='upper bound',
+                    drawstyle='steps-post', color='g')
+            ax.plot(ecdf.cdf.quantiles, ecdf_r, label='lower bound',
+                    drawstyle='steps-post', color='b')
+            ecdf.cdf.plot(ax,  ls=':', color='black', label='empirical')
+            ax.set_title(
+                f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
+            ax.legend()
 
-    # step 1:
-    ecdf_l, ecdf_r = empi_cdf.cdf.probabilities + dn, empi_cdf.cdf.probabilities - dn
+    elif isinstance(s, Interval):
+        fl = sps.ecdf(s.lo)
+        fr = sps.ecdf(s.hi)
+        ecdf_l, ecdf_r = fl.cdf.probabilities + dn, fr.cdf.probabilities - dn
+        ecdf_l, ecdf_r = logical_bounding(ecdf_l), logical_bounding(ecdf_r)
 
-    # step 2:
-    ecdf_l, ecdf_r = logical_bounding(ecdf_l), logical_bounding(ecdf_r)
+        if display:
+            fig, ax = plt.subplots()
+            ax.plot(fl.cdf.quantiles, ecdf_l, label='upper bound',
+                    drawstyle='steps-post', color='g')
+            ax.plot(fr.cdf.quantiles, ecdf_r, label='lower bound',
+                    drawstyle='steps-post', color='b')
+            ax.set_title(
+                f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
+            ax.legend()
 
-    if display:
-        fig, ax = plt.subplots()
-        ax.plot(empi_cdf.cdf.quantiles, ecdf_l, label='upper bound',
-                drawstyle='steps-post', color='g')
-        ax.plot(empi_cdf.cdf.quantiles, ecdf_r, label='lower bound',
-                drawstyle='steps-post', color='b')
-        empi_cdf.cdf.plot(ax, label='empirical', ls=':', color='black')
-        ax.legend()
+    else:
+        raise ValueError("Invalid input data type")
 
     return ecdf_l, ecdf_r
 
@@ -95,8 +125,8 @@ def known_properties(
         steps: int = Pbox.STEPS
 ) -> Pbox:
     '''
-    Generates a distribution free p-box based upon the information given. 
-    This function works by calculating every possible non-parametric p-box that can be generated using the information provided. 
+    Generates a distribution free p-box based upon the information given.
+    This function works by calculating every possible non-parametric p-box that can be generated using the information provided.
     The returned p-box is the intersection of these p-boxes.
 
     **Parameters**:
@@ -556,11 +586,11 @@ def symmetric_mean_std(
     **Parameters**:
 
     ``mean`` :  mean value of the variable
-    ``std`` : standard deviation of the variable 
+    ``std`` : standard deviation of the variable
 
     **Returns**
 
-        ``Pbox``    
+        ``Pbox``
 
     '''
     iii = [1/steps] + [i/steps for i in range(1, steps-1)]
@@ -594,7 +624,7 @@ def min_max_mean_std(
         ``minimum`` : minimum value of the variable
         ``maximum`` : maximum value of the variable
         ``mean`` : mean value of the variable
-        ``std`` :standard deviation of the variable 
+        ``std`` :standard deviation of the variable
 
     **Returns**
 
@@ -721,7 +751,7 @@ def min_max_mean_var(
         ``minimum`` : minimum value of the variable
         ``maximum`` : maximum value of the variable
         ``mean`` : mean value of the variable
-        ``var`` :variance of the variable 
+        ``var`` :variance of the variable
 
     **Returns**
 
@@ -732,7 +762,7 @@ def min_max_mean_var(
 
         Equivalent to ``min_max_mean_std(minimum,maximum,mean,np.sqrt(var))``
 
-    .. seealso:: 
+    .. seealso::
 
         :func:`min_max_mean_std`
 

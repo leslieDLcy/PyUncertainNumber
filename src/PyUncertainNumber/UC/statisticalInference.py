@@ -32,7 +32,9 @@ examples:
 # Method-of-Moment distribution constructors (matching central moments of x)
 ###############################################################################
 
+''' hint: given interval data x, return pbox '''
 # TODO Some of tThese functions may not support intervals in the data x          #**
+
 
 def MMbernoulli(x: np.ndarray):
     return bernoulli(x.mean())  # assumes x is zeros and ones
@@ -68,7 +70,7 @@ def MMchisquared(x): return (chi2(np.round(x.mean())))
 
 
 def MMexponential(x):
-    #! test interval data
+    # * test interval data --> succeeds
     return pba.expon(mean(x))
 
 
@@ -219,6 +221,12 @@ def MLchisquared(x): return (chi2(*sps.chi2.fit(x)))
 
 
 def MLexponential(x):
+    """ Maximum likelihood estimation for exponential distribution.
+
+    note:
+        - precise data returns precise distrubution
+        - interval data can return either a precise distribution or a pbox 
+    """
     # * test on interval data --> succeeds
     if isinstance(x, sps.CensoredData | np.ndarray | list):
         return expon(*sps.expon.fit(x))
