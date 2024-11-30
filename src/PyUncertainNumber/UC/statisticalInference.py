@@ -5,6 +5,10 @@ from scipy.stats import (bernoulli, beta, betabinom, binom, chi2,
                          pareto, powerlaw, triang,
                          geom, loguniform, f as F)
 import scipy.stats as sps
+from .intervalOperators import mean
+from intervals import Interval
+from PyUncertainNumber import pba
+
 ''' Here we define the statistical inference functions from data for the UncertainNumber class. 
 
 examples:
@@ -43,7 +47,8 @@ def MMbeta(x: np.ndarray):
     return beta(alpha, beta_p)
 
 
-def MMbetabinomial(n, x):  # **
+def MMbetabinomial(n: int, x):  # **
+    #! 'x**2' variable repetition
     # n must be provided; it's not estimated from data
     # https://en.wikipedia.org/wiki/Beta-binomial_distribution#Example:
     # MMbetabinomial(n=12,rep(0:12,c(3,24,104,286,670,1033,1343,1112,829,478,181,45,7)))
@@ -62,7 +67,9 @@ def MMbinomial(x):  # **
 def MMchisquared(x): return (chi2(np.round(x.mean())))
 
 
-def MMexponential(x): return (expon(mean=x.mean()))
+def MMexponential(x):
+    #! test interval data
+    return pba.expon(mean(x))
 
 
 def MMF(x):  # **
@@ -209,7 +216,18 @@ def MLbeta(x): return (beta(*sps.beta.fit(x)))
 def MLbetabinomial(x): return (betabinom(*sps.betabinom.fit(x)))
 def MLbinomial(x): return (binom(*sps.binom.fit(x)))
 def MLchisquared(x): return (chi2(*sps.chi2.fit(x)))
-def MLexponential(x): return (expon(*sps.expon.fit(x)))
+
+
+def MLexponential(x):
+    #! test on interval data
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return expon(*sps.expon.fit(x))
+    elif isinstance(x, Interval):
+        return pba.expon(mean(x))
+    else:
+        raise TypeError('Input data type not supported')
+
+
 def MLF(x): return (F(*sps.f.fit(x)))
 def MLgamma(x): return (gamma(*sps.gamma.fit(x)))
 def MLgammaexponential(x): return (

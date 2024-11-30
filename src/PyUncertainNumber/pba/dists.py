@@ -6,7 +6,7 @@ In short, distribution-based p-boxes or parametric pboxes
 """
 
 from PyUncertainNumber.UC.params import Params
-from .interval  import Interval
+from .interval import Interval
 from .pbox_base import Pbox
 import scipy.stats as sps
 import numpy as np
@@ -18,7 +18,6 @@ from warnings import *
 
 
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
-
 
 
 # a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
@@ -140,11 +139,9 @@ dists = {
 }
 
 
-
 def __get_bounds(function_name=None, steps=Params.steps, *args):
-
     """ heavy lifting function that returns the bounds of the distribution for defining pboxes
-    
+
     returns:
         Left: (array-like or list) left-bound of the pbox
         Right: (array-like or list) right-bound of the pbox
@@ -185,7 +182,6 @@ def __get_bounds(function_name=None, steps=Params.steps, *args):
     Right = np.array(Right)
 
     return Left, Right, mean, var
-
 
 
 # ---------------------supported distribution objects for pboxes ---------------------#
@@ -239,8 +235,10 @@ def lognormal(
     bound2 = __lognorm(mean.left, var.right).ppf(x)
     bound3 = __lognorm(mean.right, var.right).ppf(x)
 
-    Left = [min(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
-    Right = [max(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
+    Left = [min(bound0[i], bound1[i], bound2[i], bound3[i])
+            for i in range(steps)]
+    Right = [max(bound0[i], bound1[i], bound2[i], bound3[i])
+             for i in range(steps)]
 
     Left = np.array(Left)
     Right = np.array(Right)
@@ -2064,7 +2062,8 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
     a, b = (left - mean) / stddev, (right - mean) / stddev
 
-    Left, Right, mean, var = __get_bounds("truncnorm", steps, a, b, mean, stddev)
+    Left, Right, mean, var = __get_bounds(
+        "truncnorm", steps, a, b, mean, stddev)
 
     return Pbox(
         Left,
@@ -2554,280 +2553,278 @@ def yulesimon(*args, steps=Params.steps):
     )
 
 
-### Other distributions
-def KM(k, m, steps=Params.steps):
-    with catch_warnings():
-        simplefilter("ignore")
-        return beta(Interval(k, k + 1), Interval(m, m + 1), steps=steps)
+# ### Other distributions
+# def KM(k, m, steps=Params.steps):
+#     with catch_warnings():
+#         simplefilter("ignore")
+#         return beta(Interval(k, k + 1), Interval(m, m + 1), steps=steps)
 
 
-def KN(k, n, steps=Params.steps):
-    return KM(k, n - k, steps=steps)
+# def KN(k, n, steps=Params.steps):
+#     return KM(k, n - k, steps=steps)
 
 
-
-named_pbox = {
-    "alpha": alpha,
-    "anglit": anglit,
-    "arcsine": arcsine,
-    "argus": argus,
-    "beta": beta,
-    "betaprime": betaprime,
-    "bradford": bradford,
-    "burr": burr,
-    "burr12": burr12,
-    "cauchy": cauchy,
-    "chi": chi,
-    "chi2": chi2,
-    "cosine": cosine,
-    "crystalball": crystalball,
-    "dgamma": dgamma,
-    "dweibull": dweibull,
-    "erlang": erlang,
-    "expon": expon,
-    "exponnorm": exponnorm,
-    "exponweib": exponweib,
-    "exponpow": exponpow,
-    "f": f,
-    "fatiguelife": fatiguelife,
-    "fisk": fisk,
-    "foldcauchy": foldcauchy,
-    "foldnorm": foldnorm,
-    # 'frechet_r' : frechet_r,
-    # 'frechet_l' : frechet_l,
-    "genlogistic": genlogistic,
-    "gennorm": gennorm,
-    "genpareto": genpareto,
-    "genexpon": genexpon,
-    "genextreme": genextreme,
-    "gausshyper": gausshyper,
-    "gamma": gamma,
-    "gengamma": gengamma,
-    "genhalflogistic": genhalflogistic,
-    "geninvgauss": geninvgauss,
-    # 'gibrat' : gibrat,
-    "gompertz": gompertz,
-    "gumbel_r": gumbel_r,
-    "gumbel_l": gumbel_l,
-    "halfcauchy": halfcauchy,
-    "halflogistic": halflogistic,
-    "halfnorm": halfnorm,
-    "halfgennorm": halfgennorm,
-    "hypsecant": hypsecant,
-    "invgamma": invgamma,
-    "invgauss": invgauss,
-    "invweibull": invweibull,
-    "johnsonsb": johnsonsb,
-    "johnsonsu": johnsonsu,
-    "kappa4": kappa4,
-    "kappa3": kappa3,
-    "ksone": ksone,
-    "kstwobign": kstwobign,
-    "laplace": laplace,
-    "levy": levy,
-    "levy_l": levy_l,
-    "levy_stable": levy_stable,
-    "logistic": logistic,
-    "loggamma": loggamma,
-    "loglaplace": loglaplace,
-    "lognormal": lognormal,
-    "loguniform": loguniform,
-    "lomax": lomax,
-    "maxwell": maxwell,
-    "mielke": mielke,
-    "moyal": moyal,
-    "nakagami": nakagami,
-    "ncx2": ncx2,
-    "ncf": ncf,
-    "nct": nct,
-    "norm": norm,
-    "normal": norm,
-    "gaussian": norm,  
-    "norminvgauss": norminvgauss,
-    "pareto": pareto,
-    "pearson3": pearson3,
-    "powerlaw": powerlaw,
-    "powerlognorm": powerlognorm,
-    "powernorm": powernorm,
-    "rdist": rdist,
-    "rayleigh": rayleigh,
-    "rice": rice,
-    "recipinvgauss": recipinvgauss,
-    "semicircular": semicircular,
-    "skewnorm": skewnorm,
-    "t": t,
-    "trapz": trapz,
-    "triang": triang,
-    "truncexpon": truncexpon,
-    "truncnorm": truncnorm,
-    "tukeylambda": tukeylambda,
-    "uniform": uniform,
-    "vonmises": vonmises,
-    "vonmises_line": vonmises_line,
-    "wald": wald,
-    "weibull_min": weibull_min,
-    "weibull_max": weibull_max,
-    "wrapcauchy": wrapcauchy,
-    "bernoulli": bernoulli,
-    "betabinom": betabinom,
-    "binom": binom,
-    "boltzmann": boltzmann,
-    "dlaplace": dlaplace,
-    "geom": geom,
-    "hypergeom": hypergeom,
-    "logser": logser,
-    "nbinom": nbinom,
-    "planck": planck,
-    "poisson": poisson,
-    "randint": randint,
-    "skellam": skellam,
-    "zipf": zipf,
-    "yulesimon": yulesimon,
-}
-
-
-# ---------------------aliases---------------------#
-
-### Alternate names
-normal = norm
-N = normal
-unif = uniform
-U = uniform
-lognorm = lognormal
+# named_pbox = {
+#     "alpha": alpha,
+#     "anglit": anglit,
+#     "arcsine": arcsine,
+#     "argus": argus,
+#     "beta": beta,
+#     "betaprime": betaprime,
+#     "bradford": bradford,
+#     "burr": burr,
+#     "burr12": burr12,
+#     "cauchy": cauchy,
+#     "chi": chi,
+#     "chi2": chi2,
+#     "cosine": cosine,
+#     "crystalball": crystalball,
+#     "dgamma": dgamma,
+#     "dweibull": dweibull,
+#     "erlang": erlang,
+#     "expon": expon,
+#     "exponnorm": exponnorm,
+#     "exponweib": exponweib,
+#     "exponpow": exponpow,
+#     "f": f,
+#     "fatiguelife": fatiguelife,
+#     "fisk": fisk,
+#     "foldcauchy": foldcauchy,
+#     "foldnorm": foldnorm,
+#     # 'frechet_r' : frechet_r,
+#     # 'frechet_l' : frechet_l,
+#     "genlogistic": genlogistic,
+#     "gennorm": gennorm,
+#     "genpareto": genpareto,
+#     "genexpon": genexpon,
+#     "genextreme": genextreme,
+#     "gausshyper": gausshyper,
+#     "gamma": gamma,
+#     "gengamma": gengamma,
+#     "genhalflogistic": genhalflogistic,
+#     "geninvgauss": geninvgauss,
+#     # 'gibrat' : gibrat,
+#     "gompertz": gompertz,
+#     "gumbel_r": gumbel_r,
+#     "gumbel_l": gumbel_l,
+#     "halfcauchy": halfcauchy,
+#     "halflogistic": halflogistic,
+#     "halfnorm": halfnorm,
+#     "halfgennorm": halfgennorm,
+#     "hypsecant": hypsecant,
+#     "invgamma": invgamma,
+#     "invgauss": invgauss,
+#     "invweibull": invweibull,
+#     "johnsonsb": johnsonsb,
+#     "johnsonsu": johnsonsu,
+#     "kappa4": kappa4,
+#     "kappa3": kappa3,
+#     "ksone": ksone,
+#     "kstwobign": kstwobign,
+#     "laplace": laplace,
+#     "levy": levy,
+#     "levy_l": levy_l,
+#     "levy_stable": levy_stable,
+#     "logistic": logistic,
+#     "loggamma": loggamma,
+#     "loglaplace": loglaplace,
+#     "lognormal": lognormal,
+#     "loguniform": loguniform,
+#     "lomax": lomax,
+#     "maxwell": maxwell,
+#     "mielke": mielke,
+#     "moyal": moyal,
+#     "nakagami": nakagami,
+#     "ncx2": ncx2,
+#     "ncf": ncf,
+#     "nct": nct,
+#     "norm": norm,
+#     "normal": norm,
+#     "gaussian": norm,
+#     "norminvgauss": norminvgauss,
+#     "pareto": pareto,
+#     "pearson3": pearson3,
+#     "powerlaw": powerlaw,
+#     "powerlognorm": powerlognorm,
+#     "powernorm": powernorm,
+#     "rdist": rdist,
+#     "rayleigh": rayleigh,
+#     "rice": rice,
+#     "recipinvgauss": recipinvgauss,
+#     "semicircular": semicircular,
+#     "skewnorm": skewnorm,
+#     "t": t,
+#     "trapz": trapz,
+#     "triang": triang,
+#     "truncexpon": truncexpon,
+#     "truncnorm": truncnorm,
+#     "tukeylambda": tukeylambda,
+#     "uniform": uniform,
+#     "vonmises": vonmises,
+#     "vonmises_line": vonmises_line,
+#     "wald": wald,
+#     "weibull_min": weibull_min,
+#     "weibull_max": weibull_max,
+#     "wrapcauchy": wrapcauchy,
+#     "bernoulli": bernoulli,
+#     "betabinom": betabinom,
+#     "binom": binom,
+#     "boltzmann": boltzmann,
+#     "dlaplace": dlaplace,
+#     "geom": geom,
+#     "hypergeom": hypergeom,
+#     "logser": logser,
+#     "nbinom": nbinom,
+#     "planck": planck,
+#     "poisson": poisson,
+#     "randint": randint,
+#     "skellam": skellam,
+#     "zipf": zipf,
+#     "yulesimon": yulesimon,
+# }
 
 
-# def betapert(minimum, maximum, mode):
-#     mu = (minimum + maximum + 4*mode)/6
-#     alpha1 = (mu - minimum)*(2*mode - minimum - maximum)/((mode - mu)*(maximum - minimum))
-#     alpha2 = alpha1*(maximum - mu)/(mu - minimum)
-#     return minimum + (maximum - minimum) * beta(alpha1, alpha2)
+# # ---------------------aliases---------------------#
+
+# ### Alternate names
+# normal = norm
+# N = normal
+# unif = uniform
+# U = uniform
+# lognorm = lognormal
 
 
+# # def betapert(minimum, maximum, mode):
+# #     mu = (minimum + maximum + 4*mode)/6
+# #     alpha1 = (mu - minimum)*(2*mode - minimum - maximum)/((mode - mu)*(maximum - minimum))
+# #     alpha2 = alpha1*(maximum - mu)/(mu - minimum)
+# #     return minimum + (maximum - minimum) * beta(alpha1, alpha2)
 
-# __all__ = [
-#     "KM",
-#     "KN",
-#     "N",
-#     "U",
-#     "alpha",
-#     "anglit",
-#     "arcsine",
-#     "argus",
-#     "bernoulli",
-#     "beta",
-#     "betabinom",
-#     # 'betapert',
-#     "betaprime",
-#     "binom",
-#     "boltzmann",
-#     "bradford",
-#     "burr",
-#     "burr12",
-#     "cauchy",
-#     "chi",
-#     "chi2",
-#     "cosine",
-#     "crystalball",
-#     "dgamma",
-#     "dists",
-#     "dlaplace",
-#     "dweibull",
-#     "erlang",
-#     "expon",
-#     "exponnorm",
-#     "exponpow",
-#     "exponweib",
-#     "f",
-#     "fatiguelife",
-#     "fisk",
-#     "foldcauchy",
-#     "foldnorm",
-#     "gamma",
-#     "gausshyper",
-#     "genexpon",
-#     "genextreme",
-#     "gengamma",
-#     "genhalflogistic",
-#     "geninvgauss",
-#     "genlogistic",
-#     "gennorm",
-#     "genpareto",
-#     "geom",
-#     # 'gibrat',
-#     "gompertz",
-#     "gumbel_l",
-#     "gumbel_r",
-#     "halfcauchy",
-#     "halfgennorm",
-#     "halflogistic",
-#     "halfnorm",
-#     "hypergeom",
-#     "hypsecant",
-#     "invgamma",
-#     "invgauss",
-#     "invweibull",
-#     "itertools",
-#     "johnsonsb",
-#     "johnsonsu",
-#     "kappa3",
-#     "kappa4",
-#     "ksone",
-#     "kstwobign",
-#     "laplace",
-#     "levy",
-#     "levy_l",
-#     "levy_stable",
-#     "loggamma",
-#     "logistic",
-#     "loglaplace",
-#     "lognorm",
-#     "lognormal",
-#     "logser",
-#     "loguniform",
-#     "lomax",
-#     "maxwell",
-#     "mielke",
-#     "moyal",
-#     "nakagami",
-#     "nbinom",
-#     "ncf",
-#     "nct",
-#     "ncx2",
-#     "norm",
-#     "normal",
-#     "norminvgauss",
-#     "np",
-#     "pareto",
-#     "pearson3",
-#     "planck",
-#     "poisson",
-#     "powerlaw",
-#     "powerlognorm",
-#     "powernorm",
-#     "randint",
-#     "rayleigh",
-#     "rdist",
-#     "recipinvgauss",
-#     "rice",
-#     "semicircular",
-#     "skellam",
-#     "skewnorm",
-#     "sps",
-#     "t",
-#     "trapz",
-#     "triang",
-#     "truncexpon",
-#     "truncnorm",
-#     "tukeylambda",
-#     "unif",
-#     "uniform",
-#     "vonmises",
-#     "vonmises_line",
-#     "wald",
-#     "weibull",
-#     "weibull_max",
-#     "weibull_min",
-#     "wrapcauchy",
-#     "yulesimon",
-#     "zipf",
-# ]
+
+# # __all__ = [
+# #     "KM",
+# #     "KN",
+# #     "N",
+# #     "U",
+# #     "alpha",
+# #     "anglit",
+# #     "arcsine",
+# #     "argus",
+# #     "bernoulli",
+# #     "beta",
+# #     "betabinom",
+# #     # 'betapert',
+# #     "betaprime",
+# #     "binom",
+# #     "boltzmann",
+# #     "bradford",
+# #     "burr",
+# #     "burr12",
+# #     "cauchy",
+# #     "chi",
+# #     "chi2",
+# #     "cosine",
+# #     "crystalball",
+# #     "dgamma",
+# #     "dists",
+# #     "dlaplace",
+# #     "dweibull",
+# #     "erlang",
+# #     "expon",
+# #     "exponnorm",
+# #     "exponpow",
+# #     "exponweib",
+# #     "f",
+# #     "fatiguelife",
+# #     "fisk",
+# #     "foldcauchy",
+# #     "foldnorm",
+# #     "gamma",
+# #     "gausshyper",
+# #     "genexpon",
+# #     "genextreme",
+# #     "gengamma",
+# #     "genhalflogistic",
+# #     "geninvgauss",
+# #     "genlogistic",
+# #     "gennorm",
+# #     "genpareto",
+# #     "geom",
+# #     # 'gibrat',
+# #     "gompertz",
+# #     "gumbel_l",
+# #     "gumbel_r",
+# #     "halfcauchy",
+# #     "halfgennorm",
+# #     "halflogistic",
+# #     "halfnorm",
+# #     "hypergeom",
+# #     "hypsecant",
+# #     "invgamma",
+# #     "invgauss",
+# #     "invweibull",
+# #     "itertools",
+# #     "johnsonsb",
+# #     "johnsonsu",
+# #     "kappa3",
+# #     "kappa4",
+# #     "ksone",
+# #     "kstwobign",
+# #     "laplace",
+# #     "levy",
+# #     "levy_l",
+# #     "levy_stable",
+# #     "loggamma",
+# #     "logistic",
+# #     "loglaplace",
+# #     "lognorm",
+# #     "lognormal",
+# #     "logser",
+# #     "loguniform",
+# #     "lomax",
+# #     "maxwell",
+# #     "mielke",
+# #     "moyal",
+# #     "nakagami",
+# #     "nbinom",
+# #     "ncf",
+# #     "nct",
+# #     "ncx2",
+# #     "norm",
+# #     "normal",
+# #     "norminvgauss",
+# #     "np",
+# #     "pareto",
+# #     "pearson3",
+# #     "planck",
+# #     "poisson",
+# #     "powerlaw",
+# #     "powerlognorm",
+# #     "powernorm",
+# #     "randint",
+# #     "rayleigh",
+# #     "rdist",
+# #     "recipinvgauss",
+# #     "rice",
+# #     "semicircular",
+# #     "skellam",
+# #     "skewnorm",
+# #     "sps",
+# #     "t",
+# #     "trapz",
+# #     "triang",
+# #     "truncexpon",
+# #     "truncnorm",
+# #     "tukeylambda",
+# #     "unif",
+# #     "uniform",
+# #     "vonmises",
+# #     "vonmises_line",
+# #     "wald",
+# #     "weibull",
+# #     "weibull_max",
+# #     "weibull_min",
+# #     "wrapcauchy",
+# #     "yulesimon",
+# #     "zipf",
+# # ]

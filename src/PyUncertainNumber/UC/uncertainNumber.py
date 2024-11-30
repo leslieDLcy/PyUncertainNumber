@@ -17,7 +17,7 @@ from PyUncertainNumber.UP.endpoints import endpoints_propagation_2n
 from PyUncertainNumber.NLP_constructor.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
-from PyUncertainNumber.pba.dists import named_pbox
+from PyUncertainNumber.pba.pbox import named_pbox
 
 """ Uncertain Number class """
 
@@ -158,12 +158,11 @@ class UncertainNumber:
             - parameters: (list) the parameters of the distribution
         """
 
-        obj = named_pbox.get(keyword, 
-                       "You're lucky as the distribution is not supported")
+        obj = named_pbox.get(keyword,
+                             "You're lucky as the distribution is not supported")
         if isinstance(obj, str):
             print(obj)  # print the error message
         return obj(*parameters)
-
 
     def init_check(self):
         """check if the UN initialisation specification is correct
@@ -184,8 +183,10 @@ class UncertainNumber:
             this has nothing to do with the logic of JSON serialisation
             ergo, do whatever you fancy;
         """
-        field_values = {k: v for k, v in self.__dict__.items() if v is not None}
-        field_str = ", ".join(f"{k}={repr(v)}" for k, v in field_values.items())
+        field_values = {k: v for k, v in self.__dict__.items()
+                        if v is not None}
+        field_str = ", ".join(f"{k}={repr(v)}" for k,
+                              v in field_values.items())
         return f"{self.__class__.__name__}({field_str})"
 
     def __repr__(self) -> str:
@@ -264,7 +265,7 @@ class UncertainNumber:
 
     def display(self, **kwargs):
         """quick plot of the uncertain number object"""
-        
+
         return self._math_object.display(**kwargs)
 
     # ---------------------other constructors---------------------#
@@ -311,13 +312,10 @@ class UncertainNumber:
         """
         pass
 
-
     @classmethod
     def I(cls, bounds, **kwargs):
         """a shortcut for creating an interval-type Uncertain Number"""
         return cls(essence="interval", bounds=bounds, **kwargs)
-
-
 
     # ---------------------arithmetic operations---------------------#
 
@@ -507,7 +505,6 @@ class UncertainNumber:
             json.dump(self, fp, cls=UNEncoder, indent=4)
 
 
-
 # ---------------------class related methods---------------------#
 
 # TODO unfinished logic: currently if suffices in creating only `Interval` object
@@ -567,15 +564,16 @@ def parse_description(description):
 
 def _parse_interverl_inputs(vars):
     """ Parse the input intervals
-    
+
     note:
         - Ioanna's funcs typically take 2D NumPy arra
     """
     if isinstance(vars, np.ndarray):
         if vars.shape[1] != 2:
-            raise ValueError("vars must be a 2D array with two columns per row (lower and upper bounds)")
+            raise ValueError(
+                "vars must be a 2D array with two columns per row (lower and upper bounds)")
         else:
             return vars
-        
+
     if isinstance(vars, list):
         return UncertainNumber._toIntervalBackend(vars)

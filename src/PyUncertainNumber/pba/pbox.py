@@ -9,15 +9,15 @@ two reasons:
 import functools
 from PyUncertainNumber.UC.params import Params
 from .interval import Interval as nInterval
+from intervals import Interval
 from .pbox_base import Pbox
 import scipy.stats as sps
 import numpy as np
 import itertools
 from .params import Params
-
 from typing import *
 from warnings import *
-
+from ..UC.intervalOperators import wc_interval
 
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
 
@@ -141,7 +141,7 @@ dists = {
 }
 
 
-def __get_bounds(function_name, *args, steps=Params.steps):
+def _get_bounds(function_name, *args, steps=Params.steps):
     """ from distribution specification to define the lower and upper bounds of the p-box
 
     args:
@@ -150,7 +150,6 @@ def __get_bounds(function_name, *args, steps=Params.steps):
 
     # TODO logically speaking, it can be (0,1) ergo support will be [-inf, inf] see it works with other part codes
     # define percentile range thus getting the support
-    # p = np.linspace(0.0001, 0.9999, steps)
     p = Params.p_values
 
     # get bound arguments
@@ -191,10 +190,13 @@ def __get_bounds(function_name, *args, steps=Params.steps):
 def makePbox(func):
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-        i_args = [nInterval(arg)
-                  for arg in args if not isinstance(arg, nInterval)]
+        # i_args = [arg if isinstance(
+        #     arg, nInterval | Interval) else nInterval(arg) for arg in args]
+
+        i_args = [wc_interval(arg) for arg in args]
         shape_value = func(*args, **kwargs)
-        Left, Right, mean, var = __get_bounds(shape_value, *i_args)
+        Left, Right, mean, var = _get_bounds(shape_value, *i_args)
+
         return Pbox(
             Left,
             Right,
@@ -307,7 +309,7 @@ def beta(*args, steps=Params.steps):
         if args[i].right == 0:
             args[i].right = 1e-5
 
-    Left, Right, mean, var = __get_bounds("beta", steps, *args)
+    Left, Right, mean, var = _get_bounds("beta", steps, *args)
 
     return Pbox(
         Left,
@@ -484,7 +486,7 @@ def foldnorm(mu, s, steps=Params.steps):
 #         if args[i].__class__.__name__ != 'nInterval':
 #             args[i] = nInterval(args[i])
 
-#     Left, Right, mean, var = __get_bounds('frechet_r',steps,*args)
+#     Left, Right, mean, var = _get_bounds('frechet_r',steps,*args)
 
 #     return Pbox(
 #           Left,
@@ -503,7 +505,7 @@ def foldnorm(mu, s, steps=Params.steps):
 #         if args[i].__class__.__name__ != 'nInterval':
 #             args[i] = nInterval(args[i])
 
-#     Left, Right, mean, var = __get_bounds('frechet_l',steps,*args)
+#     Left, Right, mean, var = _get_bounds('frechet_l',steps,*args)
 
 #     return Pbox(
 #           Left,
@@ -940,7 +942,7 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
     a, b = (left - mean) / stddev, (right - mean) / stddev
 
-    Left, Right, mean, var = __get_bounds(
+    Left, Right, mean, var = _get_bounds(
         "truncnorm", steps, a, b, mean, stddev)
 
     return Pbox(
@@ -1124,3 +1126,123 @@ lognorm = lognormal
 #     alpha1 = (mu - minimum)*(2*mode - minimum - maximum)/((mode - mu)*(maximum - minimum))
 #     alpha2 = alpha1*(maximum - mu)/(mu - minimum)
 #     return minimum + (maximum - minimum) * beta(alpha1, alpha2)
+
+# *---------------------named pboxes for UN ---------------------*#
+named_pbox = {
+    "alpha": alpha,
+    "anglit": anglit,
+    "arcsine": arcsine,
+    "argus": argus,
+    "beta": beta,
+    "betaprime": betaprime,
+    "bradford": bradford,
+    "burr": burr,
+    "burr12": burr12,
+    "cauchy": cauchy,
+    "chi": chi,
+    "chi2": chi2,
+    "cosine": cosine,
+    "crystalball": crystalball,
+    "dgamma": dgamma,
+    "dweibull": dweibull,
+    "erlang": erlang,
+    "expon": expon,
+    "exponnorm": exponnorm,
+    "exponweib": exponweib,
+    "exponpow": exponpow,
+    "f": f,
+    "fatiguelife": fatiguelife,
+    "fisk": fisk,
+    "foldcauchy": foldcauchy,
+    "foldnorm": foldnorm,
+    # 'frechet_r' : frechet_r,
+    # 'frechet_l' : frechet_l,
+    "genlogistic": genlogistic,
+    "gennorm": gennorm,
+    "genpareto": genpareto,
+    "genexpon": genexpon,
+    "genextreme": genextreme,
+    "gausshyper": gausshyper,
+    "gamma": gamma,
+    "gengamma": gengamma,
+    "genhalflogistic": genhalflogistic,
+    "geninvgauss": geninvgauss,
+    # 'gibrat' : gibrat,
+    "gompertz": gompertz,
+    "gumbel_r": gumbel_r,
+    "gumbel_l": gumbel_l,
+    "halfcauchy": halfcauchy,
+    "halflogistic": halflogistic,
+    "halfnorm": halfnorm,
+    "halfgennorm": halfgennorm,
+    "hypsecant": hypsecant,
+    "invgamma": invgamma,
+    "invgauss": invgauss,
+    "invweibull": invweibull,
+    "johnsonsb": johnsonsb,
+    "johnsonsu": johnsonsu,
+    "kappa4": kappa4,
+    "kappa3": kappa3,
+    "ksone": ksone,
+    "kstwobign": kstwobign,
+    "laplace": laplace,
+    "levy": levy,
+    "levy_l": levy_l,
+    "levy_stable": levy_stable,
+    "logistic": logistic,
+    "loggamma": loggamma,
+    "loglaplace": loglaplace,
+    "lognormal": lognormal,
+    "loguniform": loguniform,
+    "lomax": lomax,
+    "maxwell": maxwell,
+    "mielke": mielke,
+    "moyal": moyal,
+    "nakagami": nakagami,
+    "ncx2": ncx2,
+    "ncf": ncf,
+    "nct": nct,
+    "norm": norm,
+    "normal": norm,
+    "gaussian": norm,
+    "norminvgauss": norminvgauss,
+    "pareto": pareto,
+    "pearson3": pearson3,
+    "powerlaw": powerlaw,
+    "powerlognorm": powerlognorm,
+    "powernorm": powernorm,
+    "rdist": rdist,
+    "rayleigh": rayleigh,
+    "rice": rice,
+    "recipinvgauss": recipinvgauss,
+    "semicircular": semicircular,
+    "skewnorm": skewnorm,
+    "t": t,
+    "trapz": trapz,
+    "triang": triang,
+    "truncexpon": truncexpon,
+    "truncnorm": truncnorm,
+    "tukeylambda": tukeylambda,
+    "uniform": uniform,
+    "vonmises": vonmises,
+    "vonmises_line": vonmises_line,
+    "wald": wald,
+    "weibull_min": weibull_min,
+    "weibull_max": weibull_max,
+    "wrapcauchy": wrapcauchy,
+    "bernoulli": bernoulli,
+    "betabinom": betabinom,
+    "binom": binom,
+    "boltzmann": boltzmann,
+    "dlaplace": dlaplace,
+    "geom": geom,
+    "hypergeom": hypergeom,
+    "logser": logser,
+    "nbinom": nbinom,
+    "planck": planck,
+    "poisson": poisson,
+    "randint": randint,
+    "skellam": skellam,
+    "zipf": zipf,
+    "yulesimon": yulesimon,
+}
