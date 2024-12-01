@@ -14,7 +14,7 @@ from pint import UnitRegistry
 from pathlib import Path
 from PyUncertainNumber.UP.vertex import vertexMethod as vM
 from PyUncertainNumber.UP.endpoints import endpoints_propagation_2n
-from PyUncertainNumber.NLP_constructor.language_parsing import hedge_interpret
+from PyUncertainNumber.nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
 from PyUncertainNumber.pba.pbox import named_pbox
@@ -499,7 +499,27 @@ class UncertainNumber:
 
 # TODO unfinished logic: currently if suffices in creating only `Interval` object
 # @classmethod
+
+    # def __add__(self, other):
+    #     """ Add two uncertain numbers.
+    #     #TODO unfinished logic for adding uncertain numbers
+    # ! this code is kept for working with units
+    #     """
+
+    #     if not isinstance(other, type(self)):
+    #         raise TypeError(
+    #             "unsupported operand for +: "
+    #             f"'{type(self).__name__}' and '{type(other).__name__}'"
+    #         )
+    #     if not self.unit == other.unit:
+    #         raise TypeError(
+    #             f"incompatible units: '{self.unit}' and '{other.unit}'"
+    #         )
+
+    #     return type(self)(super().__add__(other), self.unit)
+
 def parse_description(description):
+    # TODO add functionality for pbox
     """Parse the description of the uncertain number when initialising an Uncertain Number object
 
     args:
@@ -532,24 +552,6 @@ def parse_description(description):
             # return PM(parsed_mid_value, hw=mid_range)
             # if we take the percentage based on the context
             return PM(parsed_mid_value, hw=parsed_mid_value * mid_range)
-
-    # def __add__(self, other):
-    #     """ Add two uncertain numbers.
-    #     #TODO unfinished logic for adding uncertain numbers
-    # ! this code is kept for working with units
-    #     """
-
-    #     if not isinstance(other, type(self)):
-    #         raise TypeError(
-    #             "unsupported operand for +: "
-    #             f"'{type(self).__name__}' and '{type(other).__name__}'"
-    #         )
-    #     if not self.unit == other.unit:
-    #         raise TypeError(
-    #             f"incompatible units: '{self.unit}' and '{other.unit}'"
-    #         )
-
-    #     return type(self)(super().__add__(other), self.unit)
 
 
 def _parse_interverl_inputs(vars):
