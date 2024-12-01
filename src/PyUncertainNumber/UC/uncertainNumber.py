@@ -5,7 +5,7 @@ from typing import Type, Union
 # from .variability import Variability
 from .uncertainty_types import Uncertainty_types
 from .ensemble import Ensemble
-from PyUncertainNumber.pba.interval import Interval as I
+from PyUncertainNumber.pba.interval import Interval as nInterval
 from PyUncertainNumber.pba.interval import PM
 from .utils import *
 from .params import Params
@@ -18,6 +18,7 @@ from PyUncertainNumber.NLP_constructor.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
 from PyUncertainNumber.pba.pbox import named_pbox
+from typing import Sequence
 
 """ Uncertain Number class """
 
@@ -26,12 +27,10 @@ from PyUncertainNumber.pba.pbox import named_pbox
 class UncertainNumber:
     """Uncertain Number class
 
-    note:
-
-    log:
-        - `interval_initialisation` changed to `bounds`;
-        - `distribution_initialisation` changed to `distribution_parameters`;
-        - `pbox_initialisation` changed to `pbox_parameters`;
+    args:
+        - `bounds`;
+        - `distribution_parameters`: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
+        - `pbox_initialisation`: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
     """
 
     # ---------------------Basic---------------------#
@@ -44,8 +43,10 @@ class UncertainNumber:
     uncertainty_type: Type[Uncertainty_types] = field(default=None)
     essence: str = field(default=None)  # [interval, distribution, pbox]
     bounds: Union[List[float], str] = field(default=None)
-    distribution_parameters: List[float] = field(default=None)
-    pbox_parameters: List[float] = field(default=None)  # must be 2D array
+    distribution_parameters: List[str, Sequence[float]] = field(default=None)
+
+    pbox_parameters: List[str, Sequence[nInterval]] = field(
+        default=None)
     hedge: str = field(default=None)
     # this is the deterministic numeric representation of the
     # UN object, which shall be linked with the 'pba' or `Intervals` package
@@ -120,18 +121,18 @@ class UncertainNumber:
                 # TODO change to a dispatcher
                 # the default way of instantiating
                 if isinstance(self.bounds, str):
-                    self._math_object = parse_description(self.bounds)
+                    self._construct = parse_description(self.bounds)
                 elif isinstance(self.bounds, list):
-                    self._math_object = I(*self.bounds)
+                    self._construct = nInterval(*self.bounds)
                 elif isinstance(self.bounds, tuple):
-                    self._math_object = I(*self.bounds)
+                    self._construct = nInterval(*self.bounds)
             case "distribution":
-                self._math_object = self.match_distribution(
+                self._construct = self.match_distribution(
                     self.distribution_parameters[0],
                     self.distribution_parameters[1],
                 )
             case "pbox":
-                self._math_object = self.match_distribution(
+                self._construct = self.match_distribution(
                     self.distribution_parameters[0],
                     self.distribution_parameters[1],
                 )
@@ -139,15 +140,15 @@ class UncertainNumber:
         ### create the naked value - deterministic representation of the uncertain number ###
         match self.essence:
             case "interval":
-                self.naked_value = self._math_object.midpoint()
+                self.naked_value = self._construct.midpoint()
             case "distribution":
                 self.naked_value = (
-                    self._math_object.mean_left
+                    self._construct.mean_left
                 )  # TODO the error is here where the numeric value is NOT a value
                 # TODO continue getting familar with the 'pba' package for computing mean etc...
                 # TODO I've put `mean_left` there but unsure if correct or not
             case "pbox":
-                self.naked_value = self._math_object.mean()
+                self.naked_value = self._construct.mean()
 
     @staticmethod
     def match_distribution(keyword, parameters):
@@ -201,7 +202,7 @@ class UncertainNumber:
             case "verbose":
                 match self.essence:
                     case "interval":
-                        return f"This is an {self.essence}-type Uncertain Number whose min value is {self._math_object.left:.2f} and max value is {self._math_object.right:.2f}. An interval is a range of values that are possible for the measurand whose value is unknown, which typically represents the epistemic uncertainty. The interval is defined by the minimum and maximum values (i.e. lower bound and upper bound) that the measurand could take on."
+                        return f"This is an {self.essence}-type Uncertain Number whose min value is {self._construct.left:.2f} and max value is {self._construct.right:.2f}. An interval is a range of values that are possible for the measurand whose value is unknown, which typically represents the epistemic uncertainty. The interval is defined by the minimum and maximum values (i.e. lower bound and upper bound) that the measurand could take on."
                     case "distribution":
                         return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}. Probability distributios are typically empolyed to model aleatoric uncertainty, which represents inherent randomness. The distribution is defined by the probability density function (pdf) or cumulative distribution function (cdf)."
                     case "pbox":
@@ -213,11 +214,11 @@ class UncertainNumber:
             case "range":
                 match self.essence:
                     case "interval":
-                        return f"This is an {self.essence}-type Uncertain Number whose min value is {self._math_object.left:.2f} and max value is {self._math_object.right:.2f}."
+                        return f"This is an {self.essence}-type Uncertain Number whose min value is {self._construct.left:.2f} and max value is {self._construct.right:.2f}."
                     case "distribution":
-                        return f"This is an {self.essence}-type Uncertain Number with 'some' range of {self._math_object._range_list[0]:.2f} and {self._math_object._range_list[1]:.2f}."
+                        return f"This is an {self.essence}-type Uncertain Number with 'some' range of {self._construct._range_list[0]:.2f} and {self._construct._range_list[1]:.2f}."
                     case "pbox":
-                        return f"This is an {self.essence}-type Uncertain Number with 'some' range of {self._math_object.left:.2f} and {self._math_object.right:.2f}."
+                        return f"This is an {self.essence}-type Uncertain Number with 'some' range of {self._construct.left:.2f} and {self._construct.right:.2f}."
             case "five-number":
                 match self.essence:
                     case "interval":
@@ -226,9 +227,9 @@ class UncertainNumber:
                         print(
                             f"This is an {self.essence}-type Uncertain Number whose statistical description is shown below:\n"
                             f"- family: {self.distribution_parameters[0]}\n"
-                            f"- min: {self._math_object._range_list[0]:.2f}\n"
+                            f"- min: {self._construct._range_list[0]:.2f}\n"
                             f"- Q1: something\n"
-                            f"- mean: {self._math_object.mean_left}\n"
+                            f"- mean: {self._construct.mean_left}\n"
                             f"- Q3: something\n"
                             f"- variance: something"
                         )
@@ -240,7 +241,7 @@ class UncertainNumber:
                         print(
                             f"This is an {self.essence}-type Uncertain Number of family '{self.distribution_parameters[0]}' parameterised by {self.distribution_parameters[1]}"
                         )
-                        self._math_object.quick_plot()
+                        self._construct.quick_plot()
 
     # ---------------------some class methods---------------------#
 
@@ -254,7 +255,7 @@ class UncertainNumber:
         """get 95% range confidence interval"""
         match self.essence:
             case "interval":
-                return [self._math_object.left, self._math_object.right]
+                return [self._construct.left, self._construct.right]
             case "distribution":
                 which_dist = self.distribution_parameters[0]
                 if which_dist == "norm":
@@ -266,7 +267,7 @@ class UncertainNumber:
     def display(self, **kwargs):
         """quick plot of the uncertain number object"""
 
-        return self._math_object.display(**kwargs)
+        return self._construct.display(**kwargs)
 
     # ---------------------other constructors---------------------#
 
@@ -321,8 +322,8 @@ class UncertainNumber:
 
     def __add__(self, other):
         """add two uncertain numbers"""
-        left = (self._math_object + other._math_object).left
-        right = (self._math_object + other._math_object).right
+        left = (self._construct + other._construct).left
+        right = (self._construct + other._construct).right
         essence = self.essence
         return type(self)(essence=essence, bounds=[left, right])
 
@@ -331,8 +332,8 @@ class UncertainNumber:
 
     def __sub__(self, other):
         """subtract two uncertain numbers"""
-        left = (self._math_object - other._math_object).left
-        right = (self._math_object - other._math_object).right
+        left = (self._construct - other._construct).left
+        right = (self._construct - other._construct).right
         essence = self.essence
         return type(self)(essence=essence, bounds=[left, right])
 
@@ -340,13 +341,13 @@ class UncertainNumber:
         """multiply two uncertain numbers"""
 
         if isinstance(other, int | float):
-            left = (self._math_object * other).left
-            right = (self._math_object * other).right
+            left = (self._construct * other).left
+            right = (self._construct * other).right
             essence = self.essence
             return type(self)(essence=essence, bounds=[left, right])
         elif isinstance(other, UncertainNumber):
-            left = (self._math_object * other._math_object).left
-            right = (self._math_object * other._math_object).right
+            left = (self._construct * other._construct).left
+            right = (self._construct * other._construct).right
             essence = self.essence
             return type(self)(essence=essence, bounds=[left, right])
 
@@ -357,13 +358,13 @@ class UncertainNumber:
         """divide two uncertain numbers"""
 
         if isinstance(other, int | float):
-            left = (self._math_object / other).left
-            right = (self._math_object / other).right
+            left = (self._construct / other).left
+            right = (self._construct / other).right
             essence = self.essence
             return type(self)(essence=essence, bounds=[left, right])
         elif isinstance(other, UncertainNumber):
-            left = (self._math_object / other._math_object).left
-            right = (self._math_object / other._math_object).right
+            left = (self._construct / other._construct).left
+            right = (self._construct / other._construct).right
             essence = self.essence
             return type(self)(essence=essence, bounds=[left, right])
 
@@ -374,13 +375,13 @@ class UncertainNumber:
         """power of two uncertain numbers"""
 
         if isinstance(other, int | float):
-            left = (self._math_object**other).left
-            right = (self._math_object**other).right
+            left = (self._construct**other).left
+            right = (self._construct**other).right
             essence = self.essence
             return type(self)(essence=essence, bounds=[left, right])
         elif isinstance(other, UncertainNumber):
-            left = (self._math_object**other._math_object).left
-            right = (self._math_object**other._math_object).right
+            left = (self._construct**other._construct).left
+            right = (self._construct**other._construct).right
             essence = self.essence
             return type(self)(essence=essence, bounds=[left, right])
 
@@ -409,7 +410,7 @@ class UncertainNumber:
             if sth.essence == "interval":
                 return sth.bounds
             else:
-                return sth._math_object.rangel
+                return sth._construct.rangel
 
         _UNintervals_list = [as_interval(k) for k in selected_objs]
         _UNintervals = np.array(_UNintervals_list).reshape(-1, 2)
@@ -527,7 +528,7 @@ def parse_description(description):
         if len(an_int) == 1:
             return PM(an_int[0], hw=Params.hw)
         elif len(an_int) > 1:
-            return I(*an_int)
+            return nInterval(*an_int)
     ### type 2 ###
     elif bad_list_checking(description):
         if PlusMinus_parser(description) & (not percentage_finder(description)):

@@ -141,11 +141,11 @@ dists = {
 }
 
 
-def _get_bounds(function_name, *args, steps=Params.steps):
+def _get_bounds(dist_family, *args, steps=Params.steps):
     """ from distribution specification to define the lower and upper bounds of the p-box
 
     args:
-        - function_name: (str) the name of the distribution
+        - dist_family: (str) the name of the distribution
     """
 
     # TODO logically speaking, it can be (0,1) ergo support will be [-inf, inf] see it works with other part codes
@@ -163,8 +163,8 @@ def _get_bounds(function_name, *args, steps=Params.steps):
     var_hi = 0
 
     for a in new_args:
-        bounds.append(dists[function_name].ppf(p, *a))  # bounds as x support
-        bmean, bvar = dists[function_name].stats(*a, moments="mv")
+        bounds.append(dists[dist_family].ppf(p, *a))  # bounds as x support
+        bmean, bvar = dists[dist_family].stats(*a, moments="mv")
 
         if bmean < mean_lo:
             mean_lo = bmean
@@ -175,37 +175,41 @@ def _get_bounds(function_name, *args, steps=Params.steps):
         if bvar < var_lo:
             var_lo = bvar
 
-    Left = [min([b[i] for b in bounds]) for i in range(steps)]
-    Right = [max([b[i] for b in bounds]) for i in range(steps)]
+    Left = np.array([min([b[i] for b in bounds]) for i in range(steps)])
+    Right = np.array([max([b[i] for b in bounds]) for i in range(steps)])
 
     var = nInterval(np.float64(var_lo), np.float64(var_hi))
     mean = nInterval(np.float64(mean_lo), np.float64(mean_hi))
 
-    Left = np.array(Left)
-    Right = np.array(Right)
-
     return Left, Right, mean, var
+
+
+def _bound_pcdf(dist_family, *args, steps=Params.steps):
+    """ bound the parametric CDF 
+
+    note:
+        - only support fully bounded parameters
+    """
+
+    Left, Right, mean, var = _get_bounds(dist_family, *args)
+
+    return Pbox(
+        Left,
+        Right,
+        shape=dist_family,
+        mean_left=mean.left,
+        mean_right=mean.right,
+        var_left=var.left,
+        var_right=var.right,
+    )
 
 
 def makePbox(func):
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-        # i_args = [arg if isinstance(
-        #     arg, nInterval | Interval) else nInterval(arg) for arg in args]
-
         i_args = [wc_interval(arg) for arg in args]
         shape_value = func(*args, **kwargs)
-        Left, Right, mean, var = _get_bounds(shape_value, *i_args)
-
-        return Pbox(
-            Left,
-            Right,
-            shape=shape_value,
-            mean_left=mean.left,
-            mean_right=mean.right,
-            var_left=var.left,
-            var_right=var.right,
-        )
+        return _bound_pcdf(shape_value, *i_args)
     return wrapper_decorator
 
 
