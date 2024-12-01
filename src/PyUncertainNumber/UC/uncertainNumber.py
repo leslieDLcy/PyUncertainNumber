@@ -19,6 +19,9 @@ from scipy.stats import norm
 from .check import DistributionSpecification
 from PyUncertainNumber.pba.pbox import named_pbox
 from typing import Sequence
+from functools import singledispatch
+from .intervalOperators import wc_interval
+
 
 """ Uncertain Number class """
 
@@ -31,6 +34,7 @@ class UncertainNumber:
         - `bounds`;
         - `distribution_parameters`: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
         - `pbox_initialisation`: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
+        -  naked_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
     """
 
     # ---------------------Basic---------------------#
@@ -43,9 +47,8 @@ class UncertainNumber:
     uncertainty_type: Type[Uncertainty_types] = field(default=None)
     essence: str = field(default=None)  # [interval, distribution, pbox]
     bounds: Union[List[float], str] = field(default=None)
-    distribution_parameters: List[str, Sequence[float]] = field(default=None)
-
-    pbox_parameters: List[str, Sequence[nInterval]] = field(
+    distribution_parameters: list[str, float | int] = field(default=None)
+    pbox_parameters: list[str, Sequence[nInterval]] = field(
         default=None)
     hedge: str = field(default=None)
     # this is the deterministic numeric representation of the
@@ -114,40 +117,26 @@ class UncertainNumber:
 
         self._UnitsRep = 1 * ureg(self.units)
 
-        ### create the underlying math object ###
-        # temp logic for parsing `self.bounds` if it is a string
+        ### create the underlying construct ###
         match self.essence:
             case "interval":
-                # TODO change to a dispatcher
-                # the default way of instantiating
-                if isinstance(self.bounds, str):
-                    self._construct = parse_description(self.bounds)
-                elif isinstance(self.bounds, list):
-                    self._construct = nInterval(*self.bounds)
-                elif isinstance(self.bounds, tuple):
-                    self._construct = nInterval(*self.bounds)
-            case "distribution":
-                self._construct = self.match_distribution(
-                    self.distribution_parameters[0],
-                    self.distribution_parameters[1],
-                )
-            case "pbox":
-                self._construct = self.match_distribution(
-                    self.distribution_parameters[0],
-                    self.distribution_parameters[1],
-                )
-
-        ### create the naked value - deterministic representation of the uncertain number ###
-        match self.essence:
-            case "interval":
+                self._construct = _parse_bounds(self.bounds)
                 self.naked_value = self._construct.midpoint()
             case "distribution":
+                self._construct = self.match_distribution(
+                    self.distribution_parameters[0],
+                    self.distribution_parameters[1],
+                )
                 self.naked_value = (
                     self._construct.mean_left
                 )  # TODO the error is here where the numeric value is NOT a value
                 # TODO continue getting familar with the 'pba' package for computing mean etc...
                 # TODO I've put `mean_left` there but unsure if correct or not
             case "pbox":
+                self._construct = self.match_distribution(
+                    self.distribution_parameters[0],
+                    self.distribution_parameters[1],
+                )
                 self.naked_value = self._construct.mean()
 
     @staticmethod
@@ -578,3 +567,14 @@ def _parse_interverl_inputs(vars):
 
     if isinstance(vars, list):
         return UncertainNumber._toIntervalBackend(vars)
+
+
+@singledispatch
+def _parse_bounds(bounds):
+    """ parse the self.bounds argument """
+    return wc_interval(bounds)
+
+
+@_parse_bounds.register(str)
+def _str(bounds: str):
+    return parse_description(bounds)

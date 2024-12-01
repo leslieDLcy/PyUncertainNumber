@@ -125,3 +125,6 @@ dists = {
     "zipf": sps.zipf,
     "yulesimon": sps.yulesimon,
 }
+
+
+# * ------------------ sample-approximated dist representation  ------------------ *#
