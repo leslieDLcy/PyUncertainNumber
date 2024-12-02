@@ -60,17 +60,22 @@ def MMbetabinomial(n: int, x):  # **
     return betabinom(n, (n*m1 - m2) / d, (n-m1)*(n - m2/m1) / d)
 
 
-def MMbinomial(x):  # **
-    a = x.mean()
-    b = x.std()
-    return binom(int(np.abs(np.round(a/(1-b**2/a)))), np.abs(1-b**2/a))
+def MMbinomial(x, n: int):  # **
+    #! the return seems overcomplicated?
+    """ 
+    args:
+         - n (int): number of trials
+    """
+    return binom(n, mean()/n)
+    # a = x.mean()
+    # b = x.std()
+    # return binom(int(np.abs(np.round(a/(1-b**2/a)))), np.abs(1-b**2/a))
 
 
 def MMchisquared(x): return (chi2(np.round(x.mean())))
 
 
 def MMexponential(x):
-    # * test interval data --> succeeds
     return pba.expon(mean(x))
 
 
@@ -85,10 +90,10 @@ def MMgamma(x):  # **
     return (gamma(b**2/a, 1/(a/b)**2))  # gamma1(a, b) ~ gamma(b²/a, (a/b)²)
 
 
-def MMgeometric(x): return (geom(1/(1+x.mean())))
+def MMgeometric(x): return geom(1/(1+mean(x)))
 
 
-def MMpascal(x): return (geom(1/(1+x.mean())))
+def MMpascal(x): return geom(1/(1+mean(x)))
 
 # def MMgumbel0(x) : return(gumbel(x.mean() - 0.57721 * x.std() * np.sqrt(6)/ np.pi, x.std() * np.sqrt(6)/ np.pi))       #**  # https://stackoverflow.com/questions/51427764/using-method-of-moments-with-gumbel-r-in-python-scipy-stats-gumbel-r
 
@@ -133,7 +138,7 @@ def MMpareto(x):  # **
     return (pareto(a/(1+1/np.sqrt(1+a**2/b**2)), 1+np.sqrt(1+a**2/b**2)))
 
 
-def MMpoisson(x): return (poisson(x.mean()))
+def MMpoisson(x): return poisson(mean(x))
 
 
 def MMpowerfunction(x):  # **
