@@ -1,15 +1,14 @@
 """distribution constructs """
-
+import numpy as np
 import scipy.stats as sps
-from typing import *
 from warnings import *
-
-
+from dataclasses import dataclass
+from typing import *
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
-
+from ..UC.utils import pl_pcdf, pl_ecdf
 
 # a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
-dists = {
+named_dists = {
     "alpha": sps.alpha,
     "anglit": sps.anglit,
     "arcsine": sps.arcsine,
@@ -84,6 +83,7 @@ dists = {
     "ncf": sps.ncf,
     "nct": sps.nct,
     "norm": sps.norm,
+    "gaussian": sps.norm,
     "norminvgauss": sps.norminvgauss,
     "pareto": sps.pareto,
     "pearson3": sps.pearson3,
@@ -127,4 +127,35 @@ dists = {
 }
 
 
-# * ------------------ sample-approximated dist representation  ------------------ *#
+@dataclass
+class Distribution:
+
+    dist_family: str = None
+    dist_params: list[float] | Tuple[float, ...] = None
+    sample_data: list[float] | np.ndarray = None
+
+    def __post_init__(self):
+        if all(v is None for v in [self.dist_family, self.dist_params, self.sample_data]):
+            raise ValueError(
+                "At least one of dist_family, dist_params or sample must be specified")
+        self.dist = self.rep()
+
+    def __repr__(self):
+        # if self.sample_data is not None:
+        #     return "sample-approximated distribution object"
+        return f"dist ~ {self.dist_family}{self.dist_params}"
+
+    def rep(self):
+        """ the dist object either sps dist or sample approximated or pbox dist """
+        if self.dist_family is not None:
+            return named_dists.get(self.dist_family)(*self.dist_params)
+
+    def sample(self):
+        pass
+
+    def display(self):
+        """display the distribution"""
+        if self.sample_data is not None:
+            return pl_ecdf(self.sample_data)
+        pl_pcdf(self.dist)
+        # * ------------------ sample-approximated dist representation  ------------------ *#

@@ -21,7 +21,7 @@ from PyUncertainNumber.pba.pbox import named_pbox
 from typing import Sequence
 from functools import singledispatch
 from .intervalOperators import wc_interval
-
+from ..pba.distributions import Distribution
 
 """ Uncertain Number class """
 
@@ -78,6 +78,9 @@ class UncertainNumber:
     # class variable
     instances = []  # TODO named as registry later on
 
+    # --------------------- additional ---------------------#
+    _samples: np.ndarray | list = None
+
     # ---------------------more on initialisation---------------------#
 
     def __post_init__(self):
@@ -123,24 +126,27 @@ class UncertainNumber:
                 self._construct = _parse_bounds(self.bounds)
                 self.naked_value = self._construct.midpoint()
             case "distribution":
-                self._construct = self.match_distribution(
-                    self.distribution_parameters[0],
-                    self.distribution_parameters[1],
-                )
-                self.naked_value = (
-                    self._construct.mean_left
-                )  # TODO the error is here where the numeric value is NOT a value
+                if self._samples is not None:
+                    self._construct = Distribution(sample=self._samples)
+                elif self.distribution_parameters is not None:
+                    self._construct = Distribution(
+                        dist_family=self.distribution_parameters[0],
+                        dist_params=self.distribution_parameters[1],
+                    )
+
+                self.naked_value = 'not specified yet'
+                # TODO the error is here where the numeric value is NOT a value
                 # TODO continue getting familar with the 'pba' package for computing mean etc...
                 # TODO I've put `mean_left` there but unsure if correct or not
             case "pbox":
-                self._construct = self.match_distribution(
+                self._construct = self.match_pbox(
                     self.distribution_parameters[0],
                     self.distribution_parameters[1],
                 )
                 self.naked_value = self._construct.mean()
 
     @staticmethod
-    def match_distribution(keyword, parameters):
+    def match_pbox(keyword, parameters):
         """match the distribution keyword from the initialisation to create the underlying distribution object
 
         args:
