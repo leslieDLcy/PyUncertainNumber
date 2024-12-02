@@ -36,6 +36,9 @@ examples:
 # TODO Some of tThese functions may not support intervals in the data x          #**
 
 
+# create decorator for makeing distribution and making pboxes
+
+
 def MMbernoulli(x: np.ndarray):
     return bernoulli(x.mean())  # assumes x is zeros and ones
 
@@ -138,7 +141,7 @@ def MMpareto(x):  # **
     return (pareto(a/(1+1/np.sqrt(1+a**2/b**2)), 1+np.sqrt(1+a**2/b**2)))
 
 
-def MMpoisson(x): return poisson(mean(x))
+def MMpoisson(x): return pba.poisson(mean(x))
 
 
 def MMpowerfunction(x):  # **
@@ -230,9 +233,9 @@ def MLexponential(x):
 
     note:
         - precise data returns precise distrubution
+        - imprecise data need to be in Interval type to return a pbox
         - interval data can return either a precise distribution or a pbox 
     """
-    # * test on interval data --> succeeds
     if isinstance(x, sps.CensoredData | np.ndarray | list):
         return expon(*sps.expon.fit(x))
     elif isinstance(x, Interval):

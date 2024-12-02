@@ -313,6 +313,17 @@ class UncertainNumber:
         """a shortcut for creating an interval-type Uncertain Number"""
         return cls(essence="interval", bounds=bounds, **kwargs)
 
+    def from_sps(cls, sps_dist):
+        """ create an UN object from a parametric scipy.stats dist object
+        #! it seems that a function will suffice
+        args:
+            - sps_dist: scipy.stats dist object
+
+        note:
+            - sps_dist --> UN.Distribution object
+        """
+        pass
+
     # ---------------------arithmetic operations---------------------#
 
     def __add__(self, other):
