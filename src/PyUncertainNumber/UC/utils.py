@@ -14,6 +14,23 @@ from ..pba.params import Params
 # TODO create a defending mechanism for parsing '[15+-10%]' as only '[15 +- 10%]' works now
 
 
+def tranform_ecdf(s, display=False, **kwargs):
+    """ plot the CDF return the quantile
+
+    args:
+        s: sample
+    """
+    sth = ecdf(s)
+    if display:
+        fig, ax = plt.subplots()
+        # ax.plot(x_support, p_values, color='g')
+        ax.step(sth.cdf.quantiles, sth.cdf.probabilities,
+                color='red', zorder=10, **kwargs)
+        return sth.cdf.quantiles, ax
+    else:
+        return sth.cdf.quantiles
+
+
 def pl_pcdf(dist: type[sps.rv_continuous | sps.rv_discrete], ax=None, title=None, **kwargs):
     """ plot CDF from parametric distribution objects """
 

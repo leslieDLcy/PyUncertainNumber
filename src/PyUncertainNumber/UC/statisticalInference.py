@@ -1,3 +1,4 @@
+import functools
 import numpy as np
 from scipy.stats import (bernoulli, beta, betabinom, binom, chi2,
                          expon, gamma, norm, poisson, uniform, t,
@@ -8,6 +9,8 @@ import scipy.stats as sps
 from .intervalOperators import mean
 from intervals import Interval
 from PyUncertainNumber import pba
+from ..pba.distributions import Distribution
+
 
 ''' Here we define the statistical inference functions from data for the UncertainNumber class. 
 
@@ -262,11 +265,32 @@ def MLlognormal(x): return (lognorm(*sps.lognorm.fit(x)))
 
 
 def MLloguniform(x): return (loguniform(*sps.loguniform.fit(x)))
+
+
 def MLnegativebinomial(x): return (
     sps.nbinom(*sps.nbinom.fit(x)))
 
 
-def MLnormal(x): return (norm(*sps.norm.fit(x)))
+# def get_from_sps(sps_dist):
+#     Distribution()
+
+
+# def from_sps(func):
+#     @functools.wraps(func)
+#     def wrapper_decorator(*args, **kwargs):
+#         # Do something before
+#         sps_dist = func(*args, **kwargs)
+
+#         # Do something after
+#         return value
+#     return wrapper_decorator
+
+
+# @from_sps
+def MLnormal(x):
+    return norm(*sps.norm.fit(x))
+
+
 def MLpareto(x): return (pareto(*sps.pareto.fit(x)))
 def MLpoisson(x): return (poisson(*sps.poisson.fit(x)))
 def MLpowerfunction(x): return (powerlaw(*sps.powerlaw.fit(x)))
