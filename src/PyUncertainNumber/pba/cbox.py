@@ -7,9 +7,8 @@ import numpy as np
 from PyUncertainNumber import pba
 from scipy.stats import beta, t, uniform, gamma, betabinom, nbinom
 from .params import Params
-from intervals import Interval, intervalise
+from intervals import Interval
 import scipy
-from scipy.stats import ecdf
 from .cbox_Leslie import cbox_from_envdists, repre_pbox, cbox_from_pseudosamples, pbox_from_pseudosamples
 
 
@@ -255,67 +254,37 @@ def CBuniform(x):
     r = max(x)-min(x)
     w = (r/beta(len(x)-1, 2))/2
     m = (max(x)-w)+(2*w-r)*uniform(0, 1)
-    return (uniform(m-w, m+w))
+    return pbox_from_pseudosamples(uniform(m-w, m+w))
 
 
 def CBuniform_midpoint(x):
     r = max(x)-min(x)
     w = r/beta(len(x)-1, 2)
     m = (max(x)-w/2)+(w-(max(x)-min(x)))*uniform(0, 1)
-    return (m)
+    return cbox_from_pseudosamples(m)
 
 
 def CBuniform_width(x):
     r = max(x)-min(x)
-    return (r/beta(len(x)-1, 2))
+    return cbox_from_pseudosamples(r/beta(len(x)-1, 2))
 
 
 def CBuniform_minimum(x):
     r = max(x)-min(x)
     w = r/beta(len(x)-1, 2)
     m = (max(x)-w/2)+(w-r)*uniform(0, 1)
-    return (m-w/2)
+    return cbox_from_pseudosamples(m-w/2)
 
 
 def CBuniform_maximum(x):
     r = max(x)-min(x)
     w = r/beta(len(x)-1, 2)
     m = (max(x)-w/2)+(w-r)*uniform(0, 1)
-    return (m+w/2)
-
-
-# TODO arguments not confirmed yet
-def nextvalue_uniform(x):
-    n = len(x)
-    w = (np.max(x) - np.min(x)) / beta(n - 1, 2)
-    m = (np.max(x) - w / 2) + (w - (np.max(x) - np.min(x))) * uniform.rvs()
-    return uniform.rvs(loc=m - w / 2, scale=w)
-
-
-def parameter_uniform_minimum(x):
-    n = len(x)
-    w = (np.max(x) - np.min(x)) / beta(n - 1, 2)
-    m = (np.max(x) - w / 2) + (w - (np.max(x) - np.min(x))) * uniform.rvs()
-    return m - w / 2
-
-
-def parameter_uniform_maximum(x):
-    n = len(x)
-    w = (np.max(x) - np.min(x)) / beta(n - 1, 2)
-    m = (np.max(x) - w / 2) + (w - (np.max(x) - np.min(x))) * uniform.rvs()
-    return m + w / 2
-
-
-def parameter_uniform_width(x):
-    return (np.max(x) - np.min(x)) / beta(len(x) - 1, 2)
-
-
-def parameter_uniform_midpoint(x):
-    w = (np.max(x) - np.min(x)) / beta(len(x) - 1, 2)
-    return (np.max(x) - w / 2) + (w - (np.max(x) - np.min(x))) * uniform.rvs()
+    return cbox_from_pseudosamples(m+w/2)
 
 
 # ---------------------nonparametric---------------------#
+
 # # x[i] ~ F, a continuous but unknown distribution
 # # TODO arguments not confirmed yet
 # def nextvalue_nonparametric(x):
