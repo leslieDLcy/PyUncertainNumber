@@ -1,4 +1,3 @@
-import functools
 import numpy as np
 from scipy.stats import (bernoulli, beta, betabinom, binom, chi2,
                          expon, gamma, norm, poisson, uniform, t,
@@ -9,7 +8,6 @@ import scipy.stats as sps
 from .intervalOperators import mean
 from intervals import Interval
 from PyUncertainNumber import pba
-from ..pba.distributions import Distribution
 
 
 ''' Here we define the statistical inference functions from data for the UncertainNumber class. 
@@ -31,12 +29,33 @@ examples:
 """
 
 
+def fit(method: str, family: str, x: np.ndarray):
+    """ top-level fit function
+
+    args:
+        - method (str): method of fitting, e.g., {'mle' or 'mom'} 'entropy', 'pert', 'fermi', 'bayesian'
+        - family (str): distribution family to be fitted
+        - x (np.ndarray): data to be fitted
+
+    note:
+        - supported family list can be found in xx.
+    """
+    match method:
+        case 'mle':
+            try:
+                return mle.get(family)(x)
+            except:
+                return smle.get(family)(x)
+        case 'mom':
+            return mom.get(family)(x)
+        case _:
+            raise ValueError('method not supported')
+
+
 ###############################################################################
 # Method-of-Moment distribution constructors (matching central moments of x)
 ###############################################################################
-
 ''' hint: given interval data x, return pbox '''
-# TODO Some of tThese functions may not support intervals in the data x          #**
 
 
 # create decorator for makeing distribution and making pboxes
@@ -214,6 +233,35 @@ def MMtriangular(x, iters=100, dives=10):  # **
     return (triang(aa, cc, bb))
 
 
+mom = {
+    'bernoulli': MMbernoulli,
+    'beta': MMbeta,
+    'betabinomial': MMbetabinomial,
+    'binomial': MMbinomial,
+    'chisquared': MMchisquared,
+    'exponential': MMexponential,
+    'F': MMF,
+    'gamma': MMgamma,
+    'geometric': MMgeometric,
+    'gumbel': MMgumbel,
+    'extremevalue': MMextremevalue,
+    'lognormal': MMlognormal,
+    'laplace': MMlaplace,
+    'doubleexponential': MMdoubleexponential,
+    'logistic': MMlogistic,
+    'loguniform': MMloguniform,
+    'normal': MMnormal,
+    'gaussian': MMgaussian,
+    'pareto': MMpareto,
+    'poisson': MMpoisson,
+    'powerfunction': MMpowerfunction,
+    't': MMt,
+    'student': MMstudent,
+    'uniform': MMuniform,
+    'rectangular': MMrectangular,
+    'triangular': MMtriangular,
+}
+
 ###############################################################################
 # * Alternative maximum likelihood estimation constructors using scipy.stats  *#
 ###############################################################################
@@ -223,6 +271,7 @@ def MMtriangular(x, iters=100, dives=10):  # **
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.CensoredData.html#scipy.stats.CensoredData
 
 #! note below all return `scipy.stats.dist` objects
+
 
 def MLbernoulli(x): return (bernoulli(x.mean()))
 def MLbeta(x): return (beta(*sps.beta.fit(x)))
@@ -298,6 +347,34 @@ def MLrayleigh(x): return (sps.rayleigh(*sps.rayleigh.fit(x)))
 def MLstudent(x): return (t(*sps.t.fit(x)))
 def MLtriangular(x): return (triang(*sps.t.fit(x)))
 def MLuniform(x): return (uniform(*sps.uniform.fit(x)))
+
+
+mle = {
+    'bernoulli': MLbernoulli,
+    'beta': MLbeta,
+    'betabinomial': MLbetabinomial,
+    'binomial': MLbinomial,
+    'chisquared': MLchisquared,
+    'exponential': MLexponential,
+    'F': MLF,
+    'gamma': MLgamma,
+    'gammaexponential': MLgammaexponential,
+    'geometric': MLgeometric,
+    'gumbel': MLgumbel,
+    'laplace': MLlaplace,
+    'logistic': MLlogistic,
+    'lognormal': MLlognormal,
+    'loguniform': MLloguniform,
+    'negativebinomial': MLnegativebinomial,
+    'normal': MLnormal,
+    'pareto': MLpareto,
+    'poisson': MLpoisson,
+    'powerfunction': MLpowerfunction,
+    'rayleigh': MLrayleigh,
+    'student': MLstudent,
+    'triangular': MLtriangular,
+    'uniform': MLuniform,
+}
 
 
 ##########################################################################
@@ -385,6 +462,29 @@ def sMLgamma(data):  # **
     shape = uniroot(f, shape*np.array((0.5, 1.5))).root()
     rate = shape/xbar
     return (gamma(shape=shape, rate=rate))
+
+
+smle = {
+    'bernoulli': sMLbernoulli,
+    'normal': sMLnormal,
+    'gaussian': sMLgaussian,
+    'exponential': sMLexponential,
+    'poisson': sMLpoisson,
+    'geometric': sMLgeometric,
+    'gumbel': sMLgumbel,
+    'pascal': sMLpascal,
+    'uniform': sMLuniform,
+    'rectangular': sMLrectangular,
+    'pareto': sMLpareto,
+    'laplace': sMLlaplace,
+    'doubleexponential': sMLdoubleexponential,
+    'lognormal2': sMLlognormal2,
+    'lognormal': sMLlognormal,
+    'loguniform': sMLloguniform,
+    'weibull': sMLweibull,
+    'gamma': sMLgamma,
+}
+
 
 ##########################################################################
 # Maximum entropy distribution constructors
