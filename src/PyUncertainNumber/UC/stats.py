@@ -8,7 +8,8 @@ import scipy.stats as sps
 from .intervalOperators import mean
 from intervals import Interval
 from PyUncertainNumber import pba
-
+from ..pba.distributions import Distribution as D
+import functools
 
 ''' Here we define the statistical inference functions from data for the UncertainNumber class. 
 
@@ -273,23 +274,51 @@ mom = {
 #! note below all return `scipy.stats.dist` objects
 
 
-def MLbernoulli(x): return (bernoulli(x.mean()))
-def MLbeta(x): return (beta(*sps.beta.fit(x)))
+def makedist(shape: str):
+    def decorator_make_dist(func):
+        @functools.wraps(func)
+        def wrapper_decorator(*args, **kwargs):  # input array x
+            return D._dist_from_sps(func(*args, **kwargs), shape)
+        return wrapper_decorator
+    return decorator_make_dist
+
+
+@makedist('bernoulli')
+def MLbernoulli(x): return bernoulli(
+    *sps.bernoulli.fit(x)
+)
+
+
+def MLbeta(x):
+    return beta(*sps.beta.fit(x))
+
+
 def MLbetabinomial(x): return (betabinom(*sps.betabinom.fit(x)))
-def MLbinomial(x): return (binom(*sps.binom.fit(x)))
+
+
+@makedist('binom')
+def MLbinomial(x):
+    """ 
+    # TODO 
+    #! no fitting func for scipy discrete distributions
+    """
+    return binom(*sps.binom.fit(x))
+
+
 def MLchisquared(x): return (chi2(*sps.chi2.fit(x)))
 
 
 def MLexponential(x):
     """ Maximum likelihood estimation for exponential distribution.
 
+    #! the example of `singleparam` pattern
     note:
         - precise data returns precise distrubution
         - imprecise data need to be in Interval type to return a pbox
         - interval data can return either a precise distribution or a pbox 
     """
     if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return expon(*sps.expon.fit(x))
+        return D._dist_from_sps(expon(*sps.expon.fit(x)))
     elif isinstance(x, Interval):
         return pba.expon(mean(x))
     else:
@@ -335,7 +364,7 @@ def MLnegativebinomial(x): return (
 #     return wrapper_decorator
 
 
-# @from_sps
+@makedist('norm')
 def MLnormal(x):
     return norm(*sps.norm.fit(x))
 

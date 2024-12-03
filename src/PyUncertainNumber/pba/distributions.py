@@ -161,6 +161,20 @@ class Distribution:
             return pl_ecdf(self.sample_data)
         pl_pcdf(self.dist)
 
+    def _get_hint(self):
+        pass
+
+    @property
+    def hint(self):
+        pass
+
+# *  ---------------------constructors---------------------* #
+    @classmethod
+    def _dist_from_sps(cls, dist: sps.rv_continuous | sps.rv_discrete,
+                       shape: str = None):
+        params = dist.args + tuple(dist.kwds.values())
+        return cls(dist_family=shape, dist_params=params)
+
 
 # * ------------------ sample-approximated dist representation  ------------------ *#
 
@@ -177,6 +191,7 @@ class Distribution:
 # distributions represented internally as collections of Monte Carlo deviates
 # rather than some semi-analytical or discrete representation used in Risk Calc.
 # See the preamble to https://sites.google.com/site/confidenceboxes/software
+
 
 def bernoulli(p): return (np.random.uniform(size=Params.many) < p)
 
