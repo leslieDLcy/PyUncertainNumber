@@ -6,17 +6,18 @@ two reasons:
 2. I'd like to reorganise the constructors for pbox, which is a mess now.
 """
 
+import functools
 from PyUncertainNumber.UC.params import Params
-from .interval import Interval
+from .interval import Interval as nInterval
+from intervals import Interval
 from .pbox_base import Pbox
 import scipy.stats as sps
 import numpy as np
 import itertools
 from .params import Params
-
 from typing import *
 from warnings import *
-
+from ..UC.intervalOperators import wc_interval
 
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
 
@@ -140,16 +141,16 @@ dists = {
 }
 
 
-def __get_bounds(function_name=None, steps=Params.steps, *args):
+def _get_bounds(dist_family, *args, steps=Params.steps):
     """ from distribution specification to define the lower and upper bounds of the p-box
 
     args:
-        - function_name: (str) the name of the distribution
+        - dist_family: (str) the name of the distribution
     """
 
     # TODO logically speaking, it can be (0,1) ergo support will be [-inf, inf] see it works with other part codes
     # define percentile range thus getting the support
-    p = np.linspace(0.0001, 0.9999, steps)
+    p = Params.p_values
 
     # get bound arguments
     new_args = itertools.product(*args)
@@ -162,8 +163,8 @@ def __get_bounds(function_name=None, steps=Params.steps, *args):
     var_hi = 0
 
     for a in new_args:
-        bounds.append(dists[function_name].ppf(p, *a))  # bounds as x support
-        bmean, bvar = dists[function_name].stats(*a, moments="mv")
+        bounds.append(dists[dist_family].ppf(p, *a))  # bounds as x support
+        bmean, bvar = dists[dist_family].stats(*a, moments="mv")
 
         if bmean < mean_lo:
             mean_lo = bmean
@@ -174,19 +175,51 @@ def __get_bounds(function_name=None, steps=Params.steps, *args):
         if bvar < var_lo:
             var_lo = bvar
 
-    Left = [min([b[i] for b in bounds]) for i in range(steps)]
-    Right = [max([b[i] for b in bounds]) for i in range(steps)]
+    Left = np.array([min([b[i] for b in bounds]) for i in range(steps)])
+    Right = np.array([max([b[i] for b in bounds]) for i in range(steps)])
 
-    var = Interval(np.float64(var_lo), np.float64(var_hi))
-    mean = Interval(np.float64(mean_lo), np.float64(mean_hi))
-
-    Left = np.array(Left)
-    Right = np.array(Right)
+    var = nInterval(np.float64(var_lo), np.float64(var_hi))
+    mean = nInterval(np.float64(mean_lo), np.float64(mean_hi))
 
     return Left, Right, mean, var
 
 
+def _bound_pcdf(dist_family, *args, steps=Params.steps):
+    """ bound the parametric CDF 
+
+    note:
+        - only support fully bounded parameters
+    """
+
+    Left, Right, mean, var = _get_bounds(dist_family, *args)
+
+    return Pbox(
+        Left,
+        Right,
+        shape=dist_family,
+        mean_left=mean.left,
+        mean_right=mean.right,
+        var_left=var.left,
+        var_right=var.right,
+    )
+
+
+def makePbox(func):
+    @functools.wraps(func)
+    def wrapper_decorator(*args, **kwargs):
+        i_args = [wc_interval(arg) for arg in args]
+        shape_value = func(*args, **kwargs)
+        return _bound_pcdf(shape_value, *i_args)
+    return wrapper_decorator
+
+
 # ---------------------supported distribution objects for pboxes ---------------------#
+
+
+@makePbox
+def norm(*args):
+    return 'norm'
+
 
 def lognormal(
     mean,
@@ -220,10 +253,10 @@ def lognormal(
     else:
         x = np.linspace(0.001, 0.999, Params.steps)
 
-    if mean.__class__.__name__ != "Interval":
-        mean = Interval(mean, mean)
-    if var.__class__.__name__ != "Interval":
-        var = Interval(var, var)
+    if mean.__class__.__name__ != "nInterval":
+        mean = nInterval(mean, mean)
+    if var.__class__.__name__ != "nInterval":
+        var = nInterval(var, var)
 
     def __lognorm(mean, var):
 
@@ -247,84 +280,24 @@ def lognormal(
     return Pbox(Left, Right, steps=steps, shape="lognormal")
 
 
-def alpha(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("alpha", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="alpha",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+@makePbox
+def alpha(*args):
+    return "alpha"
 
 
-def anglit(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("anglit", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="anglit",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+@makePbox
+def anglit(*args):
+    return "anglit"
 
 
-def arcsine(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("arcsine", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="arcsine",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+@makePbox
+def argus(*args):
+    return "argus"
 
 
-def argus(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("argus", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="argus",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+@makePbox
+def arcsine(*args):
+    return "arcsine"
 
 
 def beta(*args, steps=Params.steps):
@@ -333,14 +306,14 @@ def beta(*args, steps=Params.steps):
     """
     args = list(args)
     for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
+        if args[i].__class__.__name__ != "nInterval":
+            args[i] = nInterval(args[i])
         if args[i].left == 0:
             args[i].left = 1e-5
         if args[i].right == 0:
             args[i].right = 1e-5
 
-    Left, Right, mean, var = __get_bounds("beta", steps, *args)
+    Left, Right, mean, var = _get_bounds("beta", steps, *args)
 
     return Pbox(
         Left,
@@ -354,413 +327,113 @@ def beta(*args, steps=Params.steps):
     )
 
 
-def betaprime(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("betaprime", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="betaprime",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def bradford(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("bradford", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="bradford",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def burr(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("burr", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="burr",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def burr12(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("burr12", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="burr12",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def cauchy(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("cauchy", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="cauchy",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def chi(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("chi", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="chi",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def chi2(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("chi2", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="chi2",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def cosine(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("cosine", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="cosine",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def crystalball(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("crystalball", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="crystalball",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def dgamma(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("dgamma", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="dgamma",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def dweibull(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("dweibull", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="dweibull",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def erlang(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("erlang", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="erlang",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def expon(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("expon", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="expon",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def exponnorm(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("exponnorm", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="exponnorm",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def exponweib(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("exponweib", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="exponweib",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def exponpow(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("exponpow", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="exponpow",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def f(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("f", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="f",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def fatiguelife(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("fatiguelife", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="fatiguelife",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def fisk(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("fisk", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="fisk",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def foldcauchy(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("foldcauchy", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="foldcauchy",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+@makePbox
+def betaprime(*args):
+    return "betaprime"
+
+
+@makePbox
+def bradford(*args):
+    return "bradford"
+
+
+@makePbox
+def burr(*args):
+    return "burr"
+
+
+@makePbox
+def burr12(*args):
+    return "burr12"
+
+
+@makePbox
+def cauchy(*args):
+    return "cauchy"
+
+
+@makePbox
+def chi(*args):
+    return "chi"
+
+
+@makePbox
+def chi2(*args):
+    return "chi2"
+
+
+@makePbox
+def cosine(*args):
+    return "cosine"
+
+
+@makePbox
+def crystalball(*args):
+    return "crystalball"
+
+
+@makePbox
+def dgamma(*args):
+    return "dgamma"
+
+
+@makePbox
+def dweibull(*args):
+    return "dweibull"
+
+
+@makePbox
+def erlang(*args):
+    return "erlang"
+
+
+@makePbox
+def expon(*args):
+    return "expon"
+
+
+@makePbox
+def exponnorm(*args):
+    return "exponnorm"
+
+
+@makePbox
+def exponweib(*args):
+    return "exponweib"
+
+
+@makePbox
+def exponpow(*args):
+    return "exponpow"
+
+
+@makePbox
+def f(*args):
+    return "f"
+
+
+@makePbox
+def fatiguelife(*args):
+    return "fatiguelife"
+
+
+@makePbox
+def fisk(*args):
+    return "fisk"
+
+
+@makePbox
+def foldcauchy(*args):
+    return "foldcauchy"
 
 
 def foldnorm(mu, s, steps=Params.steps):
 
     x = np.linspace(0.0001, 0.9999, steps)
-    if mu.__class__.__name__ != "Interval":
-        mu = Interval(mu)
-    if s.__class__.__name__ != "Interval":
-        s = Interval(s)
+    if mu.__class__.__name__ != "nInterval":
+        mu = nInterval(mu)
+    if s.__class__.__name__ != "nInterval":
+        s = nInterval(s)
 
     new_args = [
         [mu.lo() / s.lo(), 0, s.lo()],
@@ -793,8 +466,8 @@ def foldnorm(mu, s, steps=Params.steps):
     Left = [min([b[i] for b in bounds]) for i in range(steps)]
     Right = [max([b[i] for b in bounds]) for i in range(steps)]
 
-    var = Interval(np.float64(var_lo), np.float64(var_hi))
-    mean = Interval(np.float64(mean_lo), np.float64(mean_hi))
+    var = nInterval(np.float64(var_lo), np.float64(var_hi))
+    mean = nInterval(np.float64(mean_lo), np.float64(mean_hi))
 
     Left = np.array(Left)
     Right = np.array(Right)
@@ -814,10 +487,10 @@ def foldnorm(mu, s, steps=Params.steps):
 # def frechet_r(*args, steps = Params.steps):
 #     args = list(args)
 #     for i in range(0,len(args)):
-#         if args[i].__class__.__name__ != 'Interval':
-#             args[i] = Interval(args[i])
+#         if args[i].__class__.__name__ != 'nInterval':
+#             args[i] = nInterval(args[i])
 
-#     Left, Right, mean, var = __get_bounds('frechet_r',steps,*args)
+#     Left, Right, mean, var = _get_bounds('frechet_r',steps,*args)
 
 #     return Pbox(
 #           Left,
@@ -833,10 +506,10 @@ def foldnorm(mu, s, steps=Params.steps):
 # def frechet_l(*args, steps = Params.steps):
 #     args = list(args)
 #     for i in range(0,len(args)):
-#         if args[i].__class__.__name__ != 'Interval':
-#             args[i] = Interval(args[i])
+#         if args[i].__class__.__name__ != 'nInterval':
+#             args[i] = nInterval(args[i])
 
-#     Left, Right, mean, var = __get_bounds('frechet_l',steps,*args)
+#     Left, Right, mean, var = _get_bounds('frechet_l',steps,*args)
 
 #     return Pbox(
 #           Left,
@@ -850,1175 +523,404 @@ def foldnorm(mu, s, steps=Params.steps):
 #           )
 
 
-def genlogistic(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("genlogistic", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="genlogistic",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def gennorm(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("gennorm", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="gennorm",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def genpareto(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("genpareto", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="genpareto",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def genexpon(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("genexpon", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="genexpon",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def genextreme(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("genextreme", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="genextreme",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def gausshyper(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("gausshyper", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="gausshyper",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def gamma(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("gamma", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="gamma",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def gengamma(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("gengamma", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="gengamma",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def genhalflogistic(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("genhalflogistic", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="genhalflogistic",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def geninvgauss(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("geninvgauss", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="geninvgauss",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def gompertz(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("gompertz", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="gompertz",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def gumbel_r(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("gumbel_r", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="gumbel_r",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def gumbel_l(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("gumbel_l", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="gumbel_l",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def halfcauchy(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("halfcauchy", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="halfcauchy",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def halflogistic(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("halflogistic", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="halflogistic",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def halfnorm(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("halfnorm", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="halfnorm",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def halfgennorm(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("halfgennorm", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="halfgennorm",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def hypsecant(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("hypsecant", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="hypsecant",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def invgamma(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("invgamma", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="invgamma",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def invgauss(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("invgauss", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="invgauss",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def invweibull(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("invweibull", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="invweibull",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def johnsonsb(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("johnsonsb", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="johnsonsb",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def johnsonsu(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("johnsonsu", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="johnsonsu",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def kappa4(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("kappa4", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="kappa4",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def kappa3(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("kappa3", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="kappa3",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def ksone(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("ksone", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="ksone",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def kstwobign(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("kstwobign", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="kstwobign",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def laplace(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("laplace", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="laplace",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def levy(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("levy", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="levy",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def levy_l(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("levy_l", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="levy_l",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def levy_stable(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("levy_stable", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="levy_stable",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def logistic(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("logistic", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="logistic",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def loggamma(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("loggamma", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="loggamma",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def loglaplace(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("loglaplace", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="loglaplace",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def loguniform(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("loguniform", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="loguniform",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def lomax(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("lomax", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="lomax",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def maxwell(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("maxwell", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="maxwell",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def mielke(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("mielke", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="mielke",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def moyal(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("moyal", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="moyal",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def nakagami(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("nakagami", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="nakagami",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def ncx2(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("ncx2", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="ncx2",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def ncf(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("ncf", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="ncf",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def nct(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("nct", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="nct",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def norm(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("norm", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="norm",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def norm_debug(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("norm", steps, *args)
-    return Left, Right, mean, var
-    # return Pbox(
-    #     Left,
-    #     Right,
-    #     steps=steps,
-    #     shape="norm",
-    #     mean_left=mean.left,
-    #     mean_right=mean.right,
-    #     var_left=var.left,
-    #     var_right=var.right,
-    # )
-
-
-def norminvgauss(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("norminvgauss", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="norminvgauss",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def pareto(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("pareto", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="pareto",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def pearson3(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("pearson3", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="pearson3",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def powerlaw(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("powerlaw", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="powerlaw",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def powerlognorm(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("powerlognorm", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="powerlognorm",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def powernorm(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("powernorm", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="powernorm",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def rdist(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("rdist", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="rdist",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def rayleigh(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("rayleigh", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="rayleigh",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def rice(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("rice", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="rice",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def recipinvgauss(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("recipinvgauss", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="recipinvgauss",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def semicircular(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("semicircular", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="semicircular",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def skewnorm(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("skewnorm", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="skewnorm",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def t(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("t", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="t",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+@makePbox
+def genlogistic(*args):
+    return "genlogistic"
+
+
+@makePbox
+def gennorm(*args):
+    return "gennorm"
+
+
+@makePbox
+def genpareto(*args):
+    return "genpareto"
+
+
+@makePbox
+def genexpon(*args):
+    return "genexpon"
+
+
+@makePbox
+def genextreme(*args):
+    return "genextreme"
+
+
+@makePbox
+def gausshyper(*args):
+    return "gausshyper"
+
+
+@makePbox
+def gamma(*args):
+    return "gamma"
+
+
+@makePbox
+def gengamma(*args):
+    return "gengamma"
+
+
+@makePbox
+def genhalflogistic(*args):
+    return "genhalflogistic"
+
+
+@makePbox
+def geninvgauss(*args):
+    return "geninvgauss"
+
+
+@makePbox
+def gompertz(*args):
+    return "gompertz"
+
+
+@makePbox
+def gumbel_r(*args):
+    return "gumbel_r"
+
+
+@makePbox
+def gumbel_l(*args):
+    return "gumbel_l"
+
+
+@makePbox
+def halfcauchy(*args):
+    return "halfcauchy"
+
+
+@makePbox
+def halflogistic(*args):
+    return "halflogistic"
+
+
+@makePbox
+def halfnorm(*args):
+    return "halfnorm"
+
+
+@makePbox
+def halfgennorm(*args):
+    return 'halfgennorm'
+
+
+@makePbox
+def hypsecant(*args):
+    return 'hypsecant'
+
+
+@makePbox
+def invgamma(*args):
+    return 'invgamma'
+
+
+@makePbox
+def invgauss(*args):
+    return 'invgauss'
+
+
+@makePbox
+def invweibull(*args):
+    return 'invweibull'
+
+
+@makePbox
+def irwinhall(*args):
+    return 'irwinhall'
+
+
+@makePbox
+def jf_skew_t(*args):
+    return 'jf_skew_t'
+
+
+@makePbox
+def johnsonsb(*args):
+    return 'johnsonsb'
+
+
+@makePbox
+def johnsonsu(*args):
+    return 'johnsonsu'
+
+
+@makePbox
+def kappa4(*args):
+    return 'kappa4'
+
+
+@makePbox
+def kappa3(*args):
+    return 'kappa3'
+
+
+@makePbox
+def ksone(*args):
+    return 'ksone'
+
+
+@makePbox
+def kstwo(*args):
+    return 'kstwo'
+
+
+@makePbox
+def kstwobign(*args):
+    return 'kstwobign'
+
+
+@makePbox
+def laplace(*args):
+
+    return 'laplace'
+
+
+@makePbox
+def laplace_asymmetric(*args):
+    return 'laplace_asymmetric'
+
+
+@makePbox
+def levy(*args):
+    return 'levy'
+
+
+@makePbox
+def levy_l(*args):
+    return 'levy_l'
+
+
+@makePbox
+def levy_stable(*args):
+    return 'levy_stable'
+
+
+@makePbox
+def logistic(*args):
+    return 'logistic'
+
+
+@makePbox
+def loggamma(*args):
+    return 'loggamma'
+
+
+@makePbox
+def loglaplace(*args):
+    return 'loglaplace'
+
+
+@makePbox
+def loguniform(*args):
+    return 'loguniform'
+
+
+@makePbox
+def lomax(*args):
+    return 'lomax'
+
+
+@makePbox
+def maxwell(*args):
+    return 'maxwell'
+
+
+@makePbox
+def mielke(*args):
+    return 'mielke'
+
+
+@makePbox
+def moyal(*args):
+    return 'moyal'
+
+
+@makePbox
+def nakagami(*args):
+    return 'nakagami'
+
+
+@makePbox
+def ncx2(*args):
+    return 'ncx2'
+
+
+@makePbox
+def ncf(*args):
+    return 'ncf'
+
+
+@makePbox
+def nct(*args):
+    return 'nct'
+
+
+@makePbox
+def norminvgauss(*args):
+    return 'norminvgauss'
+
+
+@makePbox
+def pareto(*args):
+    return 'pareto'
+
+
+@makePbox
+def pearson3(*args):
+    return 'pearson3'
+
+
+@makePbox
+def powerlaw(*args):
+    return 'powerlaw'
+
+
+@makePbox
+def powerlognorm(*args):
+    return 'powerlognorm'
+
+
+@makePbox
+def powernorm(*args):
+    return 'powernorm'
+
+
+@makePbox
+def rdist(*args):
+    return 'rdist'
+
+
+@makePbox
+def rayleigh(*args):
+    return 'rayleigh'
+
+
+@makePbox
+def rel_breitwigner(*args):
+    return 'rel_breitwigner'
+
+
+@makePbox
+def rice(*args):
+    return 'rice'
+
+
+@makePbox
+def recipinvgauss(*args):
+    return 'recipinvgauss'
+
+
+@makePbox
+def semicircular(*args):
+    return 'semicircular'
+
+
+@makePbox
+def skewcauchy(*args):
+    return 'skewcauchy'
+
+
+@makePbox
+def skewnorm(*args):
+    return 'skewnorm'
+
+
+@makePbox
+def studentized_range(*args):
+    return 'studentized_range'
+
+
+@makePbox
+def t(*args):
+    return 't'
+
+
+@makePbox
+def trapezoid(*args):
+    return 'trapezoid'
+
+
+@makePbox
+def triang(*args):
+    return 'triang'
+
+
+@makePbox
+def truncexpon(*args):
+    return 'truncexpon'
+
+
+@makePbox
+def truncnorm(*args):
+    return 'truncnorm'
+
+
+@makePbox
+def truncpareto(*args):
+    return 'truncpareto'
+
+
+@makePbox
+def truncweibull_min(*args):
+    return 'truncweibull_min'
+
+
+@makePbox
+def tukeylambda(*args):
+    return 'tukeylambda'
+
+
+@makePbox
+def uniform_sps(*args):
+    return 'uniform'
+
+
+@makePbox
+def vonmises(*args):
+    return 'vonmises'
+
+
+@makePbox
+def vonmises_line(*args):
+    return 'vonmises_line'
+
+
+@makePbox
+def wald(*args):
+    return 'wald'
+
+
+@makePbox
+def weibull_min(*args):
+    return 'weibull_min'
+
+
+@makePbox
+def weibull_max(*args):
+    return 'weibull_max'
+
+
+@makePbox
+def wrapcauchy(*args):
+    return 'wrapcauchy'
+
+
+# *---------------------some special ones ---------------------*#
 
 
 def trapz(a, b, c, d, steps=Params.steps):
-    if a.__class__.__name__ != "Interval":
-        a = Interval(a)
-    if b.__class__.__name__ != "Interval":
-        b = Interval(b)
-    if c.__class__.__name__ != "Interval":
-        c = Interval(c)
-    if d.__class__.__name__ != "Interval":
-        d = Interval(d)
+    if a.__class__.__name__ != "nInterval":
+        a = nInterval(a)
+    if b.__class__.__name__ != "nInterval":
+        b = nInterval(b)
+    if c.__class__.__name__ != "nInterval":
+        c = nInterval(c)
+    if d.__class__.__name__ != "nInterval":
+        d = nInterval(d)
 
     x = np.linspace(0.0001, 0.9999, steps)
     left = sps.trapz.ppf(
@@ -2031,60 +933,20 @@ def trapz(a, b, c, d, steps=Params.steps):
     return Pbox(left, right, steps=steps, shape="trapz")
 
 
-def triang(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("triang", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="triang",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def truncexpon(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("truncexpon", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="truncexpon",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
 def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
-    if left.__class__.__name__ != "Interval":
-        left = Interval(left)
-    if right.__class__.__name__ != "Interval":
-        right = Interval(right)
-    if mean.__class__.__name__ != "Interval":
-        mean = Interval(mean)
-    if stddev.__class__.__name__ != "Interval":
-        stddev = Interval(stddev)
+    if left.__class__.__name__ != "nInterval":
+        left = nInterval(left)
+    if right.__class__.__name__ != "nInterval":
+        right = nInterval(right)
+    if mean.__class__.__name__ != "nInterval":
+        mean = nInterval(mean)
+    if stddev.__class__.__name__ != "nInterval":
+        stddev = nInterval(stddev)
 
     a, b = (left - mean) / stddev, (right - mean) / stddev
 
-    Left, Right, mean, var = __get_bounds(
+    Left, Right, mean, var = _get_bounds(
         "truncnorm", steps, a, b, mean, stddev)
 
     return Pbox(
@@ -2099,152 +961,39 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
     )
 
 
-def tukeylambda(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("tukeylambda", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="tukeylambda",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
 def uniform(a, b, steps=Params.steps):
+    """ special case of Uniform distribution 
 
-    # x = np.linspace(0, 1, steps)
-    # !SOLUTION: found a solution and prepare to raise an issue and submit a solution to Nick
+    args:
+        - a: (float) lower 
+        - b: (float) upper 
+    """
 
-    if a.__class__.__name__ != "Interval":
-        a = Interval(a, a)
-    if b.__class__.__name__ != "Interval":
-        b = Interval(b, b)
+    loc = a
+    scale = a + b
+    return uniform_sps(loc, scale)
 
-    Left = np.linspace(a.left, b.left, steps)
-    Right = np.linspace(a.right, b.right, steps)
+    # if a.__class__.__name__ != "nInterval":
+    #     a = nInterval(a, a)
+    # if b.__class__.__name__ != "nInterval":
+    #     b = nInterval(b, b)
 
-    mean = 0.5 * (a + b)
-    var = ((b - a) ** 2) / 12
+    # Left = np.linspace(a.left, b.left, steps)
+    # Right = np.linspace(a.right, b.right, steps)
 
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="uniform",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+    # mean = 0.5 * (a + b)
+    # var = ((b - a) ** 2) / 12
 
-
-def vonmises(*args, steps=Pbox.STEPS):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("vonmises", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="vonmises",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def vonmises_line(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("vonmises_line", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="vonmises_line",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def wald(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("wald", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="wald",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def weibull_min(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("weibull_min", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="weibull_min",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def weibull_max(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("weibull_max", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="weibull_max",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+    # return Pbox(
+    #     Left,
+    #     Right,
+    #     steps=steps,
+    #     shape="uniform",
+    #     mean_left=mean.left,
+    #     mean_right=mean.right,
+    #     var_left=var.left,
+    #     var_right=var.right,
+    # )
 
 
 def weibull(*args, steps=Params.steps):
@@ -2255,342 +1004,123 @@ def weibull(*args, steps=Params.steps):
     return Pbox(left=wl.left, right=wm.right)
 
 
-def wrapcauchy(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("wrapcauchy", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="wrapcauchy",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def bernoulli(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("bernoulli", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="bernoulli",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def betabinom(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("betabinom", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="betabinom",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def binom(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("binom", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="binom",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def boltzmann(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("boltzmann", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="boltzmann",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def dlaplace(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("dlaplace", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="dlaplace",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def geom(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("geom", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="geom",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def hypergeom(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("hypergeom", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="hypergeom",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def logser(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("logser", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="logser",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def nbinom(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("nbinom", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="nbinom",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def planck(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("planck", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="planck",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def poisson(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("poisson", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="poisson",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def randint(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("randint", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="randint",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def skellam(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("skellam", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="skellam",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def zipf(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("zipf", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="zipf",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def yulesimon(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
-
-    Left, Right, mean, var = __get_bounds("yulesimon", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="yulesimon",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
 # Other distributions
 def KM(k, m, steps=Params.steps):
     with catch_warnings():
         simplefilter("ignore")
-        return beta(Interval(k, k + 1), Interval(m, m + 1), steps=steps)
+        return beta(nInterval(k, k + 1), nInterval(m, m + 1), steps=steps)
 
 
 def KN(k, n, steps=Params.steps):
     return KM(k, n - k, steps=steps)
 
 
-# ---------------------aliases---------------------#
-# Alternate names
+# *---------------------discrete distributions---------------------*#
+
+@makePbox
+def bernoulli(*args):
+    return 'bernoulli'
+
+
+@makePbox
+def betabinom(*args):
+    return 'betabinom'
+
+
+@makePbox
+def betanbinom(*args):
+    return 'betanbinom'
+
+
+@makePbox
+def binom(*args):
+    return 'binom'
+
+
+@makePbox
+def boltzmann(*args):
+    return 'boltzmann'
+
+
+@makePbox
+def dlaplace(*args):
+    return 'dlaplace'
+
+
+@makePbox
+def geom(*args):
+    return 'geom'
+
+
+@makePbox
+def hypergeom(*args):
+    return 'hypergeom'
+
+
+@makePbox
+def logser(*args):
+    return 'logser'
+
+
+@makePbox
+def nbinom(*args):
+    return 'nbinom'
+
+
+@makePbox
+def nchypergeom_fisher(*args):
+    return 'nchypergeom_fisher'
+
+
+@makePbox
+def nchypergeom_wallenius(*args):
+    return 'nchypergeom_wallenius'
+
+
+@makePbox
+def nhypergeom(*args):
+    return 'nhypergeom'
+
+
+@makePbox
+def planck(*args):
+    return 'planck'
+
+
+@makePbox
+def poisson(*args):
+    return 'poisson'
+
+
+@makePbox
+def randint(*args):
+    return 'randint'
+
+
+@makePbox
+def skellam(*args):
+    return 'skellam'
+
+
+@makePbox
+def yulesimon(*args):
+    return 'yulesimon'
+
+
+@makePbox
+def zipf(*args):
+    return 'zipf'
+
+
+@makePbox
+def zipfian(*args):
+    return 'zipfian'
+
+
+# *---------------------aliases---------------------*#
 normal = norm
 N = normal
-unif = uniform
+gaussian = norm
 U = uniform
 lognorm = lognormal
 
@@ -2600,3 +1130,123 @@ lognorm = lognormal
 #     alpha1 = (mu - minimum)*(2*mode - minimum - maximum)/((mode - mu)*(maximum - minimum))
 #     alpha2 = alpha1*(maximum - mu)/(mu - minimum)
 #     return minimum + (maximum - minimum) * beta(alpha1, alpha2)
+
+# *---------------------named pboxes for UN ---------------------*#
+named_pbox = {
+    "alpha": alpha,
+    "anglit": anglit,
+    "arcsine": arcsine,
+    "argus": argus,
+    "beta": beta,
+    "betaprime": betaprime,
+    "bradford": bradford,
+    "burr": burr,
+    "burr12": burr12,
+    "cauchy": cauchy,
+    "chi": chi,
+    "chi2": chi2,
+    "cosine": cosine,
+    "crystalball": crystalball,
+    "dgamma": dgamma,
+    "dweibull": dweibull,
+    "erlang": erlang,
+    "expon": expon,
+    "exponnorm": exponnorm,
+    "exponweib": exponweib,
+    "exponpow": exponpow,
+    "f": f,
+    "fatiguelife": fatiguelife,
+    "fisk": fisk,
+    "foldcauchy": foldcauchy,
+    "foldnorm": foldnorm,
+    # 'frechet_r' : frechet_r,
+    # 'frechet_l' : frechet_l,
+    "genlogistic": genlogistic,
+    "gennorm": gennorm,
+    "genpareto": genpareto,
+    "genexpon": genexpon,
+    "genextreme": genextreme,
+    "gausshyper": gausshyper,
+    "gamma": gamma,
+    "gengamma": gengamma,
+    "genhalflogistic": genhalflogistic,
+    "geninvgauss": geninvgauss,
+    # 'gibrat' : gibrat,
+    "gompertz": gompertz,
+    "gumbel_r": gumbel_r,
+    "gumbel_l": gumbel_l,
+    "halfcauchy": halfcauchy,
+    "halflogistic": halflogistic,
+    "halfnorm": halfnorm,
+    "halfgennorm": halfgennorm,
+    "hypsecant": hypsecant,
+    "invgamma": invgamma,
+    "invgauss": invgauss,
+    "invweibull": invweibull,
+    "johnsonsb": johnsonsb,
+    "johnsonsu": johnsonsu,
+    "kappa4": kappa4,
+    "kappa3": kappa3,
+    "ksone": ksone,
+    "kstwobign": kstwobign,
+    "laplace": laplace,
+    "levy": levy,
+    "levy_l": levy_l,
+    "levy_stable": levy_stable,
+    "logistic": logistic,
+    "loggamma": loggamma,
+    "loglaplace": loglaplace,
+    "lognormal": lognormal,
+    "loguniform": loguniform,
+    "lomax": lomax,
+    "maxwell": maxwell,
+    "mielke": mielke,
+    "moyal": moyal,
+    "nakagami": nakagami,
+    "ncx2": ncx2,
+    "ncf": ncf,
+    "nct": nct,
+    "norm": norm,
+    "normal": norm,
+    "gaussian": norm,
+    "norminvgauss": norminvgauss,
+    "pareto": pareto,
+    "pearson3": pearson3,
+    "powerlaw": powerlaw,
+    "powerlognorm": powerlognorm,
+    "powernorm": powernorm,
+    "rdist": rdist,
+    "rayleigh": rayleigh,
+    "rice": rice,
+    "recipinvgauss": recipinvgauss,
+    "semicircular": semicircular,
+    "skewnorm": skewnorm,
+    "t": t,
+    "trapz": trapz,
+    "triang": triang,
+    "truncexpon": truncexpon,
+    "truncnorm": truncnorm,
+    "tukeylambda": tukeylambda,
+    "uniform": uniform,
+    "vonmises": vonmises,
+    "vonmises_line": vonmises_line,
+    "wald": wald,
+    "weibull_min": weibull_min,
+    "weibull_max": weibull_max,
+    "wrapcauchy": wrapcauchy,
+    "bernoulli": bernoulli,
+    "betabinom": betabinom,
+    "binom": binom,
+    "boltzmann": boltzmann,
+    "dlaplace": dlaplace,
+    "geom": geom,
+    "hypergeom": hypergeom,
+    "logser": logser,
+    "nbinom": nbinom,
+    "planck": planck,
+    "poisson": poisson,
+    "randint": randint,
+    "skellam": skellam,
+    "zipf": zipf,
+    "yulesimon": yulesimon,
+}
