@@ -1,7 +1,7 @@
 from decimal import DivisionByZero
 from typing import *
 from warnings import *
-
+from ..UC.utils import tranform_ecdf
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
@@ -1131,6 +1131,39 @@ class Pbox:
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(X \leq x)$")
         return ax
+
+
+# ---------------------constructors---------------------#
+''' initially used for cbox next-value distribution '''
+
+
+def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
+    """ transform into pbox object for cbox 
+
+    args:
+        rvs (list): list of scipy.stats.rv_continuous objects"""
+
+    # x_sup
+    bounds = [rv.ppf(Params.p_values) for rv in rvs]
+    if extre_bound_params is not None:
+        print(extre_bound_params)
+    return Pbox(
+        left=bounds[0],
+        right=bounds[1],
+        shape=shape,
+    )
+
+
+def pbox_from_pseudosamples(samples):
+    """ a tmp constructor for pbox/cbox from approximate solution of the confidence/next value distribution 
+
+    args:
+        samples: the approximate Monte Carlo samples of the confidence/next value distribution
+
+    note:
+        ecdf is estimted from the samples and bridge to pbox/cbox
+    """
+    return Pbox(tranform_ecdf(samples, display=False))
 
 
 ##### Functions #####

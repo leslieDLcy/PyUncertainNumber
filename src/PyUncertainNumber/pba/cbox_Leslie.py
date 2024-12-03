@@ -56,7 +56,7 @@ class Cbox(Pbox):
 # * ---------------------  constructors--------------------- *#
 
 
-def cbox_from_envdists(rvs, shape=None, extre_bound_params=None):
+def cbox_from_extredists(rvs, shape=None, extre_bound_params=None):
     """ define cbox via extreme bouding distrbution functions
 
     args:
@@ -79,34 +79,3 @@ def cbox_from_envdists(rvs, shape=None, extre_bound_params=None):
 def cbox_from_pseudosamples(samples):
 
     return Cbox(tranform_ecdf(samples, display=False))
-
-
-# * ---------------------next value --------------------- *#
-
-def repre_pbox(rvs, shape="beta", extre_bound_params=None):
-    """ transform into pbox object for cbox 
-
-    args:
-        rvs (list): list of scipy.stats.rv_continuous objects"""
-
-    # x_sup
-    bounds = [rv.ppf(Params.p_values) for rv in rvs]
-    if extre_bound_params is not None:
-        print(extre_bound_params)
-    return Pbox(
-        left=bounds[0],
-        right=bounds[1],
-        shape=shape,
-    )
-
-
-def pbox_from_pseudosamples(samples):
-    """ a tmp constructor for pbox/cbox from approximate solution of the confidence/next value distribution 
-
-    args:
-        samples: the approximate Monte Carlo samples of the confidence/next value distribution
-
-    note:
-        ecdf is estimted from the samples and bridge to pbox/cbox
-    """
-    return Pbox(tranform_ecdf(samples, display=False))

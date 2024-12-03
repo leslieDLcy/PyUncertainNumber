@@ -9,7 +9,9 @@ from scipy.stats import beta, t, uniform, gamma, betabinom, nbinom
 from .params import Params
 from intervals import Interval
 import scipy
-from .cbox_Leslie import cbox_from_envdists, repre_pbox, cbox_from_pseudosamples, pbox_from_pseudosamples
+from .cbox_Leslie import cbox_from_extredists, cbox_from_pseudosamples
+from .pbox_base import pbox_from_extredists, pbox_from_pseudosamples
+import PyUncertainNumber.pba.distributions as d
 
 
 def interval_measurements(func):
@@ -18,7 +20,7 @@ def interval_measurements(func):
     def imprecise_measurements_wrapper(x, **kwargs):
         if isinstance(x, (list, np.ndarray)):
             conf_dist, params = func(x, **kwargs)
-            return cbox_from_envdists(conf_dist, extre_bound_params=(params['loc'], params['scale']))
+            return cbox_from_extredists(conf_dist, extre_bound_params=(params['loc'], params['scale']))
 
         elif isinstance(x, Interval):
             cd_lo, params_lo = func(x.lo, **kwargs)
@@ -27,7 +29,7 @@ def interval_measurements(func):
             def get_interval_params():
                 pass
 
-            return cbox_from_envdists([cd_lo, cd_hi])
+            return cbox_from_extredists([cd_lo, cd_hi])
     return imprecise_measurements_wrapper
 
 
@@ -39,7 +41,7 @@ def CBbernoulli_p(x):
     l_b_params = [k, n - k + 1]
     r_b_params = [k + 1, n - k]
     cdfs = (beta(*l_b_params), beta(*r_b_params))
-    return cbox_from_envdists(cdfs, shape="beta", extre_bound_params=(l_b_params, r_b_params))
+    return cbox_from_extredists(cdfs, shape="beta", extre_bound_params=(l_b_params, r_b_params))
 
 # nextvalue
 
@@ -74,9 +76,9 @@ def CBbinomial_p(x, N):
     l_b_params = [k, n * N - k + 1]
     r_b_params = [k + 1, n * N - k]
     cdfs = (beta(*l_b_params), beta(*r_b_params))
-    return cbox_from_envdists(cdfs,
-                              shape="beta",
-                              extre_bound_params=(l_b_params, r_b_params))
+    return cbox_from_extredists(cdfs,
+                                shape="beta",
+                                extre_bound_params=(l_b_params, r_b_params))
 
 
 def CBbinomial(x, N):
@@ -85,7 +87,7 @@ def CBbinomial(x, N):
     n = len(x)
     k = sum(x)
     cdfs = (betabinom(N, k, n*N-k+1), betabinom(N, k+1, n*N-k))
-    return repre_pbox(cdfs, shape="betanomial")
+    return pbox_from_extredists(cdfs, shape="betanomial")
 
 
 # ---------------------binomialnp---------------------#
@@ -107,13 +109,13 @@ def parameter_binomialnp_p(x):
 # ---------------------Poisson---------------------#
 # x[i] ~ Poisson(parameter), x[i] is a nonnegative integer
 
-def CBpoisson_mean(x):
+def CBpoisson_lambda(x):
     n = len(x)
     k = sum(x)
     l_b_params = [k, 1/n]
     r_b_params = [k + 1, 1/n]
     cdfs = (gamma(*l_b_params), gamma(*r_b_params))
-    return cbox_from_envdists(cdfs, shape="gamma", extre_bound_params=(l_b_params, r_b_params))
+    return cbox_from_extredists(cdfs, shape="gamma", extre_bound_params=(l_b_params, r_b_params))
 
 
 def CBpoisson(x):
@@ -123,7 +125,7 @@ def CBpoisson(x):
     cdfs = (nbinom(k, 1 - 1/(n+1)),
             nbinom(k+1, 1 - 1/(n+1))
             )
-    return repre_pbox(cdfs, shape="nbinom")
+    return pbox_from_extredists(cdfs, shape="nbinom")
 
 
 # ---------------------exponential---------------------#
@@ -133,7 +135,7 @@ def CBexponential_lambda(x):
     n = len(x)
     k = sum(x)
     conf_dist = gamma(n, scale=1/k)
-    return cbox_from_envdists(conf_dist, shape="gamma", extre_bound_params=(n, 1/k))
+    return cbox_from_extredists(conf_dist, shape="gamma", extre_bound_params=(n, 1/k))
 
 
 def CBexponential(x):
@@ -152,23 +154,15 @@ def CBexponential(x):
                 size=Params.many),
             size=Params.many
         )
-    mc_samples = gammaexponential(shape=n, rate=k)
-    return pbox_from_pseudosamples(mc_samples)
+    pseudo_s = gammaexponential(shape=n, rate=k)
+    return pbox_from_pseudosamples(pseudo_s)
 
 
 # ---------------------normal---------------------#
 
 # x[i] ~ normal(mu, sigma)
-def CBnormal(x):
-    n = len(x)
-    # pop or sample std?
-    def student(v): return scipy.stats.t.rvs(v, size=Params.many)
-    return cbox_from_pseudosamples(np.mean(x) + np.std(x) * student(n - 1) * np.sqrt(1 + 1 / n))
-
-# base function for precise sample x
-
-
 def cboxNormalMu_base(x):
+    """ base function for precise sample x """
     n = len(x)
     xm = np.mean(x)
     s = np.std(x)
@@ -223,26 +217,37 @@ def CBnormal_sigma(x):
     return cbox_from_pseudosamples(pseudo_s)
 
 
+def CBnormal(x):
+    n = len(x)
+    # pop or sample std?
+    def student(v): return scipy.stats.t.rvs(v, size=Params.many)
+    return pbox_from_pseudosamples(np.mean(x) + np.std(x) * student(n - 1) * np.sqrt(1 + 1 / n))
+
 # * ---------------------lognormal---------------------*#
 
 # x[i] ~ lognormal(mu, sigma), x[i] is a positive value whose logarithm is distributed as normal(mu, sigma)
+
+
 def CBlognormal(x):
     n = len(x)
-    def student(v): return scipy.stats.t.rvs(v, size=Params.many)
-    return pbox_from_pseudosamples(np.exp(np.mean(np.log(x)) + np.std(np.log(x)) * student(n - 1) * np.sqrt(1+1/n)))
+    return pbox_from_pseudosamples(
+        np.exp(np.mean(np.log(x)) + np.std(np.log(x))
+               * d.student(n - 1) * np.sqrt(1+1/n))
+    )
 
 
 def CBlognormal_mu(x):
     n = len(x)
-    def student(v): return scipy.stats.t.rvs(v, size=Params.many)
-    return cbox_from_pseudosamples(np.mean(np.log(x)) + np.std(np.log(x)) * student(n - 1) / np.sqrt(n))
+    return cbox_from_pseudosamples(
+        np.mean(np.log(x)) + np.std(np.log(x)) * d.student(n - 1) / np.sqrt(n)
+    )
 
 
 def CBlognormal_sigma(x):
     n = len(x)
-    def chisquared(v): return (scipy.stats.chi2.rvs(v, size=Params.many))
-    def inversechisquared(v): return (1/chisquared(v))
-    return cbox_from_pseudosamples(np.sqrt(np.var(np.log(x))*(n-1)*inversechisquared(n-1)))
+    return cbox_from_pseudosamples(
+        np.sqrt(np.var(np.log(x))*(n-1) * d.inversechisquared(n-1))
+    )
 
 
 # ---------------------uniform---------------------#
@@ -250,38 +255,42 @@ def CBlognormal_sigma(x):
 
 # x[i] ~ uniform(midpoint, width)
 # x[i] ~ uniform(minimum, maximum)
-def CBuniform(x):
-    r = max(x)-min(x)
-    w = (r/beta(len(x)-1, 2))/2
-    m = (max(x)-w)+(2*w-r)*uniform(0, 1)
-    return pbox_from_pseudosamples(uniform(m-w, m+w))
 
 
 def CBuniform_midpoint(x):
+
     r = max(x)-min(x)
-    w = r/beta(len(x)-1, 2)
-    m = (max(x)-w/2)+(w-(max(x)-min(x)))*uniform(0, 1)
+    w = r / d.beta(len(x)-1, 2)
+    m = (max(x)-w/2)+(w-(max(x)-min(x))) * d.uniform(0, 1)
     return cbox_from_pseudosamples(m)
 
 
 def CBuniform_width(x):
     r = max(x)-min(x)
-    return cbox_from_pseudosamples(r/beta(len(x)-1, 2))
+    return cbox_from_pseudosamples(r/d.beta(len(x)-1, 2))
 
 
 def CBuniform_minimum(x):
     r = max(x)-min(x)
-    w = r/beta(len(x)-1, 2)
-    m = (max(x)-w/2)+(w-r)*uniform(0, 1)
+    w = r / d.beta(len(x)-1, 2)
+    m = (max(x)-w/2) + (w-r) * d.uniform(0, 1)
     return cbox_from_pseudosamples(m-w/2)
 
 
 def CBuniform_maximum(x):
     r = max(x)-min(x)
-    w = r/beta(len(x)-1, 2)
-    m = (max(x)-w/2)+(w-r)*uniform(0, 1)
+    w = r / d.beta(len(x)-1, 2)
+    m = (max(x)-w/2) + (w-r) * d.uniform(0, 1)
     return cbox_from_pseudosamples(m+w/2)
 
+# nextvalue
+
+
+def CBuniform(x):
+    r = max(x)-min(x)
+    w = (r / d.beta(len(x)-1, 2))/2
+    m = (max(x)-w)+(2*w-r) * d.uniform(0, 1)
+    return pbox_from_pseudosamples(d.uniform(m-w, m+w))
 
 # ---------------------nonparametric---------------------#
 
