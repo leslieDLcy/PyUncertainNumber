@@ -1,18 +1,14 @@
 import numpy as np
 from typing import Callable
 import tqdm
+from PyUncertainNumber.UP.mixed_uncertainty.extremePointX import extreme_pointX
 from PyUncertainNumber.UP.mixed_uncertainty.Cartesian import cartesian
 from scipy.stats import norm 
 from PyUncertainNumber.UC.uncertainNumber import UncertainNumber as UN
-
 import matplotlib.pyplot as plt 
+#from itertools import product
 
-##TODO finish off the method in line with all other methods
-##TODO also finish other methods like hte cauchy or the subinterval reconstitution. 
-##TODO we can change the d_disc for each distribution. 
-
-def mixed_uncertainty_method(x: list, f:Callable = None, method = 'endpoints',
-                             lim_Q: np.array = np.array([0.01, 0.09]), n_disc:int = 5):
+def mixed_uncertainty_method(x: list, f:Callable = None, lim_Q: np.array = np.array([0.0001, 0.9999]), signs: np.array = None, n_disc:int = 5):
     """
     Args:
       x (list): A list of UncertainNumber objects, each representing an input 
@@ -33,8 +29,9 @@ def mixed_uncertainty_method(x: list, f:Callable = None, method = 'endpoints',
         #TODO to add an example for this method.
     """
     d = len(x) # dimension of uncertain numbers 
-    
-    bounds_x = []  
+    xl = []
+    xr = []
+    ranges = []
     u_list = []  # List to store 'u' for each uncertain number
 
     for i, un in enumerate(x):
@@ -57,53 +54,50 @@ def mixed_uncertainty_method(x: list, f:Callable = None, method = 'endpoints',
             else:
                 u = np.linspace(lim_Q[0], lim_Q[1], n_disc)
         else:  # un.essence == "interval"
-            u = np.array([0.0, 1.0])  # Or adjust as needed for intervals
+            u = np.zeros(2)  # Or adjust as needed for intervals
 
         u_list.append(u)  # Add 'u' to the list
 
         # Generate discrete p-boxes
+       
+        temp_xl = []  # Temporary list to hold xl values for the current variable
+        temp_xr = []  # Temporary list to hold xr values for the current variable
+        
         match un.essence:
             case "distribution":
                 # Calculate xl and xr for distributions (adjust as needed)
                 temp_xl = un.ppf(u_list[i][:-1])  # Assuming un.ppf(u) returns a list or array
                 temp_xr = un.ppf(u_list[i][1:])  # Adjust based on your distribution
-                
-                rang = np.array([temp_xl, temp_xr]).T  # Create a 2D array of bounds
-                bounds_x.append(rang)
+                ranges[:, i] = [temp_xl[0], temp_xl[-1]]
+                # xl[:, i] = un.ppf(u[:-1])  # Calculate ppf for all quantiles at once
+    #             # print('xl', xl[:,i])
+    #             # xr[:, i] = un.ppf(u[1:])   # Calculate ppf for all quantiles at once
+    #             # 
 
             case "interval":
                 temp_xl = np.array([un.bounds[0]])  # Repeat lower bound for all quantiles
                 temp_xr = np.array([un.bounds[1]])  # Repeat upper bound for all quantiles
-                
-                rang = np.array([temp_xl, temp_xr]).T  # Create a 2D array of bounds
-                bounds_x.append(rang)
+                ranges[:, i] = un.bounds
 
             case "pbox":
-                temp_xl = un.ppf(u_list[i])[0]  
+                temp_xl = un.ppf(u_list[i])[0]  # Assuming un.ppf(u) returns a list of lists
                 temp_xr = un.ppf(u_list[i])[1]
-                
-                rang = np.array([temp_xl, temp_xr]).T  # Create a 2D array of bounds
-                bounds_x.append(rang)
-
+                ranges[:, i] = [temp_xl[0], temp_xl[-1]]
             case _:
                 raise ValueError(f"Unsupported uncertainty type: {un.essence}")
 
-    # Automatically generate merged_array_index
-    bounds_x_index = [np.arange(len(sub_array)) for sub_array in bounds_x]
-        
-    # Calculate Cartesian product of indices using your cartesian function
-    cartesian_product_indices = cartesian(*bounds_x_index)
-    
-    # Generate the final array using the indices
-    focal_elements_comb = []
-    for indices in cartesian_product_indices:
-        temp = []
-        for i, index in enumerate(indices):
-            temp.append(bounds_x[i][index])
-        focal_elements_comb.append(temp)
+        xl.append(temp_xl)  # Add the temporary list to xl
+        xr.append(temp_xr)  # Add the temporary list to xr
 
-    focal_elements_comb = np.array(focal_elements_comb, dtype=object)
-    
+    # Create a list of lists containing both lower and upper bounds for each number
+    combined_bounds = [
+            np.concatenate((np.atleast_1d(lower), np.atleast_1d(upper)))
+            for lower, upper in zip(xl, xr)
+                ]
+    # Generate the Cartesian product of all combinations
+    all_combinations = cartesian(*combined_bounds)
+    #print(all_combinations)
+
     all_output = None
     if f is not None:
         # Efficiency upgrade: store repeated evaluations
@@ -111,101 +105,30 @@ def mixed_uncertainty_method(x: list, f:Callable = None, method = 'endpoints',
         evalsList = []  
         numRun = 0
 
-        match method:
-            case "endpoints":
-                x_combinations = [] #np.zeros(2**d, d)
-                for array in focal_elements_comb:
-                    cartesian_product_x = cartesian(*array) 
-                    x_combinations.append(cartesian_product_x.tolist()) 
-                
-                # Initialize all_output as a list to store outputs initially
-                all_output_list = []  
-                current_index = 0
+        all_output = []  
+        for c in tqdm.tqdm(all_combinations, desc="Evaluating samples"):
+            im = np.where((inpsList == c).all(axis=1))[0]
+            if not im.size:
+                output = f(c) 
+                all_output.append(output)
+                inpsList = np.vstack([inpsList, c])
+                evalsList.append(output)
+                numRun += 1
+            else:
+                all_output.append(evalsList[im[0]]) 
+        
+        # Determine the number of outputs from the first evaluation
+        try:
+            num_outputs = len(all_output[0])
+        except TypeError:
+            num_outputs = 1  # If f returns a single value
 
-                for i, array in enumerate(x_combinations):
-                    for j, case in enumerate(array):
-                        im = np.where((inpsList == case).all(axis=1))[0]
-                        if not im.size:
-                            output = f(case)
-                            all_output_list.append(output)  # Append to the list
-                            inpsList = np.vstack([inpsList, case])
-                            evalsList.append(output)
-                            numRun += 1
-                        else:
-                            all_output_list.append(evalsList[im[0]])
-                        current_index += 1
+        # Convert all_output to a NumPy array with the correct shape
+        all_output = np.array(all_output).reshape(-1, num_outputs)  
 
-                # Determine num_outputs AFTER running the function
-                try:
-                    num_outputs = len(all_output_list[0])
-                except TypeError:
-                    num_outputs = 1
-
-                # Convert all_output to a 2D NumPy array
-                all_output = np.array(all_output_list).reshape((len(x_combinations), -1, num_outputs))
-                
-                # Calculate min and max for each sublist in all_output
-                min_values = np.min(all_output, axis=1) 
-                max_values = np.max(all_output, axis=1) 
-
-                for i in range(num_outputs):
-                    min_values[:,i] = np.sort(min_values[:,i])
-                    max_values[:,i]  = np.sort(max_values[:,i])
-
-                    
-                ## Need to check the flatten, i know what it does it is good when you have one column not here. 
-
-
+    return all_combinations, all_output #Include all_combinations in the return values
     
-    return  min_values #Include all_combinations in the return values
-    
-# example
-# from PyUncertainNumber import UncertainNumber as UN
-def cantilever_beam_deflection(x):
-    """Calculates deflection and stress for a cantilever beam.
-
-    Args:
-
-        x (np.array): Array of input parameters:
-            x[0]: Length of the beam (m)
-            x[1]: Second moment of area (mm^4)
-            x[2]: Applied force (N)
-            x[3]: Young's modulus (MPa)
-
-    Returns:
-        float: deflection (m)
-               Returns np.nan if calculation error occurs.
-    """
-
-    beam_length = x[0]
-    I = x[1]
-    F = x[2]
-    E = x[3]
-    try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
-        stress = F * beam_length**3 / (3 * E * 10**6 * I) *100 # deflection in m
-        deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
-    except:
-        deflection = np.nan
-        stress = np.nan
-
-    return np.array([deflection,stress])
-
-#L = UN(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
-#I = UN(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
-F = UN(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
-#I = UN(name='moment of inertia', symbol='I', units='m', essence='interval', bounds=["gaussian", [0.000454, 4.5061e-5]])
-
-E = UN(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
-L = UN(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
-I = UN(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
-
-a = mixed_uncertainty_method(x=[L, I, F, E], #['L', 'I', 'F', 'E'], 
-          f = cantilever_beam_deflection, 
-          n_disc= 3
-         )
-
-print(a)
-  
+   
 
     # xl = np.zeros((nd , d))
     # xr = np.zeros((nd, d))
@@ -236,28 +159,28 @@ print(a)
 
     # return xl, xr, ranges
     
-# A = UN(
-#     essence="pbox",
-#     distribution_parameters=["gaussian", [[1, 2], [1,2]]]
-# )
+A = UN(
+    essence="pbox",
+    distribution_parameters=["gaussian", [[1, 2], [1,2]]]
+)
 
-# B = UN(
-#     essence="distribution",
-#     distribution_parameters=["gaussian", [1, 1]]
-# )
+B = UN(
+    essence="distribution",
+    distribution_parameters=["gaussian", [1, 1]]
+)
 
-# C = UN(
-#     essence="interval",
-#     bounds= [3, 4] 
-# )
+C = UN(
+    essence="interval",
+    bounds= [3, 4] 
+)
 
-# V = UN(name='testing', 
-#         symbol='V', 
-#         essence='distribution', 
-#         distribution_parameters=["triang", [0.5, 10,20]])
+V = UN(name='testing', 
+        symbol='V', 
+        essence='distribution', 
+        distribution_parameters=["triang", [0.5, 10,20]])
 
-# C.display
-# plt.show
+C.display
+plt.show
 # print(A)
 # print(B)
 # print(C)
@@ -335,3 +258,76 @@ print(a)
 #     return cl, cm
 
 
+# # example
+# from PyUncertainNumber import UncertainNumber as UN
+
+def cantilever_beam_deflection(x):
+    """Calculates deflection and stress for a cantilever beam.
+
+    Args:
+
+        x (np.array): Array of input parameters:
+            x[0]: Length of the beam (m)
+            x[1]: Second moment of area (mm^4)
+            x[2]: Applied force (N)
+            x[3]: Young's modulus (MPa)
+
+    Returns:
+        float: deflection (m)
+               Returns np.nan if calculation error occurs.
+    """
+
+    beam_length = x[0]
+    I = x[1]
+    F = x[2]
+    E = x[3]
+    try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
+        deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+        
+    except:
+        deflection = np.nan
+
+    return deflection
+
+#L = UN(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
+#I = UN(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
+F = UN(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
+#I = UN(name='moment of inertia', symbol='I', units='m', essence='interval', bounds=["gaussian", [0.000454, 4.5061e-5]])
+
+E = UN(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
+L = UN(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
+I = UN(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
+#F = UN(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
+#E = UN(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
+#E.display()
+#plt.show()
+#  print(V)
+
+# print(L.essence)
+# METHOD = "latin_hypercube"
+# base_path = ""
+
+a = mixed_uncertainty_method(x=[L, I, F, E], #['L', 'I', 'F', 'E'], 
+          f = cantilever_beam_deflection, 
+          n_disc= 10
+         )
+
+print(a[1])
+# # Create a p-box UncertainNumber with a Gaussian distribution
+
+F = UN(name='vertical force', symbol='F', units='kN', essence='pbox', distribution_parameters=["gaussian", [[22.5, 26.5], 8.67]])
+
+#F.display()
+I = UN(name='moment of inertia', symbol='I', units='m', essence='pbox', distribution_parameters=["gaussian", [[0.0035,0.00067], 4.5061e-5]])
+
+I.display()
+
+
+# Calculate the positions for the horizontal lines (3 equally spaced points)
+y_positions = np.linspace(0, 1, 5)  # 4 points create 3 spaces
+print(y_positions)
+# Plot the horizontal lines
+for y in y_positions[1:]:  # Skip the first point (ymin)
+    plt.axhline(y=y, color='gray', linestyle='--')
+
+plt.show()

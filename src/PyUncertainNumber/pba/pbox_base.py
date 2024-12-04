@@ -1091,7 +1091,7 @@ class Pbox:
             return fig, ax
     plot = show
 
-    @mpl.rc_context({"text.usetex": True})
+    #@mpl.rc_context({"text.usetex": True})
     def display(self, title="", ax=None, style="simple", fill_color='lightgray', **kwargs):
         """quickly plot the pba object
 
