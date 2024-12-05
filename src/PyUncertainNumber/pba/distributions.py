@@ -5,7 +5,7 @@ from warnings import *
 from dataclasses import dataclass
 from typing import *
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
-from ..UC.utils import pl_pcdf, pl_ecdf
+from ..characterisation.utils import pl_pcdf, pl_ecdf
 import scipy
 from .params import Params
 

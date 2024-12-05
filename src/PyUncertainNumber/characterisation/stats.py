@@ -349,21 +349,6 @@ def MLnegativebinomial(x): return (
     sps.nbinom(*sps.nbinom.fit(x)))
 
 
-# def get_from_sps(sps_dist):
-#     Distribution()
-
-
-# def from_sps(func):
-#     @functools.wraps(func)
-#     def wrapper_decorator(*args, **kwargs):
-#         # Do something before
-#         sps_dist = func(*args, **kwargs)
-
-#         # Do something after
-#         return value
-#     return wrapper_decorator
-
-
 @makedist('norm')
 def MLnormal(x):
     return norm(*sps.norm.fit(x))
@@ -395,6 +380,7 @@ mle = {
     'lognormal': MLlognormal,
     'loguniform': MLloguniform,
     'negativebinomial': MLnegativebinomial,
+    'norm': MLnormal,
     'normal': MLnormal,
     'pareto': MLpareto,
     'poisson': MLpoisson,

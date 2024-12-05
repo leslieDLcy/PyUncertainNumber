@@ -1,7 +1,7 @@
 """ a Cbox constructor by Leslie"""
 from .params import Params
 from .pbox_base import Pbox
-from ..UC.utils import tranform_ecdf
+from ..characterisation.utils import tranform_ecdf
 
 
 class Cbox(Pbox):

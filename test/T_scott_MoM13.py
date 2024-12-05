@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from PyUncertainNumber.UC.stats import *
+from PyUncertainNumber.characterisation.stats import *
 
 # ---------------------Test---------------------#
 ''' method of matching moments (MoM) constructors '''

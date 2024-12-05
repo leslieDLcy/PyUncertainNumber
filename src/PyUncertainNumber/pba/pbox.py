@@ -7,7 +7,7 @@ two reasons:
 """
 
 import functools
-from PyUncertainNumber.UC.params import Params
+from PyUncertainNumber.characterisation.params import Params
 from .interval import Interval as nInterval
 from intervals import Interval
 from .pbox_base import Pbox
@@ -17,7 +17,7 @@ import itertools
 from .params import Params
 from typing import *
 from warnings import *
-from ..UC.intervalOperators import wc_interval
+from ..characterisation.intervalOperators import wc_interval
 
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
 

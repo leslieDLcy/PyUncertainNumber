@@ -12,8 +12,8 @@ from .params import Params
 from typing import List
 from pint import UnitRegistry
 from pathlib import Path
-from PyUncertainNumber.UP.vertex import vertexMethod as vM
-from PyUncertainNumber.UP.endpoints import endpoints_propagation_2n
+from PyUncertainNumber.propagation.vertex import vertexMethod as vM
+from PyUncertainNumber.propagation.endpoints import endpoints_propagation_2n
 from PyUncertainNumber.nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification

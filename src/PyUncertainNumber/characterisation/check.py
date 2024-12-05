@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Tuple, List
-from PyUncertainNumber.UC.utils import initial_list_checking
+from PyUncertainNumber.characterisation.utils import initial_list_checking
 
 """ This module is for checking the logic for the instantiation and propagation of the Uncertain Number object"""
 
