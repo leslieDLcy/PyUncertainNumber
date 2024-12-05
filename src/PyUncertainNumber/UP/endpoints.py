@@ -1,10 +1,9 @@
 import numpy as np
 import tqdm
 from typing import Callable
-from PyUncertainNumber.UP.mixed_uncertainty.Cartesian import cartesian
-from PyUncertainNumber.UP.mixed_uncertainty.extremePointX import extreme_pointX
+from PyUncertainNumber.UP.mixed_uncertainty.cartesian_product import cartesian
 
-def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
+def endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
 
     """ 
     args:
@@ -20,20 +19,17 @@ def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
 
 
     signature:
-        endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no') -> dict
+        endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no') -> dict
 
     note:
-        - Performs uncertainty propagation using the Extreme Point Method for monotonic functions. 
-        - This method estimates the bounds of a function's output by evaluating it at specific
-          combinations of extreme values (lower or upper bounds) of the input variables. 
-        - It is efficient for monotonic functions but might not be accurate for non-monotonic functions.
+        - Performs uncertainty propagation using the Endpoints Method. 
+        - The function assumes that the intervals in `x` represent uncertainties and aims to provide conservative
+          bounds on the output uncertainty.
         - If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.
 
     return:
         - dict: A dictionary containing the results:
           - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None). 
-          - 'sign_x': A NumPy array of shape (num_outputs, d) containing the signs (i.e., positive, negative) 
-                    used to determine the extreme points for each output.
           - 'min': A dictionary for lower bound results (if f is not None):
             - 'x': Input values that produced the minimum output value(s).
             - 'f': Minimum output value(s).
@@ -75,28 +71,26 @@ def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
         print("f:", y['raw_data']['f'])
 
     """
+    # Create a sequence of values for each interval based on the number of divisions provided 
+    # The divisions may be the same for all intervals or they can vary.
+    m = x.shape[0]
+    print(f"Total number of input combinations for the endpoint method: {2**m}") 
+    
     # create an array with the unique combinations of all intervals 
     X = cartesian(*x) 
-
-    d = X.shape[1]  # Number of dimensions
-    inds = np.array([1] + [2**i + 1 for i in range(d)])  # Generate indices
-    Xeval = X[inds - 1]  # Select rows based on indices (adjusting for 0-based indexing)
-
-    print(f"Total number of input combinations for the endpoint sign method: {len(inds - 1)}") 
 
     results = {
         'un': None,
         'bounds': None, 
-        'signs_x': None,
-        'min': {
+            'min': {
                 'x': None,
-                'f': None
+                'f':  None
             },
-        'max': {
+            'max': {
                 'x': None,
-                'f': None,
+                'f':  None,
                 },
-        'raw_data': {
+            'raw_data': {
                 'f': None,
                 'x': None
                 }
@@ -104,83 +98,71 @@ def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
     
     # propagates the epistemic uncertainty through subinterval reconstitution   
     if f is not None:
+        all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Evaluating samples")])
 
-        # Simulate function for the selected subset
-        all_output = []  
-        for c in tqdm.tqdm(Xeval, desc="Evaluating samples"):
-            output = f(c) 
-            all_output.append(output)
-        
-        # Determine the number of outputs from the first evaluation
-        try:
-            num_outputs = len(all_output[0])
-        except TypeError:
-            num_outputs = 1  # If f returns a single value
-
-        # Convert all_output to a NumPy array with the correct shape
-        all_output = np.array(all_output).reshape(-1, num_outputs)  
-
-        # Calculate signs
-        signX = np.zeros((num_outputs, d))
-        Xsign = np.zeros((2 * num_outputs, d))
-        for i in range(num_outputs):
-            # Calculate signs based on initial output values
-            signX[i] = np.sign(all_output[1:, i] - all_output[0, i])[::-1]  
-
-            # Calculate extreme points
-            Xsign[2*i:2*(i+1), :] = extreme_pointX(x, signX[i])
-        
-        lower_bound = np.zeros(num_outputs)
-        upper_bound = np.zeros(num_outputs)
-        for i in range(num_outputs):
-            lower_bound[i] = f(Xsign[2*i, :])
-            upper_bound[i] = f(Xsign[2*i + 1, :])
+        if all_output.ndim == 1:
+            all_output = all_output.reshape(-1, 1)
 
         results = {
-            'sign_x': signX,
             'min': {
-                'f': lower_bound,
+                'f': np.min(all_output, axis=0),
             },
             'max': {
-                'f': upper_bound,
+                'f': np.max(all_output, axis=0),
             }
         }
-        if num_outputs == 1:  # Single output
+        if all_output.shape[1] == 1:  # Single output
             results['bounds'] = np.array([results['min']['f'][0], results['max']['f'][0]])
         else:  # Multiple outputs
-            bounds = []
-            for i in range(num_outputs):
-                bounds.append([results['min']['f'][i], results['max']['f'][i]])
-            results['bounds'] = np.array(bounds)
+            bounds = np.empty((all_output.shape[1], 2))
+            for i in range(all_output.shape[1]):
+                bounds[i, :] = np.array([results['min']['f'][i], results['max']['f'][i]])
+            results['bounds'] = bounds
 
-        
-        min_indices = np.zeros((d,num_outputs))
-        max_indices = np.zeros((d,num_outputs))
-        for i in range(num_outputs):  # Iterate over outputs
-            min_indices[:,i] = Xsign[2*i, :]
-            max_indices[:,i]  = Xsign[2*i+1, :]
+        results['min']['x'] = []  # in acase more than 1 input combination yields min y
+        results['max']['x'] = []
+
+        for i in range(all_output.shape[1]):  # Iterate over outputs
+            min_indices = np.where(all_output[:, i] == results['min']['f'][i])[0]
+            max_indices = np.where(all_output[:, i] == results['max']['f'][i])[0]
             
-        # Convert to 2D arrays (if necessary) and append
-        results['min']['x'] = min_indices
-        results['max']['x'] = max_indices
+            # Convert to 2D arrays (if necessary) and append
+            results['min']['x'].append(X[min_indices].reshape(-1, m))  # Reshape to (-1, m)
+            results['max']['x'].append(X[max_indices].reshape(-1, m))
+
+        # Concatenate the arrays in the lists into 2D arrays (if necessary)
+        if len(results['min']['x']) > 1:
+            results['min']['x'] = np.concatenate(results['min']['x'], axis=0)
+        else:
+            results['min']['x'] = results['min']['x'][0]  # Take the first (and only) array
+
+        if len(results['max']['x']) > 1:
+            results['max']['x'] = np.concatenate(results['max']['x'], axis=0)
+        else:
+            results['max']['x'] = results['max']['x'][0]  # Take the first (and only) array
+        
+        if save_raw_data == 'yes':
+            results['raw_data'] = {'f': all_output, 'x': X}
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results['raw_data'] = {'f': None, 'x': Xeval}
+        results['raw_data'] = {'f': None, 'x': X}
     
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
     return results
 
-# Example usage with different parameters for minimization and maximization
-f = lambda x: x[0] + x[1] + x[2]  # Example function
+# example
+# from PyUncertainNumber import UncertainNumber as UN
+# # Example usage with different parameters for minimization and maximization
+# f = lambda x: x[0] + x[1] + x[2]  # Example function
 
-# Determine input parameters for function and method
-x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-n=2
-# Call the method
-y = endpoints_monotonic_method(x_bounds, f)
-print(y['sign_x'])
+# # Determine input parameters for function and method
+# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+# n=2
+# # Call the method
+# y = endpoints_method(x_bounds, f,  save_raw_data = 'yes')
+
 # print("-" * 30)
 # print("bounds:", y['bounds'])
 # print("-" * 30)

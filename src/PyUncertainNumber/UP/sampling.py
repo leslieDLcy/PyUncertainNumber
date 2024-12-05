@@ -150,10 +150,10 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo',
         if all_output.shape[1] == 1:  # Single output
             results['bounds'] = np.array([results['min']['f'][0], results['max']['f'][0]])
         else:  # Multiple outputs
-            bounds = []
+            bounds = np.empty((all_output.shape[1], 2))
             for i in range(all_output.shape[1]):
-                bounds.append([results['min']['f'][i], results['max']['f'][i]])
-            results['bounds'] = np.array(bounds)
+                bounds[i, :] = np.array([results['min']['f'][i], results['max']['f'][i]])
+            results['bounds'] = bounds
         
         results['min']['x'] = []
         results['max']['x'] = []

@@ -2,15 +2,16 @@ import numpy as np
 from typing import Callable
 import tqdm
 from PyUncertainNumber.UP.mixed_uncertainty.extremePointX import extreme_pointX
-from PyUncertainNumber.UP.mixed_uncertainty.Cartesian import cartesian
+from PyUncertainNumber.UP.mixed_uncertainty.cartesian_product import cartesian
 from scipy.stats import norm 
+from itertools import combinations
 from PyUncertainNumber.UC.uncertainNumber import UncertainNumber as UN
 import matplotlib.pyplot as plt 
 #from itertools import product
 
-def mixed_uncertainty_method(x: list, f:Callable = None, lim_Q: np.array = np.array([0.0001, 0.9999]), signs: np.array = None, n_disc:int = 5):
+def first_order_propagation_method(x: list, f:Callable = None, lim_Q: np.array = np.array([0.0001, 0.9999]), signs: np.array = None, n_disc:int = 5):
     """
-    Args:
+    args:
       x (list): A list of UncertainNumber objects, each representing an input 
                   variable with its associated uncertainty.
       f (Callable): A callable function that takes a 1D NumPy array of input 
@@ -31,14 +32,16 @@ def mixed_uncertainty_method(x: list, f:Callable = None, lim_Q: np.array = np.ar
     d = len(x) # dimension of uncertain numbers 
     xl = []
     xr = []
-    ranges = []
-    u_list = []  # List to store 'u' for each uncertain number
+    ranges = np.zeros((2,d))
+    n_slices = np.zeros((d))
+    u_list = []  # List to store 'u' for each uncertain number. 
 
     for i, un in enumerate(x):
         print(f"Processing variable {i + 1} with essence: {un.essence}")
 
         if un.essence == "distribution":
             # perform outward directed discretisation 
+            n_slices[i] = n_disc
             nd = n_disc + 1  
             distribution_family = un.distribution_parameters[0]
 
@@ -48,13 +51,15 @@ def mixed_uncertainty_method(x: list, f:Callable = None, lim_Q: np.array = np.ar
                 u = np.linspace(lim_Q[0], lim_Q[1], nd)
 
         elif un.essence == "pbox":
+            n_slices[i] = n_disc
             distribution_family = un.distribution_parameters[0]
             if distribution_family == 'triang': 
                 u = np.linspace(0, 1, n_disc)
             else:
                 u = np.linspace(lim_Q[0], lim_Q[1], n_disc)
         else:  # un.essence == "interval"
-            u = np.zeros(2)  # Or adjust as needed for intervals
+            n_slices[i] = 1
+            u = np.array([0.0,1.0])  # Fake values , not needed anywhere
 
         u_list.append(u)  # Add 'u' to the list
 
@@ -68,65 +73,68 @@ def mixed_uncertainty_method(x: list, f:Callable = None, lim_Q: np.array = np.ar
                 # Calculate xl and xr for distributions (adjust as needed)
                 temp_xl = un.ppf(u_list[i][:-1])  # Assuming un.ppf(u) returns a list or array
                 temp_xr = un.ppf(u_list[i][1:])  # Adjust based on your distribution
-                ranges[:, i] = [temp_xl[0], temp_xl[-1]]
-                # xl[:, i] = un.ppf(u[:-1])  # Calculate ppf for all quantiles at once
-    #             # print('xl', xl[:,i])
-    #             # xr[:, i] = un.ppf(u[1:])   # Calculate ppf for all quantiles at once
-    #             # 
+                ranges[:, i] = np.array([temp_xl[0], temp_xl[-1]])
 
             case "interval":
                 temp_xl = np.array([un.bounds[0]])  # Repeat lower bound for all quantiles
                 temp_xr = np.array([un.bounds[1]])  # Repeat upper bound for all quantiles
-                ranges[:, i] = un.bounds
+                ranges[:, i] = np.array([un.bounds])
 
             case "pbox":
                 temp_xl = un.ppf(u_list[i])[0]  # Assuming un.ppf(u) returns a list of lists
                 temp_xr = un.ppf(u_list[i])[1]
-                ranges[:, i] = [temp_xl[0], temp_xl[-1]]
+                ranges[:, i] = np.array([temp_xl[0], temp_xl[-1]])
             case _:
                 raise ValueError(f"Unsupported uncertainty type: {un.essence}")
 
         xl.append(temp_xl)  # Add the temporary list to xl
         xr.append(temp_xr)  # Add the temporary list to xr
 
-    # Create a list of lists containing both lower and upper bounds for each number
-    combined_bounds = [
-            np.concatenate((np.atleast_1d(lower), np.atleast_1d(upper)))
-            for lower, upper in zip(xl, xr)
-                ]
-    # Generate the Cartesian product of all combinations
-    all_combinations = cartesian(*combined_bounds)
-    #print(all_combinations)
-
-    all_output = None
-    if f is not None:
-        # Efficiency upgrade: store repeated evaluations
-        inpsList = np.zeros((0, d))
-        evalsList = []  
-        numRun = 0
-
-        all_output = []  
-        for c in tqdm.tqdm(all_combinations, desc="Evaluating samples"):
-            im = np.where((inpsList == c).all(axis=1))[0]
-            if not im.size:
-                output = f(c) 
-                all_output.append(output)
-                inpsList = np.vstack([inpsList, c])
-                evalsList.append(output)
-                numRun += 1
-            else:
-                all_output.append(evalsList[im[0]]) 
+    for slice in n_slices:
+        print(slice)
+    # Generate focal_elemefocal_elements_comb = cartesian(*[np.arange(slice) for i in range(d)])nts_comb with correct cartesian input
         
-        # Determine the number of outputs from the first evaluation
-        try:
-            num_outputs = len(all_output[0])
-        except TypeError:
-            num_outputs = 1  # If f returns a single value
 
-        # Convert all_output to a NumPy array with the correct shape
-        all_output = np.array(all_output).reshape(-1, num_outputs)  
+    print('focal elements', focal_elements_comb)
+    return 1 
+    # # Create a list of lists containing both lower and upper bounds for each number
+    # # combined_bounds = [
+    # #         np.concatenate((np.atleast_1d(lower), np.atleast_1d(upper)))
+    # #         for lower, upper in zip(xl, xr)
+    # #             ]
+    # # # Generate the Cartesian product of all combinations
+    # # all_combinations = cartesian(*combined_bounds)
+    # # #print(all_combinations)
 
-    return all_combinations, all_output #Include all_combinations in the return values
+    # all_output = None
+    # if f is not None:
+    #     # Efficiency upgrade: store repeated evaluations
+    #     inpsList = np.zeros((0, d))
+    #     evalsList = []  
+    #     numRun = 0
+
+    #     all_output = []  
+    #     for c in tqdm.tqdm(all_combinations, desc="Evaluating samples"):
+    #         im = np.where((inpsList == c).all(axis=1))[0]
+    #         if not im.size:
+    #             output = f(c) 
+    #             all_output.append(output)
+    #             inpsList = np.vstack([inpsList, c])
+    #             evalsList.append(output)
+    #             numRun += 1
+    #         else:
+    #             all_output.append(evalsList[im[0]]) 
+        
+    #     # Determine the number of outputs from the first evaluation
+    #     try:
+    #         num_outputs = len(all_output[0])
+    #     except TypeError:
+    #         num_outputs = 1  # If f returns a single value
+
+    #     # Convert all_output to a NumPy array with the correct shape
+    #     all_output = np.array(all_output).reshape(-1, num_outputs)  
+
+    # return all_combinations, all_output #Include all_combinations in the return values
     
    
 
@@ -307,12 +315,12 @@ I = UN(name='moment of inertia', symbol='I', units='m', essence='interval', boun
 # METHOD = "latin_hypercube"
 # base_path = ""
 
-a = mixed_uncertainty_method(x=[L, I, F, E], #['L', 'I', 'F', 'E'], 
+a = first_order_propagation_method(x=[L, I, F, E], #['L', 'I', 'F', 'E'], 
           f = cantilever_beam_deflection, 
-          n_disc= 10
+          n_disc= 3
          )
 
-print(a[1])
+print(a)
 # # Create a p-box UncertainNumber with a Gaussian distribution
 
 F = UN(name='vertical force', symbol='F', units='kN', essence='pbox', distribution_parameters=["gaussian", [[22.5, 26.5], 8.67]])
@@ -321,7 +329,6 @@ F = UN(name='vertical force', symbol='F', units='kN', essence='pbox', distributi
 I = UN(name='moment of inertia', symbol='I', units='m', essence='pbox', distribution_parameters=["gaussian", [[0.0035,0.00067], 4.5061e-5]])
 
 I.display()
-
 
 # Calculate the positions for the horizontal lines (3 equally spaced points)
 y_positions = np.linspace(0, 1, 5)  # 4 points create 3 spaces

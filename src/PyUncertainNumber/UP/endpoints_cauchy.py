@@ -3,7 +3,7 @@ import tqdm
 from typing import Callable
 from scipy.optimize import brentq
 
-def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no'):
+def cauchydeviates_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no'):
     """
     args:
         x (np.ndarray): A 2D NumPy array representing the intervals for each input variable.
@@ -130,10 +130,6 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
             x_samples[k] = xtilde - delta
             K_values[k] = K
 
-        # results['min']['x'] = None
-        # results['min']['f'] = None
-        # results['max']['x'] = None
-        # results['max']['f'] = None
         results['raw_data'] = {'x': x_samples, 'K': K_values}
     
     else:
@@ -148,7 +144,7 @@ def cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no')
 # x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
 # n=50
 # # Call the method
-# y = cauchydeviate_method(x_bounds,f=None, n=n, save_raw_data = 'yes')
+# y = cauchydeviates_method(x_bounds,f=None, n=n, save_raw_data = 'yes')
 
 # # print the results
 # print("-" * 30)

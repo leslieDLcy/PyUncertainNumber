@@ -12,7 +12,7 @@ from PyUncertainNumber.UC.params import Params
 from typing import List
 from pint import UnitRegistry
 from pathlib import Path
-from PyUncertainNumber.UP.endpoint import endpoints_method
+from PyUncertainNumber.UP.endpoints import endpoints_method
 from PyUncertainNumber.NLP_constructor.language_parsing import hedge_interpret
 from scipy.stats import norm
 from PyUncertainNumber.UC.check import DistributionSpecification

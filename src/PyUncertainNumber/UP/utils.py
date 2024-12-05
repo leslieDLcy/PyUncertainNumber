@@ -174,3 +174,11 @@ def create_csv(res_path, filename, data):
         print("The file does not exist.")
 
     return filename
+
+def save_results(data, method, res_path, fun=None):
+    if fun is None:
+        Results = post_processing(data['x'], all_output=None, method=method, res_path=res_path)
+    else:
+        Results = post_processing(data['x'], data.get('f'), method, res_path)
+            
+    return Results
