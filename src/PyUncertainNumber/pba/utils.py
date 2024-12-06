@@ -3,10 +3,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from .interval import Interval
+from ..characterisation.intervalOperators import wc_interval
 
 
 def round():
     pass
+
+
+def uniform_reparameterisation(a, b):
+    """ reparameterise the uniform distribution to a, b """
+    a, b = wc_interval(a), wc_interval(b)
+    return a, b-a
 
 
 def find_nearest(array, value):
@@ -44,6 +51,9 @@ def plot_DS_structure(interval_list, weights, ax=None, **kwargs):
                 f"{weights[i]:.2f}",
                 verticalalignment='center',
                 horizontalalignment='right')
+    ax.margins(x=0.2, y=0.2)
+    ax.set_yticks([])
+    ax.set_title('Dempster Shafer structures')
     return ax
 
 

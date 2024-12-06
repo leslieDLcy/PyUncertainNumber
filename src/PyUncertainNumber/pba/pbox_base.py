@@ -368,7 +368,7 @@ class Pbox:
         return nInterval(self.left[ind], self.right[ind])
 
 
-# ---------------------unary operations---------------------#
+# * ---------------------unary operations--------------------- *#
     ##### the top-level functions for unary operations #####
 
     def _unary(self, *args, function=lambda x: x):
@@ -1138,7 +1138,7 @@ class Pbox:
 
 
 def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
-    """ transform into pbox object for cbox 
+    """ transform into pbox object from extreme bounds represented by sps.dist
 
     args:
         rvs (list): list of scipy.stats.rv_continuous objects"""
@@ -1414,36 +1414,31 @@ def imposition(*args: Union[Pbox, nInterval, float, int]):
 
 
 def mixture(
-    *args: Union[Pbox, nInterval, float, int],
+    uns: Union[Pbox, nInterval, float, int],
     weights: List[Union[float, int]] = [],
     steps: int = Pbox.STEPS,
 ) -> Pbox:
     """
-    Mixes the pboxes in *args
-    Parameters
-    ----------
-    *args :
-        Number of p-boxes or objects to be mixed
-    weights:
-        Right side of box
+    stochastic mixture for uncertain numbers 
 
-    Returns
-    ----------
-    Pbox
+    Mixes the pboxes in *args
+    args:
+        uns (list): a list of Uncertain Numbers (which includes Pbox, nInterval, float, int)
+        weights (list): a list of weights for the uncertain numbers to be mixed
+
+    Returns:
+        Pbox
     """
     # TODO: IMPROVE READBILITY
 
-    x = []
-    for pbox in args:
-        if pbox.__class__.__name__ != "Pbox":
-            try:
-                pbox = Pbox(pbox)
-            except:
-                raise TypeError(
-                    "Unable to convert %s object (%s) to Pbox" % (
-                        type(pbox), pbox)
-                )
-        x.append(pbox)
+    def check_pbox(un):
+        try:
+            return Pbox(un)
+        except:
+            raise TypeError(
+                f"Unable to convert {type(un)} object {un} to Pbox")
+
+    x = [un if isinstance(un, Pbox) else check_pbox(un) for un in uns]
 
     k = len(x)
     if weights == []:
