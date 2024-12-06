@@ -8,7 +8,7 @@ from collections import namedtuple
 
 
 DS_element = namedtuple('DS_element', ['interval', 'weight'])
-cdf_bundle = namedtuple('cdf_bundle', ['quantile', 'percentile'])
+cdf_bundle = namedtuple('cdf_bundle', ['quantile', 'probability'])
 
 
 def reweighting(*masses):
