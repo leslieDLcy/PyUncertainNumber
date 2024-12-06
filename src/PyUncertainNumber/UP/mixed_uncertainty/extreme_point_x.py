@@ -2,24 +2,29 @@ import numpy as np
 
 def extreme_pointX(ranges, signX):
     """
-    Calculates the extreme points of a set of ranges based on signs.
+    
 
-    Args:
+    args:
         ranges: A NumPy array of shape (d, 2) representing the ranges 
                  (each row is a variable, each column is a bound).
         signX: A NumPy array of shape (1, d) representing the signs.
     
-    Returns:
+    notes: 
+        Calculates the extreme points of a set of ranges based on signs.
+    returns:
         A NumPy array of shape (2, d) representing the extreme points.
     """
-    d = ranges.shape[0]  # Get the number of dimensions (number of rows)
+    d = len(ranges)  # Get the number of dimensions
     pts = np.tile(signX, (2, 1))  # Repeat signX twice vertically
-    pts[0, pts[0, :] < 0] = 2  # Adjust indices based on signs (upper bound)
-    pts[1, pts[1, :] > 0] = 2  # Adjust indices based on signs (upper bound)
-    pts[1, pts[1, :] < 0] = 1  # Adjust indices based on signs (lower bound)
-
-    # Use indices to select lower/upper bounds from ranges
-    Xsign = np.array([ranges[j, int(pts[i, j] - 1)] for i in range(2) for j in range(d)]).reshape(2, -1)
+    
+    Xsign = np.zeros((2, d))
+    for j in range(d):  # Iterate over dimensions
+        if pts[0, j] > 0:  # Check sign for the first row (minimum)
+            Xsign[0, j] = ranges[j][0]  # Take the first element (lower bound)
+            Xsign[1, j] = ranges[j][-1]  # Take the last element (upper bound)
+        else:
+            Xsign[0, j] = ranges[j][-1]  # Take the last element (upper bound)
+            Xsign[1, j] = ranges[j][0]  # Take the first element (lower bound)
     
     return Xsign
 
