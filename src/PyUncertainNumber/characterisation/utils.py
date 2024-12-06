@@ -25,7 +25,7 @@ def tranform_ecdf(s, display=False, **kwargs):
         fig, ax = plt.subplots()
         # ax.plot(x_support, p_values, color='g')
         ax.step(sth.cdf.quantiles, sth.cdf.probabilities,
-                color='red', zorder=10, **kwargs)
+                color='red', zorder=10, where='post', **kwargs)
         return sth.cdf.quantiles, ax
     else:
         return sth.cdf.quantiles
@@ -56,7 +56,7 @@ def pl_ecdf(s, ax=None, return_value=False, **kwargs):
     if ax is None:
         fig, ax = plt.subplots()
     # ax.plot(x_support, p_values, color='g')
-    ax.step(sth.cdf.quantiles, sth.cdf.probabilities, **kwargs)
+    ax.step(sth.cdf.quantiles, sth.cdf.probabilities, where='post', **kwargs)
     if not return_value:
         return ax
     else:

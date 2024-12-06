@@ -17,7 +17,7 @@ import itertools
 from .params import Params
 from typing import *
 from warnings import *
-from ..characterisation.intervalOperators import wc_interval
+from .intervalOperators import wc_interval
 from .utils import uniform_reparameterisation
 
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this

@@ -5,7 +5,7 @@ from scipy.stats import (bernoulli, beta, betabinom, binom, chi2,
                          pareto, powerlaw, triang,
                          geom, loguniform, f as F)
 import scipy.stats as sps
-from .intervalOperators import mean
+from ..pba.intervalOperators import mean
 from intervals import Interval
 from PyUncertainNumber import pba
 from ..pba.distributions import Distribution as D

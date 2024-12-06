@@ -20,7 +20,7 @@ from .check import DistributionSpecification
 from PyUncertainNumber.pba.pbox import named_pbox
 from typing import Sequence
 from functools import singledispatch
-from .intervalOperators import wc_interval
+from ..pba.intervalOperators import wc_interval
 from ..pba.distributions import Distribution
 
 """ Uncertain Number class """

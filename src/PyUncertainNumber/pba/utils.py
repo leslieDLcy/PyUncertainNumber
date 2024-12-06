@@ -3,7 +3,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from .interval import Interval
-from ..characterisation.intervalOperators import wc_interval
+from .intervalOperators import wc_interval
+from collections import namedtuple
+
+
+DS_element = namedtuple('DS_element', ['interval', 'weight'])
+cdf_bundle = namedtuple('cdf_bundle', ['quantile', 'percentile'])
+
+
+def reweighting(*masses):
+    """ reweight the masses to sum to 1 """
+    masses = np.ravel(masses)
+    return masses / masses.sum()
 
 
 def round():
