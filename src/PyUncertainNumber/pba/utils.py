@@ -3,12 +3,69 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from .interval import Interval
-from .intervalOperators import wc_interval
+from .intervalOperators import wc_interval, make_vec_interval
 from collections import namedtuple
+from .interval import Interval as nInterval
 
-
-DS_element = namedtuple('DS_element', ['interval', 'weight'])
 cdf_bundle = namedtuple('cdf_bundle', ['quantile', 'probability'])
+
+
+def stacking(vec_interval: list[nInterval | Interval], weights, display=False):
+    """ stochastic mixture operation for DS structure and Intervals 
+
+    args:
+        - l_un (list): list of uncertain numbers
+        - weights (list): list of weights
+        - display (Boolean): boolean for plotting
+
+    return:
+        - the left and right bounds in respective tuples
+    """
+
+    vec_interval = make_vec_interval(vec_interval)
+
+    q1, p1 = weighted_ecdf(vec_interval.lo, weights)
+    q2, p2 = weighted_ecdf(vec_interval.hi, weights)
+
+    if display:
+        fig, ax = plt.subplots()
+        ax.step(q1, p1, marker='+', c='g', where='post')
+        ax.step(q2, p2, marker='+', c='b', where='post')
+        ax.plot([q1[0], q2[0]], [0, 0], c='g')
+        ax.plot([q1[-1], q2[-1]], [1, 1], c='b')
+    return cdf_bundle(q1, p1), cdf_bundle(q2, p2)
+
+
+def sorting(list1, list2):
+    list1, list2 = (list(t) for t in zip(*sorted(zip(list1, list2))))
+    return list1, list2
+
+
+def weighted_ecdf(s, w=None, display=False):
+    """ compute the weighted ecdf from (precise) sample data 
+
+    note:
+        - Sudret eq.1
+    """
+
+    if w is None:
+        # weights
+        N = len(s)
+        w = np.repeat(1/N, N)
+
+    s, w = sorting(s, w)
+    p = np.cumsum(w)
+
+    # for box plotting
+    q = np.insert(s, 0, s[0], axis=0)
+    p = np.insert(p, 0, 0., axis=0)
+
+    if display == True:
+        fig, ax = plt.subplots()
+        ax.step(q, p, marker='+', where='post')
+
+    # return quantile and probabilities
+    return q, p
 
 
 def reweighting(*masses):
@@ -37,27 +94,29 @@ def find_nearest(array, value):
 
 
 @mpl.rc_context({"text.usetex": True})
-def plot_intervals(interval_list, ax=None, **kwargs):
+def plot_intervals(vec_interval: list[nInterval | Interval], ax=None, **kwargs):
     # TODO finish the codes as this is temporary
     """ 
 
     args:
-        interval_list: list of Interval objects
+        vec_interval: vectorised interval objects
     """
+    vec_interval = make_vec_interval(vec_interval)
+
     fig, ax = plt.subplots() if ax is None else (ax.figure, ax)
-    for i, intl in enumerate(interval_list):
+    for i, intl in enumerate(vec_interval):
         # horizontally plot the interval
-        ax.plot([intl.left, intl.right], [i, i], **kwargs)
+        ax.plot([intl.lo, intl.hi], [i, i], **kwargs)
     return ax
 
 
 @mpl.rc_context({"text.usetex": True})
-def plot_DS_structure(interval_list, weights, ax=None, **kwargs):
-    ax = plot_intervals(interval_list, ax=ax, **kwargs)
+def plot_DS_structure(vec_interval, weights, ax=None, **kwargs):
+    ax = plot_intervals(vec_interval, ax=ax, **kwargs)
 
     # add the weights after each interval element
-    for i in range(len(interval_list)):
-        ax.text(interval_list[i].right + 0.3,
+    for i, interval in enumerate(vec_interval):
+        ax.text(interval.hi() + 0.3,
                 i,
                 f"{weights[i]:.2f}",
                 verticalalignment='center',

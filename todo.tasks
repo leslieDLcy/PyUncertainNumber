@@ -15,9 +15,14 @@ other:
 
 
 
+interval stuff:
+    ☐ add the plotting functions to Marco's package
+
+
+
 DS structure:
-    ☐ create a class for that
-    ☐ stochastic mixture of DS structure not finished
+    ✔ create a class for that @done (08/12/2024, 16:04:08)
+    ✔ stochastic mixture of DS structure not finished @done (08/12/2024, 16:04:09)
 
 
 pbox:

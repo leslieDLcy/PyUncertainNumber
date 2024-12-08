@@ -1,6 +1,11 @@
 """ Constructors for Dempester-Shafer structures. """
 import numpy as np
 from .intervalOperators import make_vec_interval
+from collections import namedtuple
+from .utils import reweighting, stacking, plot_DS_structure
+
+dempstershafer_element = namedtuple(
+    'dempstershafer_element', ['interval', 'weight'])
 
 
 class DempsterShafer:
@@ -12,7 +17,7 @@ class DempsterShafer:
         self._masses = np.array(masses)
 
     def _create_DSstructure(self):
-        return [(i, m) for i, m in zip(self._intervals, self._masses)]
+        return [dempstershafer_element(i, m) for i, m in zip(self._intervals, self._masses)]
 
     @property
     def structure(self):
@@ -37,3 +42,24 @@ class DempsterShafer:
 
     def disassemble(self,):
         return self._intrep, self._masses
+
+    def display(self, style='box'):
+        intervals, masses = self.disassemble()
+        match style:
+            case 'box':
+
+                stacking(intervals, masses, display=True)
+            case 'interval':
+                plot_DS_structure(intervals, masses)
+
+
+def mixture_ds(l_ds, display=False):
+    """ mixture operation for DS structure """
+
+    intervals = np.concatenate([ds.disassemble()[0] for ds in l_ds], axis=0)
+    # TODO check the duplicate intervals
+    # assert sorted(intervals) == np.unique(intervals), "intervals replicate"
+    masses = reweighting([ds.disassemble()[1] for ds in l_ds])
+    return DempsterShafer(intervals, masses)
+    # below is to return the mixture as in a pbox
+    # return stacking(intervals, masses, display=display)
