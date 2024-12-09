@@ -3,9 +3,10 @@ import numpy as np
 from .intervalOperators import make_vec_interval
 from collections import namedtuple
 from .utils import reweighting, stacking, plot_DS_structure
+from .constructors import pbox_fromDiscreteF
 
 dempstershafer_element = namedtuple(
-    'dempstershafer_element', ['interval', 'weight'])
+    'dempstershafer_element', ['interval', 'mass'])
 
 
 class DempsterShafer:
@@ -47,10 +48,14 @@ class DempsterShafer:
         intervals, masses = self.disassemble()
         match style:
             case 'box':
-
                 stacking(intervals, masses, display=True)
             case 'interval':
                 plot_DS_structure(intervals, masses)
+
+    def to_pbox(self):
+        intervals, masses = self.disassemble()
+        a, b = stacking(intervals, masses)
+        return pbox_fromDiscreteF(a, b)
 
 
 def mixture_ds(l_ds, display=False):

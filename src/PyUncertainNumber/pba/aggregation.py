@@ -30,6 +30,8 @@ def mixture_pbox(l_pboxes, weights=None, display=False):
         N = len(l_pboxes)
         weights = np.repeat(1/N, N)   # equal weights
     else:
+        weights = np.array(weights) if not isinstance(
+            weights, np.ndarray) else weights
         weights = weights / sum(weights)  # re-weighting
 
     lcdf = np.sum([p.left * w for p, w in zip(l_pboxes, weights)], axis=0)

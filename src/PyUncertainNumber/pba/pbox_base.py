@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 from .interval import Interval as nInterval
 from .utils import find_nearest, check_increasing, NotIncreasingError, _interval_list_to_array
 from .params import Params
+from .ds import DempsterShafer
 
 __all__ = [
     "Pbox",
@@ -16,13 +17,6 @@ __all__ = [
     "imposition",
     "NotIncreasingError",
 ]
-
-""" Nick: It is usually better to define p-boxes using distributions or non-parametric methods (see ). 
-This constructor is provided for completeness and for the construction of p-boxes with precise inputs.
-
-Leslie: the above does not make sense. The Pbox class is the base constructor for p-boxes, which has been
-called by whatever other constructors currently exist. The above comment is not accurate.
-"""
 
 
 class Pbox:
@@ -355,7 +349,6 @@ class Pbox:
 
 # ---------------------dual interpretation ---------------------#
 
-
     def cutv(self, x):
         """ get the bounds on the cumulative probability associated with any x-value """
         lo_ind = find_nearest(self.right, x)
@@ -363,13 +356,14 @@ class Pbox:
         return nInterval(Params.p_values[lo_ind], Params.p_values[hi_ind])
 
     def cuth(self, p=0.5):
-        """ get the bounds on the x-value at any particular probability level"""
+        """ get the bounds on the quantile at any particular probability level"""
         ind = find_nearest(Params.p_values, p)
         return nInterval(self.left[ind], self.right[ind])
 
 
 # * ---------------------unary operations--------------------- *#
     ##### the top-level functions for unary operations #####
+
 
     def _unary(self, *args, function=lambda x: x):
 
@@ -1132,8 +1126,16 @@ class Pbox:
         ax.set_ylabel(r"$\Pr(X \leq x)$")
         return ax
 
+    # * ---------------------conversion--------------------- *#
 
-# ---------------------constructors---------------------#
+    def to_ds(self, discretisation=Params.steps):
+        """convert to ds object"""
+        p_values = np.arange(0, discretisation) / discretisation
+        interval_list = [self.cuth(p_v) for p_v in p_values]
+        return DempsterShafer(interval_list, p_values)
+
+
+# * ---------------------constructors--------------------- *#
 ''' initially used for cbox next-value distribution '''
 
 
@@ -1166,7 +1168,7 @@ def pbox_from_pseudosamples(samples):
     return Pbox(tranform_ecdf(samples, display=False))
 
 
-##### Functions #####
+# * ---------------------functions--------------------- *#
 
 
 def env_int(*args):

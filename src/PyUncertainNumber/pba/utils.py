@@ -6,11 +6,12 @@ from .interval import Interval
 from .intervalOperators import wc_interval, make_vec_interval
 from collections import namedtuple
 from .interval import Interval as nInterval
+from .constructors import pbox_fromDiscreteF
 
 cdf_bundle = namedtuple('cdf_bundle', ['quantile', 'probability'])
 
 
-def stacking(vec_interval: list[nInterval | Interval], weights, display=False):
+def stacking(vec_interval: list[nInterval | Interval], weights, display=False, return_pbox=False):
     """ stochastic mixture operation for DS structure and Intervals 
 
     args:
@@ -19,7 +20,8 @@ def stacking(vec_interval: list[nInterval | Interval], weights, display=False):
         - display (Boolean): boolean for plotting
 
     return:
-        - the left and right bounds in respective tuples
+        - the left and right bound F in `cdf_bundlebounds` by default 
+        but can choose to return a p-box
     """
 
     vec_interval = make_vec_interval(vec_interval)
@@ -33,7 +35,11 @@ def stacking(vec_interval: list[nInterval | Interval], weights, display=False):
         ax.step(q2, p2, marker='+', c='b', where='post')
         ax.plot([q1[0], q2[0]], [0, 0], c='g')
         ax.plot([q1[-1], q2[-1]], [1, 1], c='b')
-    return cdf_bundle(q1, p1), cdf_bundle(q2, p2)
+
+    if return_pbox:
+        return pbox_fromDiscreteF(cdf_bundle(q1, p1), cdf_bundle(q2, p2))
+    else:
+        return cdf_bundle(q1, p1), cdf_bundle(q2, p2)
 
 
 def sorting(list1, list2):
@@ -94,36 +100,42 @@ def find_nearest(array, value):
 
 
 @mpl.rc_context({"text.usetex": True})
-def plot_intervals(vec_interval: list[nInterval | Interval], ax=None, **kwargs):
-    # TODO finish the codes as this is temporary
-    """ 
+def plot_DS_structure(vec_interval: list[nInterval | Interval], weights=None, offset=0.3, ax=None, **kwargs):
+    """ plot the intervals in a vectorised form
 
     args:
         vec_interval: vectorised interval objects
+        weights: weights of the intervals
+        offset: offset for display the weights next to the intervals
     """
     vec_interval = make_vec_interval(vec_interval)
-
     fig, ax = plt.subplots() if ax is None else (ax.figure, ax)
-    for i, intl in enumerate(vec_interval):
-        # horizontally plot the interval
+    for i, intl in enumerate(vec_interval):  # horizontally plot the interval
         ax.plot([intl.lo, intl.hi], [i, i], **kwargs)
+        if weights is not None:
+            ax.text(intl.hi + offset,
+                    i,
+                    f"{weights[i]:.2f}",
+                    verticalalignment='center',
+                    horizontalalignment='right'
+                    )
+    ax.margins(x=0.2, y=0.1)
+    ax.set_yticks([])
     return ax
 
 
 @mpl.rc_context({"text.usetex": True})
-def plot_DS_structure(vec_interval, weights, ax=None, **kwargs):
-    ax = plot_intervals(vec_interval, ax=ax, **kwargs)
-
-    # add the weights after each interval element
-    for i, interval in enumerate(vec_interval):
-        ax.text(interval.hi() + 0.3,
-                i,
-                f"{weights[i]:.2f}",
-                verticalalignment='center',
-                horizontalalignment='right')
-    ax.margins(x=0.2, y=0.2)
+def plot_intervals(vec_interval: list[nInterval | Interval], ax=None, **kwargs):
+    """ plot the intervals in a vectorised form
+    args:
+        vec_interval: vectorised interval objects
+    """
+    vec_interval = make_vec_interval(vec_interval)
+    fig, ax = plt.subplots() if ax is None else (ax.figure, ax)
+    for i, intl in enumerate(vec_interval):  # horizontally plot the interval
+        ax.plot([intl.lo, intl.hi], [i, i], **kwargs)
+    ax.margins(x=0.1, y=0.1)
     ax.set_yticks([])
-    ax.set_title('Dempster Shafer structures')
     return ax
 
 
