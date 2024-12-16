@@ -2,7 +2,7 @@ import numpy as np
 from typing import Callable
 from scipy.optimize import minimize
 
-def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
+def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None, results:dict = None,
                               tol_loc: np.ndarray = None, options_loc: dict = None,
                               *, method_loc='Nelder-Mead'):
     """
@@ -36,7 +36,7 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
                                     Defaults to 'Nelder-Mead'.
    
    signature:
-        local_optimisation_method(x:np.ndarray, f:Callable, 
+        local_optimisation_method(x:np.ndarray, f:Callable,  results:dict = None,
                               *, x0:np.ndarray = None,  
                               tol_loc:np.ndarray = None, options_loc: dict = None, method_loc = 'Nelder-Mead') -> dict
 
@@ -74,17 +74,17 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
 
         # Print the results
         print("-" * 30)
-        print("bounds:", y['bounds'])
+        print("bounds:", y['raw_data']['bounds'])
 
         print("Minimum:")
-        print("x:", y['min']['x'])
-        print("f:", y['min']['f'])
-        print("message:", y['min']['message'])
+        print("x:", y['raw_data']['min']['x'])
+        print("f:", y['raw_data']['min']['f'])
+        print("message:", y['raw_data']['min']['message'])
 
         print("Maximum:")
-        print("x:", y['max']['x'])
-        print("f:", y['max']['f'])
-        print("message:", y['max']['message'])
+        print("x:", y['raw_data']['max']['x'])
+        print("f:", y['raw_data']['max']['f'])
+        print("message:", y['raw_data']['max']['message'])
     """
     bounds = [(var[0], var[1]) for var in x]
 
@@ -127,24 +127,28 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
     # Store results in a dictionary
     results = {
         'un': None,
-        'bounds' : np.array([min_y.fun, max_y.fun]),
-        'min': {
-            'x': min_y.x, #The input values that resulted in the minimum value.
-            'f': min_y.fun, #The estimated minimum value of the function.
-            'message': min_y.message, #The success message from the minimization optimization.
-            'niterations': min_y.nit, #The number of iterations for minimisation.
-            'nfevaluations': min_y.nfev, #The number of function evaluations for minimisation.
-            'final_simplex': min_y.final_simplex #The final simplex for minimization.
-        },
-        'max': {
-            'x': max_y.x, #The estimated maximum value of the function.
-            'f': max_y.fun, #The estimated maximum value of the function.
-            'message': max_y.message, #The success message from the maximization optimization.
-            'niterations': max_y.nit, #The number of iterations for maximisation.
-            'nfevalutations': max_y.nfev, #The number of function evaluations for maximisation.
-            'final_simplex': max_y.final_simplex #The number of function evaluations for maximization.
+        'raw_data': {            
+            'min': {
+                'x': min_y.x, #The input values that resulted in the minimum value.
+                'f': min_y.fun, #The estimated minimum value of the function.
+                'message': min_y.message, #The success message from the minimization optimization.
+                'niterations': min_y.nit, #The number of iterations for minimisation.
+                'nfevaluations': min_y.nfev, #The number of function evaluations for minimisation.
+                'final_simplex': min_y.final_simplex #The final simplex for minimization.
+                },
+            'max': {
+                'x': max_y.x, #The estimated maximum value of the function.
+                'f': max_y.fun, #The estimated maximum value of the function.
+                'message': max_y.message, #The success message from the maximization optimization.
+                'niterations': max_y.nit, #The number of iterations for maximisation.
+                'nfevalutations': max_y.nfev, #The number of function evaluations for maximisation.
+                'final_simplex': max_y.final_simplex #The number of function evaluations for maximization.
+                },
+                'bounds' : np.array([min_y.fun, max_y.fun])
+
+            }
+        
         }
-    }
 
     return results
 
@@ -170,14 +174,15 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
 
 # # Print the results
 # print("-" * 30)
-# print("bounds:", y['bounds'])
+# print("bounds:", y['raw_data']['bounds'])
 
 # print("Minimum:")
-# print("x:", y['min']['x'])
-# print("f:", y['min']['f'])
+# print("x:", y['raw_data']['min'])
+# print("x:", y['raw_data']['min']['x'])
+# print("f:", y['raw_data']['min']['f'])
 # print("message:", y['min']['message'])
 
 # print("Maximum:")
-# print("x:", y['max']['x'])
-# print("f:", y['max']['f'])
-# print("message:", y['max']['message'])
+# print("x:", y['raw_data']['max']['x'])
+# print("f:", y['raw_data']['max']['f'])
+# print("message:", y['raw_data']['max']['message'])

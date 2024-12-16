@@ -1,8 +1,8 @@
 import numpy as np
 from typing import Callable
 import tqdm
-from PyUncertainNumber.UP.mixed_uncertainty.extremePointX import extreme_pointX
-from PyUncertainNumber.UP.endpoints_monotonic import endpoints_monotonic_method
+from PyUncertainNumber.UP.mixed_uncertainty.extreme_point_x import extreme_pointX
+from PyUncertainNumber.UP.endpoints_extremepoint import endpoints_extremepoint_method
 from PyUncertainNumber.UC.uncertainNumber import UncertainNumber as UN
 
 def imp(X):
@@ -38,18 +38,19 @@ def first_order_propagation_method(x: list, f:Callable = None, results:dict = No
     if results is None:
         results = {
              'un': None,
-            'bounds': None, 
-            'min': {
-                'x': None,
-                'f': None
-                },
-            'max': {
+           
+            'raw_data': {                
                 'x': None,
                 'f': None,
-                },
-            'raw_data': {
-                'f': None,
-                'x': None
+                'min': {
+                        'x': None,
+                        'f': None
+                    },
+                'max': {
+                        'x': None,
+                        'f': None,
+                    },
+                'bounds': None
                 }
             }
 
@@ -114,7 +115,7 @@ def first_order_propagation_method(x: list, f:Callable = None, results:dict = No
         xr.append(temp_xr)  # Add the temporary list to xr
     
     # Determine the positive or negative signs for each input
-    res = endpoints_monotonic_method(ranges.T, f)
+    res = endpoints_extremepoint_method(ranges.T, f)
 
     num_outputs = res['sign_x'].shape[0]
     inpsList = np.zeros((0, d))
@@ -172,8 +173,8 @@ def first_order_propagation_method(x: list, f:Callable = None, results:dict = No
         bounds[i, 0, :] = lower_bound[i,:]
         bounds[i, 1, :] = upper_bound[i,:]   
 
-        results['bounds']= bounds
-        results['min']['f']=  lower_bound
-        results['max']['f']=  upper_bound
+        results['raw_data']['bounds']= bounds
+        results['raw_data']['min']['f']=  lower_bound
+        results['raw_data']['max']['f']=  upper_bound
 
     return results

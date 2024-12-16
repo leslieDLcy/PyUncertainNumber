@@ -104,7 +104,6 @@ def post_processing(all_input: np.ndarray, all_output: np.ndarray = None, method
 
     return df_output_input
 
-
 def create_folder(base_path, method):
     """Creates a folder named after the called UP method where the results files are stored
 

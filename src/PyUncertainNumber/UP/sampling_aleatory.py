@@ -1,12 +1,10 @@
 import numpy as np
 import tqdm
 from typing import Callable
-from statsmodels.distributions.empirical_distribution import ECDF
-from scipy.stats import kstwobign
 from scipy.stats import qmc  # Import Latin Hypercube Sampling from SciPy
 
-def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', conf_level=0.95, ks_bound_points: int =100,
-                    save_raw_data='no'):
+def sampling_aleatory_method(x: list, f: Callable, n: int, method='monte_carlo', results:dict = None,      
+                        save_raw_data='no'):
     """
     args:
         x (list): A list of UncertainNumber objects, each representing an input 
@@ -30,7 +28,8 @@ def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', con
                                     Defaults to 'no'.
     
     signature:
-        sampling_method(x:list, f:Callable, n:int, method ='montecarlo',  conf_level=0.95, ks_bound_points=100, save_raw_data = 'no') -> dict of np.ndarrays
+        sampling_aleatory_method(x:list, f:Callable, n:int, method ='montecarlo', results:dict = None,    
+                                    save_raw_data = 'no') -> dict of np.ndarrays
 
     note:
         - Performs uncertainty propagation using Monte Carlo or Latin Hypercube sampling, 
@@ -56,8 +55,17 @@ def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', con
     if save_raw_data not in ('yes', 'no'):
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
     
+    if results is None:
+        results = {
+                'un': None, 
+            
+                'raw_data': {
+                        'f': None,
+                        'x': None
+                        }
+                }
+    
     if method == 'monte_carlo':   
-        #parameter_samples = np.array([un._math_object.random(size=n) for un in x]) 
         parameter_samples = np.array([
             un.random(size=n) for un in x
         ])
@@ -67,8 +75,7 @@ def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', con
         lhd_samples = sampler.random(n=n)
 
         parameter_samples = []  # Initialize an empty list to store the samples
-
-   
+ 
     for i, un in enumerate(x):  # Iterate over each UncertainNumber in the list 'x'
         q_values = lhd_samples[:, i]  # Get the entire column of quantiles for this UncertainNumber
     
@@ -84,47 +91,16 @@ def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', con
         
     # Transpose to have each row as a sample
     parameter_samples = parameter_samples.T
-
-    results = {
-            'un': None, 
-            'ks_bounds': None,       
-            'raw_data': {
-                    'f': None,
-                    'x': None
-                    }
-                }
- 
+     
     if f is not None:  # Only evaluate if f is provided
         all_output = np.array([f(xi) for xi in tqdm.tqdm(parameter_samples, desc="Evaluating samples")])
 
         if all_output.ndim == 1:  # If f returns a single output
-            num_outputs = 1
             all_output = all_output.reshape(-1, 1)  # Reshape to a column vector
-        else:
-            num_outputs = all_output.shape[1]
-    
-        # Calculate and plot K-S bounds for each output
-        alpha = 1.00 - conf_level
-        ks_bounds = []
-        for i in range(num_outputs):
-            data = all_output[:, i]
-            ecdf = ECDF(data)
-            x_vals = np.linspace(min(data), max(data), ks_bound_points)
-            cdf_vals = ecdf(x_vals)
-            critical_D = kstwobign.ppf(1 - alpha / 2) / np.sqrt(n)
-            upper_bound = np.clip(cdf_vals + critical_D, 0, 1)
-            lower_bound = np.clip(cdf_vals - critical_D, 0, 1)
-
-            ks_bounds.append({
-                    'x_vals': x_vals, 
-                    'upper_bound': upper_bound,
-                    'lower_bound': lower_bound
-                    })
-
-        results['ks_bounds'] = ks_bounds
-        
-        if save_raw_data == 'yes':
-            results['raw_data'] = {'f': all_output, 'x': parameter_samples}
+            
+        #if save_raw_data == 'yes':
+        results['raw_data']['f'] = all_output
+        results['raw_data']['x'] =  parameter_samples
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
         results['raw_data']['x'] = parameter_samples
@@ -134,7 +110,7 @@ def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', con
 
     return results
 
-# # example
+# # # example
 # from PyUncertainNumber import UncertainNumber as UN
 
 # def cantilever_beam_deflection(x):
@@ -173,7 +149,7 @@ def sampling_alea_method(x: list, f: Callable, n: int, method='monte_carlo', con
 # METHOD = "latin_hypercube"
 # base_path = ""
 
-# a = sampling_alea_method(x=[L, I, F, E], #['L', 'I', 'F', 'E'], 
+# a = sampling_aleatory_method(x=[L, I, F, E], #['L', 'I', 'F', 'E'], 
 #           f = cantilever_beam_deflection, 
 #           n = 300, 
 #           method = METHOD, 

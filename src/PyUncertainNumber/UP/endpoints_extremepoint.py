@@ -2,9 +2,9 @@ import numpy as np
 import tqdm
 from typing import Callable
 from PyUncertainNumber.UP.mixed_uncertainty.cartesian_product import cartesian
-from PyUncertainNumber.UP.mixed_uncertainty.extremePointX import extreme_pointX
+from PyUncertainNumber.UP.mixed_uncertainty.extreme_point_x import extreme_pointX
 
-def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
+def endpoints_extremepoint_method(x:np.ndarray, f:Callable, results:dict = None, save_raw_data = 'no'):
 
     """ 
     args:
@@ -20,7 +20,7 @@ def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
 
 
     signature:
-        endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no') -> dict
+        endpoints_extremepoint_method(x:np.ndarray, f:Callable, results:dict, save_raw_data = 'no') -> dict
 
     note:
         - Performs uncertainty propagation using the Extreme Point Method for monotonic functions. 
@@ -44,35 +44,31 @@ def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
             - 'x': All generated input samples.
             - 'f': Corresponding output values for each input sample.
 
-    example:
-        #Define input intervals
-        x = np.array([[1, 2], [3, 4], [5, 6]])
+    # Example usage with different parameters for minimization and maximization
+    f = lambda x: x[0] + x[1] + x[2]  # Example function
 
-        # Define the function
-        f = lambda x: x[0] + x[1] + x[2]
-        
-        # Run sampling method with n = 2
-        y = endpoints_method(x, f, save_raw_data = 'yes')
-        
-        # Print the results
-        print("-" * 30)
-        print("bounds:", y['bounds'])
+    # Determine input parameters for function and method
+    x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+    n=2
+    # Call the method
+    y = endpoints_extremepoint_method(x_bounds, f)
+    print(y['raw_data']['sign_x'])
+    print("-" * 30)
+    print("bounds:", y['raw_data']['bounds'])
+    print("-" * 30)
+    print("Minimum:")
+    print("x:", y['raw_data']['min']['x'])
+    print("f:", y['raw_data']['min']['f'])
 
-        print("-" * 30)
-        print("Minimum:")
-        print("x:", y['min']['x'])
-        print("f:", y['min']['f'])
+    print("-" * 30)
+    print("Maximum:")
+    print("x:", y['raw_data']['max']['x'])
+    print("f:", y['raw_data']['max']['f'])
 
-        print("-" * 30)
-        print("Maximum:")
-        print("x:", y['max']['x'])
-        print("f:", y['max']['f'])
-
-        print("-" * 30)
-        print("Raw data")
-        print("x:",y['raw_data']['x'])
-        print("type_x:",type(y['raw_data']['x']))
-        print("f:", y['raw_data']['f'])
+    print("-" * 30)
+    print("Raw data:")
+    print("x:", y['raw_data']['x'])
+    print("f:", y['raw_data']['f']) 
 
     """
     # create an array with the unique combinations of all intervals 
@@ -82,25 +78,27 @@ def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
     inds = np.array([1] + [2**i + 1 for i in range(d)])  # Generate indices
     Xeval = X[inds - 1]  # Select rows based on indices (adjusting for 0-based indexing)
 
-    print(f"Total number of input combinations for the endpoint sign method: {len(inds - 1)}") 
+    print(f"Total number of input combinations for the endpoints extreme method: {len(inds - 1)}") 
 
-    results = {
-        'un': None,
-        'bounds': None, 
-        'signs_x': None,
-        'min': {
-                'x': None,
-                'f': None
-            },
-        'max': {
+    if results is None:
+        results = {
+             'un': None,
+           
+            'raw_data': {                
                 'x': None,
                 'f': None,
-                },
-        'raw_data': {
-                'f': None,
-                'x': None
+                'min': {
+                        'x': None,
+                        'f': None
+                    },
+                'max': {
+                        'x': None,
+                        'f': None,
+                    },
+                'bounds': None,
+                'signs_x': None,
                 }
-        }
+            }
     
     # propagates the epistemic uncertainty through subinterval reconstitution   
     if f is not None:
@@ -137,21 +135,28 @@ def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
             upper_bound[i] = f(Xsign[2*i + 1, :])
 
         results = {
-            'sign_x': signX,
-            'min': {
-                'f': lower_bound,
-            },
-            'max': {
-                'f': upper_bound,
+            'raw_data':{
+                'f': all_output,
+                'x': Xeval,
+                
+                'min': {
+                    'f': lower_bound,
+                    },
+                'max': {
+                    'f': upper_bound,
+                    },
+                'sign_x': signX
+
             }
+           
         }
         if num_outputs == 1:  # Single output
-            results['bounds'] = np.array([results['min']['f'][0], results['max']['f'][0]])
+            results['raw_data']['bounds'] = np.array([results['raw_data']['min']['f'][0], results['raw_data']['max']['f'][0]])
         else:  # Multiple outputs
             bounds = []
             for i in range(num_outputs):
-                bounds.append([results['min']['f'][i], results['max']['f'][i]])
-            results['bounds'] = np.array(bounds)
+                bounds.append([results['raw_data']['min']['f'][i], results['raw_data']['max']['f'][i]])
+            results['raw_data']['bounds'] = np.array(bounds)
         
         min_indices = np.zeros((d,num_outputs))
         max_indices = np.zeros((d,num_outputs))
@@ -160,8 +165,8 @@ def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
             max_indices[:,i] = Xsign[2*i+1, :]
             
         # Convert to 2D arrays (if necessary) and append
-        results['min']['x'] = min_indices
-        results['max']['x'] = max_indices
+        results['raw_data']['min']['x'] = min_indices
+        results['raw_data']['max']['x'] = max_indices
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
         results['raw_data'] = {'f': None, 'x': Xeval}
@@ -178,19 +183,19 @@ def endpoints_monotonic_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
 # x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
 # n=2
 # # Call the method
-# y = endpoints_monotonic_method(x_bounds, f)
-# print(y['sign_x'])
+# y = endpoints_extremepoint_method(x_bounds, f)
+# print(y['raw_data']['sign_x'])
 # print("-" * 30)
-# print("bounds:", y['bounds'])
+# print("bounds:", y['raw_data']['bounds'])
 # print("-" * 30)
 # print("Minimum:")
-# print("x:", y['min']['x'])
-# print("f:", y['min']['f'])
+# print("x:", y['raw_data']['min']['x'])
+# print("f:", y['raw_data']['min']['f'])
 
 # print("-" * 30)
 # print("Maximum:")
-# print("x:", y['max']['x'])
-# print("f:", y['max']['f'])
+# print("x:", y['raw_data']['max']['x'])
+# print("f:", y['raw_data']['max']['f'])
 
 # print("-" * 30)
 # print("Raw data:")

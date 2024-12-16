@@ -3,7 +3,7 @@ import tqdm
 from typing import Callable
 from PyUncertainNumber.UP.mixed_uncertainty.cartesian_product import cartesian
 
-def endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
+def endpoints_method(x:np.ndarray, f:Callable, results:dict = None, save_raw_data = 'no'):
 
     """ 
     args:
@@ -40,35 +40,31 @@ def endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
             - 'x': All generated input samples.
             - 'f': Corresponding output values for each input sample.
 
-    example:
-        #Define input intervals
-        x = np.array([[1, 2], [3, 4], [5, 6]])
+    # Example usage with different parameters for minimization and maximization
+    f = lambda x: x[0] + x[1] + x[2]  # Example function
 
-        # Define the function
-        f = lambda x: x[0] + x[1] + x[2]
-        
-        # Run sampling method with n = 2
-        y = endpoints_method(x, f, save_raw_data = 'yes')
-        
-        # Print the results
-        print("-" * 30)
-        print("bounds:", y['bounds'])
+    # Determine input parameters for function and method
+    x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
 
-        print("-" * 30)
-        print("Minimum:")
-        print("x:", y['min']['x'])
-        print("f:", y['min']['f'])
+    # Call the method
+    y = endpoints_method(x_bounds, f)
 
-        print("-" * 30)
-        print("Maximum:")
-        print("x:", y['max']['x'])
-        print("f:", y['max']['f'])
+    print("-" * 30)
+    print("bounds:", y['raw_data']['bounds'])
+    print("-" * 30)
+    print("Minimum:")
+    print("x:", y['raw_data']['min']['x'])
+    print("f:", y['raw_data']['min']['f'])
 
-        print("-" * 30)
-        print("Raw data")
-        print("x:",y['raw_data']['x'])
-        print("type_x:",type(y['raw_data']['x']))
-        print("f:", y['raw_data']['f'])
+    print("-" * 30)
+    print("Maximum:")
+    print("x:", y['raw_data']['max']['x'])
+    print("f:", y['raw_data']['max']['f'])
+
+    print("-" * 30)
+    print("Raw data:")
+    print("x:", y['raw_data']['x'])
+    print("f:", y['raw_data']['f']) 
 
     """
     # Create a sequence of values for each interval based on the number of divisions provided 
@@ -79,22 +75,24 @@ def endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
     # create an array with the unique combinations of all intervals 
     X = cartesian(*x) 
 
-    results = {
-        'un': None,
-        'bounds': None, 
-            'min': {
+    if results is None:
+        results = {
+             'un': None,
+           
+            'raw_data': {                
                 'x': None,
-                'f':  None
-            },
-            'max': {
-                'x': None,
-                'f':  None,
-                },
-            'raw_data': {
                 'f': None,
-                'x': None
+                'min': {
+                        'x': None,
+                        'f': None
+                    },
+                'max': {
+                        'x': None,
+                        'f': None,
+                    },
+                'bounds': None
                 }
-        }
+            }
     
     # propagates the epistemic uncertainty through subinterval reconstitution   
     if f is not None:
@@ -103,46 +101,50 @@ def endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
         if all_output.ndim == 1:
             all_output = all_output.reshape(-1, 1)
 
-        results = {
-            'min': {
-                'f': np.min(all_output, axis=0),
-            },
-            'max': {
-                'f': np.max(all_output, axis=0),
-            }
-        }
+        results = { 'raw_data':{
+                        'min': {
+                            'f': np.min(all_output, axis=0)
+                                },
+                        'max': {
+                            'f': np.max(all_output, axis=0)
+                            },
+                            }
+                        }
+        
+   
         if all_output.shape[1] == 1:  # Single output
-            results['bounds'] = np.array([results['min']['f'][0], results['max']['f'][0]])
+            results['raw_data']['bounds'] = np.array([results['raw_data']['min']['f'][0], results['raw_data']['max']['f'][0]])
         else:  # Multiple outputs
             bounds = np.empty((all_output.shape[1], 2))
             for i in range(all_output.shape[1]):
-                bounds[i, :] = np.array([results['min']['f'][i], results['max']['f'][i]])
-            results['bounds'] = bounds
+                bounds[i, :] = np.array([results['raw_data']['min']['f'][i], results['raw_data']['max']['f'][i]])
+            results['raw_data']['bounds'] = bounds
 
-        results['min']['x'] = []  # in acase more than 1 input combination yields min y
-        results['max']['x'] = []
+        results['raw_data']['min']['x'] = []  
+        results['raw_data']['max']['x'] = []
 
         for i in range(all_output.shape[1]):  # Iterate over outputs
-            min_indices = np.where(all_output[:, i] == results['min']['f'][i])[0]
-            max_indices = np.where(all_output[:, i] == results['max']['f'][i])[0]
+            min_indices = np.where(all_output[:, i] == results['raw_data']['min']['f'][i])[0]
+            max_indices = np.where(all_output[:, i] == results['raw_data']['max']['f'][i])[0]
             
-            # Convert to 2D arrays (if necessary) and append
-            results['min']['x'].append(X[min_indices].reshape(-1, m))  # Reshape to (-1, m)
-            results['max']['x'].append(X[max_indices].reshape(-1, m))
+            # Convert to 2D arrays and append
+            results['raw_data']['min']['x'].extend(X[min_indices])  # Use extend here
+            results['raw_data']['max']['x'].extend(X[max_indices])  # Use extend here
 
-        # Concatenate the arrays in the lists into 2D arrays (if necessary)
-        if len(results['min']['x']) > 1:
-            results['min']['x'] = np.concatenate(results['min']['x'], axis=0)
+        # Concatenate arrays if necessary
+        if len(results['raw_data']['min']['x']) > 1:
+            results['raw_data']['min']['x'] = np.array(results['raw_data']['min']['x']) 
         else:
-            results['min']['x'] = results['min']['x'][0]  # Take the first (and only) array
+            results['raw_data']['min']['x'] = np.array([results['raw_data']['min']['x'][0]])
 
-        if len(results['max']['x']) > 1:
-            results['max']['x'] = np.concatenate(results['max']['x'], axis=0)
+        if len(results['raw_data']['max']['x']) > 1:
+            results['raw_data']['max']['x'] = np.array(results['raw_data']['max']['x'])
         else:
-            results['max']['x'] = results['max']['x'][0]  # Take the first (and only) array
-        
-        if save_raw_data == 'yes':
-            results['raw_data'] = {'f': all_output, 'x': X}
+            results['raw_data']['max']['x'] = np.array([results['raw_data']['max']['x'][0]])
+
+        #if save_raw_data == 'yes':
+        results['raw_data']['f'] = all_output
+        results['raw_data']['x'] = X
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
         results['raw_data'] = {'f': None, 'x': X}
@@ -153,27 +155,27 @@ def endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no'):
     return results
 
 # example
-# from PyUncertainNumber import UncertainNumber as UN
+
 # # Example usage with different parameters for minimization and maximization
 # f = lambda x: x[0] + x[1] + x[2]  # Example function
 
 # # Determine input parameters for function and method
 # x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-# n=2
+
 # # Call the method
-# y = endpoints_method(x_bounds, f,  save_raw_data = 'yes')
+# y = endpoints_method(x_bounds, f)
 
 # print("-" * 30)
-# print("bounds:", y['bounds'])
+# #print("bounds:", y['raw_data']['bounds'])
 # print("-" * 30)
 # print("Minimum:")
-# print("x:", y['min']['x'])
-# print("f:", y['min']['f'])
+# print("x:", y['raw_data']['min']['x'])
+# print("f:", y['raw_data']['min']['f'])
 
 # print("-" * 30)
 # print("Maximum:")
-# print("x:", y['max']['x'])
-# print("f:", y['max']['f'])
+# print("x:", y['raw_data']['max']['x'])
+# print("f:", y['raw_data']['max']['f'])
 
 # print("-" * 30)
 # print("Raw data:")

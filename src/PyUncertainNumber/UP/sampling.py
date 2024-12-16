@@ -28,7 +28,7 @@ def index_to_bool_(index:np.ndarray,dim=2):
     index = np.asarray(index,dtype=int)
     return np.asarray([index==j for j in range(dim)],dtype=bool)
 
-def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo', 
+def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo', results:dict = None,     
                     save_raw_data='no', endpoints=False ):
     """
     args:
@@ -47,7 +47,7 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo',
                                         Defaults to 'no'.
     
     signature:
-        sampling_method(x:np.ndarray, f:Callable, n:int, method ='montecarlo', endpoints=False, save_raw_data = 'no') -> dict of np.ndarrays
+        sampling_method(x:np.ndarray, f:Callable, n:int, method ='montecarlo', endpoints=False, results:dict = None, save_raw_data = 'no') -> dict of np.ndarrays
 
     note:
         - The function assumes that the na in `x` represent uniform distributions.
@@ -78,13 +78,13 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo',
         # Print the results
         print("-" * 30)
         print("Minimum:")
-        print("x:", y['min']['x'])
-        print("f:", y['min']['f'])
+        print("x:", y['raw_data']['min']['x'])
+        print("f:", y['raw_data']['min']['f'])
 
         print("-" * 30)
         print("Maximum:")
-        print("x:", y['max']['x'])
-        print("f:", y['max']['f'])
+        print("x:", y['raw_data']['max']['x'])
+        print("f:", y['raw_data']['max']['f'])
 
         print("-" * 30)
         print("Raw data")
@@ -92,6 +92,25 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo',
         print("type_x:",type(y['raw_data']['x']))
         print("f:", y['raw_data']['f'])
     """
+    if results is None:
+        results = {
+             'un': None,
+           
+            'raw_data': {                
+                'x': None,
+                'f': None,
+                'min': {
+                        'x': None,
+                        'f': None
+                    },
+                'max': {
+                        'x': None,
+                        'f': None,
+                    },
+                'bounds': None
+                }
+            }
+        
     m = x.shape[0]
     lo = x[:, 0]
     hi = x[:, 1]
@@ -114,23 +133,6 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo',
             X_end[j, :] = x[itb]
         X = np.vstack([X, X_end])  # Combine generated samples with endpoint combinations     
 
-    results = {
-            'un': None, 
-            'bounds': None,
-            'min': {
-                'x': None,
-                'f': None
-            },
-            'max': {
-                'x': None,
-                'f': None
-                },
-            'raw_data': {
-                'f': None,
-                'x': None
-                }
-        }
-
     if f is not None:  # Only evaluate if f is provided
         all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Evaluating samples")])
 
@@ -138,50 +140,45 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo',
             all_output = all_output.reshape(-1, 1)  # Reshape to a column vector
 
          # Create a dictionary to store the results
-        results = {
-            'min': {
-                'f': np.min(all_output, axis=0),
-                },
-            'max': {
-                'f': np.max(all_output, axis=0),
-                } 
-            }
-        
+        results['raw_data']['min']['f'] = np.min(all_output, axis=0)
+        results['raw_data']['max']['f'] = np.max(all_output, axis=0)
+
         if all_output.shape[1] == 1:  # Single output
-            results['bounds'] = np.array([results['min']['f'][0], results['max']['f'][0]])
+            results['raw_data']['bounds'] = np.array([results['raw_data']['min']['f'][0], results['raw_data']['max']['f'][0]])
         else:  # Multiple outputs
             bounds = np.empty((all_output.shape[1], 2))
             for i in range(all_output.shape[1]):
-                bounds[i, :] = np.array([results['min']['f'][i], results['max']['f'][i]])
-            results['bounds'] = bounds
+                bounds[i, :] = np.array([results['raw_data']['min']['f'][i], results['raw_data']['max']['f'][i]])
+            results['raw_data']['bounds'] = bounds
         
-        results['min']['x'] = []
-        results['max']['x'] = []
+        results['raw_data']['min']['x'] = []
+        results['raw_data']['max']['x'] = []
 
         for i in range(all_output.shape[1]):  # Iterate over outputs
-            min_indices = np.where(all_output[:, i] == results['min']['f'][i])[0]
-            max_indices = np.where(all_output[:, i] == results['max']['f'][i])[0]
+            min_indices = np.where(all_output[:, i] == results['raw_data']['min']['f'][i])[0]
+            max_indices = np.where(all_output[:, i] == results['raw_data']['max']['f'][i])[0]
             
             # Convert to 2D arrays (if necessary) and append
-            results['min']['x'].append(X[min_indices].reshape(-1, m))  # Reshape to (-1, m)
-            results['max']['x'].append(X[max_indices].reshape(-1, m))
+            results['raw_data']['min']['x'].append(X[min_indices].reshape(-1, m))  # Reshape to (-1, m)
+            results['raw_data']['max']['x'].append(X[max_indices].reshape(-1, m))
 
         # Concatenate the arrays in the lists into 2D arrays (if necessary)
-        if len(results['min']['x']) > 1:
-            results['min']['x'] = np.concatenate(results['min']['x'], axis=0)
+        if len(results['raw_data']['min']['x']) > 1:
+            results['raw_data']['min']['x'] = np.concatenate(results['raw_data']['min']['x'], axis=0)
         else:
-            results['min']['x'] = results['min']['x'][0]  # Take the first (and only) array
+            results['raw_data']['min']['x'] = results['raw_data']['min']['x'][0]  # Take the first (and only) array
 
-        if len(results['max']['x']) > 1:
-            results['max']['x'] = np.concatenate(results['max']['x'], axis=0)
+        if len(results['raw_data']['max']['x']) > 1:
+            results['raw_data']['max']['x'] = np.concatenate(results['raw_data']['max']['x'], axis=0)
         else:
-            results['max']['x'] = results['max']['x'][0]  # Take the first (and only) array
+            results['raw_data']['max']['x'] = results['raw_data']['max']['x'][0]  # Take the first (and only) array
         
-        if save_raw_data == 'yes':
-            results['raw_data'] = {'f': all_output, 'x': X}
+        #if save_raw_data == 'yes':
+        results['raw_data']['f'] = all_output
+        results['raw_data']['x'] = X
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results['raw_data'] = {'x': X}
+        results['raw_data'] = {'f':None, 'x': X}
     
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
@@ -195,17 +192,17 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo',
 # x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
 # n=20
 # # Call the method
-# y = sampling_method(x_bounds, f, n=n, endpoints= True, save_raw_data = 'yes')
-
+# y = sampling_method(x_bounds,f=None, n=n, endpoints= True, save_raw_data = 'yes')
+# print(y)
 # print("-" * 30)
 # print("Minimum:")
-# print("x:", y['min']['x'])
-# print("f:", y['min']['f'])
+# print("x:", y['raw_data']['min']['x'])
+# print("f:", y['raw_data']['min']['f'])
 
 # print("-" * 30)
 # print("Maximum:")
-# print("x:", y['max']['x'])
-# print("f:", y['max']['f'])
+# print("x:", y['raw_data']['max']['x'])
+# print("f:", y['raw_data']['max']['f'])
 
 # print("-" * 30)
 # print("Raw data:")

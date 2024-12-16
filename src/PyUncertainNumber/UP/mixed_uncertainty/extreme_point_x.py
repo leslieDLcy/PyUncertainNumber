@@ -3,7 +3,6 @@ import numpy as np
 def extreme_pointX(ranges, signX):
     """
     
-
     args:
         ranges: A NumPy array of shape (d, 2) representing the ranges 
                  (each row is a variable, each column is a bound).

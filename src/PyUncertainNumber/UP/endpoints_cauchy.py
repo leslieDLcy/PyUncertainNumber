@@ -3,7 +3,7 @@ import tqdm
 from typing import Callable
 from scipy.optimize import brentq
 
-def cauchydeviates_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no'):
+def cauchydeviates_method(x: np.ndarray, f: Callable, n: int, results:dict = None, save_raw_data='no'):
     """
     args:
         x (np.ndarray): A 2D NumPy array representing the intervals for each input variable.
@@ -17,7 +17,7 @@ def cauchydeviates_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no'
                                         Currently not supported by this method.
     
     signature:
-        cauchydeviate_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no') -> dict
+        cauchydeviate_method(x: np.ndarray, f: Callable, n: int, results:dict = None, save_raw_data='no') -> dict
 
     note:
         - This method propagates intervals through a balck box model with the endpoint Cauchy deviate method. 
@@ -36,19 +36,30 @@ def cauchydeviates_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no'
                   - 'x': Cauchy deviates (x).
                   - 'K': Maximum Cauchy deviate (K).
     """
+    if results is None:
+        results = {
+             'un': None,
+           
+            'raw_data': {                
+                'x': None,
+                'f': None,
+                'min': {
+                        'x': None,
+                        'f': None
+                    },
+                'max': {
+                        'x': None,
+                        'f': None,
+                    },
+                'bounds': None
+                }
+            }
+    
     x = np.atleast_2d(x)  # Ensure x is 2D
     lo, hi = x.T  # Unpack lower and upper bounds directly
 
     xtilde = (lo + hi) / 2
     Delta = (hi - lo) / 2
-
-    results = {
-        'un': None,
-        'bounds': None,
-        'min': {'f': None, 'x': None},
-        'max': {'f': None, 'x': None},
-        'raw_data': {'x': None, 'K': None, 'f' : None}
-    }  # Initialize with None values
 
     if f is not None:  # Only evaluate if f is provided
         ytilde = f(xtilde)
@@ -101,23 +112,23 @@ def cauchydeviates_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no'
             bounds = np.vstack([min_candidate, max_candidate]) 
 
         print("Input x for min max y are NOT available for the Cauchy method!")
-        results = {
-            'bounds': bounds,
-            'min': {
-                'f': min_candidate,
-                'x': None
-            },
-            'max': {
-                'f': max_candidate,
-                'x': None
-            },
-            'raw_data': {
-                'f': None,
-                'x': None
-            }
-        }
+        
+        results = { 'raw_data':{
+                        'min': {
+                            'x': None,
+                            'f': min_candidate
+                            },
+                        'max': {
+                            'x': None,
+                            'f': max_candidate
+                            },
+                        'bounds':  bounds
+
+                        }
+                }
+
         if save_raw_data == 'yes':
-            print("Input-Output raw data are NOT provided for the Cauchy method!")
+            print("Input-Output raw data are NOT available for the Cauchy method!")
 
     elif  save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes' 
         x_samples = np.zeros((n, x.shape[0]))
@@ -144,21 +155,21 @@ def cauchydeviates_method(x: np.ndarray, f: Callable, n: int, save_raw_data='no'
 # x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
 # n=50
 # # Call the method
-# y = cauchydeviates_method(x_bounds,f=None, n=n, save_raw_data = 'yes')
+# y = cauchydeviates_method(x_bounds,f=f, n=n, save_raw_data = 'yes')
 
 # # print the results
 # print("-" * 30)
-# print("bounds:", y['bounds'])
+# print("bounds:", y['raw_data']['bounds'])
     
 # print("-" * 30)
 # print("Minimum:")
-# print("x:", y['min']['x'])
-# print("f:", y['min']['f'])
+# print("x:", y['raw_data']['min']['x'])
+# print("f:", y['raw_data']['min']['f'])
 
 # print("-" * 30)
 # print("Maximum:")
-# print("x:", y['max']['x'])
-# print("f:", y['max']['f'])
+# print("x:", y['raw_data']['max']['x'])
+# print("f:", y['raw_data']['max']['f'])
 
 # print("-" * 30)
 # print("Raw data:")

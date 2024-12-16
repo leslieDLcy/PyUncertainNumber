@@ -7,11 +7,9 @@ from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.core.callback import Callback
 
-#from intervals.methods import intervalise as i
-
 def a(x): return np.asarray(x,dtype=float)
 
-def genetic_optimization_method(x_bounds: np.ndarray, f: Callable,
+def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, results:dict = None,
                                  pop_size=1000, n_gen=100, tol=1e-3,
                                  n_gen_last=10, algorithm_type="NSGA2"):
     """
@@ -23,25 +21,25 @@ def genetic_optimization_method(x_bounds: np.ndarray, f: Callable,
         tol: Tolerance for convergence check (float or array of shape (2,)).
         n_gen_last: Number of last generations to consider for convergence 
                     (int or array of shape (2,)).
-        algorithm_type: 'NSGA2' or 'GA' to select the optimization algorithm 
+        algorithm_type: 'NSGA2' or 'GA' to select the optimisation algorithm 
                         (str or array of shape (2,)).
     
     signature:
-        genetic_optimization_method(x_bounds: np.ndarray, f: Callable,
+        genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, results:dict,
                                     pop_size=1000, n_gen=100, tol=1e-3,
                                     n_gen_last=10, algorithm_type="NSGA2") -> dict
 
     note:
-        Performs both minimization and maximization using a genetic algorithm.
+        Performs both minimisation and maximisation using a genetic algorithm.
 
     returns:
-        dict: A dictionary containing the optimization results:
+        dict: A dictionary containing the optimisation results:
             - 'bounds': An np.ndarray of the bounds for the output parameter (if f is not None). 
-            - 'min': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for minimization results.
-            - 'max': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for maximization results.
+            - 'min': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for minimisation results.
+            - 'max': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for maximisation results.
     
     example:
-        # Example usage with different parameters for minimization and maximization
+        # Example usage with different parameters for minimisation and maximisation
         f = lambda x: x[0] + x[1] + x[2] # Example function
         x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
 
@@ -57,7 +55,7 @@ def genetic_optimization_method(x_bounds: np.ndarray, f: Callable,
         # Different algorithms
         algorithm_type = np.array(["GA", "NSGA2"])  
 
-        y = genetic_optimization_method(x_bounds, f, pop_size=pop_size, n_gen=n_gen,
+        y = genetic_optimisation_method(x_bounds, f, pop_size=pop_size, n_gen=n_gen,
                                         tol=tol, n_gen_last=10, algorithm_type=algorithm_type)
 
         # Print the results                                               
@@ -78,7 +76,29 @@ def genetic_optimization_method(x_bounds: np.ndarray, f: Callable,
         print("Number of iterations:", y['max']['n_iter'])
 
     """
-
+    if results is None:
+        results = {
+             'un': None,
+           
+            'raw_data': {                
+                'x': None,
+                'f': None,
+                'min': {
+                        'x': None,
+                        'f': None,
+                        'n_gen': None,
+                        'n_iter': None
+                    },
+                'max': {
+                        'x': None,
+                        'f': None,
+                        'n_gen': None,
+                        'n_iter': None
+                    },
+                'bounds': None
+                }
+            }
+        
     class ProblemWrapper(Problem):
         def __init__(self, objective, **kwargs):
             super().__init__(n_obj=1, **kwargs)
@@ -112,17 +132,18 @@ def genetic_optimization_method(x_bounds: np.ndarray, f: Callable,
                 # Calculate the range of the last 'n_last' values
                 convergence_value = np.max(last_values) - np.min(last_values)
                 if convergence_value <= self.tol and not self.convergence_reached:
-                    print("Convergence reached!")
+                    self.convergence_message = "Convergence reached!"  # Store the message
+                    print(self.convergence_message)
                     self.convergence_reached = True  # Set the flag to True
                     algorithm.termination.force_termination = True
 
-    def run_optimization(objective, pop_size, n_gen, tol, n_gen_last, algorithm_type):
+    def run_optimisation(objective, pop_size, n_gen, tol, n_gen_last, algorithm_type):
         callback = ConvergenceMonitor(tol=tol, n_last=n_gen_last)
         problem = ProblemWrapper(objective=objective, n_var=x_bounds.shape[0],
                                   xl=x_bounds[:, 0], xu=x_bounds[:, 1])
         algorithm = GA(pop_size=pop_size) if algorithm_type == "GA" else NSGA2(pop_size=pop_size)
         result = minimize(problem, algorithm, ('n_gen', n_gen), callback=callback)
-        return result, callback.n_generations, problem.n_evals
+        return result, callback.n_generations, problem.n_evals, callback.convergence_message
 
     # Handle arguments that can be single values or arrays
     def handle_arg(arg):
@@ -134,32 +155,75 @@ def genetic_optimization_method(x_bounds: np.ndarray, f: Callable,
     n_gen_last = handle_arg(n_gen_last)
     algorithm_type = handle_arg(algorithm_type)
 
-    # --- Minimization ---
-    result_min, n_gen_min, n_iter_min = run_optimization(
+    # --- Minimisation ---
+    result_min, n_gen_min, n_iter_min, message_min = run_optimisation(
         'min', pop_size[0], n_gen[0], tol[0], n_gen_last[0], algorithm_type[0]
     )
 
-    # --- Maximization ---
-    result_max, n_gen_max, n_iter_max = run_optimization(
+    # --- Maximisation ---
+    result_max, n_gen_max, n_iter_max, message_max = run_optimisation(
         'max', pop_size[1], n_gen[1], tol[1], n_gen_last[1], algorithm_type[1]
     )
 
     # Create a dictionary to store the results
     results = {
         'un': None,
-        'bounds' : np.array([result_min.F[0], -result_max.F[0]]),
-        'min': {
-            'x': result_min.X,
-            'f': result_min.F,
-            'n_gen': n_gen_min,
-            'n_iter': n_iter_min,
-        },
-        'max': {
-            'x': result_max.X,
-            'f': -result_max.F,  # Negate the result for maximization
-            'n_gen': n_gen_max,
-            'n_iter': n_iter_max,
+        
+        'raw_data': {
+            'min': {
+                'x': result_min.X,
+                'f': result_min.F,
+                'message' : message_min,
+                'n_gen': n_gen_min,
+                'n_iter': n_iter_min
+                },
+            'max': {
+                'x': result_max.X,
+                'f': -result_max.F,  # Negate the result for maximisation
+                'message' : message_max,
+                'n_gen': n_gen_max,
+                'n_iter': n_iter_max
+                },
+            'bounds' : np.array([result_min.F[0], -result_max.F[0]])
+            }
         }
-    }
 
     return results
+
+
+
+# # Example usage with different parameters for minimisation and maximisation
+# f = lambda x: x[0] + x[1] + x[2] # Example function
+# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+
+# # Different population sizes for min and max
+# pop_size = np.array([500, 1500])  
+
+# # Different number of generations
+# n_gen = np.array([50, 150])     
+
+# # Different tolerances
+# tol = np.array([1e-2, 1e-4])     
+
+# # Different algorithms
+# algorithm_type = np.array(["GA", "NSGA2"])  
+
+# y = genetic_optimisation_method(x_bounds, f, pop_size=pop_size, n_gen=n_gen,
+#                                         tol=tol, n_gen_last=10, algorithm_type=algorithm_type)
+
+# # Print the results                                               
+# print("-" * 30)
+# print("bounds:", y['raw_data']['bounds'])
+
+# print("Minimum:")
+# print("Optimized x:", y['raw_data']['min']['x'])
+# print("Optimized f:", y['raw_data']['min']['f'])
+# print("Number of generations:", y['raw_data']['min']['n_gen'])
+# print("Number of iterations:", y['raw_data']['min']['n_iter'])
+
+# print("-" * 30)
+# print("Maximum:")
+# print("Optimized x:", y['raw_data']['max']['x'])
+# print("Optimized f:", y['raw_data']['max']['f'])
+# # print("Number of generations:", y['raw_data']['max']['n_gen'])
+# # print("Number of iterations:", y['raw_data']['max']['n_iter'])
