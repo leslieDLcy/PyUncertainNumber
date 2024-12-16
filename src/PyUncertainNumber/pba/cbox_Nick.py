@@ -1,7 +1,8 @@
-from ..pbox_base import Pbox
+from .pbox_base import Pbox
 import numpy as np
 
 __all__ = ['Cbox']
+
 
 class Cbox(Pbox):
     """
@@ -13,16 +14,16 @@ class Cbox(Pbox):
     Args:
         Pbox (_type_): _description_
     """
-    
-    def __init__(self,*args,**kwargs):
-        if len(args) == 1 and isinstance(args[0],Pbox):
-            
-                super().__init__(**vars(args[0]))
-                
+
+    def __init__(self, *args, **kwargs):
+        if len(args) == 1 and isinstance(args[0], Pbox):
+
+            super().__init__(**vars(args[0]))
+
         else:
-            
-            super().__init__(*args,**kwargs)
-        
+
+            super().__init__(*args, **kwargs)
+
     def __repr__(self):
         if self.mean_left == self.mean_right:
             mean_text = f'{round(self.mean_left, 4)}'
@@ -39,7 +40,8 @@ class Cbox(Pbox):
         if self.shape is None:
             shape_text = ' '
         else:
-            shape_text = f' {self.shape}' # space to start; see below lacking space
+            # space to start; see below lacking space
+            shape_text = f' {self.shape}'
 
         return f'Cbox: ~ {shape_text} (range={range_text}, mean={mean_text}, var={var_text})'
 
@@ -61,8 +63,8 @@ class Cbox(Pbox):
         else:
             return Cbox(super().__radd__(other))
 
-    def add(self,other, method = 'f'):
-        return Cbox(super().add(other, method = method))
+    def add(self, other, method='f'):
+        return Cbox(super().add(other, method=method))
 
     def __sub__(self, other):
         if isinstance(other, Cbox):
@@ -80,8 +82,8 @@ class Cbox(Pbox):
         else:
             return Cbox(super().__rsub__(other))
 
-    def sub(self,other, method = 'f'):
-        return Cbox(super().sub(other, method = method))
+    def sub(self, other, method='f'):
+        return Cbox(super().sub(other, method=method))
 
     def __mul__(self, other):
         if isinstance(other, Cbox):
@@ -99,8 +101,8 @@ class Cbox(Pbox):
         else:
             return Cbox(super().__rmul__(other))
 
-    def mul(self,other, method = 'f'):
-        return Cbox(super().mul(other, method = method))
+    def mul(self, other, method='f'):
+        return Cbox(super().mul(other, method=method))
 
     def __truediv__(self, other):
         if isinstance(other, Cbox):
@@ -118,12 +120,11 @@ class Cbox(Pbox):
         else:
             return Cbox(super().__rtruediv__(other))
 
-    def div(self,other, method = 'f'):
-        return Cbox(super().div(other, method = method))
+    def div(self, other, method='f'):
+        return Cbox(super().div(other, method=method))
 
     def __neg__(self):
         return Cbox(super().__neg__())
-    
+
     def recip(self):
         return Cbox(super().recip())
-    

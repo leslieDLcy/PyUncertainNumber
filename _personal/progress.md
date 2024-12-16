@@ -1,6 +1,0 @@
-- Built the boilerplate for a modern look GUI interface of the developed software with the framework of `Qt` and `Pyside6`. 
-- Debugged some errors of the `pba` python package (e.g. the deafult 'steps' arrribute for 'pba.U()' is incorrect)
-- Created a new Python package named `PyUncertainNumber` with pre-built package structures (i.e. skeleton built).
-- Build the boilerplate for the documentation, which introduces key API, of the developed Python package using `sphinx` and ready to host such documentation using 'github.io'. #TODO needs to ask if online is required.
-- Created a constructor for the **UncertaintyCharacterisation** module specifically with the features Scott desired (see [here](../assets/scott_desired_constructor.png)) 
-- create multple ojects and serialise them with json

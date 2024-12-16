@@ -1,10 +1,17 @@
+import functools
 import numpy as np
 from scipy.stats import (bernoulli, beta, betabinom, binom, chi2,
                          expon, gamma, norm, poisson, uniform, t,
                          gumbel_r, lognorm, laplace, logistic,
-                         pareto, powerlaw, triangular,
-                         geometric, loguniform, f as F)
+                         pareto, powerlaw, triang,
+                         geom, loguniform, f as F)
 import scipy.stats as sps
+from .intervalOperators import mean
+from intervals import Interval
+from PyUncertainNumber import pba
+from ..pba.distributions import Distribution
+
+
 ''' Here we define the statistical inference functions from data for the UncertainNumber class. 
 
 examples:
@@ -28,10 +35,15 @@ examples:
 # Method-of-Moment distribution constructors (matching central moments of x)
 ###############################################################################
 
+''' hint: given interval data x, return pbox '''
 # TODO Some of tThese functions may not support intervals in the data x          #**
 
-def MMbernoulli(x: np.ndarray): return (
-    bernoulli(x.mean()))  # assumes x is zeros and ones
+
+# create decorator for makeing distribution and making pboxes
+
+
+def MMbernoulli(x: np.ndarray):
+    return bernoulli(x.mean())  # assumes x is zeros and ones
 
 
 def MMbeta(x: np.ndarray):
@@ -43,26 +55,34 @@ def MMbeta(x: np.ndarray):
     return beta(alpha, beta_p)
 
 
-def MMbetabinomial(n, x):  # **
+def MMbetabinomial(n: int, x):  # **
+    #! 'x**2' variable repetition
     # n must be provided; it's not estimated from data
     # https://en.wikipedia.org/wiki/Beta-binomial_distribution#Example:
     # MMbetabinomial(n=12,rep(0:12,c(3,24,104,286,670,1033,1343,1112,829,478,181,45,7)))
     m1 = x.mean()
     m2 = (x**2).mean()
     d = n * (m2 / m1 - m1 - 1) + m1
-    return (betabinom(n, (n*m1 - m2) / d, (n-m1)*(n - m2/m1) / d))
+    return betabinom(n, (n*m1 - m2) / d, (n-m1)*(n - m2/m1) / d)
 
 
-def MMbinomial(x):  # **
-    a = x.mean()
-    b = x.std()
-    return (binom(int(np.abs(np.round(a/(1-b**2/a)))), np.abs(1-b**2/a)))
+def MMbinomial(x, n: int):  # **
+    #! the return seems overcomplicated?
+    """ 
+    args:
+         - n (int): number of trials
+    """
+    return binom(n, mean()/n)
+    # a = x.mean()
+    # b = x.std()
+    # return binom(int(np.abs(np.round(a/(1-b**2/a)))), np.abs(1-b**2/a))
 
 
 def MMchisquared(x): return (chi2(np.round(x.mean())))
 
 
-def MMexponential(x): return (expon(mean=x.mean()))
+def MMexponential(x):
+    return pba.expon(mean(x))
 
 
 def MMF(x):  # **
@@ -76,10 +96,10 @@ def MMgamma(x):  # **
     return (gamma(b**2/a, 1/(a/b)**2))  # gamma1(a, b) ~ gamma(b²/a, (a/b)²)
 
 
-def MMgeometric(x): return (geometric(1/(1+x.mean())))
+def MMgeometric(x): return geom(1/(1+mean(x)))
 
 
-def MMpascal(x): return (geometric(1/(1+x.mean())))
+def MMpascal(x): return geom(1/(1+mean(x)))
 
 # def MMgumbel0(x) : return(gumbel(x.mean() - 0.57721 * x.std() * np.sqrt(6)/ np.pi, x.std() * np.sqrt(6)/ np.pi))       #**  # https://stackoverflow.com/questions/51427764/using-method-of-moments-with-gumbel-r-in-python-scipy-stats-gumbel-r
 
@@ -124,7 +144,7 @@ def MMpareto(x):  # **
     return (pareto(a/(1+1/np.sqrt(1+a**2/b**2)), 1+np.sqrt(1+a**2/b**2)))
 
 
-def MMpoisson(x): return (poisson(x.mean()))
+def MMpoisson(x): return pba.poisson(mean(x))
 
 
 def MMpowerfunction(x):  # **
@@ -191,50 +211,92 @@ def MMtriangular(x, iters=100, dives=10):  # **
     # -#green(triangular(aa,bb,cc))
     # -#A;aa; B;bb; C;cc  # the order is min, max, mode
     print(aa, bb, cc)
-    return (triangular(aa, cc, bb))
+    return (triang(aa, cc, bb))
 
 
 ###############################################################################
-# Alternative maximum likelihood estimation constructors using scipy.stats
+# * Alternative maximum likelihood estimation constructors using scipy.stats  *#
 ###############################################################################
 
 # Some of these functions may support intervals in the data x.  See
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rv_continuous.fit.html#scipy.stats.rv_continuous.fit
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.CensoredData.html#scipy.stats.CensoredData
 
+#! note below all return `scipy.stats.dist` objects
+
 def MLbernoulli(x): return (bernoulli(x.mean()))
 def MLbeta(x): return (beta(*sps.beta.fit(x)))
 def MLbetabinomial(x): return (betabinom(*sps.betabinom.fit(x)))
 def MLbinomial(x): return (binom(*sps.binom.fit(x)))
 def MLchisquared(x): return (chi2(*sps.chi2.fit(x)))
-def MLexponential(x): return (expon(*sps.expon.fit(x)))
+
+
+def MLexponential(x):
+    """ Maximum likelihood estimation for exponential distribution.
+
+    note:
+        - precise data returns precise distrubution
+        - imprecise data need to be in Interval type to return a pbox
+        - interval data can return either a precise distribution or a pbox 
+    """
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return expon(*sps.expon.fit(x))
+    elif isinstance(x, Interval):
+        return pba.expon(mean(x))
+    else:
+        raise TypeError('Input data type not supported')
+
+
 def MLF(x): return (F(*sps.f.fit(x)))
 def MLgamma(x): return (gamma(*sps.gamma.fit(x)))
 def MLgammaexponential(x): return (
-    gammaexponential(*sps.gammaexpon.fit(x)))
+    sps.gammaexpon(*sps.gammaexpon.fit(x)))
 
 
-def MLgeometric(x): return (geometric(*sps.geom.fit(x)))
+def MLgeometric(x): return (geom(*sps.geom.fit(x)))
 def MLgumbel(x): return (gumbel_r(*sps.gumbel_r.fit(x)))
 def MLlaplace(x): return (laplace(*sps.laplace.fit(x)))
 def MLlogistic(x): return (logistic(*sps.logistic.fit(x)))
-# def MLlognormal(x) : return(lognormal(*sps.lognorm.fit(x)))
-def MLlognormal(x): return (sps.lognorm.rvs(
-    *sps.lognorm.fit(x), size=many))
+def MLlognormal(x): return (lognorm(*sps.lognorm.fit(x)))
+
+# TODO why not use `sps.lognorm.fit(x)`` directly?
+# def MLlognormal(x): return (sps.lognorm.rvs(
+#     *sps.lognorm.fit(x), size=many))
 
 
 def MLloguniform(x): return (loguniform(*sps.loguniform.fit(x)))
+
+
 def MLnegativebinomial(x): return (
-    negativebinomial(*sps.nbinom.fit(x)))
+    sps.nbinom(*sps.nbinom.fit(x)))
 
 
-def MLnormal(x): return (norm(*sps.norm.fit(x)))
+# def get_from_sps(sps_dist):
+#     Distribution()
+
+
+# def from_sps(func):
+#     @functools.wraps(func)
+#     def wrapper_decorator(*args, **kwargs):
+#         # Do something before
+#         sps_dist = func(*args, **kwargs)
+
+#         # Do something after
+#         return value
+#     return wrapper_decorator
+
+
+# @from_sps
+def MLnormal(x):
+    return norm(*sps.norm.fit(x))
+
+
 def MLpareto(x): return (pareto(*sps.pareto.fit(x)))
 def MLpoisson(x): return (poisson(*sps.poisson.fit(x)))
 def MLpowerfunction(x): return (powerlaw(*sps.powerlaw.fit(x)))
-def MLrayleigh(x): return (rayleigh(*sps.rayleigh.fit(x)))
+def MLrayleigh(x): return (sps.rayleigh(*sps.rayleigh.fit(x)))
 def MLstudent(x): return (t(*sps.t.fit(x)))
-def MLtriangular(x): return (triangular(*sps.t.fit(x)))
+def MLtriangular(x): return (triang(*sps.t.fit(x)))
 def MLuniform(x): return (uniform(*sps.uniform.fit(x)))
 
 
@@ -259,7 +321,7 @@ def sMLexponential(x): return expon(x.mean())
 def sMLpoisson(x): return (poisson(x.mean()))
 
 
-def sMLgeometric(x): return (geometric(1/(1+x.mean())))
+def sMLgeometric(x): return (geom(1/(1+x.mean())))
 
 
 def sMLgumbel(x):
@@ -420,7 +482,7 @@ def MEminmaxmeanvar(min, max, mean, var): return (
 ###############################################################################
 
 # https://wernerantweiler.ca/blog.php?item=2019-06-05       #**
-def antweiler(x): return (triangular(
+def antweiler(x): return (triang(
     min=min(x), mode=3*np.mean(x)-max(x)-min(x), max=max(x)))
 
 

@@ -28,7 +28,7 @@ pbox:
 
 cbox:
     ☐ ci function with arguments
-    ☐ print out the bounds parameters when instantiating the cbox
+    ✔ print out the bounds parameters when instantiating the cbox @done (03/12/2024, 14:24:46)
     ☐ interval statistics
 
 

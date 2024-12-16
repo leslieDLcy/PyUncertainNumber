@@ -7,12 +7,14 @@ import numpy as np
 
 
 def is_number(n):
-    """check if a string is a number"""
+    """check if a string is a number 
+    note:
+        - If string is not a valid `float`,
+        - it'll raise `ValueError` exception
+    """
 
     try:
         float(n)  # Type-casting the string to `float`.
-        # If string is not a valid `float`,
-        # it'll raise `ValueError` exception
     except ValueError:
         return False
     return True

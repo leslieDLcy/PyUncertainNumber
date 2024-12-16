@@ -756,7 +756,8 @@ class Interval:
 
         """
         if not isinstance(other, Interval):
-            raise TypeError(f"Needs to be an instance of Interval not {type(other)}")
+            raise TypeError(
+                f"Needs to be an instance of Interval not {type(other)}")
 
         return self.left == other.left and self.right == other.right
 
@@ -1019,6 +1020,7 @@ class Interval:
     #     return Interval(np.tan(self.left),np.tan(self.right))
 
     # ---------------------methods---------------------#
+
     @mpl.rc_context({"text.usetex": True})
     def display(self, title="", ax=None, style="simple", **kwargs):
 
@@ -1027,7 +1029,7 @@ class Interval:
 
         if title is not None:
             ax.set_title(title, **kwargs)
-            
+
         if style == "simple":
             # Plot the interval horizontally
             ax.plot(
@@ -1101,6 +1103,10 @@ class Interval:
         if seed is not None:
             r.seed(seed)
         return self.left + r.random() * self.width()
+
+    def round(self,):
+        """ outward rounding operation for an interval object """
+        return Interval(np.floor(self.left), np.ceil(self.right))
 
     # ---------------------Constructors---------------------#
 
