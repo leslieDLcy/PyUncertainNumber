@@ -8,8 +8,7 @@ two reasons:
 
 import functools
 from PyUncertainNumber.UC.params import Params
-from .interval import Interval as nInterval
-from intervals import Interval
+from intervals import Interval as nInterval
 from .pbox_base import Pbox
 import scipy.stats as sps
 import numpy as np
