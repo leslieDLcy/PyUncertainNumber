@@ -3,6 +3,122 @@ import csv
 import pandas as pd
 import numpy as np
 
+class propagation_results:
+    """
+    attributes:
+        un (np.ndarray): np.array of UncertainNumber objects (one for each output).
+        raw_data (dict): Dictionary containing raw data shared across outputs:
+            x (np.ndarray): Input values.
+            f (np.ndarray): Output values.
+            min (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'x', 'f' for the minimum of that output.
+            max (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'x', 'f' for the maximum of that output.
+            bounds (np.ndarray): 2D array of lower and upper bounds for each output.
+    notes:
+        - Stores the results of uncertainty propagation with multiple outputs,
+            sharing raw_data x and f.
+    """
+
+    def __init__(self, un: np.ndarray = None, raw_data: dict = None):
+        self.un = un if un is not None else np.array([])
+
+        if raw_data is not None:
+            self.raw_data = raw_data
+        else:
+            self.raw_data = {
+                'x': None,
+                'f': None,
+                'min': np.array([]),
+                'max': np.array([]),
+                'bounds': np.array([])
+            }
+    def add_raw_data(self, x=None, K=None, sign_x:np.ndarray = None):
+        """Adds raw data to the results."""
+        if x is not None:
+            self.raw_data['x'] = x
+        if K is not None:
+            self.raw_data['K'] = K
+        if sign_x is not None:
+            if isinstance(sign_x, np.ndarray) and len(sign_x.shape) > 1:  # Multiple outputs
+                self.raw_data['sign_x'] = sign_x
+            else:  # Single output
+                self.raw_data['sign_x'] = np.array([sign_x])  # Wrap in an array
+
+    def print(self):
+        """Prints the results in a formatted way, handling None values and multiple outputs."""
+
+        num_outputs = 1 if len(self.raw_data['bounds'].shape) == 1 else self.raw_data['bounds'].shape[0]
+
+        for i in range(num_outputs):
+            print("-" * 30)
+            print(f"Output {i+1}:")
+
+            print("-" * 30)
+            if 'un' in self.un and len(self.un) > 0:
+                print("Uncertain Number:", self.un[i])
+            else:
+                print("Uncertain Number: None")
+            print("-" * 30)
+            if 'bounds' in self.raw_data and len(self.raw_data['bounds']) > 0:
+                if num_outputs == 1:
+                    print("Bounds:", self.raw_data['bounds'])
+                else:
+                    print("Bounds:", self.raw_data['bounds'][i])
+            else:
+                print("Bounds: None")
+
+            print("-" * 30)
+            print("Minimum:")
+            if 'min' in self.raw_data and len(self.raw_data['min']) > 0:
+                min_data = self.raw_data['min'][i]
+                print("x:", min_data.get('x'))
+                print("f:", min_data.get('f'))
+
+                # Print additional results only for local_optimisation
+                if 'niterations' in min_data:  # Check if the keys exist
+                    print("niterations:", min_data.get('niterations'))
+                    print("nfevaluations:", min_data.get('nfevaluations'))
+                    print("final_simplex:", min_data.get('final_simplex'))
+            else:
+                print("x: None")
+                print("f: None")
+
+            print("-" * 30)
+            print("Maximum:")
+            if 'max' in self.raw_data and len(self.raw_data['max']) > 0:
+                max_data = self.raw_data['max'][i]
+                print("x:", max_data.get('x'))
+                print("f:", max_data.get('f'))
+
+                # Print additional results only for local_optimisation
+                if 'niterations' in max_data:  # Check if the keys exist
+                    print("niterations:", max_data.get('niterations'))
+                    print("nfevaluations:", max_data.get('nfevaluations'))
+                    print("final_simplex:", max_data.get('final_simplex'))
+
+            else:
+                print("x: None")
+                print("f: None")
+        
+        print("-" * 30)
+        if 'sign_x' in self.raw_data:
+            print("sign_x:", self.raw_data['sign_x'][i])
+        print("-" * 30)
+        print("Input combinations and corresponding output(s):")
+        if self.raw_data['x'] is not None and len(self.raw_data['x']) > 0:  # Check if 'x' is not None
+            print("x:", self.raw_data['x'])
+        else:
+            print("x: None")
+        
+        if 'K' in self.raw_data:  # Check if the keys exist
+            print("K:", self.raw_data['K'])
+
+        if self.raw_data['f'] is not None and len(self.raw_data['f']) > 0:  # Check if 'x' is not None
+            print("f:", self.raw_data['f'])
+        else:
+            print("f: None")
+        print("-" * 30)
 
 def header_results(all_output, all_input, method = None):
     """

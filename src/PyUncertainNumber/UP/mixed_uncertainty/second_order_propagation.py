@@ -32,7 +32,7 @@ def second_order_propagation_method(x: list, f:Callable = None, results:dict = N
     
     if results is None:
         results = {
-             'un': None,
+            'un': None,
             'bounds': None, 
             'min': {
                 'x': None,
@@ -177,7 +177,7 @@ def second_order_propagation_method(x: list, f:Callable = None, results:dict = N
             case _:
                 raise ValueError("Invalid UP method! endpoints_cauchy and subinterval reconstitution under development.")
 
-        results['bounds']= bounds
+        results['bounds']  = bounds
         results['min']['y']=  lower_bound
         results['max']['y']=  upper_bound
 

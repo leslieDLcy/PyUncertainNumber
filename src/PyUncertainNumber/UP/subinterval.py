@@ -3,7 +3,7 @@ import tqdm
 from typing import Callable
 from PyUncertainNumber.UP.mixed_uncertainty.cartesian_product import cartesian
 
-def subinterval_method(x:np.ndarray, f:Callable, n:np.array, results:dict = None,  save_raw_data = 'no'):
+def subinterval_method(x:np.ndarray, f:Callable, n_sub:np.array =3, results:dict = None,  save_raw_data = 'no'):
 
     """ 
     args:
@@ -11,9 +11,9 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, results:dict = None
            define its lower and upper bounds (interval).
         - f: A callable function that takes a 1D NumPy array of input values and returns the
            corresponding output(s).
-        - n: A scalar (integer) or a 1D NumPy array specifying the number of subintervals for 
+        - n_sub: A scalar (integer) or a 1D NumPy array specifying the number of subintervals for 
            each input variable. 
-            - If a scalar, all input variables are divided into the same number of subintervals.
+            - If a scalar, all input variables are divided into the same number of subintervals (defaults 3 divisions).
             - If an array, each element specifies the number of subintervals for the 
               corresponding input variable.
         - save_raw_data: Controls the amount of data returned:
@@ -53,7 +53,7 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, results:dict = None
         f = lambda x: x[0] + x[1] + x[2]
         
         # Run sampling method with n = 2
-        y = subinterval_method(x, f, n, save_raw_data = 'yes')
+        y = subinterval_method(x, f, n_sub, save_raw_data = 'yes')
 
         # Print the results
         print("-" * 30)
@@ -98,20 +98,20 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, results:dict = None
     # Create a sequence of values for each interval based on the number of divisions provided 
     # The divisions may be the same for all intervals or they can vary.
     m = x.shape[0]
-    print(f"Total number of input combinations for the subinterval method: {(n+1)**m}")
+    print(f"Total number of input combinations for the subinterval method: {(n_sub+1)**m}")
     
-    if type(n) == int: #All inputs have identical division
-        total = (n + 1)**m 
-        Xint = np.zeros((0,n + 1), dtype=object )
+    if type(n_sub) == int: #All inputs have identical division
+        total = (n_sub + 1)**m 
+        Xint = np.zeros((0,n_sub + 1), dtype=object )
         for xi in x:
-            new_X =  np.linspace(xi[0], xi[1], n+1)
-            Xint = np.concatenate((Xint, new_X.reshape(1,n+1)),  axis=0)
+            new_X =  np.linspace(xi[0], xi[1], n_sub+1)
+            Xint = np.concatenate((Xint, new_X.reshape(1,n_sub+1)),  axis=0)
     else: #Different divisions per input
         total = 1
         Xint = []   
-        for xc, c in zip(x, range(len(n))):
-            total *= (n[c]+1)
-            new_X =  np.linspace(xc[0], xc[1], n[c]+1)
+        for xc, c in zip(x, range(len(n_sub))):
+            total *= (n_sub[c]+1)
+            new_X =  np.linspace(xc[0], xc[1], n_sub[c]+1)
             
             Xint.append(new_X)
  
@@ -179,30 +179,30 @@ def subinterval_method(x:np.ndarray, f:Callable, n:np.array, results:dict = None
 
     return results
 
-# Example usage with different parameters for minimization and maximization
-f = lambda x: x[0] + x[1] + x[2]  # Example function
+# # Example usage with different parameters for minimization and maximization
+# f = lambda x: x[0] + x[1] + x[2]  # Example function
 
-# Determine input parameters for function and method
-x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-n=2
-# Call the method
-y = subinterval_method(x_bounds, f, n=n, save_raw_data = 'yes')
+# # Determine input parameters for function and method
+# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+# n=2
+# # Call the method
+# y = subinterval_method(x_bounds, f, n_sub=n, save_raw_data = 'yes')
 
-#Print the results
-print("-" * 30)
-print("bounds:", y['raw_data']['bounds'])
+# #Print the results
+# print("-" * 30)
+# print("bounds:", y['raw_data']['bounds'])
 
-print("-" * 30)
-print("Minimum:")
-print("x:", y['raw_data']['min']['x'])
-print("f:", y['raw_data']['min']['f'])
+# print("-" * 30)
+# print("Minimum:")
+# print("x:", y['raw_data']['min']['x'])
+# print("f:", y['raw_data']['min']['f'])
 
-print("-" * 30)
-print("Maximum:")
-print("x:", y['raw_data']['max']['x'])
-print("f:", y['raw_data']['max']['f'])
+# print("-" * 30)
+# print("Maximum:")
+# print("x:", y['raw_data']['max']['x'])
+# print("f:", y['raw_data']['max']['f'])
 
-print("-" * 30)
-print("Raw data:")
-print("x:", y['raw_data']['x'])
-print("f:", y['raw_data']['f']) 
+# print("-" * 30)
+# print("Raw data:")
+# print("x:", y['raw_data']['x'])
+# print("f:", y['raw_data']['f']) 

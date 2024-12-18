@@ -1021,7 +1021,7 @@ class Interval:
 
     # ---------------------methods---------------------#
 
-    @mpl.rc_context({"text.usetex": True})
+   # @mpl.rc_context({"text.usetex": True})
     def display(self, title="", ax=None, style="simple", **kwargs):
 
         if ax is None:

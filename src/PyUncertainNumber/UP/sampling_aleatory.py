@@ -3,7 +3,7 @@ import tqdm
 from typing import Callable
 from scipy.stats import qmc  # Import Latin Hypercube Sampling from SciPy
 
-def sampling_aleatory_method(x: list, f: Callable, n: int, method='monte_carlo', results:dict = None,      
+def sampling_aleatory_method(x: list, f: Callable, n_sam: int = 500, method='monte_carlo', results:dict = None,      
                         save_raw_data='no'):
     """
     args:
@@ -12,7 +12,7 @@ def sampling_aleatory_method(x: list, f: Callable, n: int, method='monte_carlo',
         f (Callable): A callable function that takes a 1D NumPy array of input 
                       values and returns the corresponding output(s). Can be None, 
                       in which case only samples are generated.
-        n (int): The number of samples to generate for the chosen sampling method.
+        n_sam (int): The number of samples to generate for the chosen sampling method (default 500 samples).
         method (str, optional): The sampling method to use. Choose from:
                                 - 'monte_carlo': Monte Carlo sampling (random sampling 
                                                  from the distributions specified in 
@@ -20,15 +20,11 @@ def sampling_aleatory_method(x: list, f: Callable, n: int, method='monte_carlo',
                                 - 'latin_hypercube': Latin Hypercube sampling (stratified 
                                                       sampling for better space coverage)
                                 Defaults to 'monte_carlo'.
-        conf_level (float, optional): The confidence level for calculating the K-S bounds. 
-                                    Defaults to 0.95 (95% confidence).
-        ks_bound_points (integer, optional): The number of points to evaluate K-S bounds at. 
-                                    Defaults to 100.
         save_raw_data (str, optional): Whether to save raw data. Options: 'yes', 'no'. 
                                     Defaults to 'no'.
     
     signature:
-        sampling_aleatory_method(x:list, f:Callable, n:int, method ='montecarlo', results:dict = None,    
+        sampling_aleatory_method(x:list, f:Callable, n_sam:int, method ='montecarlo', results:dict = None,    
                                     save_raw_data = 'no') -> dict of np.ndarrays
 
     note:
@@ -47,13 +43,15 @@ def sampling_aleatory_method(x: list, f: Callable, n: int, method='monte_carlo',
                 - 'x': All generated input samples.
                 - 'f': Corresponding output values for each input sample.
     example:
-        #TODO to add an example for this method.
+
     """
     if method not in ('monte_carlo', 'latin_hypercube'):
         raise ValueError("Invalid sampling method. Choose 'monte_carlo' or 'latin_hypercube'.")
 
     if save_raw_data not in ('yes', 'no'):
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
+    
+    print(f"Total number of input combinations for the {method} method: {n_sam}")
     
     if results is None:
         results = {
@@ -67,27 +65,27 @@ def sampling_aleatory_method(x: list, f: Callable, n: int, method='monte_carlo',
     
     if method == 'monte_carlo':   
         parameter_samples = np.array([
-            un.random(size=n) for un in x
+            un.random(size=n_sam) for un in x
         ])
 
     elif method == 'latin_hypercube':
         sampler = qmc.LatinHypercube(d=len(x))
-        lhd_samples = sampler.random(n=n)
+        lhd_samples = sampler.random(n=n_sam)
 
         parameter_samples = []  # Initialize an empty list to store the samples
  
-    for i, un in enumerate(x):  # Iterate over each UncertainNumber in the list 'x'
-        q_values = lhd_samples[:, i]  # Get the entire column of quantiles for this UncertainNumber
+        for i, un in enumerate(x):  # Iterate over each UncertainNumber in the list 'x'
+            q_values = lhd_samples[:, i]  # Get the entire column of quantiles for this UncertainNumber
     
-        # Now we need to calculate the ppf for each q value in the q_values array
-        ppf_values = []  # Initialize an empty list to store the ppf values for this UncertainNumber
-        for q in q_values:  # Iterate over each individual q value
-            ppf_value = un.ppf(q)  # Calculate the ppf value for this q
-            ppf_values.append(ppf_value)  # Add the calculated ppf value to the list
+            # Now we need to calculate the ppf for each q value in the q_values array
+            ppf_values = []  # Initialize an empty list to store the ppf values for this UncertainNumber
+            for q in q_values:  # Iterate over each individual q value
+                ppf_value = un.ppf(q)  # Calculate the ppf value for this q
+                ppf_values.append(ppf_value)  # Add the calculated ppf value to the list
 
-        parameter_samples.append(ppf_values)  # Add the list of ppf values to the main list
+            parameter_samples.append(ppf_values)  # Add the list of ppf values to the main list
 
-    parameter_samples = np.array(parameter_samples)  # Convert the list of lists to a NumPy array
+        parameter_samples = np.array(parameter_samples)  # Convert the list of lists to a NumPy array
         
     # Transpose to have each row as a sample
     parameter_samples = parameter_samples.T
@@ -140,18 +138,18 @@ def sampling_aleatory_method(x: list, f: Callable, n: int, method='monte_carlo',
 #         deflection = np.nan
 
 #     return deflection
-
+# # example
 # L = UN(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
 # I = UN(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
 # F = UN(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
 # E = UN(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
 
-# METHOD = "latin_hypercube"
+# METHOD = "monte_carlo"
 # base_path = ""
 
 # a = sampling_aleatory_method(x=[L, I, F, E], #['L', 'I', 'F', 'E'], 
 #           f = cantilever_beam_deflection, 
-#           n = 300, 
+#           n_sam = 300, 
 #           method = METHOD, 
 #           save_raw_data = "no"
 #          )

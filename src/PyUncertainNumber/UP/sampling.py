@@ -28,7 +28,7 @@ def index_to_bool_(index:np.ndarray,dim=2):
     index = np.asarray(index,dtype=int)
     return np.asarray([index==j for j in range(dim)],dtype=bool)
 
-def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo', results:dict = None,     
+def sampling_method(x: np.ndarray, f: Callable, n_sam: int = 500, method='monte_carlo', results:dict = None,     
                     save_raw_data='no', endpoints=False ):
     """
     args:
@@ -36,18 +36,18 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo', re
                             the two columns define its lower and upper bounds (interval).
         f (Callable): A callable function that takes a 1D NumPy array of input values and returns the 
                         corresponding output(s). Can be None, in which case only samples are generated.
-        n (int): The number of samples to generate for the chosen sampling method.
+        n_sam (int): The number of samples to generate for the chosen sampling method.
         method (str, optional): The sampling method to use. Choose from:
                                  - 'monte_carlo': Monte Carlo sampling (random sampling from uniform distributions)
-                                 - 'lhs': Latin Hypercube sampling (stratified sampling for better space coverage)
-                                Defaults to 'montecarlo'.
+                                 - 'latin_hypercube': Latin Hypercube sampling (stratified sampling for better space coverage)
+                                Defaults to 'monte_carlo'.
         endpoints (bool, optional): If True, include the interval endpoints in the sampling. 
                                     Defaults to False. 
         save_raw_data (str, optional): Whether to save raw data. Options: 'yes', 'no'. 
                                         Defaults to 'no'.
     
     signature:
-        sampling_method(x:np.ndarray, f:Callable, n:int, method ='montecarlo', endpoints=False, results:dict = None, save_raw_data = 'no') -> dict of np.ndarrays
+        sampling_method(x:np.ndarray, f:Callable, n_sam:int, method ='montecarlo', endpoints=False, results:dict = None, save_raw_data = 'no') -> dict of np.ndarrays
 
     note:
         - The function assumes that the na in `x` represent uniform distributions.
@@ -72,8 +72,8 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo', re
         # Define the function
         f = lambda x: x[0] + x[1] + x[2]
         
-        # Run sampling method with n = 5
-        y = sampling_method(x, f, n=5, method='monte_carlo', endpoints=False, save_raw_data='no')
+        # Run sampling method with n = 500
+        y = sampling_method(x, f, n_sam=500, method='monte_carlo', endpoints=False, save_raw_data='no')
 
         # Print the results
         print("-" * 30)
@@ -110,16 +110,17 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo', re
                 'bounds': None
                 }
             }
-        
+    print(f"Total number of input combinations for the {method} method: {n_sam}")    
+    
     m = x.shape[0]
     lo = x[:, 0]
     hi = x[:, 1]
 
     if method == 'monte_carlo':
-        X = lo + (hi - lo) * np.random.rand(n, m)
+        X = lo + (hi - lo) * np.random.rand(n_sam, m)
     elif method == 'latin_hypercube':
         sampler = qmc.LatinHypercube(m)
-        X = lo + (hi - lo) * sampler.random(n)
+        X = lo + (hi - lo) * sampler.random(n_sam)
     else:
         raise ValueError("Invalid sampling method. Choose 'monte_carlo' or 'latin_hypercube'.")
 
@@ -192,7 +193,7 @@ def sampling_method(x: np.ndarray, f: Callable, n: int, method='monte_carlo', re
 # x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
 # n=20
 # # Call the method
-# y = sampling_method(x_bounds,f=None, n=n, endpoints= True, save_raw_data = 'yes')
+# y = sampling_method(x_bounds,f=f, n_sam=n, method  ='latin_hypercube' , endpoints= True, save_raw_data = 'yes')
 # print(y)
 # print("-" * 30)
 # print("Minimum:")

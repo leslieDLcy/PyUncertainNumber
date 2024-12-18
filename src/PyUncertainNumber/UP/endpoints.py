@@ -48,24 +48,9 @@ def endpoints_method(x:np.ndarray, f:Callable, results:dict = None, save_raw_dat
 
     # Call the method
     y = endpoints_method(x_bounds, f)
-
-    print("-" * 30)
-    print("bounds:", y['raw_data']['bounds'])
-    print("-" * 30)
-    print("Minimum:")
-    print("x:", y['raw_data']['min']['x'])
-    print("f:", y['raw_data']['min']['f'])
-
-    print("-" * 30)
-    print("Maximum:")
-    print("x:", y['raw_data']['max']['x'])
-    print("f:", y['raw_data']['max']['f'])
-
-    print("-" * 30)
-    print("Raw data:")
-    print("x:", y['raw_data']['x'])
-    print("f:", y['raw_data']['f']) 
-
+    # print the results
+    y.print()
+    
     """
     # Create a sequence of values for each interval based on the number of divisions provided 
     # The divisions may be the same for all intervals or they can vary.
@@ -74,25 +59,6 @@ def endpoints_method(x:np.ndarray, f:Callable, results:dict = None, save_raw_dat
     
     # create an array with the unique combinations of all intervals 
     X = cartesian(*x) 
-
-    if results is None:
-        results = {
-             'un': None,
-           
-            'raw_data': {                
-                'x': None,
-                'f': None,
-                'min': {
-                        'x': None,
-                        'f': None
-                    },
-                'max': {
-                        'x': None,
-                        'f': None,
-                    },
-                'bounds': None
-                }
-            }
     
     # propagates the epistemic uncertainty through subinterval reconstitution   
     if f is not None:

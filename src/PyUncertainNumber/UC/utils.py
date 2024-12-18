@@ -13,7 +13,6 @@ from ..pba.params import Params
 
 # TODO create a defending mechanism for parsing '[15+-10%]' as only '[15 +- 10%]' works now
 
-
 def tranform_ecdf(s, display=False, **kwargs):
     """ plot the CDF return the quantile
 

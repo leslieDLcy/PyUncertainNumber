@@ -3,8 +3,11 @@ import tqdm
 from typing import Callable
 from PyUncertainNumber.UP.mixed_uncertainty.cartesian_product import cartesian
 from PyUncertainNumber.UP.mixed_uncertainty.extreme_point_x import extreme_pointX
+from PyUncertainNumber.UP.utils import propagation_results
 
-def endpoints_extremepoint_method(x:np.ndarray, f:Callable, results:dict = None, save_raw_data = 'no'):
+def extremepoints_method(x:np.ndarray, f:Callable, 
+                                   results_class= propagation_results, 
+                                   save_raw_data = 'no')-> propagation_results:  # Specify return type
 
     """ 
     args:
@@ -20,7 +23,7 @@ def endpoints_extremepoint_method(x:np.ndarray, f:Callable, results:dict = None,
 
 
     signature:
-        endpoints_extremepoint_method(x:np.ndarray, f:Callable, results:dict, save_raw_data = 'no') -> dict
+        endpoints_extremepoints_method(x:np.ndarray, f:Callable, results:dict, save_raw_data = 'no') -> dict
 
     note:
         - Performs uncertainty propagation using the Extreme Point Method for monotonic functions. 
@@ -30,7 +33,7 @@ def endpoints_extremepoint_method(x:np.ndarray, f:Callable, results:dict = None,
         - If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.
 
     return:
-        - dict: A dictionary containing the results:
+        - A propagation_results object containing the results.
           - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None). 
           - 'sign_x': A NumPy array of shape (num_outputs, d) containing the signs (i.e., positive, negative) 
                     used to determine the extreme points for each output.
@@ -45,32 +48,18 @@ def endpoints_extremepoint_method(x:np.ndarray, f:Callable, results:dict = None,
             - 'f': Corresponding output values for each input sample.
 
     # Example usage with different parameters for minimization and maximization
-    f = lambda x: x[0] + x[1] + x[2]  # Example function
-
-    # Determine input parameters for function and method
-    x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-    n=2
-    # Call the method
-    y = endpoints_extremepoint_method(x_bounds, f)
-    print(y['raw_data']['sign_x'])
-    print("-" * 30)
-    print("bounds:", y['raw_data']['bounds'])
-    print("-" * 30)
-    print("Minimum:")
-    print("x:", y['raw_data']['min']['x'])
-    print("f:", y['raw_data']['min']['f'])
-
-    print("-" * 30)
-    print("Maximum:")
-    print("x:", y['raw_data']['max']['x'])
-    print("f:", y['raw_data']['max']['f'])
-
-    print("-" * 30)
-    print("Raw data:")
-    print("x:", y['raw_data']['x'])
-    print("f:", y['raw_data']['f']) 
-
+        f = lambda x: x[0] + x[1] + x[2]  # Example function
+        # Determine input parameters for function and method
+        x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+        # Call the method
+        y = endpoints_extremepoint_method(x_bounds, f)
+        # print results
+        y.print()
+    
     """
+
+    results = results_class()
+
     # create an array with the unique combinations of all intervals 
     X = cartesian(*x) 
 
@@ -78,27 +67,7 @@ def endpoints_extremepoint_method(x:np.ndarray, f:Callable, results:dict = None,
     inds = np.array([1] + [2**i + 1 for i in range(d)])  # Generate indices
     Xeval = X[inds - 1]  # Select rows based on indices (adjusting for 0-based indexing)
 
-    print(f"Total number of input combinations for the endpoints extreme method: {len(inds - 1)}") 
-
-    if results is None:
-        results = {
-             'un': None,
-           
-            'raw_data': {                
-                'x': None,
-                'f': None,
-                'min': {
-                        'x': None,
-                        'f': None
-                    },
-                'max': {
-                        'x': None,
-                        'f': None,
-                    },
-                'bounds': None,
-                'signs_x': None,
-                }
-            }
+    print(f"Total number of input combinations for the endpoints extreme points method: {d + 3}") 
     
     # propagates the epistemic uncertainty through subinterval reconstitution   
     if f is not None:
@@ -134,30 +103,6 @@ def endpoints_extremepoint_method(x:np.ndarray, f:Callable, results:dict = None,
             lower_bound[i] = f(Xsign[2*i, :])
             upper_bound[i] = f(Xsign[2*i + 1, :])
 
-        results = {
-            'raw_data':{
-                'f': all_output,
-                'x': Xeval,
-                
-                'min': {
-                    'f': lower_bound,
-                    },
-                'max': {
-                    'f': upper_bound,
-                    },
-                'sign_x': signX
-
-            }
-           
-        }
-        if num_outputs == 1:  # Single output
-            results['raw_data']['bounds'] = np.array([results['raw_data']['min']['f'][0], results['raw_data']['max']['f'][0]])
-        else:  # Multiple outputs
-            bounds = []
-            for i in range(num_outputs):
-                bounds.append([results['raw_data']['min']['f'][i], results['raw_data']['max']['f'][i]])
-            results['raw_data']['bounds'] = np.array(bounds)
-        
         min_indices = np.zeros((d,num_outputs))
         max_indices = np.zeros((d,num_outputs))
         for i in range(num_outputs):  # Iterate over outputs
@@ -165,39 +110,30 @@ def endpoints_extremepoint_method(x:np.ndarray, f:Callable, results:dict = None,
             max_indices[:,i] = Xsign[2*i+1, :]
             
         # Convert to 2D arrays (if necessary) and append
-        results['raw_data']['min']['x'] = min_indices
-        results['raw_data']['max']['x'] = max_indices
+        for i in range(num_outputs):
+            results.raw_data['min'] = np.append(results.raw_data['min'], {'x': min_indices[:, i], 'f': lower_bound[i]})
+            results.raw_data['max'] = np.append(results.raw_data['max'], {'x': max_indices[:, i], 'f': upper_bound[i]})
+            results.raw_data['bounds'] = np.vstack([results.raw_data['bounds'], np.array([lower_bound[i], upper_bound[i]])]) if results.raw_data['bounds'].size else np.array([lower_bound[i], upper_bound[i]])
+
+        results.add_raw_data(sign_x=signX)
+        results.raw_data['x']= Xeval
+        results.raw_data['f']= all_output
+    
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results['raw_data'] = {'f': None, 'x': Xeval}
+        results.add_raw_data(x= Xeval)  # Store Xeval in raw_data['x'] even if f is None
     
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
     return results
 
-# # Example usage with different parameters for minimization and maximization
-# f = lambda x: x[0] + x[1] + x[2]  # Example function
+# Example usage with different parameters for minimization and maximization
+f = lambda x: x[0] + x[1] + x[2]  # Example function
 
-# # Determine input parameters for function and method
-# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-# n=2
-# # Call the method
-# y = endpoints_extremepoint_method(x_bounds, f)
-# print(y['raw_data']['sign_x'])
-# print("-" * 30)
-# print("bounds:", y['raw_data']['bounds'])
-# print("-" * 30)
-# print("Minimum:")
-# print("x:", y['raw_data']['min']['x'])
-# print("f:", y['raw_data']['min']['f'])
-
-# print("-" * 30)
-# print("Maximum:")
-# print("x:", y['raw_data']['max']['x'])
-# print("f:", y['raw_data']['max']['f'])
-
-# print("-" * 30)
-# print("Raw data:")
-# print("x:", y['raw_data']['x'])
-# print("f:", y['raw_data']['f']) 
+# Determine input parameters for function and method
+x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+n=2
+# Call the method
+y = endpoints_extremepoints_method(x_bounds, f=f, save_raw_data = 'yes')
+y.print()
