@@ -1,6 +1,7 @@
 """distribution constructs """
 import numpy as np
 import scipy.stats as sps
+import matplotlib as mpl
 from warnings import *
 from dataclasses import dataclass
 from typing import *
@@ -8,6 +9,7 @@ from typing import *
 from ..characterisation.utils import pl_pcdf, pl_ecdf
 import scipy
 from .params import Params
+
 
 # a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
 named_dists = {
@@ -145,7 +147,12 @@ class Distribution:
     def __repr__(self):
         # if self.sample_data is not None:
         #     return "sample-approximated distribution object"
-        return f"dist ~ {self.dist_family}{self.dist_params}"
+        if self.dist_params is not None:
+            return f"dist ~ {self.dist_family}{self.dist_params}"
+        elif self.sample_data is not None:
+            return "sample-approximated distribution object"
+        else:
+            return "wrong initialisation"
 
     def rep(self):
         """ the dist object either sps dist or sample approximated or pbox dist """
@@ -155,11 +162,12 @@ class Distribution:
     def sample(self):
         pass
 
-    def display(self):
+    @mpl.rc_context({"text.usetex": True})
+    def display(self, **kwargs):
         """display the distribution"""
         if self.sample_data is not None:
-            return pl_ecdf(self.sample_data)
-        pl_pcdf(self.dist)
+            return pl_ecdf(self.sample_data, **kwargs)
+        pl_pcdf(self.dist, **kwargs)
 
     def _get_hint(self):
         pass

@@ -42,6 +42,8 @@ def pl_pcdf(dist: type[sps.rv_continuous | sps.rv_discrete], ax=None, title=None
     x_values = dist.ppf(Params.p_values)
 
     ax.plot(x_values, Params.p_values, **kwargs)
+    ax.set_xlabel(r"$x$")
+    ax.set_ylabel(r"$\Pr(X \leq x)$")
     return ax
 
 
@@ -57,6 +59,8 @@ def pl_ecdf(s, ax=None, return_value=False, **kwargs):
         fig, ax = plt.subplots()
     # ax.plot(x_support, p_values, color='g')
     ax.step(sth.cdf.quantiles, sth.cdf.probabilities, where='post', **kwargs)
+    ax.set_xlabel(r"$x$")
+    ax.set_ylabel(r"$\Pr(X \leq x)$")
     if not return_value:
         return ax
     else:

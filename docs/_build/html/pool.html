@@ -1,16 +1,16 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="../">
+<html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>&lt;no title&gt; - PyUncertainNumber documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     
     
 
@@ -167,7 +167,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyUncertainNumber  documentation</div></a>
+      <a href="index.html"><div class="brand">PyUncertainNumber  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -188,34 +188,34 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   <div class="sidebar-logo-container">
-    <img class="sidebar-logo" src="../_static/UNlogo3.png" alt="Logo"/>
+    <img class="sidebar-logo" src="_static/UNlogo3.png" alt="Logo"/>
   </div>
   
   <span class="sidebar-brand-text">PyUncertainNumber  documentation</span>
   
-</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
-<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User Guides</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../guides/installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/uc.html">Characterisation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/up.html">Propagation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/uc.html">Characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/up.html">Propagation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">probability bounds analysis</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pbox.html">Probability box</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../cbox.html">Confidence box</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../interval_analysis.html">interval analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbox.html">Probability box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cbox.html">Confidence box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interval_analysis.html">interval analysis</a></li>
 </ul>
 
 </div>
@@ -236,7 +236,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/stubs/quickstart-stub.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/pool.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -256,44 +256,10 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <p>Install <a class="reference external" href="https://cookiecutter.readthedocs.io/en/latest/"><code class="docutils literal notranslate"><span class="pre">cookiecutter</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><style type="text/css">
-span.prompt1:before {
-  content: "$ ";
-}
-</style><span class="prompt1">pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.</span>
-</pre></div></div><p>Generate a Python package structure using <a class="reference external" href="https://github.com/py-pkgs/py-pkgs-cookiecutter"><code class="docutils literal notranslate"><span class="pre">py-pkgs-cookiecutter</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">cookiecutter<span class="w"> </span>https://github.com/py-pkgs/py-pkgs-cookiecutter.git</span>
-</pre></div></div><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pkg
-├── .github                    ┐
-│   └── workflows              │ GitHub Actions workflow
-│       └── ci-cd.yml          ┘
-├── .gitignore                 ┐
-├── .readthedocs.yml           │
-├── CHANGELOG.md               │
-├── CONDUCT.md                 │
-├── CONTRIBUTING.md            │
-├── docs                       │
-│   ├── make.bat               │
-│   ├── Makefile               │
-│   ├── requirements.txt       │
-│   ├── changelog.md           │
-│   ├── conduct.md             │
-│   ├── conf.py                │ Package documentation
-│   ├── contributing.md        │
-│   ├── index.md               │
-│   └── usage.ipynb            │
-├── LICENSE                    │
-├── README.md                  ┘
-├── pyproject.toml             ┐ 
-├── src                        │
-│   └── pkg                    │ Package source code, metadata,
-│       ├── __init__.py        │ and build instructions 
-│       └── pkg.py             ┘
-└── tests                      ┐
-    └── test_pkg.py            ┘ Package tests
-</pre></div>
-</div>
+          <p>PyUncertainNumber is an generic computational tasks focusing on uncertainty quantification.
+It provides a research-grade computing environment for uncertainty characterisation, propagation, validation
+and uncertainty extrapolation. Four key modules comprised of the UQ ecosystem:
+Uncertainty characterisation module, Uncertainty propagation module, Uncertainty validation module and Uncertainty extrapolation module.</p>
 
         </article>
       </div>
@@ -326,11 +292,11 @@ span.prompt1:before {
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
-    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../_static/copybutton.js?v=f281be69"></script>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

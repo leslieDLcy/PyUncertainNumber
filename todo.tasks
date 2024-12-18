@@ -88,15 +88,7 @@ preparation for the December workshop:
     ☐ package documentation @high 
     ✔ slides in Beams @done (17/11/2024, 20:17:31)
     ☐ notebook on installation
-    ☐ notebook on the Cantilever beam example
-
-
-
-
-
-
-
-
+    ✔ notebook on the Cantilever beam example @done (17/12/2024, 09:41:23)
 
 
     
@@ -106,11 +98,14 @@ Overarching:
 
 
 
+website workshop:
+    ✔ GDPR data protection disclaimer @done (17/12/2024, 09:52:08)
+    ✔ experince Python and UQ background @done (17/12/2024, 09:59:31)
+    ☐ if there's lunch
+    ✔ only email address is required @done (17/12/2024, 09:56:36)ß
+    ✔ question on the form: either come in person or online @done (17/12/2024, 09:57:21)
 
 
 
-
-
-
-
-
+some questions for the workshop:
+    ☐ levels of abstractions

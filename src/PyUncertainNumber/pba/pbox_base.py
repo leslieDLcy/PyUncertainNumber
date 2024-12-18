@@ -357,6 +357,7 @@ class Pbox:
 
     def cuth(self, p=0.5):
         """ get the bounds on the quantile at any particular probability level"""
+        # TODO have a conservative cut.
         ind = find_nearest(Params.p_values, p)
         return nInterval(self.left[ind], self.right[ind])
 
