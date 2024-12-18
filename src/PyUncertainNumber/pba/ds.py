@@ -54,8 +54,7 @@ class DempsterShafer:
 
     def to_pbox(self):
         intervals, masses = self.disassemble()
-        a, b = stacking(intervals, masses)
-        return pbox_fromDiscreteF(a, b)
+        return stacking(intervals, masses, return_pbox=True)
 
 
 def mixture_ds(l_ds, display=False):

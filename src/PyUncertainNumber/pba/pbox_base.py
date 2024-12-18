@@ -367,6 +367,7 @@ class Pbox:
 
 
     def _unary(self, *args, function=lambda x: x):
+        """ for monotonic unary functions only """
 
         ints = [function(nInterval(l, r), *args)
                 for l, r in zip(self.left, self.right)]
@@ -1132,8 +1133,9 @@ class Pbox:
     def to_ds(self, discretisation=Params.steps):
         """convert to ds object"""
         p_values = np.arange(0, discretisation) / discretisation
+        # TODO use outer approximation
         interval_list = [self.cuth(p_v) for p_v in p_values]
-        return DempsterShafer(interval_list, p_values)
+        return DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation))
 
 
 # * ---------------------constructors--------------------- *#

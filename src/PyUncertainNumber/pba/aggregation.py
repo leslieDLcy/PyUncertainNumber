@@ -6,7 +6,7 @@ from .ds import DempsterShafer, mixture_ds
 from .utils import stacking
 
 
-def stochastic_mixture(l_uns, weights=None, display=False):
+def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
     """ it could work for either Pbox, distribution, DS structure or Intervals 
 
     args:
@@ -18,7 +18,7 @@ def stochastic_mixture(l_uns, weights=None, display=False):
         - currently only accepts same type objects
     """
     if isinstance(l_uns[0], nInterval | Interval | list):
-        return stacking(l_uns, weights, display=display)
+        return stacking(l_uns, weights, display=display, **kwargs)
     elif isinstance(l_uns[0], Pbox):
         return mixture_pbox(l_uns, weights, display=display)
     elif isinstance(l_uns[0], DempsterShafer):
