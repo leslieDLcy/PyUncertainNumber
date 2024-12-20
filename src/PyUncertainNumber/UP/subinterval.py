@@ -1,9 +1,13 @@
 import numpy as np
 import tqdm
 from typing import Callable
-from PyUncertainNumber.UP.mixed_uncertainty.cartesian_product import cartesian
+from PyUncertainNumber.UP.cartesian_product import cartesian
+from PyUncertainNumber.UP.utils import propagation_results
 
-def subinterval_method(x:np.ndarray, f:Callable, n_sub:np.array =3, results:dict = None,  save_raw_data = 'no'):
+def subinterval_method(x:np.ndarray, f:Callable, 
+                       results: propagation_results = None,
+                       n_sub:np.array =3,
+                       save_raw_data = 'no') -> propagation_results:  # Specify return type
 
     """ 
     args:
@@ -56,44 +60,11 @@ def subinterval_method(x:np.ndarray, f:Callable, n_sub:np.array =3, results:dict
         y = subinterval_method(x, f, n_sub, save_raw_data = 'yes')
 
         # Print the results
-        print("-" * 30)
-        print("bounds:", y['raw_data']['bounds'])
-
-        print("-" * 30)
-        print("Minimum:")
-        print("x:", y['raw_data']['min']['x'])
-        print("f:", y['raw_data']['min']['f'])
-
-        print("-" * 30)
-        print("Maximum:")
-        print("x:", y['raw_data']['max']['x'])
-        print("f:", y['raw_data']['max']['f'])
-
-        print("-" * 30)
-        print("Raw data")
-        print("x:",y['raw_data']['x'])
-        print("type_x:",type(y['raw_data']['x']))
-        print("f:", y['raw_data']['f'])
+        y.print()
 
     """
     if results is None:
-        results = {
-             'un': None,
-           
-            'raw_data': {                
-                'x': None,
-                'f': None,
-                'min': {
-                        'x': None,
-                        'f': None
-                    },
-                'max': {
-                        'x': None,
-                        'f': None,
-                    },
-                'bounds': None
-                }
-            }
+        results = propagation_results()  # Create an instance of propagation_results
     
     # Create a sequence of values for each interval based on the number of divisions provided 
     # The divisions may be the same for all intervals or they can vary.
@@ -123,57 +94,33 @@ def subinterval_method(x:np.ndarray, f:Callable, n_sub:np.array =3, results:dict
     if f is not None:
         all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Evaluating samples")])
 
-        if all_output.ndim == 1:
-            all_output = all_output.reshape(-1, 1)
-
-        results = { 'raw_data':{
-                        'min': {
-                            'f': np.min(all_output, axis=0),
-                            },
-                        'max': {
-                            'f': np.max(all_output, axis=0),
-                            }
-
-                        }
-                }
+        try:
+            num_outputs = len(all_output[0])
+        except TypeError:
+            num_outputs = 1  # If f returns a single value
         
-        if all_output.shape[1] == 1:  # Single output
-            results['raw_data']['bounds'] = np.array([results['raw_data']['min']['f'][0], results['raw_data']['max']['f'][0]])
-        else:  # Multiple outputs
-            bounds = np.empty((all_output.shape[1], 2))
-            for i in range(all_output.shape[1]):
-                bounds[i, :] = np.array([results['raw_data']['min']['f'][i], results['raw_data']['max']['f'][i]])
-            results['raw_data']['bounds'] = bounds
+         # Reshape all_output to a 2D array (Corrected)
+        all_output = np.array(all_output).reshape(-1, num_outputs)  
 
-        results['raw_data']['min']['x'] = []
-        results['raw_data']['max']['x'] = []
+        # Calculate lower and upper bounds for each output
+        lower_bound = np.min(all_output, axis=0)
+        upper_bound = np.max(all_output, axis=0)
 
-        for i in range(all_output.shape[1]):  # Iterate over outputs
-            min_indices = np.where(all_output[:, i] == results['raw_data']['min']['f'][i])[0]
-            max_indices = np.where(all_output[:, i] == results['raw_data']['max']['f'][i])[0]
-            
-            # Convert to 2D arrays (if necessary) and append
-            results['raw_data']['min']['x'].append(X[min_indices].reshape(-1, m))  # Reshape to (-1, m)
-            results['raw_data']['max']['x'].append(X[max_indices].reshape(-1, m))
+        # Find indices of minimum and maximum values for each output
+        min_indices = np.array([np.where(all_output[:, i] == lower_bound[i])[0] for i in range(num_outputs)])
+        max_indices = np.array([np.where(all_output[:, i] == upper_bound[i])[0] for i in range(num_outputs)])
 
-        # Concatenate the arrays in the lists into 2D arrays (if necessary)
-        if len(results['raw_data']['min']['x']) > 1:
-            results['raw_data']['min']['x'] = np.concatenate(results['raw_data']['min']['x'], axis=0)
-        else:
-            results['raw_data']['min']['x'] = results['raw_data']['min']['x'][0]  # Take the first (and only) array
+        # Convert to 2D arrays (if necessary) and append
+        for i in range(num_outputs):
+            results.raw_data['min'] = np.append(results.raw_data['min'], {'x': X[min_indices[i]], 'f': lower_bound[i]})
+            results.raw_data['max'] = np.append(results.raw_data['max'], {'x': X[max_indices[i]], 'f': upper_bound[i]})
+            results.raw_data['bounds'] = np.vstack([results.raw_data['bounds'], np.array([lower_bound[i], upper_bound[i]])]) if results.raw_data['bounds'].size else np.array([lower_bound[i], upper_bound[i]])
 
-        if len(results['raw_data']['max']['x']) > 1:
-            results['raw_data']['max']['x'] = np.concatenate(results['raw_data']['max']['x'], axis=0)
-        else:
-            results['raw_data']['max']['x'] = results['raw_data']['max']['x'][0]  # Take the first (and only) array
-        
-                #if save_raw_data == 'yes':
-        results['raw_data']['f'] = all_output
-        results['raw_data']['x'] = X
+        results.raw_data['f'] = all_output
+        results.raw_data['x'] = X
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results['raw_data'] = {'f': None, 'x': X}
-    
+        results.add_raw_data(x= X)
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
@@ -186,23 +133,7 @@ def subinterval_method(x:np.ndarray, f:Callable, n_sub:np.array =3, results:dict
 # x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
 # n=2
 # # Call the method
-# y = subinterval_method(x_bounds, f, n_sub=n, save_raw_data = 'yes')
+# y = subinterval_method(x_bounds, f=None, n_sub=n, save_raw_data = 'yes')
 
 # #Print the results
-# print("-" * 30)
-# print("bounds:", y['raw_data']['bounds'])
-
-# print("-" * 30)
-# print("Minimum:")
-# print("x:", y['raw_data']['min']['x'])
-# print("f:", y['raw_data']['min']['f'])
-
-# print("-" * 30)
-# print("Maximum:")
-# print("x:", y['raw_data']['max']['x'])
-# print("f:", y['raw_data']['max']['f'])
-
-# print("-" * 30)
-# print("Raw data:")
-# print("x:", y['raw_data']['x'])
-# print("f:", y['raw_data']['f']) 
+# y.print()

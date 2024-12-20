@@ -21,7 +21,10 @@ class propagation_results:
     """
 
     def __init__(self, un: np.ndarray = None, raw_data: dict = None):
-        self.un = un if un is not None else np.array([])
+        if un is None:
+            self.un = np.array([])  # Initialize as an empty array if un is None
+        else:
+            self.un = un 
 
         if raw_data is not None:
             self.raw_data = raw_data
@@ -33,12 +36,15 @@ class propagation_results:
                 'max': np.array([]),
                 'bounds': np.array([])
             }
-    def add_raw_data(self, x=None, K=None, sign_x:np.ndarray = None):
+
+    def add_raw_data(self, x=None, f=None, K=None, sign_x:np.ndarray = None):
         """Adds raw data to the results."""
         if x is not None:
             self.raw_data['x'] = x
         if K is not None:
             self.raw_data['K'] = K
+        if f is not None:
+            self.raw_data['f'] = f
         if sign_x is not None:
             if isinstance(sign_x, np.ndarray) and len(sign_x.shape) > 1:  # Multiple outputs
                 self.raw_data['sign_x'] = sign_x
@@ -48,77 +54,204 @@ class propagation_results:
     def print(self):
         """Prints the results in a formatted way, handling None values and multiple outputs."""
 
-        num_outputs = 1 if len(self.raw_data['bounds'].shape) == 1 else self.raw_data['bounds'].shape[0]
+        if self.raw_data['f'] is not None:  # Check if 'f' exists and is not None
+            if len(self.raw_data['f'].shape) == 1:  # 1D array, single output
+                num_outputs = 1
+            else:  # 2D array, multiple outputs
+                num_outputs = self.raw_data['f'].shape[1]  # Number of columns
+        elif self.raw_data['bounds'] is not None and len(self.raw_data['bounds']) > 0 :  # Check if 'bounds' exists and is not None (Corrected)
+            if len(self.raw_data['bounds'].shape) == 1:  # 1D array, single output
+                num_outputs = 1
+            else:  # 2D array, multiple outputs
+                num_outputs = self.raw_data['bounds'].shape[0]  # Number of rows (Corrected)
+        else:
+            num_outputs = 0  # Or handle the case where 'f' is None appropriately
 
         for i in range(num_outputs):
             print("-" * 30)
             print(f"Output {i+1}:")
-
             print("-" * 30)
-            if 'un' in self.un and len(self.un) > 0:
-                print("Uncertain Number:", self.un[i])
+
+            if self.un is not None:
+                if num_outputs == 1:
+                    print("Uncertain Number:", self.un)
+                else:
+                    print("Uncertain Number:", self.un[i])            
             else:
                 print("Uncertain Number: None")
-            print("-" * 30)
-            if 'bounds' in self.raw_data and len(self.raw_data['bounds']) > 0:
+
+            if 'bounds' in self.raw_data and self.raw_data['bounds'] is not None and len(self.raw_data['bounds']) > 0:
+                print("-" * 30)
                 if num_outputs == 1:
                     print("Bounds:", self.raw_data['bounds'])
                 else:
                     print("Bounds:", self.raw_data['bounds'][i])
-            else:
-                print("Bounds: None")
 
-            print("-" * 30)
-            print("Minimum:")
-            if 'min' in self.raw_data and len(self.raw_data['min']) > 0:
+            if 'min' in self.raw_data and self.raw_data['min'] is not None and len(self.raw_data['min']) > 0:
+                print("-" * 30)
+                print("Minimum:")
                 min_data = self.raw_data['min'][i]
-                print("x:", min_data.get('x'))
-                print("f:", min_data.get('f'))
-
-                # Print additional results only for local_optimisation
-                if 'niterations' in min_data:  # Check if the keys exist
-                    print("niterations:", min_data.get('niterations'))
-                    print("nfevaluations:", min_data.get('nfevaluations'))
-                    print("final_simplex:", min_data.get('final_simplex'))
-            else:
-                print("x: None")
-                print("f: None")
-
-            print("-" * 30)
-            print("Maximum:")
-            if 'max' in self.raw_data and len(self.raw_data['max']) > 0:
+                if min_data.get('f') is not None:
+                    print("f:", min_data.get('f'))
+                    if min_data.get('x') is None:  # Handle the case where 'x' is None
+                        print("x: None") 
+                    else:
+                        print("x:", min_data.get('x'))
+                    #Print additional results only for local_optimisation
+                    if 'final_simplex' in min_data:
+                        print("niterations:", min_data.get('niterations'))
+                        print("nfevaluations:", min_data.get('nfevaluations'))
+                        print("final_simplex:", min_data.get('final_simplex'))
+                        print("message:", min_data.get('message'))
+                    if 'ngenerations' in min_data:
+                        print("niterations:", min_data.get('niterations'))
+                        print("ngenerations", min_data.get('ngenerations'))
+                        print("message:", min_data.get('message'))
+                
+            if 'max' in self.raw_data and self.raw_data['max'] is not None and len(self.raw_data['max']) > 0:
+                print("-" * 30)
+                print("Maximum:")
                 max_data = self.raw_data['max'][i]
-                print("x:", max_data.get('x'))
-                print("f:", max_data.get('f'))
+                if max_data.get('f') is not None:
+                    print("f:", max_data.get('f'))
+                    if max_data.get('x') is None:  # Handle the case where 'x' is None
+                        print("x: None") 
+                    else:
+                        print("x:", max_data.get('x'))
+                    if 'final_simplex' in max_data:                        
+                        print("niterations:", max_data.get('niterations'))
+                        print("nfevaluations:", max_data.get('nfevaluations'))
+                        print("final_simplex:", max_data.get('final_simplex'))
+                        print("message:", max_data.get('message'))
+                    if 'ngenerations' in max_data:                        
+                        print("niterations:", max_data.get('niterations'))
+                        print("ngenerations:", max_data.get('ngenerations'))
+                        print("message:", max_data.get('message'))
 
-                # Print additional results only for local_optimisation
-                if 'niterations' in max_data:  # Check if the keys exist
-                    print("niterations:", max_data.get('niterations'))
-                    print("nfevaluations:", max_data.get('nfevaluations'))
-                    print("final_simplex:", max_data.get('final_simplex'))
-
-            else:
-                print("x: None")
-                print("f: None")
-        
-        print("-" * 30)
-        if 'sign_x' in self.raw_data:
-            print("sign_x:", self.raw_data['sign_x'][i])
+            if 'sign_x' in self.raw_data:
+                print("-" * 30)
+                print("sign_x:", self.raw_data['sign_x'][i]) 
+       
         print("-" * 30)
         print("Input combinations and corresponding output(s):")
         if self.raw_data['x'] is not None and len(self.raw_data['x']) > 0:  # Check if 'x' is not None
             print("x:", self.raw_data['x'])
         else:
             print("x: None")
-        
+            
         if 'K' in self.raw_data:  # Check if the keys exist
+            print("-" * 30)
             print("K:", self.raw_data['K'])
+        print("-" * 30)
 
         if self.raw_data['f'] is not None and len(self.raw_data['f']) > 0:  # Check if 'x' is not None
-            print("f:", self.raw_data['f'])
+            print("f:", self.raw_data['f'])  # Print directly if single output
         else:
             print("f: None")
         print("-" * 30)
+    # def print(self):
+    #     """Prints the results in a formatted way, handling None values and multiple outputs."""
+
+    #     if self.raw_data['f'] is not None:  # Check if 'f' exists and is not None
+    #         if len(self.raw_data['f'].shape) == 1:  # 1D array, single output
+    #             num_outputs = 1
+    #         else:  # 2D array, multiple outputs
+    #             num_outputs = self.raw_data['f'].shape[1]  # Number of columns
+    #     else:
+    #         num_outputs = 0  # Or handle the case where 'f' is None appropriately
+
+
+    #     for i in range(num_outputs):
+    #         print("-" * 30)
+    #         print(f"Output {i+1}:")
+
+    #         print("-" * 30)
+    #         if 'un' in self.un and len(self.un) > 0:
+    #             print("Uncertain Number:", self.un[i])
+    #         else:
+    #             print("Uncertain Number: None")
+
+    #         if self.raw_data['bounds'] is not None and len(self.raw_data['bounds']) > 0:
+    #             print("-" * 30)
+    #             if num_outputs == 1:
+    #                 print("Bounds:", self.raw_data['bounds'])
+    #             else:
+    #                 print("Bounds:", self.raw_data['bounds'][i])
+
+    #         if self.raw_data['min'] is not None and len(self.raw_data['min']) > 0:
+    #             print("-" * 30)
+    #             print("Minimum:")
+    #             if num_outputs == 1:  # Handle single output case
+    #                 min_data = self.raw_data['min'][0]  # Access the first element directly
+    #             else:
+    #                 min_data = self.raw_data['min'][i]
+                
+    #             if min_data.get('f') is not None :  # Only print if 'x' is present
+    #                 print("x:", min_data.get('x'))
+    #                 print("f:", min_data.get('f'))
+
+    #                 # # Print additional results only for local_optimisation
+    #                 # if 'niterations' in min_data:
+    #                 #     print("niterations:", min_data.get('niterations'))
+    #                 #     print("nfevaluations:", min_data.get('nfevaluations'))
+    #                 #     print("final_simplex:", min_data.get('final_simplex'))
+                
+    #             # elif min_data.get('f') is not None and min_data.get('x') is None :  # Only print if 'x' is present
+    #             #     print("x:", None)
+    #             #     print("f:", min_data.get('f'))
+
+    #             #     # Print additional results only for local_optimisation
+    #             #     if 'niterations' in min_data:
+    #             #         print("niterations:", min_data.get('niterations'))
+    #             #         print("nfevaluations:", min_data.get('nfevaluations'))
+    #             #         print("final_simplex:", min_data.get('final_simplex'))
+
+    #         if self.raw_data['max'] is not None and len(self.raw_data['max']) > 0:
+    #             print("-" * 30)
+    #             print("Maximum:")
+    #             max_data = self.raw_data['max'][i]
+    #             if max_data.get('f') is not None :  # Only print if 'x' is present
+    #                 print("x:", max_data.get('x'))
+    #                 print("f:", max_data.get('f'))
+
+    #                 # # Print additional results only for local_optimisation
+    #                 # if 'niterations' in max_data:
+    #                 #     print("niterations:", max_data.get('niterations'))
+    #                 #     print("nfevaluations:", max_data.get('nfevaluations'))
+    #                 #     print("final_simplex:", max_data.get('final_simplex'))
+                
+    #             # elif max_data.get('f') is not None and max_data.get('x') is None :  # Only print if 'x' is present
+    #             #     print("x:", None)
+    #             #     print("f:", max_data.get('f'))
+
+    #             #     # Print additional results only for local_optimisation
+    #             #     if 'niterations' in max_data:
+    #             #         print("niterations:", max_data.get('niterations'))
+    #             #         print("nfevaluations:", max_data.get('nfevaluations'))
+    #             #         print("final_simplex:", max_data.get('final_simplex'))
+        
+    #     print("-" * 30)
+    #     if 'sign_x' in self.raw_data:
+    #         print("Input combinations and corresponding output(s):")
+    #         print("sign_x:", self.raw_data['sign_x'][i])
+    #     print("-" * 30)
+    #     print("Input combinations and corresponding output(s):")
+    #     if self.raw_data['x'] is not None and len(self.raw_data['x']) > 0:  # Check if 'x' is not None
+    #         print("x:", self.raw_data['x'])
+    #     else:
+    #         print("x: None")
+        
+    #     if 'K' in self.raw_data:  # Check if the keys exist
+    #         print("K:", self.raw_data['K'])
+
+    #     if self.raw_data['f'] is not None and len(self.raw_data['f']) > 0:  # Check if 'x' is not None
+    #         if num_outputs == 1:
+    #             print("f:", self.raw_data['f'])  # Print directly if single output
+    #         else:
+    #             print("f:", self.raw_data['f'][i])  # Print the i-th output if multiple outputs
+    #     else:
+    #         print("f: None")
+    #     print("-" * 30)
 
 def header_results(all_output, all_input, method = None):
     """

@@ -1,8 +1,8 @@
 import numpy as np
 from typing import Callable
 import tqdm
-from PyUncertainNumber.UP.mixed_uncertainty.extreme_point_x import extreme_pointX
-from PyUncertainNumber.UP.endpoints_extremepoint import endpoints_extremepoint_method
+from PyUncertainNumber.UP.extreme_point_func import extreme_pointX
+from PyUncertainNumber.UP.extremepoints import extremepoints_method
 from PyUncertainNumber.UC.uncertainNumber import UncertainNumber as UN
 
 def imp(X):
@@ -115,7 +115,7 @@ def first_order_propagation_method(x: list, f:Callable = None, results:dict = No
         xr.append(temp_xr)  # Add the temporary list to xr
     
     # Determine the positive or negative signs for each input
-    res = endpoints_extremepoint_method(ranges.T, f)
+    res = extremepoints_method(ranges.T, f)
 
     num_outputs = res['sign_x'].shape[0]
     inpsList = np.zeros((0, d))

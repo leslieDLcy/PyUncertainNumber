@@ -143,8 +143,8 @@ class Distribution:
         self.dist = self.rep()
 
     def __repr__(self):
-        # if self.sample_data is not None:
-        #     return "sample-approximated distribution object"
+        if self.sample_data is not None:
+            return "sample-approximated distribution object"
         return f"dist ~ {self.dist_family}{self.dist_params}"
 
     def rep(self):

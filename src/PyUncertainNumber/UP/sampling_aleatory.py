@@ -2,9 +2,12 @@ import numpy as np
 import tqdm
 from typing import Callable
 from scipy.stats import qmc  # Import Latin Hypercube Sampling from SciPy
+from PyUncertainNumber.UP.utils import propagation_results
 
-def sampling_aleatory_method(x: list, f: Callable, n_sam: int = 500, method='monte_carlo', results:dict = None,      
-                        save_raw_data='no'):
+def sampling_aleatory_method(x: list, f: Callable, 
+                             results: propagation_results = None,
+                             n_sam: int = 500, method='monte_carlo',      
+                             save_raw_data='no')-> propagation_results:  # Specify return type
     """
     args:
         x (list): A list of UncertainNumber objects, each representing an input 
@@ -45,6 +48,9 @@ def sampling_aleatory_method(x: list, f: Callable, n_sam: int = 500, method='mon
     example:
 
     """
+    if results is None:
+        results = propagation_results()
+    
     if method not in ('monte_carlo', 'latin_hypercube'):
         raise ValueError("Invalid sampling method. Choose 'monte_carlo' or 'latin_hypercube'.")
 
@@ -97,18 +103,18 @@ def sampling_aleatory_method(x: list, f: Callable, n_sam: int = 500, method='mon
             all_output = all_output.reshape(-1, 1)  # Reshape to a column vector
             
         #if save_raw_data == 'yes':
-        results['raw_data']['f'] = all_output
-        results['raw_data']['x'] =  parameter_samples
+        results.add_raw_data(x = parameter_samples)
+        results.add_raw_data(f = all_output)
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results['raw_data']['x'] = parameter_samples
+        results.add_raw_data(x = parameter_samples)
     
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
     return results
 
-# # # example
+# # example
 # from PyUncertainNumber import UncertainNumber as UN
 
 # def cantilever_beam_deflection(x):
@@ -148,11 +154,11 @@ def sampling_aleatory_method(x: list, f: Callable, n_sam: int = 500, method='mon
 # base_path = ""
 
 # a = sampling_aleatory_method(x=[L, I, F, E], #['L', 'I', 'F', 'E'], 
-#           f = cantilever_beam_deflection, 
-#           n_sam = 300, 
+#           f = None,#cantilever_beam_deflection, 
+#           n_sam = 3, 
 #           method = METHOD, 
-#           save_raw_data = "no"
+#           save_raw_data = "yes"
 #          )
 
-# print(a)
+# a.print()
 

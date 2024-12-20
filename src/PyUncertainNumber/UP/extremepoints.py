@@ -1,12 +1,12 @@
 import numpy as np
 import tqdm
 from typing import Callable
-from PyUncertainNumber.UP.mixed_uncertainty.cartesian_product import cartesian
-from PyUncertainNumber.UP.mixed_uncertainty.extreme_point_x import extreme_pointX
+from PyUncertainNumber.UP.cartesian_product import cartesian
+from PyUncertainNumber.UP.extreme_point_func import extreme_pointX
 from PyUncertainNumber.UP.utils import propagation_results
 
 def extremepoints_method(x:np.ndarray, f:Callable, 
-                                   results_class= propagation_results, 
+                                   results: propagation_results =None, 
                                    save_raw_data = 'no')-> propagation_results:  # Specify return type
 
     """ 
@@ -23,7 +23,7 @@ def extremepoints_method(x:np.ndarray, f:Callable,
 
 
     signature:
-        endpoints_extremepoints_method(x:np.ndarray, f:Callable, results:dict, save_raw_data = 'no') -> dict
+        extremepoints_method(x:np.ndarray, f:Callable, results:dict, save_raw_data = 'no') -> dict
 
     note:
         - Performs uncertainty propagation using the Extreme Point Method for monotonic functions. 
@@ -52,13 +52,13 @@ def extremepoints_method(x:np.ndarray, f:Callable,
         # Determine input parameters for function and method
         x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
         # Call the method
-        y = endpoints_extremepoint_method(x_bounds, f)
+        y = extremepoint_method(x_bounds, f)
         # print results
         y.print()
     
     """
-
-    results = results_class()
+    if results is None:
+        results = propagation_results()  # Create an instance of propagation_results
 
     # create an array with the unique combinations of all intervals 
     X = cartesian(*x) 
@@ -99,9 +99,14 @@ def extremepoints_method(x:np.ndarray, f:Callable,
         
         lower_bound = np.zeros(num_outputs)
         upper_bound = np.zeros(num_outputs)
-        for i in range(num_outputs):
-            lower_bound[i] = f(Xsign[2*i, :])
-            upper_bound[i] = f(Xsign[2*i + 1, :])
+
+        if num_outputs == 1:
+            lower_bound[0] = f(Xsign[2*i, :])
+            upper_bound[0] = f(Xsign[2*i + 1, :])
+        else:        
+            for i in range(num_outputs):
+                lower_bound[i] = f(Xsign[2*i, :])[i]
+                upper_bound[i] = f(Xsign[2*i + 1, :])[i]
 
         min_indices = np.zeros((d,num_outputs))
         max_indices = np.zeros((d,num_outputs))
@@ -121,19 +126,19 @@ def extremepoints_method(x:np.ndarray, f:Callable,
     
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results.add_raw_data(x= Xeval)  # Store Xeval in raw_data['x'] even if f is None
+        results.add_raw_data(x = Xeval)  # Store Xeval in raw_data['x'] even if f is None
     
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
     return results
 
-# Example usage with different parameters for minimization and maximization
-f = lambda x: x[0] + x[1] + x[2]  # Example function
+# # Example usage with different parameters for minimization and maximization
+# f = lambda x: x[0] + x[1] + x[2]  # Example function
 
-# Determine input parameters for function and method
-x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-n=2
-# Call the method
-y = endpoints_extremepoints_method(x_bounds, f=f, save_raw_data = 'yes')
-y.print()
+# # Determine input parameters for function and method
+# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+# n=2
+# # Call the method
+# y = extremepoints_method(x_bounds, f=None, save_raw_data= 'yes')
+# y.print()

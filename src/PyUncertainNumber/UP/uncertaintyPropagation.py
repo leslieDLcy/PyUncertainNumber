@@ -1,22 +1,30 @@
 import numpy as np
 import pprint
-from typing import Callable
+from typing import Callable, Union
+import matplotlib.pyplot as plt
+
 # import plotly.express as ps
 from PyUncertainNumber.UP.endpoints import endpoints_method
-from PyUncertainNumber.UP.endpoints_extremepoints import endpoints_extremepoints_method
+from PyUncertainNumber.UP.extremepoints import extremepoints_method
 from PyUncertainNumber.UP.subinterval import subinterval_method
 from PyUncertainNumber.UP.sampling import sampling_method
 from PyUncertainNumber.UP.genetic_optimisation import genetic_optimisation_method
 from PyUncertainNumber.UP.local_optimisation import local_optimisation_method
 from PyUncertainNumber.UP.endpoints_cauchy import cauchydeviates_method
 from PyUncertainNumber.UP.sampling_aleatory import sampling_aleatory_method
-from PyUncertainNumber.UP.utils import create_folder, save_results
-from PyUncertainNumber.UC.uncertainNumber import UncertainNumber #_parse_interverl_inputs,
+from PyUncertainNumber.UP.mixed_uncertainty.second_order_propagation import second_order_propagation_method
+from PyUncertainNumber.UP.mixed_uncertainty.first_order_propagation import first_order_propagation_method
+from PyUncertainNumber.UP.utils import create_folder, save_results, propagation_results
+from PyUncertainNumber.UC.uncertainNumber import UncertainNumber, Distribution #_parse_interverl_inputs,
+
 #TODO fix the distribution parameters if we only  have sample values. 
+#TODO the cauchy with save_raw_data = 'yes' raises issues. 
+#TODO incorporate the mixed uncertainty 
+#TODO update the descriptions for all functions one last time. 
 # ---------------------the top level UP function ---------------------#
        
 def aleatory_propagation(vars:list = None,
-        results:dict = None,
+        results: propagation_results = None,
         fun:Callable = None,
         n_sam:int = None,
         method:str = "monte_carlo",       
@@ -69,16 +77,17 @@ def aleatory_propagation(vars:list = None,
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
     
     def process_alea_results(results):
-        if results['raw_data']['f'] is None:
-            results['un'] = UncertainNumber(essence="distribution", distribution_parameters=None, **kwargs)
+        
+        if results.raw_data['f'] is None:  # Access raw_data from results object
+            results.un = None #UncertainNumber(essence="distribution", distribution_parameters=None, **kwargs)
         else:
-            results['un'] = []
-            for sample_data in results['raw_data']['f'].T:  # Transpose to iterate over columns
-                results['un'].append(UncertainNumber(essence="distribution", distribution_parameters=sample_data, **kwargs))
+            results.un = []
+            for sample_data in results.raw_data['f'].T:  # Access raw_data from results object
+                results.un.append(Distribution(sample_data= sample_data) )#results.un.append(UncertainNumber(essence="distribution", distribution_parameters=sample_data, **kwargs))
 
         if save_raw_data == "yes":
             res_path = create_folder(base_path, method)
-            save_results(results['raw_data'], method=method, res_path=res_path, fun=fun) # only to save raw_data as data.frames
+            save_results(results.raw_data, method=method, res_path=res_path, fun=fun) 
 
         return results
         
@@ -87,16 +96,57 @@ def aleatory_propagation(vars:list = None,
         case ("monte_carlo" | "latin_hypercube"): 
             if n_sam is None:
                 raise ValueError("n (number of samples) is required for sampling methods.")
-            results= sampling_aleatory_method(vars, fun, n_sam, method=method.lower(), results=results, save_raw_data= save_raw_data)    
+            results= sampling_aleatory_method(vars, fun,  results, n_sam, method=method.lower(), save_raw_data= save_raw_data)    
             return process_alea_results(results)
         case ("taylor_expansion" ): 
             print("Taylor expansion is not implemented in this version")
         case _:
             raise ValueError("Invalid UP method.")
+
+def mixed_propagation(vars: list, fun:Callable = None,  
+                    results: propagation_results = None, 
+                    method = 'endpoints',
+                    n_disc: Union[int, np.ndarray] = 10, 
+                    condensation:int = 1,
+                    tOp: Union[float, np.ndarray] = 0.999,
+                    bOt: Union[float, np.ndarray] = 0.001,
+                    lim_Q: np.array = np.array([0.01, 0.09]), 
+                    save_raw_data= 'no',
+                    **kwargs,):  
+    
+    match method:
         
+        case ("second_order_endpoints" | "second_order_vertex" | "endpoints" |"vertex"):
+            results = second_order_propagation_method(vars,                                
+                                                    fun,
+                                                    results,
+                                                    method = 'endpoints',
+                                                    n_disc= n_disc,
+                                                    condensation =condensation, 
+                                                    tOp =tOp,
+                                                    bOt= bOt,
+                                                    save_raw_data = save_raw_data,
+                                                    **kwargs,
+                                                    )  # Pass save_raw_data directly
+            return results #process_results(results) 
+        
+        case ("extremepoints" ):       
+            results =  second_order_propagation_method(vars,                                
+                                                    fun,
+                                                    results,
+                                                    method = 'extremepoints',
+                                                    n_disc= n_disc,
+                                                    condensation =condensation, 
+                                                    tOp =tOp,
+                                                    bOt= bOt,
+                                                    save_raw_data = save_raw_data,
+                                                    **kwargs,   
+                                                    )  # Pass save_raw_data directly
+            return results #process_results(results) 
+
 def epistemic_propagation(vars,
           fun,
-          results:dict = None,
+          results: propagation_results = None,
           n_sub: np.integer = None,
           n_sam: np.integer = None,
           x0: np.ndarray = None,
@@ -152,20 +202,20 @@ def epistemic_propagation(vars,
     if save_raw_data not in ("yes", "no"):  # Input validation
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
     
-    def process_results(results):
-        if results['raw_data']['bounds'] is None:
-            results['un'] = UncertainNumber(essence="interval", bounds=None, **kwargs)
+    def process_results(results: propagation_results):  # Add type hint
+        if results.raw_data['bounds'] is None or results.raw_data['bounds'].size == 0:
+            results.un = UncertainNumber(essence="interval", bounds=None, **kwargs)
         else:
-            if results['raw_data']['bounds'].ndim == 2:  # 2D array
-                results['un'] = [UncertainNumber(essence="interval", bounds=bound, **kwargs) for bound in results['raw_data']['bounds']]
-            elif results['raw_data']['bounds'].ndim == 1 and len(results['raw_data']['bounds']) == 2:  # 1D array
-                results['un'] = UncertainNumber(essence="interval", bounds=results['raw_data']['bounds'], **kwargs)
+            if results.raw_data['bounds'].ndim == 2:  # 2D array
+                results.un = [UncertainNumber(essence="interval", bounds=bound, **kwargs) for bound in results.raw_data['bounds']]
+            elif results.raw_data['bounds'].ndim == 1 and len(results.raw_data['bounds']) == 2:  # 1D array
+                results.un = UncertainNumber(essence="interval", bounds=results.raw_data['bounds'], **kwargs)
             else:
                 raise ValueError("Invalid shape for 'bounds'. Expected 2D array or 1D array with two values.")
 
         if save_raw_data == "yes":
             res_path = create_folder(base_path, method)
-            save_results(results['raw_data'], method=method, res_path=res_path, fun=fun) # only to save raw_data as data.frames
+            save_results(results.raw_data, method=method, res_path=res_path, fun=fun) 
 
         return results
         
@@ -175,45 +225,45 @@ def epistemic_propagation(vars,
             results = endpoints_method(x, fun, results, save_raw_data)  # Pass save_raw_data directly
             return process_results(results) 
         
-        case ("endpoints_extremepoints" ):       
-            results = endpoints_extremepoints_method(x, fun,  results,save_raw_data)  # Pass save_raw_data directly
+        case ("extremepoints" ):       
+            results = extremepoints_method(x, fun, results,save_raw_data)  # Pass save_raw_data directly
             return process_results(results) 
 
         case ("subinterval" | "subinterval_reconstitution"):
             if n_sub is None:
                 raise ValueError("n (number of subintervals) is required for subinterval methods.")
-            results = subinterval_method(x, fun, n_sub,  results, save_raw_data)  # Pass save_raw_data directly
+            results = subinterval_method(x, fun,results, n_sub, save_raw_data)  # Pass save_raw_data directly
             return process_results(results)
         
         case ("monte_carlo" |  "latin_hypercube"): 
             if n_sam is None:
                 raise ValueError("n (number of samples) is required for sampling methods.")            
-            results= sampling_method(x, fun, n_sam, method=method.lower(), endpoints=False,  results=results, save_raw_data= save_raw_data)    
+            results= sampling_method(x, fun, results, n_sam,  method=method.lower(), endpoints=False, save_raw_data= save_raw_data)    
             return process_results(results)
                 
         case ("monte_carlo_endpoints" ): 
             if n_sam is None:
                 raise ValueError("n (number of samples) is required for sampling methods.")           
-            results= sampling_method(x, fun, n_sam, method= "monte_carlo", endpoints=True,  results=results, save_raw_data= save_raw_data)    
+            results= sampling_method(x, fun, results, n_sam,  method= "monte_carlo", endpoints=True,  save_raw_data= save_raw_data)    
             return process_results(results)
 
         case ("latin_hypercube_endpoints" ): 
             if n_sam is None:
                 raise ValueError("n (number of samples) is required for sampling methods.")           
-            results= sampling_method(x, fun, n_sam, method="latin_hypercube", endpoints=True,  results=results, save_raw_data= save_raw_data)    
+            results= sampling_method(x, fun, results, n_sam, method="latin_hypercube", endpoints=True,  save_raw_data= save_raw_data)    
             return process_results(results)   
 
-        case ("cauchy" |  "endpoint_cauchy"|  "endpoints_cauchy"): 
+        case ("cauchy" |  "endpoint_cauchy"| "endpoints_cauchy"): 
             if n_sam is None:
                 raise ValueError("n (number of samples) is required for sampling methods.")            
-            results= cauchydeviates_method(x,fun, n_sam, results, save_raw_data)
+            results= cauchydeviates_method(x,fun, results, n_sam, save_raw_data)
             return process_results(results)    
 
         case ("local_optimization" | "local_optimisation"|"local optimisation"|"local optimization") :
 
             if save_raw_data == 'yes':
                 print("The intermediate steps cannot be saved for local optimisation")               
-            results = local_optimisation_method(x, fun, x0, results=results,
+            results = local_optimisation_method(x, fun, results, x0,  
                                              tol_loc = tol_loc, 
                                              options_loc = options_loc, 
                                              method_loc = method_loc)
@@ -230,72 +280,44 @@ def epistemic_propagation(vars,
             raise ValueError("Invalid UP method.")
 
 def propagation(vars:list,
-          fun:Callable,
-          results:dict = None,
-          n_sub: np.integer = 3,
-          n_sam: np.integer = 500,
-          x0: np.ndarray = None,
-          method=None,
-          save_raw_data="no",
-          *,  # Keyword-only arguments start here
-          base_path=np.nan,
-          tol_loc: np.ndarray = None,
-          options_loc: dict = None,
-          method_loc="Nelder-Mead",
-          pop_size=1000,
-          n_gen=100,
-          tol=1e-3,
-          n_gen_last=10,
-          algorithm_type="NSGA2",
-          **kwargs,
+        fun:Callable,
+        results:propagation_results = None,
+        n_sub: np.integer = 3,
+        n_sam: np.integer = 500,
+        x0: np.ndarray = None,
+        method=None,
+        save_raw_data="no",
+        *,  # Keyword-only arguments start here
+        base_path=np.nan,
+        tol_loc: np.ndarray = None,
+        options_loc: dict = None,
+        method_loc="Nelder-Mead",
+        pop_size=1000,
+        n_gen=100,
+        tol=1e-3,
+        n_gen_last=10,
+        algorithm_type="NSGA2",
+        n_disc: Union[int, np.ndarray] = 10, 
+        condensation:int = 1,
+        tOp: Union[float, np.ndarray] = 0.999,
+        bOt: Union[float, np.ndarray] = 0.001,
+          **kwargs
           ):
-    
+
     essences = [un.essence for un in vars]  # Get a list of all essences
 
-    results = {
-             'un': None,
-           
-            'raw_data': {                
-                'x': None,
-                'f': None,
-                'min': {
-                        'x': None,
-                        'f': None,
-                        # for genetic optimisation only
-                        'message': None, #The success message from the minimization optimization.
-                        'n_gen': None,
-                        'n_iter': None,
-                        # for local optimisation only
-                        'niterations': None, #The number of iterations for minimisation.
-                        'nfevaluations': None, #The number of function evaluations for minimisation.
-                        'final_simplex': None #The final simplex for minimization.
-                    },
-                'max': {
-                        'x': None,
-                        'f': None,
-                        # for genetic optimisation only
-                        'message': None, #The success message from the minimization optimization.
-                        'n_gen': None,
-                        'n_iter': None,
-                        # for local optimisation only
-                        'niterations': None, #The number of iterations for minimisation.
-                        'nfevaluations': None, #The number of function evaluations for minimisation.
-                        'final_simplex': None #The final simplex for minimization.
-                    },
-                'bounds': None
-                }
-            }
- 
+    if results is None:
+        results = propagation_results()  # Create an instance of propagation_results
 
     # Determine the plotting strategy based on essences
     if all(essence == "interval" for essence in essences):
         
         y = epistemic_propagation(vars = vars,
                                         fun = fun,
+                                        results= results, 
                                         n_sub = n_sub,
                                         n_sam = n_sam,
                                         x0 = x0,
-                                        results= results, 
                                         method = method,
                                         save_raw_data = save_raw_data,
                                         base_path = base_path ,
@@ -311,9 +333,9 @@ def propagation(vars:list,
                                         )
  
     elif all(essence == "distribution" for essence in essences):
-        y = aleatory_propagation(vars = vars,
-                                results= results,
+        y = aleatory_propagation(vars = vars,                                
                                 fun= fun,
+                                results= results,
                                 n_sam = n_sam,
                                 method= method,       
                                 save_raw_data = save_raw_data,
@@ -321,10 +343,59 @@ def propagation(vars:list,
                                 **kwargs)
 
     else:  # Mixed case or at least one p-box
-        #y = mixed_propagation()
-        pass
+        y = mixed_propagation(vars = vars,                                
+                              fun= fun,
+                              results= results,
+                              n_disc= n_disc,
+                              condensation =condensation, 
+                              tOp =tOp,
+                              bOt= bOt,
+                              save_raw_data = save_raw_data,
+                              base_path= base_path,
+                                **kwargs)                               
 
     return y 
+
+
+def plotPbox(xL, xR, p=None):
+    """
+    Plots a p-box (probability box) using matplotlib.
+
+    Args:
+        xL (np.ndarray): A 1D NumPy array of lower bounds.
+        xR (np.ndarray): A 1D NumPy array of upper bounds.
+        p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
+                                   Defaults to None, which generates equally spaced probabilities.
+        color (str, optional): The color of the plot. Defaults to 'k' (black).
+    """
+    xL = np.squeeze(xL)  # Ensure xL is a 1D array
+    xR = np.squeeze(xR)  # Ensure xR is a 1D array
+
+    if p is None:
+        p = np.linspace(0, 1, len(xL))  # p should have one more element than xL/xR
+
+    if p.min() > 0:
+        p = np.concatenate(([0], p))
+        xL = np.concatenate(([xL[0]], xL))
+        xR = np.concatenate(([xR[0]], xR))
+
+    if p.max() < 1:
+        p = np.concatenate((p, [1]))
+        xR = np.concatenate((xR, [xR[-1]]))
+        xL = np.concatenate((xL, [xL[-1]]))
+    
+    colors = 'black'
+    # Highlight the points (xL, p)
+    plt.scatter(xL, p, color=colors, marker='o', edgecolors='black', zorder=3)
+
+    # Highlight the points (xR, p)
+    plt.scatter(xR, p, color=colors, marker='o', edgecolors='black', zorder=3)
+
+
+    plt.fill_betweenx(p, xL, xR, color=colors, alpha=0.5)
+    plt.plot( [xL[0], xR[0]], [0, 0],color=colors, linewidth=3)
+    plt.plot([xL[-1], xR[-1]],[1, 1],  color=colors, linewidth=3)
+    plt.show()
 
 def main():
     """ implementation of any method for epistemic uncertainty on the cantilever beam example"""
@@ -368,8 +439,6 @@ def main():
 
         return deflection
     
-   # xInt = np.array([y,L, I, F, E])
-    #print(xInt)
     def cantilever_beam_func(x):
         
         y = x[0]
@@ -386,51 +455,35 @@ def main():
             stress = np.nan
 
         return np.array([deflection, stress])
-
-    y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
+#     # example
+#     # y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
     L = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
-    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
-    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
-    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
+    #I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
+    #F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
+#     # E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
+    
+#     y = UncertainNumber(name='beam width', symbol='y', units='m', essence='interval', bounds=[0.145, 0.155]) 
+  #  L = UncertainNumber(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
+    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
+    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
+    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
+  
+    METHOD = "extremepoints"
+    base_path = "C:\\Users\\Ioanna\\OneDrive - The University of Liverpool\\DAWS2_code\\UP\\"
 
-    # L = UncertainNumber(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
-    # I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
-    # F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
-    # E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
-
-    METHOD = "endpoints_extremepoint"
-    base_path = ""
-# (vars = None,
-#         results:dict = None,
-#         fun = None,
-#         n: np.integer = None,
-#         method = "monte_carlo", 
-             
-#         save_raw_data="no",
-#         *,  # Keyword-only arguments start here
-#         base_path=np.nan,
-#         **kwargs,
-    a = propagation(vars= [ L, I, F, E], 
-                            results = None,
-                            fun= cantilever_beam_deflection, 
-                           # n_sam= 5, 
-                            method= METHOD, 
-                            save_raw_data= "no"
+    a = mixed_propagation(vars= [ L, I, F, E], 
+                                fun= cantilever_beam_deflection, 
+                                method= 'extremepoints', 
+                                n_disc=40,
+                                save_raw_data= "no",
+                            #save_raw_data= "yes",
+                            #base_path= base_path
                         )
-    print(a['un'])
-
+    a.print()
+    plotPbox(a.raw_data['min'][0]['f'], a.raw_data['max'][0]['f'], p=None)
+    plt.show()
 
     return a
-
-    # method = "endpoint_cauchy"
-    # base_path = "C:\\Users\\Ioanna\\Documents\\GitHub\\PyUncertainNumber\\cantilever_beam"
-    # #a = epistemic_propagation(xInt, fun= None, method=method, save_raw_data="yes", base_path=base_path)
-    # a = epistemic_propagation(xInt, fun= None, n=10, method=method,save_raw_data="yes", base_path=base_path )
-    # #pprint.pprint(a['un'])
-    # #pprint.pprint(a)
-    # #pprint.pprint(a)
-    # print(a['un'])
-    # return a
 
 if __name__ == "__main__":
     main()

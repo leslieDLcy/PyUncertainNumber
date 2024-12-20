@@ -6,12 +6,14 @@ from pymoo.core.problem import Problem
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.core.callback import Callback
+from PyUncertainNumber.UP.utils import propagation_results
 
 def a(x): return np.asarray(x,dtype=float)
 
-def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, results:dict = None,
+def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, 
+                                 results: propagation_results =None,
                                  pop_size=1000, n_gen=100, tol=1e-3,
-                                 n_gen_last=10, algorithm_type="NSGA2"):
+                                 n_gen_last=10, algorithm_type="NSGA2")-> propagation_results:  # Specify return type
     """
     args:
         x_bounds: Bounds for decision variables (NumPy array).
@@ -59,46 +61,10 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, results:dict 
                                         tol=tol, n_gen_last=10, algorithm_type=algorithm_type)
 
         # Print the results                                               
-        print("-" * 30)
-        print("bounds:", y['bounds'])
-
-        print("Minimum:")
-        print("Optimized x:", y['min']['x'])
-        print("Optimized f:", y['min']['f'])
-        print("Number of generations:", y['min']['n_gen'])
-        print("Number of iterations:", y['min']['n_iter'])
-
-        print("-" * 30)
-        print("Maximum:")
-        print("Optimized x:", y['max']['x'])
-        print("Optimized f:", y['max']['f'])
-        print("Number of generations:", y['max']['n_gen'])
-        print("Number of iterations:", y['max']['n_iter'])
+        y.print()
 
     """
-    if results is None:
-        results = {
-             'un': None,
-           
-            'raw_data': {                
-                'x': None,
-                'f': None,
-                'min': {
-                        'x': None,
-                        'f': None,
-                        'n_gen': None,
-                        'n_iter': None
-                    },
-                'max': {
-                        'x': None,
-                        'f': None,
-                        'n_gen': None,
-                        'n_iter': None
-                    },
-                'bounds': None
-                }
-            }
-        
+    
     class ProblemWrapper(Problem):
         def __init__(self, objective, **kwargs):
             super().__init__(n_obj=1, **kwargs)
@@ -166,31 +132,29 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, results:dict 
     )
 
     # Create a dictionary to store the results
-    results = {
-        'un': None,
-        
-        'raw_data': {
-            'min': {
+    if results is None:
+        results = propagation_results()  # Create an instance of propagation_results
+
+    # Store ALL results in the results object with descriptions
+    results.raw_data['min'] = np.append(results.raw_data['min'], {
                 'x': result_min.X,
                 'f': result_min.F,
                 'message' : message_min,
-                'n_gen': n_gen_min,
-                'n_iter': n_iter_min
-                },
-            'max': {
+                'ngenerations': n_gen_min,
+                'niterations': n_iter_min
+                })
+
+    results.raw_data['max'] = np.append(results.raw_data['min'],{
                 'x': result_max.X,
                 'f': -result_max.F,  # Negate the result for maximisation
                 'message' : message_max,
-                'n_gen': n_gen_max,
-                'n_iter': n_iter_max
-                },
-            'bounds' : np.array([result_min.F[0], -result_max.F[0]])
-            }
-        }
+                'ngenerations': n_gen_max,
+                'niterations': n_iter_max
+                   })
+    
+    results.raw_data['bounds'] =  np.array([result_min.F[0], -result_max.F[0]])
 
     return results
-
-
 
 # # Example usage with different parameters for minimisation and maximisation
 # f = lambda x: x[0] + x[1] + x[2] # Example function
@@ -212,18 +176,4 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, results:dict 
 #                                         tol=tol, n_gen_last=10, algorithm_type=algorithm_type)
 
 # # Print the results                                               
-# print("-" * 30)
-# print("bounds:", y['raw_data']['bounds'])
-
-# print("Minimum:")
-# print("Optimized x:", y['raw_data']['min']['x'])
-# print("Optimized f:", y['raw_data']['min']['f'])
-# print("Number of generations:", y['raw_data']['min']['n_gen'])
-# print("Number of iterations:", y['raw_data']['min']['n_iter'])
-
-# print("-" * 30)
-# print("Maximum:")
-# print("Optimized x:", y['raw_data']['max']['x'])
-# print("Optimized f:", y['raw_data']['max']['f'])
-# # print("Number of generations:", y['raw_data']['max']['n_gen'])
-# # print("Number of iterations:", y['raw_data']['max']['n_iter'])
+# y.print()

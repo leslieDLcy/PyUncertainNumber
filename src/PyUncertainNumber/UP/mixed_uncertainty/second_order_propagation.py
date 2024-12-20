@@ -1,12 +1,21 @@
 import numpy as np
-from typing import Callable
+from typing import Callable, Union
 import tqdm
-from PyUncertainNumber.UP.mixed_uncertainty.cartesian_product import cartesian
+from PyUncertainNumber.UP.cartesian_product import cartesian
+from PyUncertainNumber.UP.extreme_point_func import extreme_pointX
+from PyUncertainNumber.UP.extremepoints import extremepoints_method
+from PyUncertainNumber.UP.utils import propagation_results
 
-def second_order_propagation_method(x: list, f:Callable = None, results:dict = None,
-                             method = 'endpoints',
-                             lim_Q: np.array = np.array([0.01, 0.09]), n_disc:int = 5, 
-                             save_raw_data= 'no'):
+#TODO add tail concentratig algorithms and condensation.
+#TODO add x valus for min and max
+def second_order_propagation_method(x: list, f:Callable = None,  
+                                    results: propagation_results = None, 
+                                    method = 'endpoints',
+                                    n_disc: Union[int, np.ndarray] = 10, 
+                                    condensation:int = 1, # to be implemented
+                                    tOp: Union[float, np.ndarray] = 0.999,
+                                    bOt: Union[float, np.ndarray] = 0.001,
+                                    save_raw_data= 'no')-> propagation_results:  # Specify return type
     """
     args:
         x (list): A list of UncertainNumber objects.
@@ -26,47 +35,61 @@ def second_order_propagation_method(x: list, f:Callable = None, results:dict = N
         dict: A dictionary containing the results
     """
     d = len(x) # dimension of uncertain numbers 
-    
+    results = propagation_results()
     bounds_x = []  
+    ranges = np.zeros((2,d))
     u_list = []  # List to store 'u' for each uncertain number
     
-    if results is None:
-        results = {
-            'un': None,
-            'bounds': None, 
-            'min': {
-                'x': None,
-                'f': None
-                },
-            'max': {
-                'x': None,
-                'f': None,
-                },
-            'raw_data': {
-                'f': None,
-                'x': None
-                }
-            }
-
     for i, un in enumerate(x):
         print(f"Processing variable {i + 1} with essence: {un.essence}")
 
         if un.essence == "distribution":
             # perform outward directed discretisation 
-            nd = n_disc + 1  
+            if isinstance(n_disc, int):
+                nd = n_disc + 1
+            else:
+                nd = n_disc[i] + 1  # Use the i-th element of n_disc array
+
             distribution_family = un.distribution_parameters[0]
 
             if distribution_family == 'triang':
                 u = np.linspace(0, 1, nd)
             else:
-                u = np.linspace(lim_Q[0], lim_Q[1], nd)
+                if isinstance(tOp, np.ndarray):
+                    top = tOp[i]
+                else:
+                    top = tOp
+                if isinstance(bOt, np.ndarray):
+                    bot = bOt[i]
+                else:
+                    bot = bOt
+                u = np.linspace(bot, top, nd)  # Use bOt and tOp here
+
 
         elif un.essence == "pbox":
             distribution_family = un.distribution_parameters[0]
             if distribution_family == 'triang': 
-                u = np.linspace(0, 1, n_disc)
+                if isinstance(n_disc, int):
+                    nd = n_disc
+                else:
+                    nd = n_disc[i]  # Use the i-th element of n_disc array
+                u = np.linspace(0, 1, nd)
             else:
-                u = np.linspace(lim_Q[0], lim_Q[1], n_disc)
+                if isinstance(n_disc, int):
+                    nd = n_disc
+                else:
+                    nd = n_disc[i]  # Use the i-th element of n_disc array
+
+                if isinstance(tOp, np.ndarray):
+                    top = tOp[i]
+                else:
+                    top = tOp
+                if isinstance(bOt, np.ndarray):
+                    bot = bOt[i]
+                else:
+                    bot = bOt
+                u = np.linspace(bot, top, nd)  # Use bOt and tOp here
+                
         else:  # un.essence == "interval"
             u = np.array([0.0, 1.0])  # Or adjust as needed for intervals
 
@@ -80,18 +103,21 @@ def second_order_propagation_method(x: list, f:Callable = None, results:dict = N
                 temp_xr = un.ppf(u_list[i][1:])  # Adjust based on your distribution                
                 rang = np.array([temp_xl, temp_xr]).T  # Create a 2D array of bounds
                 bounds_x.append(rang)
+                ranges[:, i] = np.array([temp_xl[0], temp_xr[-1]])
 
             case "interval":
                 temp_xl = np.array([un.bounds[0]])  # Repeat lower bound for all quantiles
                 temp_xr = np.array([un.bounds[1]])  # Repeat upper bound for all quantiles               
                 rang = np.array([temp_xl, temp_xr]).T  # Create a 2D array of bounds
                 bounds_x.append(rang)
+                ranges[:, i] = un.bounds #np.array([un.bounds])
 
             case "pbox":
                 temp_xl = un.ppf(u_list[i])[0]  
                 temp_xr = un.ppf(u_list[i])[1]               
                 rang = np.array([temp_xl, temp_xr]).T  # Create a 2D array of bounds
                 bounds_x.append(rang)
+                ranges[:, i] = np.array([temp_xl[0], temp_xr[-1]])
 
             case _:
                 raise ValueError(f"Unsupported uncertainty type: {un.essence}")
@@ -174,22 +200,77 @@ def second_order_propagation_method(x: list, f:Callable = None, results:dict = N
                     
                     bounds[i, 0, :] = lower_bound[i,:]
                     bounds[i, 1, :] = upper_bound[i,:]
-            case _:
-                raise ValueError("Invalid UP method! endpoints_cauchy and subinterval reconstitution under development.")
 
-        results['bounds']  = bounds
-        results['min']['y']=  lower_bound
-        results['max']['y']=  upper_bound
+            case "extremepoints":
+                # Determine the positive or negative signs for each input
+
+                res = extremepoints_method(ranges.T, f)
+                
+                 # Determine the number of outputs from the first evaluation
+                try:
+                    num_outputs = res.raw_data['sign_x'].shape[0]
+                except TypeError:
+                    num_outputs = 1  # If f returns a single value
+
+                inpsList = np.zeros((0, d))
+                evalsList = np.zeros((0, num_outputs))
+                all_output_list = []             
+
+                for out in range(num_outputs):
+                    Xsings = np.empty((focal_elements_comb.shape[0], 2, d))
+                    current_index = 0
+                    for i, slice in enumerate(focal_elements_comb):
+                        Xsings[i, :, :] = extreme_pointX(slice, res.raw_data['sign_x'][out])
+                        current_index += 1
+
+                        for k in range(Xsings.shape[1]):
+                            c = Xsings[i, k, :]
+                            im = np.where((inpsList == c).all(axis=1))[0]
+                            if not im.size:
+                                output = f(c)
+                                all_output_list.append(output)
+                                inpsList = np.vstack([inpsList, c])
+                                evalsList = np.vstack([evalsList, output])
+                            else:
+                                all_output_list.append(evalsList[im[0]])
+                
+                current_index = 0  # Reset for the next input
+
+                # Convert all_output to a 2D NumPy array
+                all_output =  np.array(all_output_list).reshape(focal_elements_comb.shape[0], 2, num_outputs)
+                
+                # Calculate min and max for each sublist in all_output
+                min_values = np.min(all_output, axis=1) 
+                max_values = np.max(all_output, axis=1) 
+
+                lower_bound = np.zeros((num_outputs,len(min_values)))
+                upper_bound = np.zeros((num_outputs,len(max_values)))
+  
+                bounds = np.empty((num_outputs, 2, lower_bound.shape[1])) 
+
+                for i in range(num_outputs):
+                    min_values[:,i] = np.sort(min_values[:,i])
+                    max_values[:,i]  = np.sort(max_values[:,i])
+                    lower_bound[i,:] = min_values[:, i]  # Extract each column
+                    upper_bound[i,:] = max_values[:, i]  
+                    
+                    bounds[i, 0, :] = lower_bound[i,:]
+                    bounds[i, 1, :] = upper_bound[i,:]
+                
+            case _:
+                raise ValueError("Invalid UP method! endpoints_cauchy are under development.")
+
+        results.raw_data['bounds']  = bounds
+        results.raw_data['min'] = np.array([{ 'f': lower_bound}])  # Initialize as a NumPy array
+        results.raw_data['max'] = np.array([{ 'f': upper_bound}])  # Initialize as a NumPy array
 
         if save_raw_data == 'yes':
-            results['raw_data'] = {'f': all_output, 'x': x_combinations}
+            results.add_raw_data(f= all_output, x= x_combinations)
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results['raw_data'] = {'f': None, 'x': x_combinations}
+        results.add_raw_data(f= None, x= x_combinations)
     
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
-
        
     return results 
-

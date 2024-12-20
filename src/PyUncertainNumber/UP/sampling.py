@@ -2,6 +2,7 @@ import numpy as np
 from scipy.stats import qmc
 import tqdm
 from typing import Callable
+from PyUncertainNumber.UP.utils import propagation_results
 
 def index_to_bool_(index:np.ndarray,dim=2):
 
@@ -28,8 +29,10 @@ def index_to_bool_(index:np.ndarray,dim=2):
     index = np.asarray(index,dtype=int)
     return np.asarray([index==j for j in range(dim)],dtype=bool)
 
-def sampling_method(x: np.ndarray, f: Callable, n_sam: int = 500, method='monte_carlo', results:dict = None,     
-                    save_raw_data='no', endpoints=False ):
+def sampling_method(x: np.ndarray, f: Callable, 
+                    results: propagation_results = None, 
+                    n_sam: int = 500, method='monte_carlo',     
+                    save_raw_data='no', endpoints=False )-> propagation_results:  # Specify return type
     """
     args:
         x (np.ndarray): A 2D NumPy array where each row represents an input variable and 
@@ -76,40 +79,11 @@ def sampling_method(x: np.ndarray, f: Callable, n_sam: int = 500, method='monte_
         y = sampling_method(x, f, n_sam=500, method='monte_carlo', endpoints=False, save_raw_data='no')
 
         # Print the results
-        print("-" * 30)
-        print("Minimum:")
-        print("x:", y['raw_data']['min']['x'])
-        print("f:", y['raw_data']['min']['f'])
-
-        print("-" * 30)
-        print("Maximum:")
-        print("x:", y['raw_data']['max']['x'])
-        print("f:", y['raw_data']['max']['f'])
-
-        print("-" * 30)
-        print("Raw data")
-        print("x:",y['raw_data']['x'])
-        print("type_x:",type(y['raw_data']['x']))
-        print("f:", y['raw_data']['f'])
+        y.print()
     """
     if results is None:
-        results = {
-             'un': None,
-           
-            'raw_data': {                
-                'x': None,
-                'f': None,
-                'min': {
-                        'x': None,
-                        'f': None
-                    },
-                'max': {
-                        'x': None,
-                        'f': None,
-                    },
-                'bounds': None
-                }
-            }
+        results = propagation_results()  # Create an instance of propagation_results
+
     print(f"Total number of input combinations for the {method} method: {n_sam}")    
     
     m = x.shape[0]
@@ -137,49 +111,34 @@ def sampling_method(x: np.ndarray, f: Callable, n_sam: int = 500, method='monte_
     if f is not None:  # Only evaluate if f is provided
         all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Evaluating samples")])
 
-        if all_output.ndim == 1:  # If f returns a single output
-            all_output = all_output.reshape(-1, 1)  # Reshape to a column vector
-
-         # Create a dictionary to store the results
-        results['raw_data']['min']['f'] = np.min(all_output, axis=0)
-        results['raw_data']['max']['f'] = np.max(all_output, axis=0)
-
-        if all_output.shape[1] == 1:  # Single output
-            results['raw_data']['bounds'] = np.array([results['raw_data']['min']['f'][0], results['raw_data']['max']['f'][0]])
-        else:  # Multiple outputs
-            bounds = np.empty((all_output.shape[1], 2))
-            for i in range(all_output.shape[1]):
-                bounds[i, :] = np.array([results['raw_data']['min']['f'][i], results['raw_data']['max']['f'][i]])
-            results['raw_data']['bounds'] = bounds
+        try:
+            num_outputs = len(all_output[0])
+        except TypeError:
+            num_outputs = 1  # If f returns a single value
         
-        results['raw_data']['min']['x'] = []
-        results['raw_data']['max']['x'] = []
-
-        for i in range(all_output.shape[1]):  # Iterate over outputs
-            min_indices = np.where(all_output[:, i] == results['raw_data']['min']['f'][i])[0]
-            max_indices = np.where(all_output[:, i] == results['raw_data']['max']['f'][i])[0]
-            
-            # Convert to 2D arrays (if necessary) and append
-            results['raw_data']['min']['x'].append(X[min_indices].reshape(-1, m))  # Reshape to (-1, m)
-            results['raw_data']['max']['x'].append(X[max_indices].reshape(-1, m))
-
-        # Concatenate the arrays in the lists into 2D arrays (if necessary)
-        if len(results['raw_data']['min']['x']) > 1:
-            results['raw_data']['min']['x'] = np.concatenate(results['raw_data']['min']['x'], axis=0)
-        else:
-            results['raw_data']['min']['x'] = results['raw_data']['min']['x'][0]  # Take the first (and only) array
-
-        if len(results['raw_data']['max']['x']) > 1:
-            results['raw_data']['max']['x'] = np.concatenate(results['raw_data']['max']['x'], axis=0)
-        else:
-            results['raw_data']['max']['x'] = results['raw_data']['max']['x'][0]  # Take the first (and only) array
+         # Reshape all_output to a 2D array (Corrected)
+        all_output = np.array(all_output).reshape(-1, num_outputs)  
         
-        #if save_raw_data == 'yes':
-        results['raw_data']['f'] = all_output
-        results['raw_data']['x'] = X
+        # Calculate lower and upper bounds for each output
+        lower_bound = np.min(all_output, axis=0)
+        upper_bound = np.max(all_output, axis=0)
+
+        # Find indices of minimum and maximum values for each output
+        min_indices = np.array([np.where(all_output[:, i] == lower_bound[i])[0] for i in range(num_outputs)])
+        max_indices = np.array([np.where(all_output[:, i] == upper_bound[i])[0] for i in range(num_outputs)])
+
+        # Populate the results object (Corrected)
+        for i in range(num_outputs):
+            results.raw_data['min'] = np.append(results.raw_data['min'], {'x': X[min_indices[i]], 'f': lower_bound[i]})
+            results.raw_data['max'] = np.append(results.raw_data['max'], {'x': X[max_indices[i]], 'f': upper_bound[i]})
+            results.raw_data['bounds'] = np.vstack([results.raw_data['bounds'], np.array([lower_bound[i], upper_bound[i]])]) if results.raw_data['bounds'].size else np.array([lower_bound[i], upper_bound[i]])
+
+        #if save_raw_data == 'yes': (This part is already handled correctly)
+        results.raw_data['f'] = all_output
+        results.raw_data['x'] = X
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results['raw_data'] = {'f':None, 'x': X}
+        results.add_raw_data(x= X)
     
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
@@ -194,18 +153,4 @@ def sampling_method(x: np.ndarray, f: Callable, n_sam: int = 500, method='monte_
 # n=20
 # # Call the method
 # y = sampling_method(x_bounds,f=f, n_sam=n, method  ='latin_hypercube' , endpoints= True, save_raw_data = 'yes')
-# print(y)
-# print("-" * 30)
-# print("Minimum:")
-# print("x:", y['raw_data']['min']['x'])
-# print("f:", y['raw_data']['min']['f'])
-
-# print("-" * 30)
-# print("Maximum:")
-# print("x:", y['raw_data']['max']['x'])
-# print("f:", y['raw_data']['max']['f'])
-
-# print("-" * 30)
-# print("Raw data:")
-# print("x:", y['raw_data']['x'])
-# print("f:", y['raw_data']['f']) 
+# y.print()
