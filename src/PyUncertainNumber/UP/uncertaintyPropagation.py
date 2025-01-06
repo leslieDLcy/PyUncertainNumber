@@ -130,7 +130,7 @@ def mixed_propagation(vars: list, fun:Callable = None,
                                                     )  # Pass save_raw_data directly
             return results #process_results(results) 
         
-        case ("extremepoints" ):       
+        case ("second_order_extremepoints" |"extremepoints" ):       
             results =  second_order_propagation_method(vars,                                
                                                     fun,
                                                     results,
