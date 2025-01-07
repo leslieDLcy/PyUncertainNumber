@@ -79,7 +79,7 @@ class UncertainNumber:
     instances = []  # TODO named as registry later on
 
     # * --------------------- additional ---------------------*#
-    _samples: np.ndarray | list = None
+    _samples: np.ndarray | list = field(default=None, repr=False)
 
     # ---------------------more on initialisation---------------------#
 
@@ -127,7 +127,7 @@ class UncertainNumber:
                 self.naked_value = self._construct.midpoint()
             case "distribution":
                 if self._samples is not None:
-                    self._construct = Distribution(sample=self._samples)
+                    self._construct = Distribution(sample_data=self._samples)
                 elif self.distribution_parameters is not None:
                     self._construct = Distribution(
                         dist_family=self.distribution_parameters[0],
@@ -265,7 +265,7 @@ class UncertainNumber:
         return self._construct.display(**kwargs)
 
     # * ---------------------getters --------------------- *#
-
+    @property
     def construct(self):
         return self._construct
 
@@ -297,13 +297,19 @@ class UncertainNumber:
                 the distribution parameters
         """
         distSpec = DistributionSpecification(D.dist_family, D.dist_params)
-        # if "essence" not in kwargs:
-        #     kwargs["essence"] = "distribution"
-        return cls(
-            essence="distribution",
-            distribution_parameters=distSpec.get_specification(),
-            **kwargs,
-        )
+
+        if D.sample_data is None:
+            return cls(
+                essence="distribution",
+                distribution_parameters=distSpec.get_specification(),
+                **kwargs,
+            )
+        else:
+            return cls(
+                essence="distribution",
+                distribution_parameters=None,
+                _samples=D.sample_data,
+            )
 
     @classmethod
     def from_distributionProperties(cls, min, max, mean, median, variance, **kwargs):

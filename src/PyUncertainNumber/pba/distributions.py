@@ -143,7 +143,8 @@ class Distribution:
         if all(v is None for v in [self.dist_family, self.dist_params, self.sample_data]):
             raise ValueError(
                 "At least one of dist_family, dist_params or sample must be specified")
-        self.dist = self.rep()
+        self.flag()
+        self._dist = self.rep()
 
     def __repr__(self):
         # if self.sample_data is not None:
@@ -160,15 +161,31 @@ class Distribution:
         if self.dist_family is not None:
             return named_dists.get(self.dist_family)(*self.dist_params)
 
-    def sample(self):
-        pass
+    def flag(self):
+        """ boolean flag for if the distribution is a parameterised distribution or not 
+        note:
+            - only parameterised dist can do sampling
+            - for non-parameterised sample-data based dist, next steps could be fitting
+        """
+        if ((self.dist_params is not None) & (self.dist_family is not None)):
+            self._flag = True
+        else:
+            self._flag = False
+
+    def sample(self, size):
+        """ generate deviates from the distribution """
+        if self._flag:
+            return self._dist.rvs(size=size)
+        else:
+            raise ValueError(
+                "Sampling not supported for sample-approximated distributions")
 
     @mpl.rc_context({"text.usetex": True})
     def display(self, **kwargs):
         """display the distribution"""
         if self.sample_data is not None:
             return pl_ecdf(self.sample_data, **kwargs)
-        pl_pcdf(self.dist, **kwargs)
+        pl_pcdf(self._dist, **kwargs)
 
     def _get_hint(self):
         pass
@@ -179,8 +196,8 @@ class Distribution:
 
 # *  ---------------------constructors---------------------* #
     @classmethod
-    def _dist_from_sps(cls, dist: sps.rv_continuous | sps.rv_discrete,
-                       shape: str = None):
+    def dist_from_sps(cls, dist: sps.rv_continuous | sps.rv_discrete,
+                      shape: str = None):
         params = dist.args + tuple(dist.kwds.values())
         return cls(dist_family=shape, dist_params=params)
 

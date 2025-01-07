@@ -26,3 +26,5 @@ class DistributionSpecification:
             return [self.dist_family, initial_list_checking(self.dist_params)]
         elif isinstance(self.dist_params, list):
             return [self.dist_family, self.dist_params]
+        else:
+            return [self.dist_family, self.dist_params]
