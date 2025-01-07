@@ -14,13 +14,13 @@ import functools
 ''' Here we define the statistical inference functions from data for the UncertainNumber class. '''
 
 
-def fit(method: str, family: str, x: np.ndarray):
+def fit(method: str, family: str, data: np.ndarray):
     """ top-level fit function
 
     args:
         - method (str): method of fitting, e.g., {'mle' or 'mom'} 'entropy', 'pert', 'fermi', 'bayesian'
         - family (str): distribution family to be fitted
-        - x (np.ndarray): data to be fitted
+        - data (np.ndarray): data to be fitted
 
     note:
         - supported family list can be found in xx.
@@ -31,11 +31,11 @@ def fit(method: str, family: str, x: np.ndarray):
     match method:
         case 'mle':
             try:
-                return mle.get(family)(x)
+                return mle.get(family)(data)
             except:
-                return smle.get(family)(x)
+                return smle.get(family)(data)
         case 'mom':
-            return mom.get(family)(x)
+            return mom.get(family)(data)
         case _:
             raise ValueError('method not supported')
 
@@ -89,7 +89,7 @@ def MMchisquared(x): return (chi2(np.round(x.mean())))
 
 
 def MMexponential(x):
-    return pba.expon(mean(x))
+    return expon(mean(x))
 
 
 def MMF(x):  # **
@@ -228,7 +228,9 @@ mom = {
     'binomial': MMbinomial,
     'chisquared': MMchisquared,
     'exponential': MMexponential,
+    'expon': MMexponential,
     'F': MMF,
+    'f': MMF,
     'gamma': MMgamma,
     'geometric': MMgeometric,
     'gumbel': MMgumbel,
@@ -238,6 +240,7 @@ mom = {
     'doubleexponential': MMdoubleexponential,
     'logistic': MMlogistic,
     'loguniform': MMloguniform,
+    'norm': MMnormal,
     'normal': MMnormal,
     'gaussian': MMgaussian,
     'pareto': MMpareto,
@@ -260,6 +263,7 @@ mom = {
 
 
 def makedist(shape: str):
+    """ change return from sps.dist to Distribution objects """
     def decorator_make_dist(func):
         @functools.wraps(func)
         def wrapper_decorator(*args, **kwargs):  # input array x
@@ -298,10 +302,19 @@ def MLchisquared(x): return (chi2(*sps.chi2.fit(x)))
 
 @makedist('expon')
 def MLexponential(x):
-    """ Maximum likelihood estimation for exponential distribution.
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return expon(*sps.expon.fit(x))
+
+
+def universal_MLexponential(x):
+    """ a first attempt to Maximum likelihood estimation for exponential distribution
+        which accepts both precise and imprecise data;
 
     #! the example of `singleparam` pattern
+    #! to change, add the 'interval_measurement' decorator
     note:
+        the attempt is successful per se, but not accommodating to the top-level calling signature yet.
+
         - precise data returns precise distrubution
         - imprecise data need to be in Interval type to return a pbox
         - interval data can return either a precise distribution or a pbox 
@@ -400,7 +413,9 @@ mle = {
     'binomial': MLbinomial,
     'chisquared': MLchisquared,
     'exponential': MLexponential,
+    'expon': MLexponential,
     'F': MLF,
+    'f': MLF,
     'gamma': MLgamma,
     'gammaexponential': MLgammaexponential,
     'geometric': MLgeometric,
@@ -412,6 +427,7 @@ mle = {
     'negativebinomial': MLnegativebinomial,
     'norm': MLnormal,
     'normal': MLnormal,
+    'gaussian': MLnormal,
     'pareto': MLpareto,
     'poisson': MLpoisson,
     'powerfunction': MLpowerfunction,

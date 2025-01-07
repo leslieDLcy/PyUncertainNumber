@@ -7,6 +7,7 @@ UC module:
 
 fit distribution:
     ☐ Bayesian methods are not supported yet
+    ☐ test ML*() with many distributions
 
 
 other:
