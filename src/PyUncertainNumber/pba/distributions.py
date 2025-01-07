@@ -133,6 +133,7 @@ named_dists = {
 
 @dataclass
 class Distribution:
+    """ two signature for the distribution object, either a parametric specification or a nonparametric sample per se"""
 
     dist_family: str = None
     dist_params: list[float] | Tuple[float, ...] = None
@@ -150,7 +151,7 @@ class Distribution:
         if self.dist_params is not None:
             return f"dist ~ {self.dist_family}{self.dist_params}"
         elif self.sample_data is not None:
-            return "sample-approximated distribution object"
+            return "dist ~ sample-approximated distribution object"
         else:
             return "wrong initialisation"
 

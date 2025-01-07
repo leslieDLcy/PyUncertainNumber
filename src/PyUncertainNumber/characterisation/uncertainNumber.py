@@ -55,7 +55,7 @@ class UncertainNumber:
     # UN object, which shall be linked with the 'pba' or `Intervals` package
     naked_value: float = field(default=None)
 
-    # ---------------------auxlliary information---------------------#
+    # * ---------------------auxlliary information---------------------*#
     # some simple boiler plates
     # lat: float = field(default=0.0, metadata={'unit': 'degrees'})
     # ensemble: Type[Ensemble] = field(default=None)
@@ -67,18 +67,18 @@ class UncertainNumber:
     structure: str = field(default=None)
     security: str = field(default=None)
 
-    # ---------------------aleatoric component---------------------#
+    # * ---------------------aleatoric component--------------------- *#
     ensemble: Type[Ensemble] = field(default=None)
     variability: str = field(default=None)
     dependence: str = field(default=None)
 
-    # ---------------------epistemic component---------------------#
+    # * ---------------------epistemic component---------------------*#
     uncertainty: str = field(default=None)
 
     # class variable
     instances = []  # TODO named as registry later on
 
-    # --------------------- additional ---------------------#
+    # * --------------------- additional ---------------------*#
     _samples: np.ndarray | list = None
 
     # ---------------------more on initialisation---------------------#
@@ -264,7 +264,12 @@ class UncertainNumber:
 
         return self._construct.display(**kwargs)
 
-    # ---------------------other constructors---------------------#
+    # * ---------------------getters --------------------- *#
+
+    def construct(self):
+        return self._construct
+
+    # * ---------------------other constructors--------------------- *#
 
     @classmethod
     def from_hedge(cls, hedged_language):
@@ -280,19 +285,22 @@ class UncertainNumber:
         return cls(essence=essence, bounds=[left, right])
 
     @classmethod
-    def from_distribution(cls, dist_family: str, dist_params, **kwargs):
+    def fromDistribution(cls, D, **kwargs):
+        # dist_family: str, dist_params,
         """create an Uncertain Number from specification of distribution
 
         args:
+            - D: Distribution object
             dist_family: str
                 the distribution family
             dist_params: list, tuple or string
                 the distribution parameters
         """
-        distSpec = DistributionSpecification(dist_family, dist_params)
-        if "essence" not in kwargs:
-            kwargs["essence"] = "distribution"
+        distSpec = DistributionSpecification(D.dist_family, D.dist_params)
+        # if "essence" not in kwargs:
+        #     kwargs["essence"] = "distribution"
         return cls(
+            essence="distribution",
             distribution_parameters=distSpec.get_specification(),
             **kwargs,
         )
