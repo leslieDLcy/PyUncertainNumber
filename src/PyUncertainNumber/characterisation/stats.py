@@ -11,23 +11,7 @@ from PyUncertainNumber import pba
 from ..pba.distributions import Distribution as D
 import functools
 
-''' Here we define the statistical inference functions from data for the UncertainNumber class. 
-
-examples:
-    - maximum likelihood
-    - method of matching moments
-    - ~~confidence boxes~~
-    - maximum entropy
-    - ~~Bayesian inference~~
-    - maximum a posteriori
-    - PERT
-    - Fermi methods
-'''
-
-""" ongoing notes
-- the return from the constructors below are `scipy.stats.dist` objects
-
-"""
+''' Here we define the statistical inference functions from data for the UncertainNumber class. '''
 
 
 def fit(method: str, family: str, x: np.ndarray):
@@ -40,6 +24,9 @@ def fit(method: str, family: str, x: np.ndarray):
 
     note:
         - supported family list can be found in xx.
+
+    return:
+        - the return from the constructors below are `scipy.stats.dist` objects
     """
     match method:
         case 'mle':
@@ -271,14 +258,12 @@ mom = {
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rv_continuous.fit.html#scipy.stats.rv_continuous.fit
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.CensoredData.html#scipy.stats.CensoredData
 
-#! note below all return `scipy.stats.dist` objects
-
 
 def makedist(shape: str):
     def decorator_make_dist(func):
         @functools.wraps(func)
         def wrapper_decorator(*args, **kwargs):  # input array x
-            return D._dist_from_sps(func(*args, **kwargs), shape)
+            return D.dist_from_sps(func(*args, **kwargs), shape)
         return wrapper_decorator
     return decorator_make_dist
 
@@ -289,10 +274,12 @@ def MLbernoulli(x): return bernoulli(
 )
 
 
+@makedist('beta')
 def MLbeta(x):
     return beta(*sps.beta.fit(x))
 
 
+@makedist('betabinom')
 def MLbetabinomial(x): return (betabinom(*sps.betabinom.fit(x)))
 
 
@@ -305,9 +292,11 @@ def MLbinomial(x):
     return binom(*sps.binom.fit(x))
 
 
+@makedist('chi2')
 def MLchisquared(x): return (chi2(*sps.chi2.fit(x)))
 
 
+@makedist('expon')
 def MLexponential(x):
     """ Maximum likelihood estimation for exponential distribution.
 
@@ -318,23 +307,43 @@ def MLexponential(x):
         - interval data can return either a precise distribution or a pbox 
     """
     if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return D._dist_from_sps(expon(*sps.expon.fit(x)))
+        return D.dist_from_sps(expon(*sps.expon.fit(x)))
     elif isinstance(x, Interval):
         return pba.expon(mean(x))
     else:
         raise TypeError('Input data type not supported')
 
 
+@makedist('f')
 def MLF(x): return (F(*sps.f.fit(x)))
+
+
+@makedist('gamma')
 def MLgamma(x): return (gamma(*sps.gamma.fit(x)))
+
+
+@makedist('gammaexpon')
 def MLgammaexponential(x): return (
     sps.gammaexpon(*sps.gammaexpon.fit(x)))
 
 
+@makedist('geom')
 def MLgeometric(x): return (geom(*sps.geom.fit(x)))
+
+
+@makedist('gumbel')
 def MLgumbel(x): return (gumbel_r(*sps.gumbel_r.fit(x)))
+
+
+@makedist('laplace')
 def MLlaplace(x): return (laplace(*sps.laplace.fit(x)))
+
+
+@makedist('logistic')
 def MLlogistic(x): return (logistic(*sps.logistic.fit(x)))
+
+
+@makedist('lognorm')
 def MLlognormal(x): return (lognorm(*sps.lognorm.fit(x)))
 
 # TODO why not use `sps.lognorm.fit(x)`` directly?
@@ -342,9 +351,11 @@ def MLlognormal(x): return (lognorm(*sps.lognorm.fit(x)))
 #     *sps.lognorm.fit(x), size=many))
 
 
+@makedist('loguniform')
 def MLloguniform(x): return (loguniform(*sps.loguniform.fit(x)))
 
 
+@makedist('nbinom')
 def MLnegativebinomial(x): return (
     sps.nbinom(*sps.nbinom.fit(x)))
 
@@ -354,12 +365,31 @@ def MLnormal(x):
     return norm(*sps.norm.fit(x))
 
 
+@makedist('pareto')
 def MLpareto(x): return (pareto(*sps.pareto.fit(x)))
+
+
+@makedist('poisson')
 def MLpoisson(x): return (poisson(*sps.poisson.fit(x)))
+
+
+@makedist('powerlaw')
 def MLpowerfunction(x): return (powerlaw(*sps.powerlaw.fit(x)))
+
+
+@makedist('rayleigh')
 def MLrayleigh(x): return (sps.rayleigh(*sps.rayleigh.fit(x)))
+
+
+@makedist('t')
 def MLstudent(x): return (t(*sps.t.fit(x)))
+
+
+@makedist('triang')
 def MLtriangular(x): return (triang(*sps.t.fit(x)))
+
+
+@makedist('uniform')
 def MLuniform(x): return (uniform(*sps.uniform.fit(x)))
 
 
