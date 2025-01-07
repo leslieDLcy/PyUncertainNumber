@@ -33,7 +33,81 @@ def interval_measurements(func):
     return imprecise_measurements_wrapper
 
 
-# ---------------------Bernoulli---------------------#
+named_cbox = {
+    'bernoulli': MMbernoulli,
+    'beta': MMbeta,
+    'betabinomial': MMbetabinomial,
+    'binomial': MMbinomial,
+    'chisquared': MMchisquared,
+    'exponential': MMexponential,
+    'expon': MMexponential,
+    'F': MMF,
+    'f': MMF,
+    'gamma': MMgamma,
+    'geometric': MMgeometric,
+    'gumbel': MMgumbel,
+    'extremevalue': MMextremevalue,
+    'lognormal': MMlognormal,
+    'laplace': MMlaplace,
+    'doubleexponential': MMdoubleexponential,
+    'logistic': MMlogistic,
+    'loguniform': MMloguniform,
+    'norm': MMnormal,
+    'normal': MMnormal,
+    'gaussian': MMgaussian,
+    'pareto': MMpareto,
+    'poisson': MMpoisson,
+    'powerfunction': MMpowerfunction,
+    't': MMt,
+    'student': MMstudent,
+    'uniform': MMuniform,
+    'rectangular': MMrectangular,
+    'triangular': MMtriangular,
+}
+
+
+named_nextvalue = {
+    'bernoulli': MMbernoulli,
+    'beta': MMbeta,
+    'betabinomial': MMbetabinomial,
+    'binomial': MMbinomial,
+    'chisquared': MMchisquared,
+    'exponential': MMexponential,
+    'expon': MMexponential,
+    'F': MMF,
+    'f': MMF,
+    'gamma': MMgamma,
+    'geometric': MMgeometric,
+    'gumbel': MMgumbel,
+    'extremevalue': MMextremevalue,
+    'lognormal': MMlognormal,
+    'laplace': MMlaplace,
+    'doubleexponential': MMdoubleexponential,
+    'logistic': MMlogistic,
+    'loguniform': MMloguniform,
+    'norm': MMnormal,
+    'normal': MMnormal,
+    'gaussian': MMgaussian,
+    'pareto': MMpareto,
+    'poisson': MMpoisson,
+    'powerfunction': MMpowerfunction,
+    't': MMt,
+    'student': MMstudent,
+    'uniform': MMuniform,
+    'rectangular': MMrectangular,
+    'triangular': MMtriangular,
+}
+
+
+def cbox(family: str, data):
+    return named_cbox.get(family)(data)
+
+
+def nextvalue(family: str, data):
+    return named_nextvalue.get(family)(data)
+
+# * ---------------------Bernoulli---------------------*#
+
 
 def CBbernoulli_p(x):
     n = len(x)
@@ -52,7 +126,7 @@ def CBbernoulli(x):
     return pba.bernoulli(np.array([k, k+1])/(n+1))
 
 
-# ---------------------binomial---------------------#
+# * ---------------------binomial---------------------*#
 # x[i] ~ binomial(N, p), for known N, x[i] is a nonnegative integer less than or equal to N
 def CBbinomial_p(x, N):
     """ cbox for Bionomial parameter
@@ -90,7 +164,7 @@ def CBbinomial(x, N):
     return pbox_from_extredists(cdfs, shape="betanomial")
 
 
-# ---------------------binomialnp---------------------#
+# * ---------------------binomialnp---------------------*#
 # TODO not done yet
 # x[i] ~ binomial(N, p), for unknown N, x[i] is a nonnegative integer
 # see https://sites.google.com/site/cboxbinomialnp/
@@ -106,7 +180,7 @@ def parameter_binomialnp_p(x):
     pass
 
 
-# ---------------------Poisson---------------------#
+# * ---------------------Poisson---------------------*#
 # x[i] ~ Poisson(parameter), x[i] is a nonnegative integer
 
 def CBpoisson_lambda(x):
@@ -128,7 +202,7 @@ def CBpoisson(x):
     return pbox_from_extredists(cdfs, shape="nbinom")
 
 
-# ---------------------exponential---------------------#
+# * ---------------------exponential---------------------*#
 # x[i] ~ exponential(parameter), x[i] is a nonnegative integer
 
 def CBexponential_lambda(x):
@@ -158,7 +232,7 @@ def CBexponential(x):
     return pbox_from_pseudosamples(pseudo_s)
 
 
-# ---------------------normal---------------------#
+# * ---------------------normal---------------------*#
 
 # x[i] ~ normal(mu, sigma)
 def cboxNormalMu_base(x):
@@ -250,7 +324,7 @@ def CBlognormal_sigma(x):
     )
 
 
-# ---------------------uniform---------------------#
+# * ---------------------uniform---------------------*#
 
 
 # x[i] ~ uniform(midpoint, width)
@@ -292,7 +366,7 @@ def CBuniform(x):
     m = (max(x)-w)+(2*w-r) * d.uniform(0, 1)
     return pbox_from_pseudosamples(d.uniform(m-w, m+w))
 
-# ---------------------nonparametric---------------------#
+# * ---------------------nonparametric---------------------*#
 
 # # x[i] ~ F, a continuous but unknown distribution
 # # TODO arguments not confirmed yet
@@ -315,4 +389,4 @@ def CBuniform(x):
 #     return (mixture(z, w), mixture(z[:-1] + [np.inf], w))
 
 
-# ---------------------helper modules---------------------#
+# * ---------------------helper modules---------------------*#
