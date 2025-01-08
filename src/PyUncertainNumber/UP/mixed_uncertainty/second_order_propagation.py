@@ -214,48 +214,88 @@ def second_order_propagation_method(x: list, f:Callable = None,
 
                 inpsList = np.zeros((0, d))
                 evalsList = np.zeros((0, num_outputs))
-                all_output_list = []             
+                all_output_list = []  
 
-                for out in range(num_outputs):
-                    Xsings = np.empty((focal_elements_comb.shape[0], 2, d))
-                    current_index = 0
-                    for i, slice in enumerate(focal_elements_comb):
-                        Xsings[i, :, :] = extreme_pointX(slice, res.raw_data['sign_x'][out])
-                        current_index += 1
-
-                        for k in range(Xsings.shape[1]):
-                            c = Xsings[i, k, :]
-                            im = np.where((inpsList == c).all(axis=1))[0]
-                            if not im.size:
-                                output = f(c)
-                                all_output_list.append(output)
-                                inpsList = np.vstack([inpsList, c])
-                                evalsList = np.vstack([evalsList, output])
-                            else:
-                                all_output_list.append(evalsList[im[0]])
+                # Preallocate all_output_list with explicit loops
+                all_output_list = []
+                for _ in range(num_outputs):
+                    output_for_current_output = []
+                    for _ in range(len(focal_elements_comb)):  # Changed to focal_elements_comb
+                        output_for_current_output.append([None, None])
+                    all_output_list.append(output_for_current_output)
                 
-                current_index = 0  # Reset for the next input
+                for i, slice in enumerate(focal_elements_comb):  # Iterate over focal_elements_comb
+                    Xsings = np.empty((2, d))  # Changed to 2 for the two extreme points
+                    Xsings[:, :] = extreme_pointX(slice, res.raw_data['sign_x'])  # Use the entire sign_x array
+
+                    for k in range(Xsings.shape[0]):  # Changed to Xsings.shape[0]
+                        c = Xsings[k, :]
+                        im = np.where((inpsList == c).all(axis=1))[0]
+                        if not im.size:
+                            output = f(c)
+
+                            # Store each output in a separate sublist
+                            for out in range(num_outputs):
+                                all_output_list[out][i][k] = output[out]  # Changed indexing
+
+                            inpsList = np.vstack([inpsList, c])
+
+                            # Ensure output is always a NumPy array
+                            if not isinstance(output, np.ndarray):
+                                output = np.array(output)
+
+                            evalsList = np.vstack([evalsList, output])
+                        else:
+                            for out in range(num_outputs):
+                                all_output_list[out][i][k] = evalsList[im[0]][out]  # Changed indexing
+         
+
+                # for out in range(num_outputs):
+                #     Xsings = np.empty((focal_elements_comb.shape[0], 2, d))
+                #     current_index = 0
+                #     for i, slice in enumerate(focal_elements_comb):
+                #         Xsings[i, :, :] = extreme_pointX(slice, res.raw_data['sign_x'][out])
+                #         current_index += 1
+
+                #         for k in range(Xsings.shape[1]):
+                #             c = Xsings[i, k, :]
+                #             im = np.where((inpsList == c).all(axis=1))[0]
+                #             if not im.size:
+                #                 output = f(c)
+                #                 all_output_list.append(output)
+                #                 inpsList = np.vstack([inpsList, c])
+                #                 evalsList = np.vstack([evalsList, output])
+                #             else:
+                #                 all_output_list.append(evalsList[im[0]])
+                
+                # current_index = 0  # Reset for the next input
 
                 # Convert all_output to a 2D NumPy array
-                all_output =  np.array(all_output_list).reshape(focal_elements_comb.shape[0], 2, num_outputs)
-                
+                #all_output =  np.array(all_output_list).reshape(focal_elements_comb.shape[0], 2, num_outputs)
+                # Reshape all_output based on the actual number of elements per output
+                all_output = np.array(all_output_list, dtype=object)
+                print('output', all_output)
+                all_output = np.reshape(all_output, (num_outputs, -1, 2))  # Reshape to 3D
                 # Calculate min and max for each sublist in all_output
-                min_values = np.min(all_output, axis=1) 
-                max_values = np.max(all_output, axis=1) 
+                min_values = np.min(all_output, axis=2) 
+                print('min_values', (min_values.shape[0]))
+                print('min_values', (min_values))
+                max_values = np.max(all_output, axis=2) 
+                print('max_values', (max_values))
 
-                lower_bound = np.zeros((num_outputs,len(min_values)))
-                upper_bound = np.zeros((num_outputs,len(max_values)))
+                lower_bound = np.zeros((num_outputs,min_values.shape[1]))
+                upper_bound = np.zeros((num_outputs,max_values.shape[1]))
   
                 bounds = np.empty((num_outputs, 2, lower_bound.shape[1])) 
 
                 for i in range(num_outputs):
-                    min_values[:,i] = np.sort(min_values[:,i])
-                    max_values[:,i]  = np.sort(max_values[:,i])
-                    lower_bound[i,:] = min_values[:, i]  # Extract each column
-                    upper_bound[i,:] = max_values[:, i]  
+                    print('sort', np.sort(min_values[i,:]))
+                    lower_bound[i,:] = np.sort(min_values[i,:])  # Extract each column
+                    upper_bound[i,:] = np.sort(max_values[i,:])
                     
                     bounds[i, 0, :] = lower_bound[i,:]
                     bounds[i, 1, :] = upper_bound[i,:]
+                print('bounds', bounds)
                 
             case _:
                 raise ValueError("Invalid UP method! endpoints_cauchy are under development.")
@@ -266,6 +306,8 @@ def second_order_propagation_method(x: list, f:Callable = None,
         results.raw_data['bounds']  = bounds
         results.raw_data['min'] = np.array([{ 'f': lower_bound}])  # Initialize as a NumPy array
         results.raw_data['max'] = np.array([{ 'f': upper_bound}])  # Initialize as a NumPy array
+
+        print(bounds)
 
         if save_raw_data == 'yes':
             #results.add_raw_data(f= all_output, x= x_combinations)
@@ -278,3 +320,84 @@ def second_order_propagation_method(x: list, f:Callable = None,
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
        
     return results 
+
+from PyUncertainNumber import UncertainNumber
+
+def myFunctionWithTwoOutputs(x):
+    """
+    Example function with two outputs.
+    Replace this with your actual function logic.
+    """
+    input1= x[0]
+    input2=x[1]
+    input3=x[2]
+    input4=x[3]
+    input5=x[4]
+    output1 = input1 + input2 + input3 + input4 + input5
+    output2 = input1 * input2 * input3 * input4 * input5
+    return np.array([output1, output2])
+
+means = np.array([1, 2, 3, 4, 5])
+stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+
+
+n_disc = 10  # Number of discretizations
+
+x = [
+        UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
+        UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[1], stds[1]]]),
+        UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[2], stds[2]]]),
+        UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[3], stds[3]]]),
+        UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[4], stds[4]]]),
+    ]
+
+results = second_order_propagation_method(x=x, f=myFunctionWithTwoOutputs, method = 'extremepoints', n_disc= 4)
+
+print(results)
+
+import matplotlib.pyplot as plt
+
+def plotPbox(xL, xR, p=None):
+    """
+    Plots a p-box (probability box) using matplotlib.
+
+    Args:
+        xL (np.ndarray): A 1D NumPy array of lower bounds.
+        xR (np.ndarray): A 1D NumPy array of upper bounds.
+        p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
+                                   Defaults to None, which generates equally spaced probabilities.
+        color (str, optional): The color of the plot. Defaults to 'k' (black).
+    """
+    xL = np.squeeze(xL)  # Ensure xL is a 1D array
+    xR = np.squeeze(xR)  # Ensure xR is a 1D array
+
+    if p is None:
+        p = np.linspace(0, 1, len(xL))  # p should have one more element than xL/xR
+
+    if p.min() > 0:
+        p = np.concatenate(([0], p))
+        xL = np.concatenate(([xL[0]], xL))
+        xR = np.concatenate(([xR[0]], xR))
+
+    if p.max() < 1:
+        p = np.concatenate((p, [1]))
+        xR = np.concatenate((xR, [xR[-1]]))
+        xL = np.concatenate((xL, [xL[-1]]))
+    
+    colors = 'black'
+    # Highlight the points (xL, p)
+    plt.scatter(xL, p, color=colors, marker='o', edgecolors='black', zorder=3)
+
+    # Highlight the points (xR, p)
+    plt.scatter(xR, p, color=colors, marker='o', edgecolors='black', zorder=3)
+
+
+    plt.fill_betweenx(p, xL, xR, color=colors, alpha=0.5)
+    plt.plot( [xL[0], xR[0]], [0, 0],color=colors, linewidth=3)
+    plt.plot([xL[-1], xR[-1]],[1, 1],  color=colors, linewidth=3)
+    plt.show()
+
+print(results.raw_data['min'][0]['f'])
+plotPbox(results.raw_data['min'][0]['f'], results.raw_data['max'][0]['f'], p=None)
+plt.show()
+
