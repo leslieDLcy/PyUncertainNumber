@@ -154,11 +154,25 @@ def MMgamma(x):  # **
 
 
 @makedist('geometric')
-def MMgeometric(x): return geom(1/(1+mean(x)))
+def MMgeometric(x): return
 
 
-@makedist('pascal')
-def MMpascal(x): return geom(1/(1+mean(x)))
+def MMgeometric(x):
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return D.dist_from_sps(geom(1/(1+mean(x))), shape='geometric')
+    elif isinstance(x, Interval):
+        return pba.geom(1/(1+mean(x)))
+    else:
+        raise TypeError('Input data type not supported')
+
+
+def MMpascal(x):
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return D.dist_from_sps(geom(1/(1+mean(x))), shape='pascal')
+    elif isinstance(x, Interval):
+        return pba.geom(1/(1+mean(x)))
+    else:
+        raise TypeError('Input data type not supported')
 
 # def MMgumbel0(x) : return(gumbel(x.mean() - 0.57721 * x.std() * np.sqrt(6)/ np.pi, x.std() * np.sqrt(6)/ np.pi))       #**  # https://stackoverflow.com/questions/51427764/using-method-of-moments-with-gumbel-r-in-python-scipy-stats-gumbel-r
 
