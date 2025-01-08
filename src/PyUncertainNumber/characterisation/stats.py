@@ -9,9 +9,30 @@ from ..pba.intervalOperators import mean
 from intervals import Interval
 from PyUncertainNumber import pba
 from ..pba.distributions import Distribution as D
+from ..pba.distributions import named_dists
+from ..pba.pbox import named_pbox
 import functools
 
 ''' Here we define the statistical inference functions from data for the UncertainNumber class. '''
+
+
+def makedist(shape: str):
+    """ change return from sps.dist to Distribution objects """
+    def decorator_make_dist(func):
+        @functools.wraps(func)
+        def wrapper_decorator(*args, **kwargs):  # input array x
+            return D.dist_from_sps(func(*args, **kwargs), shape)
+        return wrapper_decorator
+    return decorator_make_dist
+
+
+def singleParamPattern(x, shape: str):
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return D.dist_from_sps(named_dists.get(shape)(mean(x)), shape=shape)
+    elif isinstance(x, Interval):
+        return named_pbox.get(shape)(mean(x))
+    else:
+        raise TypeError('Input data type not supported')
 
 
 def fit(method: str, family: str, data: np.ndarray):
@@ -46,13 +67,28 @@ def fit(method: str, family: str, data: np.ndarray):
 ''' hint: given interval data x, return pbox '''
 
 
-# create decorator for makeing distribution and making pboxes
+def MMbernoulli(x):
+    """ a first attempt to Maximum likelihood estimation for exponential distribution
+        which accepts both precise and imprecise data;
+
+    #! the example of `singleparam` pattern
+    #! to change, add the 'interval_measurement' decorator
+    note:
+        the attempt is successful per se, but not accommodating to the top-level calling signature yet.
+
+        - precise data returns precise distrubution
+        - imprecise data need to be in Interval type to return a pbox
+        - interval data can return either a precise distribution or a pbox
+    """
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return D.dist_from_sps(expon(*sps.bernoulli.fit(x)), shape='bernoulli')
+    elif isinstance(x, Interval):
+        return pba.bernoulli(mean(x))
+    else:
+        raise TypeError('Input data type not supported')
 
 
-def MMbernoulli(x: np.ndarray):
-    return bernoulli(x.mean())  # assumes x is zeros and ones
-
-
+@makedist('beta')
 def MMbeta(x: np.ndarray):
     m = x.mean()
     s = x.var()
@@ -62,6 +98,7 @@ def MMbeta(x: np.ndarray):
     return beta(alpha, beta_p)
 
 
+@makedist('betabinom')
 def MMbetabinomial(n: int, x):  # **
     #! 'x**2' variable repetition
     # n must be provided; it's not estimated from data
@@ -73,9 +110,10 @@ def MMbetabinomial(n: int, x):  # **
     return betabinom(n, (n*m1 - m2) / d, (n-m1)*(n - m2/m1) / d)
 
 
+@makedist('binom')
 def MMbinomial(x, n: int):  # **
     #! the return seems overcomplicated?
-    """ 
+    """
     args:
          - n (int): number of trials
     """
@@ -85,32 +123,47 @@ def MMbinomial(x, n: int):  # **
     # return binom(int(np.abs(np.round(a/(1-b**2/a)))), np.abs(1-b**2/a))
 
 
+@makedist('chi2')
 def MMchisquared(x): return (chi2(np.round(x.mean())))
+
+# def MMchisquared(x):
+#     #! TODO interval outward_rounding
+#     if isinstance(x, sps.CensoredData | np.ndarray | list):
+#         return D.dist_from_sps(chi2(outward_rounding(mean(x))), shape='chi2')
+#     elif isinstance(x, Interval):
+#         return pba.expon(mean(x))
+#     else:
+#         raise TypeError('Input data type not supported')
 
 
 def MMexponential(x):
-    return expon(mean(x))
+    return singleParamPattern(x, 'expon')
 
 
+@makedist('f')
 def MMF(x):  # **
     w = 2/(1-1/x.mean())
     return (F(np.round((2*w**3 - 4*w**2) / ((w-2)**2 * (w-4) * x.std()**2 - 2*w**2)), np.round(w)))
 
 
+@makedist('gamma')
 def MMgamma(x):  # **
     a = x.mean()
     b = x.std()
     return (gamma(b**2/a, 1/(a/b)**2))  # gamma1(a, b) ~ gamma(b²/a, (a/b)²)
 
 
+@makedist('geometric')
 def MMgeometric(x): return geom(1/(1+mean(x)))
 
 
+@makedist('pascal')
 def MMpascal(x): return geom(1/(1+mean(x)))
 
 # def MMgumbel0(x) : return(gumbel(x.mean() - 0.57721 * x.std() * np.sqrt(6)/ np.pi, x.std() * np.sqrt(6)/ np.pi))       #**  # https://stackoverflow.com/questions/51427764/using-method-of-moments-with-gumbel-r-in-python-scipy-stats-gumbel-r
 
 
+@makedist('gumbel')
 def MMgumbel(x):  # **
     # https://stackoverflow.com/questions/51427764/using-method-of-moments-with-gumbel-r-in-python-scipy-stats-gumbel-r
     scale = np.sqrt(6)/np.pi * np.std(x)
@@ -118,66 +171,92 @@ def MMgumbel(x):  # **
     return (gumbel_r(loc, scale))
 
 
+@makedist('extremevalue')
 def MMextremevalue(x): return (gumbel_r(x.mean() - 0.57721 * x.std()
                                         * np.sqrt(6) / np.pi, x.std() * np.sqrt(6) / np.pi))  # **
 
 
+@makedist('lognormal')
 def MMlognormal(x): return (lognorm(x.mean(), x.std()))  # **
 
 
+@makedist('laplace')
 def MMlaplace(x): return (laplace(x.mean(), x.std()/np.sqrt(2)))  # **
 
 
+@makedist('doubleexponential')
 def MMdoubleexponential(x): return (
     laplace(x.mean(), x.std()/np.sqrt(2)))  # **
 
 
+@makedist('logistic')
 def MMlogistic(x): return (
     logistic(x.mean(), x.std() * np.sqrt(3)/np.pi))  # **
 
 
+@makedist('loguniform')
 def MMloguniform(x): return (loguniform(mean=x.mean(), std=x.std()))  # **
 
 
+@makedist('norm')
 def MMnormal(x): return (norm(x.mean(), x.std()))  # **
 
 
+@makedist('gaussian')
 def MMgaussian(x): return (norm(x.mean(), x.std()))  # **
 
 
+@makedist('pareto')
 def MMpareto(x):  # **
     a = x.mean()
     b = x.std()
     return (pareto(a/(1+1/np.sqrt(1+a**2/b**2)), 1+np.sqrt(1+a**2/b**2)))
 
 
-def MMpoisson(x): return pba.poisson(mean(x))
+def MMpoisson(x):
+    return singleParamPattern(x, 'poisson')
 
 
+# test if below is correct
+# def MMpoisson(x):
+#     if isinstance(x, sps.CensoredData | np.ndarray | list):
+#         return D.dist_from_sps(poisson(mean(x)), shape='poisson')
+#     elif isinstance(x, Interval):
+#         return pba.poisson(mean(x))
+#     else:
+#         raise TypeError('Input data type not supported')
+
+
+@makedist('powerlaw')
 def MMpowerfunction(x):  # **
     a = x.mean()
     b = x.std()
     return powerlaw(a/(1-1/np.sqrt(1+(a/b)**2)), np.sqrt(1+(a/b)**2)-1)
 
 
-def MMt(x): return (t(2/(1-1/x.std()**2)))
+@makedist('t')
+def MMt(x): return t(2/(1-1/x.std()**2))
 
 
+@makedist('student')
 def MMstudent(x):
     assert not (
         1 < x.std()), 'Improper standard deviation for student distribution'
     return t(2/(1-1/x.std()**2))
 
 
+@makedist('uniform')
 def MMuniform(x):  # **
     a = x.mean()
     b = np.sqrt(3)*x.std()
     return (uniform(a-b, a+b))
 
 
+@makedist('rectangular')
 def MMrectangular(x): return (MMuniform(x))
 
 
+@makedist('triangular')
 def MMtriangular(x, iters=100, dives=10):  # **
     # iterative search for triangular distribution parameters using method of
     # matching moments (you solve the thing analytically! too messy without help)
@@ -262,16 +341,6 @@ mom = {
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.CensoredData.html#scipy.stats.CensoredData
 
 
-def makedist(shape: str):
-    """ change return from sps.dist to Distribution objects """
-    def decorator_make_dist(func):
-        @functools.wraps(func)
-        def wrapper_decorator(*args, **kwargs):  # input array x
-            return D.dist_from_sps(func(*args, **kwargs), shape)
-        return wrapper_decorator
-    return decorator_make_dist
-
-
 @makedist('bernoulli')
 def MLbernoulli(x): return bernoulli(
     *sps.bernoulli.fit(x)
@@ -302,29 +371,9 @@ def MLchisquared(x): return (chi2(*sps.chi2.fit(x)))
 
 @makedist('expon')
 def MLexponential(x):
+    """ a standalone caller for exponential distribution, not in use yet """
     if isinstance(x, sps.CensoredData | np.ndarray | list):
         return expon(*sps.expon.fit(x))
-
-
-def universal_MLexponential(x):
-    """ a first attempt to Maximum likelihood estimation for exponential distribution
-        which accepts both precise and imprecise data;
-
-    #! the example of `singleparam` pattern
-    #! to change, add the 'interval_measurement' decorator
-    note:
-        the attempt is successful per se, but not accommodating to the top-level calling signature yet.
-
-        - precise data returns precise distrubution
-        - imprecise data need to be in Interval type to return a pbox
-        - interval data can return either a precise distribution or a pbox 
-    """
-    if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return D.dist_from_sps(expon(*sps.expon.fit(x)))
-    elif isinstance(x, Interval):
-        return pba.expon(mean(x))
-    else:
-        raise TypeError('Input data type not supported')
 
 
 @makedist('f')

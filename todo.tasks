@@ -8,7 +8,7 @@ UC module:
 fit distribution:
     ☐ Bayesian methods are not supported yet
     ☐ test ML*() with many distributions
-
+    ☐ #! think about adding the 'interval_measurement' decorator in improving consistency
 
 other:
     ✔ plot function @done (03/12/2024, 14:45:18)
