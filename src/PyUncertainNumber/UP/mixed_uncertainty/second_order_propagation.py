@@ -4,15 +4,15 @@ import tqdm
 from PyUncertainNumber.UP.cartesian_product import cartesian
 from PyUncertainNumber.UP.extreme_point_func import extreme_pointX
 from PyUncertainNumber.UP.extremepoints import extremepoints_method
-from PyUncertainNumber.UP.utils import propagation_results
+from PyUncertainNumber.UP.utils import propagation_results, condense_bounds
 
-#TODO add tail concentratig algorithms and condensation.
+#TODO add tail concentratig algorithms.
 #TODO add x valus for min and max
 def second_order_propagation_method(x: list, f:Callable = None,  
                                     results: propagation_results = None, 
                                     method = 'endpoints',
                                     n_disc: Union[int, np.ndarray] = 10, 
-                                    condensation:int = 1, # to be implemented
+                                    condensation: Union[float, np.ndarray] = None, 
                                     tOp: Union[float, np.ndarray] = 0.999,
                                     bOt: Union[float, np.ndarray] = 0.001,
                                     save_raw_data= 'no')-> propagation_results:  # Specify return type
@@ -260,12 +260,16 @@ def second_order_propagation_method(x: list, f:Callable = None,
             case _:
                 raise ValueError("Invalid UP method! endpoints_cauchy are under development.")
 
+        if condensation is not None:
+            bounds = condense_bounds(bounds, condensation) 
+
         results.raw_data['bounds']  = bounds
         results.raw_data['min'] = np.array([{ 'f': lower_bound}])  # Initialize as a NumPy array
         results.raw_data['max'] = np.array([{ 'f': upper_bound}])  # Initialize as a NumPy array
 
         if save_raw_data == 'yes':
-            results.add_raw_data(f= all_output, x= x_combinations)
+            #results.add_raw_data(f= all_output, x= x_combinations)
+            results.add_raw_data(f= all_output)
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
         results.add_raw_data(f= None, x= x_combinations)

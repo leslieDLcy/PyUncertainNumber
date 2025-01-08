@@ -110,39 +110,51 @@ def mixed_propagation(vars: list, fun:Callable = None,
                     condensation:int = 1,
                     tOp: Union[float, np.ndarray] = 0.999,
                     bOt: Union[float, np.ndarray] = 0.001,
-                    lim_Q: np.array = np.array([0.01, 0.09]), 
-                    save_raw_data= 'no',
+                    save_raw_data= 'no', 
+                             
                     **kwargs,):  
     
     match method:
         
         case ("second_order_endpoints" | "second_order_vertex" | "endpoints" |"vertex"):
             results = second_order_propagation_method(vars,                                
-                                                    fun,
-                                                    results,
-                                                    method = 'endpoints',
-                                                    n_disc= n_disc,
-                                                    condensation =condensation, 
-                                                    tOp =tOp,
-                                                    bOt= bOt,
-                                                    save_raw_data = save_raw_data,
-                                                    **kwargs,
-                                                    )  # Pass save_raw_data directly
+                                                fun,
+                                                results,
+                                                method = 'endpoints',
+                                                n_disc= n_disc,
+                                                condensation =condensation, 
+                                                tOp =tOp,
+                                                bOt= bOt,
+                                                save_raw_data = save_raw_data,
+                                                **kwargs,
+                                                )  # Pass save_raw_data directly
             return results #process_results(results) 
         
-        case ("second_order_extremepoints" |"extremepoints" ):       
+        case ("second_order_extremepoints" | "extremepoints" ):       
             results =  second_order_propagation_method(vars,                                
-                                                    fun,
-                                                    results,
-                                                    method = 'extremepoints',
-                                                    n_disc= n_disc,
-                                                    condensation =condensation, 
-                                                    tOp =tOp,
-                                                    bOt= bOt,
-                                                    save_raw_data = save_raw_data,
-                                                    **kwargs,   
-                                                    )  # Pass save_raw_data directly
+                                                fun,
+                                                results,
+                                                method = 'extremepoints',
+                                                n_disc= n_disc,
+                                                condensation =condensation, 
+                                                tOp =tOp,
+                                                bOt= bOt,
+                                                save_raw_data = save_raw_data,
+                                                **kwargs,   
+                                                )  # Pass save_raw_data directly
             return results #process_results(results) 
+        case ("first_order"):
+            results = first_order_propagation_method(vars,                              
+                                                fun,
+                                                results,
+                                                #method = 'extremepoints',
+                                                n_disc= n_disc,
+                                                condensation =condensation, 
+                                                tOp =tOp,
+                                                bOt= bOt,
+                                                save_raw_data = save_raw_data,
+                                                **kwargs,  
+                                                ) 
 
 def epistemic_propagation(vars,
           fun,
@@ -473,9 +485,9 @@ def main():
 
     a = mixed_propagation(vars= [ L, I, F, E], 
                                 fun= cantilever_beam_deflection, 
-                                method= 'extremepoints', 
+                                method= 'first_order', 
                                 n_disc=40,
-                                save_raw_data= "no",
+                                save_raw_data= "no"#,
                             #save_raw_data= "yes",
                             #base_path= base_path
                         )

@@ -430,3 +430,41 @@ def save_results(data, method, res_path, fun=None):
         Results = post_processing(data['x'], data.get('f'), method, res_path)
             
     return Results
+
+def condense_bounds(bounds, N):
+    """
+    Condenses lower and upper bounds of a probability distribution to a specified size.
+
+    Args:
+      bounds: A NumPy array of shape (num_outputs, 2, num_points) representing the lower 
+              and upper bounds of a probability distribution for potentially multiple outputs.
+              The first dimension corresponds to different outputs of the function, 
+              the second dimension corresponds to lower and upper bounds (0 for lower, 1 for upper),
+              and the third dimension corresponds to the original discretization points.
+      N: The desired size of the condensed arrays.
+
+    Returns:
+      A NumPy array of shape (num_outputs, 2, N) containing the condensed lower and upper bounds.
+    """
+    num_outputs = bounds.shape[0]
+    num_points = bounds.shape[2]
+
+    # Handle different condensation sizes for each output
+    if isinstance(N, int):
+        N = [N] * num_outputs  # Create a list with the same size for all outputs
+
+    condensed_bounds = np.zeros((num_outputs, 2, max(N)))  # Initialize with the maximum size
+
+    for i in range(num_outputs):
+        interval_size = num_points // N[i]
+
+        lower_bounds_sorted = np.sort(bounds[i, 0, :])
+        upper_bounds_sorted = np.sort(bounds[i, 1, :])
+
+        condensed_lower = np.array([lower_bounds_sorted[j * interval_size + interval_size - 1] for j in range(N[i])])
+        condensed_upper = np.array([upper_bounds_sorted[j * interval_size] for j in range(N[i])])
+
+        condensed_bounds[i, 0, :N[i]] = condensed_lower  # Assign to the correct slice
+        condensed_bounds[i, 1, :N[i]] = condensed_upper
+
+    return condensed_bounds
