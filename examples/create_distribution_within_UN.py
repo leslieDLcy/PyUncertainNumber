@@ -1,4 +1,4 @@
-from PyUncertainNumber.UC.uncertainNumber import UncertainNumber as UN
+from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber as UN
 
 # Create a Gausssian distribution within the UN
 

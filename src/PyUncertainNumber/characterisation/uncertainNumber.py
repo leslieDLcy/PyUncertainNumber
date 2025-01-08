@@ -12,15 +12,15 @@ from .params import Params
 from typing import List
 from pint import UnitRegistry
 from pathlib import Path
-from PyUncertainNumber.UP.vertex import vertexMethod as vM
-from PyUncertainNumber.UP.endpoints import endpoints_propagation_2n
+from PyUncertainNumber.propagation.vertex import vertexMethod as vM
+from PyUncertainNumber.propagation.endpoints import endpoints_propagation_2n
 from PyUncertainNumber.nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
 from PyUncertainNumber.pba.pbox import named_pbox
 from typing import Sequence
 from functools import singledispatch
-from .intervalOperators import wc_interval
+from ..pba.intervalOperators import wc_interval
 from ..pba.distributions import Distribution
 
 """ Uncertain Number class """
@@ -55,7 +55,7 @@ class UncertainNumber:
     # UN object, which shall be linked with the 'pba' or `Intervals` package
     naked_value: float = field(default=None)
 
-    # ---------------------auxlliary information---------------------#
+    # * ---------------------auxlliary information---------------------*#
     # some simple boiler plates
     # lat: float = field(default=0.0, metadata={'unit': 'degrees'})
     # ensemble: Type[Ensemble] = field(default=None)
@@ -67,19 +67,19 @@ class UncertainNumber:
     structure: str = field(default=None)
     security: str = field(default=None)
 
-    # ---------------------aleatoric component---------------------#
+    # * ---------------------aleatoric component--------------------- *#
     ensemble: Type[Ensemble] = field(default=None)
     variability: str = field(default=None)
     dependence: str = field(default=None)
 
-    # ---------------------epistemic component---------------------#
+    # * ---------------------epistemic component---------------------*#
     uncertainty: str = field(default=None)
 
     # class variable
     instances = []  # TODO named as registry later on
 
-    # --------------------- additional ---------------------#
-    _samples: np.ndarray | list = None
+    # * --------------------- additional ---------------------*#
+    _samples: np.ndarray | list = field(default=None, repr=False)
 
     # ---------------------more on initialisation---------------------#
 
@@ -127,7 +127,7 @@ class UncertainNumber:
                 self.naked_value = self._construct.midpoint()
             case "distribution":
                 if self._samples is not None:
-                    self._construct = Distribution(sample=self._samples)
+                    self._construct = Distribution(sample_data=self._samples)
                 elif self.distribution_parameters is not None:
                     self._construct = Distribution(
                         dist_family=self.distribution_parameters[0],
@@ -264,7 +264,12 @@ class UncertainNumber:
 
         return self._construct.display(**kwargs)
 
-    # ---------------------other constructors---------------------#
+    # * ---------------------getters --------------------- *#
+    @property
+    def construct(self):
+        return self._construct
+
+    # * ---------------------other constructors--------------------- *#
 
     @classmethod
     def from_hedge(cls, hedged_language):
@@ -280,22 +285,31 @@ class UncertainNumber:
         return cls(essence=essence, bounds=[left, right])
 
     @classmethod
-    def from_distribution(cls, dist_family: str, dist_params, **kwargs):
+    def fromDistribution(cls, D, **kwargs):
+        # dist_family: str, dist_params,
         """create an Uncertain Number from specification of distribution
 
         args:
+            - D: Distribution object
             dist_family: str
                 the distribution family
             dist_params: list, tuple or string
                 the distribution parameters
         """
-        distSpec = DistributionSpecification(dist_family, dist_params)
-        if "essence" not in kwargs:
-            kwargs["essence"] = "distribution"
-        return cls(
-            distribution_parameters=distSpec.get_specification(),
-            **kwargs,
-        )
+        distSpec = DistributionSpecification(D.dist_family, D.dist_params)
+
+        if D.sample_data is None:
+            return cls(
+                essence="distribution",
+                distribution_parameters=distSpec.get_specification(),
+                **kwargs,
+            )
+        else:
+            return cls(
+                essence="distribution",
+                distribution_parameters=None,
+                _samples=D.sample_data,
+            )
 
     @classmethod
     def from_distributionProperties(cls, min, max, mean, median, variance, **kwargs):

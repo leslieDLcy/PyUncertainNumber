@@ -19,12 +19,12 @@ copyright = f"{datetime.datetime.now().year}, Yu Chen (Leslie)"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-            #   "myst_nb",
-              "myst_parser",
-              # "autoapi.extension", 
-              "sphinx.ext.napoleon",
-              "sphinx-prompt", 
-              "sphinx_copybutton"]
+    #   "myst_nb",
+    "myst_parser",
+    # "autoapi.extension",
+    "sphinx.ext.napoleon",
+    "sphinx-prompt",
+    "sphinx_copybutton"]
 
 # autoapi_dirs = ["../../src"]  # location to parse for API reference
 
@@ -43,8 +43,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 html_static_path = ["_static"]
-# html_theme = "sphinx_rtd_theme"
 html_theme = "furo"
 
 
-# html_logo = "_static/logo.png"
+html_logo = "_static/UNlogo3.png"

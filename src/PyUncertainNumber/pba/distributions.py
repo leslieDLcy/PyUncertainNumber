@@ -1,13 +1,15 @@
 """distribution constructs """
 import numpy as np
 import scipy.stats as sps
+import matplotlib as mpl
 from warnings import *
 from dataclasses import dataclass
 from typing import *
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
-from ..UC.utils import pl_pcdf, pl_ecdf
+from ..characterisation.utils import pl_pcdf, pl_ecdf
 import scipy
 from .params import Params
+
 
 # a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
 named_dists = {
@@ -131,6 +133,7 @@ named_dists = {
 
 @dataclass
 class Distribution:
+    """ two signature for the distribution object, either a parametric specification or a nonparametric sample per se"""
 
     dist_family: str = None
     dist_params: list[float] | Tuple[float, ...] = None
@@ -140,26 +143,63 @@ class Distribution:
         if all(v is None for v in [self.dist_family, self.dist_params, self.sample_data]):
             raise ValueError(
                 "At least one of dist_family, dist_params or sample must be specified")
-        self.dist = self.rep()
+        self.flag()
+        self._dist = self.rep()
 
     def __repr__(self):
         # if self.sample_data is not None:
         #     return "sample-approximated distribution object"
-        return f"dist ~ {self.dist_family}{self.dist_params}"
+        if self.dist_params is not None:
+            return f"dist ~ {self.dist_family}{self.dist_params}"
+        elif self.sample_data is not None:
+            return "dist ~ sample-approximated distribution object"
+        else:
+            return "wrong initialisation"
 
     def rep(self):
         """ the dist object either sps dist or sample approximated or pbox dist """
         if self.dist_family is not None:
             return named_dists.get(self.dist_family)(*self.dist_params)
 
-    def sample(self):
-        pass
+    def flag(self):
+        """ boolean flag for if the distribution is a parameterised distribution or not 
+        note:
+            - only parameterised dist can do sampling
+            - for non-parameterised sample-data based dist, next steps could be fitting
+        """
+        if ((self.dist_params is not None) & (self.dist_family is not None)):
+            self._flag = True
+        else:
+            self._flag = False
 
-    def display(self):
+    def sample(self, size):
+        """ generate deviates from the distribution """
+        if self._flag:
+            return self._dist.rvs(size=size)
+        else:
+            raise ValueError(
+                "Sampling not supported for sample-approximated distributions")
+
+    @mpl.rc_context({"text.usetex": True})
+    def display(self, **kwargs):
         """display the distribution"""
         if self.sample_data is not None:
-            return pl_ecdf(self.sample_data)
-        pl_pcdf(self.dist)
+            return pl_ecdf(self.sample_data, **kwargs)
+        pl_pcdf(self._dist, **kwargs)
+
+    def _get_hint(self):
+        pass
+
+    @property
+    def hint(self):
+        pass
+
+# *  ---------------------constructors---------------------* #
+    @classmethod
+    def dist_from_sps(cls, dist: sps.rv_continuous | sps.rv_discrete,
+                      shape: str = None):
+        params = dist.args + tuple(dist.kwds.values())
+        return cls(dist_family=shape, dist_params=params)
 
 
 # * ------------------ sample-approximated dist representation  ------------------ *#
@@ -177,6 +217,7 @@ class Distribution:
 # distributions represented internally as collections of Monte Carlo deviates
 # rather than some semi-analytical or discrete representation used in Risk Calc.
 # See the preamble to https://sites.google.com/site/confidenceboxes/software
+
 
 def bernoulli(p): return (np.random.uniform(size=Params.many) < p)
 

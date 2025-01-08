@@ -1,4 +1,3 @@
-import functools
 import numpy as np
 from scipy.stats import (bernoulli, beta, betabinom, binom, chi2,
                          expon, gamma, norm, poisson, uniform, t,
@@ -6,46 +5,90 @@ from scipy.stats import (bernoulli, beta, betabinom, binom, chi2,
                          pareto, powerlaw, triang,
                          geom, loguniform, f as F)
 import scipy.stats as sps
-from .intervalOperators import mean
+from ..pba.intervalOperators import mean
 from intervals import Interval
 from PyUncertainNumber import pba
-from ..pba.distributions import Distribution
+from ..pba.distributions import Distribution as D
+from ..pba.distributions import named_dists
+from ..pba.pbox import named_pbox
+import functools
+
+''' Here we define the statistical inference functions from data for the UncertainNumber class. '''
 
 
-''' Here we define the statistical inference functions from data for the UncertainNumber class. 
+def makedist(shape: str):
+    """ change return from sps.dist to Distribution objects """
+    def decorator_make_dist(func):
+        @functools.wraps(func)
+        def wrapper_decorator(*args, **kwargs):  # input array x
+            return D.dist_from_sps(func(*args, **kwargs), shape)
+        return wrapper_decorator
+    return decorator_make_dist
 
-examples:
-    - maximum likelihood
-    - method of matching moments
-    - ~~confidence boxes~~
-    - maximum entropy
-    - ~~Bayesian inference~~
-    - maximum a posteriori
-    - PERT
-    - Fermi methods
-'''
 
-""" ongoing notes
-- the return from the constructors below are `scipy.stats.dist` objects
+def singleParamPattern(x, shape: str):
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return D.dist_from_sps(named_dists.get(shape)(mean(x)), shape=shape)
+    elif isinstance(x, Interval):
+        return named_pbox.get(shape)(mean(x))
+    else:
+        raise TypeError('Input data type not supported')
 
-"""
+
+def fit(method: str, family: str, data: np.ndarray):
+    """ top-level fit function
+
+    args:
+        - method (str): method of fitting, e.g., {'mle' or 'mom'} 'entropy', 'pert', 'fermi', 'bayesian'
+        - family (str): distribution family to be fitted
+        - data (np.ndarray): data to be fitted
+
+    note:
+        - supported family list can be found in xx.
+
+    return:
+        - the return from the constructors below are `scipy.stats.dist` objects
+    """
+    match method:
+        case 'mle':
+            try:
+                return mle.get(family)(data)
+            except:
+                return smle.get(family)(data)
+        case 'mom':
+            return mom.get(family)(data)
+        case _:
+            raise ValueError('method not supported')
 
 
 ###############################################################################
 # Method-of-Moment distribution constructors (matching central moments of x)
 ###############################################################################
-
 ''' hint: given interval data x, return pbox '''
-# TODO Some of tThese functions may not support intervals in the data x          #**
 
 
-# create decorator for makeing distribution and making pboxes
+def MMbernoulli(x):
+    """ a first attempt to Maximum likelihood estimation for exponential distribution
+        which accepts both precise and imprecise data;
+
+    #! the example of `singleparam` pattern
+    #! to change, add the 'interval_measurement' decorator
+    note:
+        the attempt is successful per se, but not accommodating to the top-level calling signature yet.
+
+        - precise data returns precise distrubution
+        - imprecise data need to be in Interval type to return a pbox
+        - interval data can return either a precise distribution or a pbox
+    """
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return D.dist_from_sps(expon(*sps.bernoulli.fit(x)), shape='bernoulli')
+    elif isinstance(x, Interval):
+        return pba.bernoulli(mean(x))
+    else:
+        raise TypeError('Input data type not supported')
 
 
-def MMbernoulli(x: np.ndarray):
-    return bernoulli(x.mean())  # assumes x is zeros and ones
-
-
+@makedist('beta')
 def MMbeta(x: np.ndarray):
     m = x.mean()
     s = x.var()
@@ -55,6 +98,7 @@ def MMbeta(x: np.ndarray):
     return beta(alpha, beta_p)
 
 
+@makedist('betabinom')
 def MMbetabinomial(n: int, x):  # **
     #! 'x**2' variable repetition
     # n must be provided; it's not estimated from data
@@ -66,9 +110,10 @@ def MMbetabinomial(n: int, x):  # **
     return betabinom(n, (n*m1 - m2) / d, (n-m1)*(n - m2/m1) / d)
 
 
+@makedist('binom')
 def MMbinomial(x, n: int):  # **
     #! the return seems overcomplicated?
-    """ 
+    """
     args:
          - n (int): number of trials
     """
@@ -78,32 +123,61 @@ def MMbinomial(x, n: int):  # **
     # return binom(int(np.abs(np.round(a/(1-b**2/a)))), np.abs(1-b**2/a))
 
 
+@makedist('chi2')
 def MMchisquared(x): return (chi2(np.round(x.mean())))
+
+# def MMchisquared(x):
+#     #! TODO interval outward_rounding
+#     if isinstance(x, sps.CensoredData | np.ndarray | list):
+#         return D.dist_from_sps(chi2(outward_rounding(mean(x))), shape='chi2')
+#     elif isinstance(x, Interval):
+#         return pba.expon(mean(x))
+#     else:
+#         raise TypeError('Input data type not supported')
 
 
 def MMexponential(x):
-    return pba.expon(mean(x))
+    return singleParamPattern(x, 'expon')
 
 
+@makedist('f')
 def MMF(x):  # **
     w = 2/(1-1/x.mean())
     return (F(np.round((2*w**3 - 4*w**2) / ((w-2)**2 * (w-4) * x.std()**2 - 2*w**2)), np.round(w)))
 
 
+@makedist('gamma')
 def MMgamma(x):  # **
     a = x.mean()
     b = x.std()
     return (gamma(b**2/a, 1/(a/b)**2))  # gamma1(a, b) ~ gamma(b²/a, (a/b)²)
 
 
-def MMgeometric(x): return geom(1/(1+mean(x)))
+@makedist('geometric')
+def MMgeometric(x): return
 
 
-def MMpascal(x): return geom(1/(1+mean(x)))
+def MMgeometric(x):
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return D.dist_from_sps(geom(1/(1+mean(x))), shape='geometric')
+    elif isinstance(x, Interval):
+        return pba.geom(1/(1+mean(x)))
+    else:
+        raise TypeError('Input data type not supported')
+
+
+def MMpascal(x):
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return D.dist_from_sps(geom(1/(1+mean(x))), shape='pascal')
+    elif isinstance(x, Interval):
+        return pba.geom(1/(1+mean(x)))
+    else:
+        raise TypeError('Input data type not supported')
 
 # def MMgumbel0(x) : return(gumbel(x.mean() - 0.57721 * x.std() * np.sqrt(6)/ np.pi, x.std() * np.sqrt(6)/ np.pi))       #**  # https://stackoverflow.com/questions/51427764/using-method-of-moments-with-gumbel-r-in-python-scipy-stats-gumbel-r
 
 
+@makedist('gumbel')
 def MMgumbel(x):  # **
     # https://stackoverflow.com/questions/51427764/using-method-of-moments-with-gumbel-r-in-python-scipy-stats-gumbel-r
     scale = np.sqrt(6)/np.pi * np.std(x)
@@ -111,66 +185,92 @@ def MMgumbel(x):  # **
     return (gumbel_r(loc, scale))
 
 
+@makedist('extremevalue')
 def MMextremevalue(x): return (gumbel_r(x.mean() - 0.57721 * x.std()
                                         * np.sqrt(6) / np.pi, x.std() * np.sqrt(6) / np.pi))  # **
 
 
+@makedist('lognormal')
 def MMlognormal(x): return (lognorm(x.mean(), x.std()))  # **
 
 
+@makedist('laplace')
 def MMlaplace(x): return (laplace(x.mean(), x.std()/np.sqrt(2)))  # **
 
 
+@makedist('doubleexponential')
 def MMdoubleexponential(x): return (
     laplace(x.mean(), x.std()/np.sqrt(2)))  # **
 
 
+@makedist('logistic')
 def MMlogistic(x): return (
     logistic(x.mean(), x.std() * np.sqrt(3)/np.pi))  # **
 
 
+@makedist('loguniform')
 def MMloguniform(x): return (loguniform(mean=x.mean(), std=x.std()))  # **
 
 
+@makedist('norm')
 def MMnormal(x): return (norm(x.mean(), x.std()))  # **
 
 
+@makedist('gaussian')
 def MMgaussian(x): return (norm(x.mean(), x.std()))  # **
 
 
+@makedist('pareto')
 def MMpareto(x):  # **
     a = x.mean()
     b = x.std()
     return (pareto(a/(1+1/np.sqrt(1+a**2/b**2)), 1+np.sqrt(1+a**2/b**2)))
 
 
-def MMpoisson(x): return pba.poisson(mean(x))
+def MMpoisson(x):
+    return singleParamPattern(x, 'poisson')
 
 
+# test if below is correct
+# def MMpoisson(x):
+#     if isinstance(x, sps.CensoredData | np.ndarray | list):
+#         return D.dist_from_sps(poisson(mean(x)), shape='poisson')
+#     elif isinstance(x, Interval):
+#         return pba.poisson(mean(x))
+#     else:
+#         raise TypeError('Input data type not supported')
+
+
+@makedist('powerlaw')
 def MMpowerfunction(x):  # **
     a = x.mean()
     b = x.std()
     return powerlaw(a/(1-1/np.sqrt(1+(a/b)**2)), np.sqrt(1+(a/b)**2)-1)
 
 
-def MMt(x): return (t(2/(1-1/x.std()**2)))
+@makedist('t')
+def MMt(x): return t(2/(1-1/x.std()**2))
 
 
+@makedist('student')
 def MMstudent(x):
     assert not (
         1 < x.std()), 'Improper standard deviation for student distribution'
     return t(2/(1-1/x.std()**2))
 
 
+@makedist('uniform')
 def MMuniform(x):  # **
     a = x.mean()
     b = np.sqrt(3)*x.std()
     return (uniform(a-b, a+b))
 
 
+@makedist('rectangular')
 def MMrectangular(x): return (MMuniform(x))
 
 
+@makedist('triangular')
 def MMtriangular(x, iters=100, dives=10):  # **
     # iterative search for triangular distribution parameters using method of
     # matching moments (you solve the thing analytically! too messy without help)
@@ -214,6 +314,38 @@ def MMtriangular(x, iters=100, dives=10):  # **
     return (triang(aa, cc, bb))
 
 
+mom = {
+    'bernoulli': MMbernoulli,
+    'beta': MMbeta,
+    'betabinomial': MMbetabinomial,
+    'binomial': MMbinomial,
+    'chisquared': MMchisquared,
+    'exponential': MMexponential,
+    'expon': MMexponential,
+    'F': MMF,
+    'f': MMF,
+    'gamma': MMgamma,
+    'geometric': MMgeometric,
+    'gumbel': MMgumbel,
+    'extremevalue': MMextremevalue,
+    'lognormal': MMlognormal,
+    'laplace': MMlaplace,
+    'doubleexponential': MMdoubleexponential,
+    'logistic': MMlogistic,
+    'loguniform': MMloguniform,
+    'norm': MMnormal,
+    'normal': MMnormal,
+    'gaussian': MMgaussian,
+    'pareto': MMpareto,
+    'poisson': MMpoisson,
+    'powerfunction': MMpowerfunction,
+    't': MMt,
+    'student': MMstudent,
+    'uniform': MMuniform,
+    'rectangular': MMrectangular,
+    'triangular': MMtriangular,
+}
+
 ###############################################################################
 # * Alternative maximum likelihood estimation constructors using scipy.stats  *#
 ###############################################################################
@@ -222,41 +354,72 @@ def MMtriangular(x, iters=100, dives=10):  # **
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rv_continuous.fit.html#scipy.stats.rv_continuous.fit
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.CensoredData.html#scipy.stats.CensoredData
 
-#! note below all return `scipy.stats.dist` objects
 
-def MLbernoulli(x): return (bernoulli(x.mean()))
-def MLbeta(x): return (beta(*sps.beta.fit(x)))
+@makedist('bernoulli')
+def MLbernoulli(x): return bernoulli(
+    *sps.bernoulli.fit(x)
+)
+
+
+@makedist('beta')
+def MLbeta(x):
+    return beta(*sps.beta.fit(x))
+
+
+@makedist('betabinom')
 def MLbetabinomial(x): return (betabinom(*sps.betabinom.fit(x)))
-def MLbinomial(x): return (binom(*sps.binom.fit(x)))
+
+
+@makedist('binom')
+def MLbinomial(x):
+    """ 
+    # TODO 
+    #! no fitting func for scipy discrete distributions
+    """
+    return binom(*sps.binom.fit(x))
+
+
+@makedist('chi2')
 def MLchisquared(x): return (chi2(*sps.chi2.fit(x)))
 
 
+@makedist('expon')
 def MLexponential(x):
-    """ Maximum likelihood estimation for exponential distribution.
-
-    note:
-        - precise data returns precise distrubution
-        - imprecise data need to be in Interval type to return a pbox
-        - interval data can return either a precise distribution or a pbox 
-    """
+    """ a standalone caller for exponential distribution, not in use yet """
     if isinstance(x, sps.CensoredData | np.ndarray | list):
         return expon(*sps.expon.fit(x))
-    elif isinstance(x, Interval):
-        return pba.expon(mean(x))
-    else:
-        raise TypeError('Input data type not supported')
 
 
+@makedist('f')
 def MLF(x): return (F(*sps.f.fit(x)))
+
+
+@makedist('gamma')
 def MLgamma(x): return (gamma(*sps.gamma.fit(x)))
+
+
+@makedist('gammaexpon')
 def MLgammaexponential(x): return (
     sps.gammaexpon(*sps.gammaexpon.fit(x)))
 
 
+@makedist('geom')
 def MLgeometric(x): return (geom(*sps.geom.fit(x)))
+
+
+@makedist('gumbel')
 def MLgumbel(x): return (gumbel_r(*sps.gumbel_r.fit(x)))
+
+
+@makedist('laplace')
 def MLlaplace(x): return (laplace(*sps.laplace.fit(x)))
+
+
+@makedist('logistic')
 def MLlogistic(x): return (logistic(*sps.logistic.fit(x)))
+
+
+@makedist('lognorm')
 def MLlognormal(x): return (lognorm(*sps.lognorm.fit(x)))
 
 # TODO why not use `sps.lognorm.fit(x)`` directly?
@@ -264,40 +427,78 @@ def MLlognormal(x): return (lognorm(*sps.lognorm.fit(x)))
 #     *sps.lognorm.fit(x), size=many))
 
 
+@makedist('loguniform')
 def MLloguniform(x): return (loguniform(*sps.loguniform.fit(x)))
 
 
+@makedist('nbinom')
 def MLnegativebinomial(x): return (
     sps.nbinom(*sps.nbinom.fit(x)))
 
 
-# def get_from_sps(sps_dist):
-#     Distribution()
-
-
-# def from_sps(func):
-#     @functools.wraps(func)
-#     def wrapper_decorator(*args, **kwargs):
-#         # Do something before
-#         sps_dist = func(*args, **kwargs)
-
-#         # Do something after
-#         return value
-#     return wrapper_decorator
-
-
-# @from_sps
+@makedist('norm')
 def MLnormal(x):
     return norm(*sps.norm.fit(x))
 
 
+@makedist('pareto')
 def MLpareto(x): return (pareto(*sps.pareto.fit(x)))
+
+
+@makedist('poisson')
 def MLpoisson(x): return (poisson(*sps.poisson.fit(x)))
+
+
+@makedist('powerlaw')
 def MLpowerfunction(x): return (powerlaw(*sps.powerlaw.fit(x)))
+
+
+@makedist('rayleigh')
 def MLrayleigh(x): return (sps.rayleigh(*sps.rayleigh.fit(x)))
+
+
+@makedist('t')
 def MLstudent(x): return (t(*sps.t.fit(x)))
+
+
+@makedist('triang')
 def MLtriangular(x): return (triang(*sps.t.fit(x)))
+
+
+@makedist('uniform')
 def MLuniform(x): return (uniform(*sps.uniform.fit(x)))
+
+
+mle = {
+    'bernoulli': MLbernoulli,
+    'beta': MLbeta,
+    'betabinomial': MLbetabinomial,
+    'binomial': MLbinomial,
+    'chisquared': MLchisquared,
+    'exponential': MLexponential,
+    'expon': MLexponential,
+    'F': MLF,
+    'f': MLF,
+    'gamma': MLgamma,
+    'gammaexponential': MLgammaexponential,
+    'geometric': MLgeometric,
+    'gumbel': MLgumbel,
+    'laplace': MLlaplace,
+    'logistic': MLlogistic,
+    'lognormal': MLlognormal,
+    'loguniform': MLloguniform,
+    'negativebinomial': MLnegativebinomial,
+    'norm': MLnormal,
+    'normal': MLnormal,
+    'gaussian': MLnormal,
+    'pareto': MLpareto,
+    'poisson': MLpoisson,
+    'powerfunction': MLpowerfunction,
+    'rayleigh': MLrayleigh,
+    'student': MLstudent,
+    'triangular': MLtriangular,
+    'uniform': MLuniform,
+}
 
 
 ##########################################################################
@@ -385,6 +586,29 @@ def sMLgamma(data):  # **
     shape = uniroot(f, shape*np.array((0.5, 1.5))).root()
     rate = shape/xbar
     return (gamma(shape=shape, rate=rate))
+
+
+smle = {
+    'bernoulli': sMLbernoulli,
+    'normal': sMLnormal,
+    'gaussian': sMLgaussian,
+    'exponential': sMLexponential,
+    'poisson': sMLpoisson,
+    'geometric': sMLgeometric,
+    'gumbel': sMLgumbel,
+    'pascal': sMLpascal,
+    'uniform': sMLuniform,
+    'rectangular': sMLrectangular,
+    'pareto': sMLpareto,
+    'laplace': sMLlaplace,
+    'doubleexponential': sMLdoubleexponential,
+    'lognormal2': sMLlognormal2,
+    'lognormal': sMLlognormal,
+    'loguniform': sMLloguniform,
+    'weibull': sMLweibull,
+    'gamma': sMLgamma,
+}
+
 
 ##########################################################################
 # Maximum entropy distribution constructors

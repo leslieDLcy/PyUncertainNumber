@@ -6,7 +6,7 @@ from PyUncertainNumber.pba.interval import Interval as nInterval
 
 @singledispatch
 def wc_interval(bound):
-    """ wildcard interval """
+    """ wildcard scalar interval """
     return nInterval(bound)
 
 
@@ -26,8 +26,28 @@ def _marco_interval_like(bound: Interval):
 def _nick_interval_like(bound: nInterval):
     return bound
 
+### vector interval implementation tmp ###
 
-# * ---------------------mean func --------------------- *#
+
+def make_vec_interval(vec):
+    assert len(vec) > 1, "Interval must have more than one element"
+
+    if isinstance(vec, Interval):
+        return vec
+
+    elif isinstance(vec[0], nInterval):
+        lo_endpoints = [un.left for un in vec]
+        hi_endpoints = [un.right for un in vec]
+        return Interval(lo_endpoints, hi_endpoints)
+
+    elif isinstance(vec[0], list | tuple | np.ndarray):
+        lo_endpoints = [un[0] for un in vec]
+        hi_endpoints = [un[1] for un in vec]
+        return Interval(lo_endpoints, hi_endpoints)
+    else:
+        print("not implemented yet")
+
+    # * ---------------------mean func --------------------- *#
 
 
 @singledispatch

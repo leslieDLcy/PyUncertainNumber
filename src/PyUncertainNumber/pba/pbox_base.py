@@ -1,13 +1,14 @@
 from decimal import DivisionByZero
 from typing import *
 from warnings import *
-from ..UC.utils import tranform_ecdf
+from ..characterisation.utils import tranform_ecdf
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from .interval import Interval as nInterval
 from .utils import find_nearest, check_increasing, NotIncreasingError, _interval_list_to_array
 from .params import Params
+from .ds import DempsterShafer
 
 __all__ = [
     "Pbox",
@@ -16,13 +17,6 @@ __all__ = [
     "imposition",
     "NotIncreasingError",
 ]
-
-""" Nick: It is usually better to define p-boxes using distributions or non-parametric methods (see ). 
-This constructor is provided for completeness and for the construction of p-boxes with precise inputs.
-
-Leslie: the above does not make sense. The Pbox class is the base constructor for p-boxes, which has been
-called by whatever other constructors currently exist. The above comment is not accurate.
-"""
 
 
 class Pbox:
@@ -355,7 +349,6 @@ class Pbox:
 
 # ---------------------dual interpretation ---------------------#
 
-
     def cutv(self, x):
         """ get the bounds on the cumulative probability associated with any x-value """
         lo_ind = find_nearest(self.right, x)
@@ -363,15 +356,18 @@ class Pbox:
         return nInterval(Params.p_values[lo_ind], Params.p_values[hi_ind])
 
     def cuth(self, p=0.5):
-        """ get the bounds on the x-value at any particular probability level"""
+        """ get the bounds on the quantile at any particular probability level"""
+        # TODO have a conservative cut.
         ind = find_nearest(Params.p_values, p)
         return nInterval(self.left[ind], self.right[ind])
 
 
-# ---------------------unary operations---------------------#
+# * ---------------------unary operations--------------------- *#
     ##### the top-level functions for unary operations #####
 
+
     def _unary(self, *args, function=lambda x: x):
+        """ for monotonic unary functions only """
 
         ints = [function(nInterval(l, r), *args)
                 for l, r in zip(self.left, self.right)]
@@ -1132,13 +1128,22 @@ class Pbox:
         ax.set_ylabel(r"$\Pr(X \leq x)$")
         return ax
 
+    # * ---------------------conversion--------------------- *#
 
-# ---------------------constructors---------------------#
+    def to_ds(self, discretisation=Params.steps):
+        """convert to ds object"""
+        p_values = np.arange(0, discretisation) / discretisation
+        # TODO use outer approximation
+        interval_list = [self.cuth(p_v) for p_v in p_values]
+        return DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation))
+
+
+# * ---------------------constructors--------------------- *#
 ''' initially used for cbox next-value distribution '''
 
 
 def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
-    """ transform into pbox object for cbox 
+    """ transform into pbox object from extreme bounds represented by sps.dist
 
     args:
         rvs (list): list of scipy.stats.rv_continuous objects"""
@@ -1166,7 +1171,7 @@ def pbox_from_pseudosamples(samples):
     return Pbox(tranform_ecdf(samples, display=False))
 
 
-##### Functions #####
+# * ---------------------functions--------------------- *#
 
 
 def env_int(*args):
@@ -1414,36 +1419,31 @@ def imposition(*args: Union[Pbox, nInterval, float, int]):
 
 
 def mixture(
-    *args: Union[Pbox, nInterval, float, int],
+    uns: Union[Pbox, nInterval, float, int],
     weights: List[Union[float, int]] = [],
     steps: int = Pbox.STEPS,
 ) -> Pbox:
     """
-    Mixes the pboxes in *args
-    Parameters
-    ----------
-    *args :
-        Number of p-boxes or objects to be mixed
-    weights:
-        Right side of box
+    stochastic mixture for uncertain numbers 
 
-    Returns
-    ----------
-    Pbox
+    Mixes the pboxes in *args
+    args:
+        uns (list): a list of Uncertain Numbers (which includes Pbox, nInterval, float, int)
+        weights (list): a list of weights for the uncertain numbers to be mixed
+
+    Returns:
+        Pbox
     """
     # TODO: IMPROVE READBILITY
 
-    x = []
-    for pbox in args:
-        if pbox.__class__.__name__ != "Pbox":
-            try:
-                pbox = Pbox(pbox)
-            except:
-                raise TypeError(
-                    "Unable to convert %s object (%s) to Pbox" % (
-                        type(pbox), pbox)
-                )
-        x.append(pbox)
+    def check_pbox(un):
+        try:
+            return Pbox(un)
+        except:
+            raise TypeError(
+                f"Unable to convert {type(un)} object {un} to Pbox")
+
+    x = [un if isinstance(un, Pbox) else check_pbox(un) for un in uns]
 
     k = len(x)
     if weights == []:

@@ -7,7 +7,7 @@ two reasons:
 """
 
 import functools
-from PyUncertainNumber.UC.params import Params
+from PyUncertainNumber.characterisation.params import Params
 from .interval import Interval as nInterval
 from intervals import Interval
 from .pbox_base import Pbox
@@ -17,7 +17,8 @@ import itertools
 from .params import Params
 from typing import *
 from warnings import *
-from ..UC.intervalOperators import wc_interval
+from .intervalOperators import wc_interval
+from .utils import uniform_reparameterisation
 
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
 
@@ -962,38 +963,38 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
 
 def uniform(a, b, steps=Params.steps):
-    """ special case of Uniform distribution 
+    """ special case of Uniform distribution as 
+    Scipy has an unbelivably strange parameterisation than common sense
 
     args:
-        - a: (float) lower 
-        - b: (float) upper 
+        - a: (float) lower endpoint
+        - b: (float) upper endpoints
     """
 
-    loc = a
-    scale = a + b
+    loc, scale = uniform_reparameterisation(a,  b)
     return uniform_sps(loc, scale)
 
-    # if a.__class__.__name__ != "nInterval":
-    #     a = nInterval(a, a)
-    # if b.__class__.__name__ != "nInterval":
-    #     b = nInterval(b, b)
+#     # if a.__class__.__name__ != "nInterval":
+#     #     a = nInterval(a, a)
+#     # if b.__class__.__name__ != "nInterval":
+#     #     b = nInterval(b, b)
 
-    # Left = np.linspace(a.left, b.left, steps)
-    # Right = np.linspace(a.right, b.right, steps)
+#     # Left = np.linspace(a.left, b.left, steps)
+#     # Right = np.linspace(a.right, b.right, steps)
 
-    # mean = 0.5 * (a + b)
-    # var = ((b - a) ** 2) / 12
+#     # mean = 0.5 * (a + b)
+#     # var = ((b - a) ** 2) / 12
 
-    # return Pbox(
-    #     Left,
-    #     Right,
-    #     steps=steps,
-    #     shape="uniform",
-    #     mean_left=mean.left,
-    #     mean_right=mean.right,
-    #     var_left=var.left,
-    #     var_right=var.right,
-    # )
+#     # return Pbox(
+#     #     Left,
+#     #     Right,
+#     #     steps=steps,
+#     #     shape="uniform",
+#     #     mean_left=mean.left,
+#     #     mean_right=mean.right,
+#     #     var_left=var.left,
+#     #     var_right=var.right,
+#     # )
 
 
 def weibull(*args, steps=Params.steps):

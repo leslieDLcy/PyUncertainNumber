@@ -1,14 +1,7 @@
 
-<!-- ```{image} _static/hex.png
-:alt: The Py-Pkgs-Cookiecutter logo.
-:width: 250px
-:align: center
-``` -->
-
 <br>
 
 <!-- `PyUncertainNumber` is a Python function library for generic computational tasks focussing on aleatory and epistemic uncertainty, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation. -->
-
 
 ```{include} ../../README.md
 ```
@@ -57,7 +50,6 @@ guides/installation
 guides/uc
 guides/up
 ```
-
 
 ```{toctree}
 :caption: probability bounds analysis

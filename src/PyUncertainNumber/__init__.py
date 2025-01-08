@@ -1,1 +1,1 @@
-from PyUncertainNumber.UC.uncertainNumber import UncertainNumber
+from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber
