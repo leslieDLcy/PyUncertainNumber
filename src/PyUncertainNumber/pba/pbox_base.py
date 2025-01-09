@@ -349,6 +349,7 @@ class Pbox:
 
 # ---------------------dual interpretation ---------------------#
 
+
     def cutv(self, x):
         """ get the bounds on the cumulative probability associated with any x-value """
         lo_ind = find_nearest(self.right, x)
@@ -361,10 +362,26 @@ class Pbox:
         ind = find_nearest(Params.p_values, p)
         return nInterval(self.left[ind], self.right[ind])
 
+    def outer_approximate(self, n=100):
+        """ outer approximation of a p-box 
+
+        note:
+            - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
+        """
+        p_values = np.arange(0, n) / n
+        p_leftend = p_values[0:-1]
+        p_rightend = p_values[1:]
+
+        q_l = [self.cuth(p).left for p in p_leftend]
+        q_r = [self.cuth(p).right for p in p_rightend]
+
+        # get the interval list
+        # TODO streamline below the interval list into Marco interval vector
+        the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
+        return p_values, the_interval_list
 
 # * ---------------------unary operations--------------------- *#
     ##### the top-level functions for unary operations #####
-
 
     def _unary(self, *args, function=lambda x: x):
         """ for monotonic unary functions only """
@@ -1130,12 +1147,21 @@ class Pbox:
 
     # * ---------------------conversion--------------------- *#
 
-    def to_ds(self, discretisation=Params.steps):
-        """convert to ds object"""
+    def to_ds_old(self, discretisation=Params.steps):
+        """convert to ds object
+
+        note:
+            - without outer approximation
+        """
         p_values = np.arange(0, discretisation) / discretisation
-        # TODO use outer approximation
         interval_list = [self.cuth(p_v) for p_v in p_values]
         return DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation))
+
+    def to_ds(self, discretisation=Params.steps):
+        """convert to ds object"""
+
+        _, interval_list = self.outer_approximate(discretisation)
+        return DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation-1))
 
 
 # * ---------------------constructors--------------------- *#

@@ -45,6 +45,7 @@ class DempsterShafer:
         return self._intrep, self._masses
 
     def display(self, style='box'):
+        # TODO cannot take kwargs (such as title='') yet. to be fixed
         intervals, masses = self.disassemble()
         match style:
             case 'box':
