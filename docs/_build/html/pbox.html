@@ -256,21 +256,33 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="probability-box">
+          <section class="tex2jax_ignore mathjax_ignore" id="probability-box">
 <h1>Probability box<a class="headerlink" href="#probability-box" title="Link to this heading">¶</a></h1>
+<p>A conspicuous problem in probability distribution elicition, for example in probabilistic modelling analysis, is that the specification is typically precise, despite hardly justified by empirical informtion in many cases. Epistemic Uncertainy remains on the shape, parameters, and dependencies of the distributions. <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_box">Probability box</a> (abbreviated as <code class="docutils literal notranslate"><span class="pre">p-box</span></code>) essentially represents bounds on the cumulative distribution function of the underlying random variable. Let <span class="math notranslate nohighlight">\([\overline{F}, \underline{F}]\)</span> denotes the <strong>set</strong> of all nondecreasing functions from the reals into <span class="math notranslate nohighlight">\([0,1]\)</span> such that <span class="math notranslate nohighlight">\(\underline{F} \le F \le \overline{F}\)</span>. This means that, <span class="math notranslate nohighlight">\([\overline{F}, \underline{F}]\)</span> denotes a p-box for a random varaible <span class="math notranslate nohighlight">\(X\)</span> whose c.d.f <span class="math notranslate nohighlight">\(F\)</span> is unknown except that it is within the “box” circumscribed by the lower (<span class="math notranslate nohighlight">\(\underline{F}\)</span>) and upper bound (<span class="math notranslate nohighlight">\(\overline{F}\)</span>).</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+\underline{F} \le F(x) \le \overline{F}
+\]</div>
+</div>
+<p>p-box collectively reflects the variability (aleatoric uncertainty) and incertitude (epistemic uncertainty) in one structure for the uncertain quantity of interest.
+<img alt="pbox illustration" src="_images/pbox_illustration.png" /></p>
+<!-- a plot -->
 <!-- the idea is for motivating purposes not to educate them. -->
-<p>Content can have inline markup like <em>emphasis</em>, <strong>strong emphasis</strong>,
-<code class="docutils literal notranslate"><span class="pre">inline</span> <span class="pre">literals</span></code>, <sub>subscript</sub>, <sup>superscript</sup> and so much more.
-Providing a reference to <span class="target" id="index-0"></span><a class="pep reference external" href="https://peps.python.org/pep-0008/"><strong>PEP 8</strong></a> is straightforward. You can also include
-abbreviations like <abbr title="Hyper Text Markup Language">HTML</abbr>.</p>
-<blockquote>
-<div><p>This is blockquoted text.</p>
-</div></blockquote>
-<p>It is possible to have multiple paragraphs of text, which get separated
+<!-- Content can have inline markup like *emphasis*, **strong emphasis**,
+`inline literals`, {sub}`subscript`, {sup}`superscript` and so much more.
+Providing a reference to {pep}`8` is straightforward. You can also include
+abbreviations like {abbr}`HTML (Hyper Text Markup Language)`.
+
+> This is blockquoted text.
+
+It is possible to have multiple paragraphs of text, which get separated
 from each other visually. When stronger visual separation is desired, a
-horizontal separator can be used (3 or more punctuation characters on a line).</p>
-<hr class="docutils" />
-<p>This is written in Markdown.</p>
+horizontal separator can be used (3 or more punctuation characters on a line).
+
+---
+
+This is written in Markdown. -->
 <!--1.  when there is limited knowledge in terms of characterisation of input variables -->
 <!-- 2. aggregating expert judgement --></section>
 
@@ -303,7 +315,7 @@ horizontal separator can be used (3 or more punctuation characters on a line).</
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2024, Yu Chen (Leslie)
+                Copyright &#169; 2025, Yu Chen (Leslie)
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -329,5 +341,7 @@ horizontal separator can be used (3 or more punctuation characters on a line).</
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

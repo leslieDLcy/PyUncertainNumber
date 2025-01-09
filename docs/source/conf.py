@@ -44,6 +44,11 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_static_path = ["_static"]
 html_theme = "furo"
-
-
 html_logo = "_static/UNlogo3.png"
+
+myst_enable_extensions = [
+
+    "dollarmath",
+    "html_admonition",
+
+]

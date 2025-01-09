@@ -25,12 +25,21 @@ class Cbox(Pbox):
         super().__init__(*args, **kwargs)
 
     def __repr__(self):
-        # msg =
-        return f"Cbox ~ {self.shape}{self.extre_bound_params}"
+        # notation is defined as two bounding c.d.fs
+
+        if self.extre_bound_params is None:
+            return f"Cbox ~ approximation"
+        if len(self.extre_bound_params) > 1:
+            return f"Cbox ~ [{self.shape}{self.extre_bound_params[0]}, {self.shape}{self.extre_bound_params[1]}]"
+        else:
+            return f"Cbox ~ {self.shape}{self.extre_bound_params[0]}"
 
     def display(self, parameter_name=None, **kwargs):
-        ax = super().display(
-            title=f'Cbox {parameter_name}', fill_color='salmon', **kwargs)
+        if parameter_name is not None:
+            ax = super().display(
+                title=f'Cbox {parameter_name}', fill_color='salmon', **kwargs)
+        else:
+            ax = super().display(fill_color='salmon', **kwargs)
         ax.set_ylabel('Confidence')
         return ax
 
@@ -57,15 +66,19 @@ class Cbox(Pbox):
 
 
 def cbox_from_extredists(rvs, shape=None, extre_bound_params=None):
-    """ define cbox via extreme bouding distrbution functions
+    """ define cbox via parameterised extreme bouding distrbution functions
 
     args:
         rvs (list): list of `scipy.stats.rv_continuous` objects
+        extre_bound_params (list): list of parameters for the extreme bounding c.d.f
     """
     if not isinstance(rvs, list | tuple):
         rvs = [rvs]
+    # extreme bouding quantiles
     bounds = [rv.ppf(Params.p_values) for rv in rvs]
     # if extre_bound_params is not None: print(extre_bound_params)
+    if not isinstance(extre_bound_params, list):
+        extre_bound_params = [extre_bound_params]
 
     return Cbox(
         *bounds,
