@@ -33,12 +33,21 @@ def interval_measurements(func):
     return imprecise_measurements_wrapper
 
 
-def infer_cbox(family: str, data):
-    return {k: v(data) for (k, v) in named_cbox.get(family).items()}
+def infer_cbox(family: str, data, **args):
+    """ top-level call signature to infer a c-box given data and family, plus rarely additional kwargs 
+
+    notes:
+        - data (list): a list of data samples, e.g. [2]
+        - additina kwargs such as N for binomial family
+    """
+    if isinstance(named_cbox.get(family), dict):
+        return {k: v(data, **args) for (k, v) in named_cbox.get(family).items()}
+    return named_cbox.get(family)(data, **args)
 
 
-def infer_nextvalue(family: str, data):
-    return named_nextvalue.get(family)(data)
+def infer_predictive_distribution(family: str, data, **args):
+    """ top-level call for the next value predictive distribution """
+    return named_nextvalue.get(family)(data, **args)
 
 # * ---------------------Bernoulli---------------------*#
 
