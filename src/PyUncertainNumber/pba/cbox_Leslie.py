@@ -1,4 +1,5 @@
 """ a Cbox constructor by Leslie"""
+import numpy as np
 from .params import Params
 from .pbox_base import Pbox
 from ..characterisation.utils import tranform_ecdf
@@ -43,11 +44,21 @@ class Cbox(Pbox):
         ax.set_ylabel('Confidence')
         return ax
 
-    @classmethod
-    def from_cd(cls):
-        """ constructor from a confidence distribution """
+    def ci(self, c=0.95, alpha=None, beta=None, style='two-sided'):
+        """ query the confidence interval at a given confidence level `c`"""
+        if style == 'two-sided':
+            if alpha is None:
+                alpha = (1-c)/2
+            if beta is None:
+                beta = 1-(1-c)/2
 
-        pass
+            l_quantile = self.cuth(alpha).left
+            r_quantile = self.cuth(beta).right
+        if style == "one-sides":
+            l_quantile = self.cuth(0.01).left
+            r_quantile = self.cuth(c).right
+
+        return np.array([l_quantile, r_quantile])
 
     # def query_confidence(self, level=None, low=None, upper=None):
 
