@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="interval analysis" href="interval_analysis.html" /><link rel="prev" title="Probability box" href="pbox.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Confidence box - PyUncertainNumber documentation</title>
+        <title>&lt;no title&gt; - PyUncertainNumber documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -212,9 +212,9 @@
 <li class="toctree-l1"><a class="reference internal" href="guides/up.html">Propagation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">probability bounds analysis</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="pbox.html">Probability box</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Confidence box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cbox.html">Confidence box</a></li>
 <li class="toctree-l1"><a class="reference internal" href="interval_analysis.html">interval analysis</a></li>
 </ul>
 
@@ -236,7 +236,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/cbox.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/interval_measurements.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -256,54 +256,14 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="confidence-box">
-<h1>Confidence box<a class="headerlink" href="#confidence-box" title="Link to this heading">¶</a></h1>
-<p>Trationally confidence intervals are widely used in engineering to making inference with respect to parameters of interest. It is appealing as it provides a gurantee of statistical performance through repeated use. Studies in frequetist inference continue to wonder the possibility of a distributional estimator just like the Bayesian posterior, which leads to a lot of developments towards the <strong>confidence distribution</strong> though it is not technically the same as a distribution in the canonical sense <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. It conveiently provides confidence intervals of all levels for a parameter of interest. Confidence boxes, or confidence structures, (abbreviated as c-box) are imprecise generalisations of confidence distributions and they can be applied to problems with discrete observatons, interval-censored data, and even inference problems in which no assumption about the distribution shape can be made.</p>
-<p>The figure below provides an illustration of the confidence box which yields several confidence intrevals for the parameter <span class="math notranslate nohighlight">\(\theta\)</span>.</p>
-<!-- <p float="left">
-  <img src="../../assets/left.png" width="32% />
-  <img src="./../assets/middle.png" width="32% />
-  <img src="./../assets/right.png" width="32% />
-</p> -->
-<a class="bg-primary reference internal image-reference" href="_images/confidence_distribution_illustration.png"><img alt="confidence distribution illustration" class="bg-primary align-center" src="_images/confidence_distribution_illustration.png" style="width: 1000px;" />
-</a>
-<!-- exmaple normal confidence distribution -->
-<p>Generallly one cannot directly compute with confidence intervals, but you can compute with confidence boxes from which you can get arbitrary confidence intervals for the results.</p>
-</section>
-<hr class="docutils" />
-<hr class="footnotes docutils" />
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id2" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>A confidence distribution is merely a ciphering device that encodes confidence intervals for each possible confidence level.</p>
-</aside>
-</aside>
-
+          
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="interval_analysis.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">interval analysis</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="pbox.html">
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-              <div class="page-info">
-                <div class="context">
-                  <span>Previous</span>
-                </div>
-                
-                <div class="title">Probability box</div>
-                
-              </div>
-            </a>
+          
+          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -334,7 +294,5 @@
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

@@ -10,7 +10,14 @@ The figure below provides an illustration of the confidence box which yields sev
   <img src="./../assets/right.png" width="32% />
 </p> -->
 
-![left](../../assets/left.png) ![middle](./../assets/middle.png) ![right](./../assets/right.png)
+```{image} ../../assets/confidence_distribution_illustration.png
+:alt: confidence distribution illustration
+:class: bg-primary
+:width: 1000px
+:align: center
+
+Illustration of confidence distribution
+```
 
 <!-- exmaple normal confidence distribution -->
 
