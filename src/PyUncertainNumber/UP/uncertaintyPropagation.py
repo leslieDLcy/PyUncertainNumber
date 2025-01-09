@@ -107,15 +107,35 @@ def mixed_propagation(vars: list, fun:Callable = None,
                     results: propagation_results = None, 
                     method = 'endpoints',
                     n_disc: Union[int, np.ndarray] = 10, 
-                    condensation:int = 1,
+                    condensation:int = None,
                     tOp: Union[float, np.ndarray] = 0.999,
                     bOt: Union[float, np.ndarray] = 0.001,
                     save_raw_data= 'no', 
-                             
+                    *,  # Keyword-nly arguments start here
+                    base_path=np.nan,
                     **kwargs,):  
     
-    match method:
+    if save_raw_data not in ("yes", "no"):  # Input validation
+        raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
+    
+    def process_mixed_results(results: propagation_results):  
+        # if results.raw_data['bounds'] is None or results.raw_data['bounds'].size == 0:
+        #     results.un = None
+        # else:
+        #     if results.raw_data['bounds'].ndim == 4:  # 2D array
+        #         results.un = UncertainNumber( essence='interval', bounds=[1, 2])  #[UncertainNumber(essence="pbox", pbox_parameters = bound, **kwargs) for bound in results.raw_data['bounds']]
+        #     elif results.raw_data['bounds'].ndim == 3:  # 1D array
+        #         results.un =  UncertainNumber( essence='interval', bounds=[1, 2]) #UncertainNumber(essence="pbox",  pbox_parameters=results.raw_data['bounds'], **kwargs)
+        #     else:
+        #         raise ValueError("Invalid shape for 'bounds'. Expected 2D array or 1D array with two values.")
+
+        #if save_raw_data == "yes":
+            #res_path = create_folder(base_path, method)
+            #save_results(results.raw_data, method=method, res_path=res_path, fun=fun) 
         
+        return results
+    
+    match method:       
         case ("second_order_endpoints" | "second_order_vertex" | "endpoints" |"vertex"):
             results = second_order_propagation_method(vars,                                
                                                 fun,
@@ -128,7 +148,7 @@ def mixed_propagation(vars: list, fun:Callable = None,
                                                 save_raw_data = save_raw_data,
                                                 **kwargs,
                                                 )  # Pass save_raw_data directly
-            return results #process_results(results) 
+            return process_mixed_results(results) 
         
         case ("second_order_extremepoints" | "extremepoints" ):       
             results =  second_order_propagation_method(vars,                                
@@ -142,8 +162,9 @@ def mixed_propagation(vars: list, fun:Callable = None,
                                                 save_raw_data = save_raw_data,
                                                 **kwargs,   
                                                 )  # Pass save_raw_data directly
-            return results #process_results(results) 
-        case ("first_order"):
+            return process_mixed_results(results) 
+        
+        case ("first_order"|"first_order_extremepoints"):
             results = first_order_propagation_method(vars,                              
                                                 fun,
                                                 results,
@@ -155,6 +176,9 @@ def mixed_propagation(vars: list, fun:Callable = None,
                                                 save_raw_data = save_raw_data,
                                                 **kwargs,  
                                                 ) 
+            return process_mixed_results(results)
+        case _:
+            raise ValueError("Invalid UP method.")
 
 def epistemic_propagation(vars,
           fun,
@@ -298,6 +322,10 @@ def propagation(vars:list,
         n_sam: np.integer = 500,
         x0: np.ndarray = None,
         method=None,
+        n_disc: Union[int, np.ndarray] = 10, 
+        condensation:int = None,
+        tOp: Union[float, np.ndarray] = 0.999,
+        bOt: Union[float, np.ndarray] = 0.001,
         save_raw_data="no",
         *,  # Keyword-only arguments start here
         base_path=np.nan,
@@ -308,11 +336,7 @@ def propagation(vars:list,
         n_gen=100,
         tol=1e-3,
         n_gen_last=10,
-        algorithm_type="NSGA2",
-        n_disc: Union[int, np.ndarray] = 10, 
-        condensation:int = 1,
-        tOp: Union[float, np.ndarray] = 0.999,
-        bOt: Union[float, np.ndarray] = 0.001,
+        algorithm_type="NSGA2",        
           **kwargs
           ):
 
@@ -345,15 +369,27 @@ def propagation(vars:list,
                                         )
  
     elif all(essence == "distribution" for essence in essences):
-        y = aleatory_propagation(vars = vars,                                
-                                fun= fun,
-                                results= results,
-                                n_sam = n_sam,
-                                method= method,       
-                                save_raw_data = save_raw_data,
-                                base_path= base_path,
-                                **kwargs)
-
+        if method in ("second_order_endpoints", "second_order_vertex", 
+                      "second_order_extremepoints"):
+            y = mixed_propagation(vars=vars, 
+                                  fun=fun, 
+                                  results=results, 
+                                  n_disc=n_disc,
+                                  condensation=condensation, 
+                                  tOp=tOp,
+                                  bOt=bOt,
+                                  save_raw_data=save_raw_data,
+                                  base_path=base_path,
+                                  **kwargs)
+        else:  # Use aleatory propagation if method is not in the list above
+            y = aleatory_propagation(vars=vars,
+                                      fun=fun,
+                                      results=results,
+                                      n_sam=n_sam,
+                                      method=method,
+                                      save_raw_data=save_raw_data,
+                                      base_path=base_path,
+                                      **kwargs)
     else:  # Mixed case or at least one p-box
         y = mixed_propagation(vars = vars,                                
                               fun= fun,
@@ -403,7 +439,6 @@ def plotPbox(xL, xR, p=None):
     # Highlight the points (xR, p)
     plt.scatter(xR, p, color=colors, marker='o', edgecolors='black', zorder=3)
 
-
     plt.fill_betweenx(p, xL, xR, color=colors, alpha=0.5)
     plt.plot( [xL[0], xR[0]], [0, 0],color=colors, linewidth=3)
     plt.plot([xL[-1], xR[-1]],[1, 1],  color=colors, linewidth=3)
@@ -449,7 +484,7 @@ def main():
         except:
             deflection = np.nan
 
-        return deflection
+        return np.array([deflection])
     
     def cantilever_beam_func(x):
         
@@ -468,33 +503,36 @@ def main():
 
         return np.array([deflection, stress])
 #     # example
-#     # y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
+    y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
     L = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
-    #I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
-    #F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
-#     # E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
+    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
+    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
+    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
     
 #     y = UncertainNumber(name='beam width', symbol='y', units='m', essence='interval', bounds=[0.145, 0.155]) 
   #  L = UncertainNumber(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
-    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
-    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
-    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
+    # I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
+    # F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
+    # E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
   
     METHOD = "extremepoints"
     base_path = "C:\\Users\\Ioanna\\OneDrive - The University of Liverpool\\DAWS2_code\\UP\\"
 
-    a = mixed_propagation(vars= [ L, I, F, E], 
-                                fun= cantilever_beam_deflection, 
-                                method= 'first_order', 
-                                n_disc=40,
-                                save_raw_data= "no"#,
-                            #save_raw_data= "yes",
-                            #base_path= base_path
+    a = mixed_propagation(vars= [ y,L, I, F, E], 
+                            fun= cantilever_beam_func, 
+                            method= 'second_order_extremepoints', 
+                            n_disc=8,
+                            #save_raw_data= "no"#,
+                            save_raw_data= "yes",
+                            base_path= base_path
                         )
-    a.print()
     plotPbox(a.raw_data['min'][0]['f'], a.raw_data['max'][0]['f'], p=None)
     plt.show()
+    plotPbox(a.raw_data['min'][1]['f'], a.raw_data['max'][1]['f'], p=None)
+    plt.show()
 
+    a.print()
+   
     return a
 
 if __name__ == "__main__":
