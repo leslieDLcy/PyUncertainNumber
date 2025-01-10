@@ -420,7 +420,7 @@ def plotPbox(xL, xR, p=None):
     xR = np.squeeze(xR)  # Ensure xR is a 1D array
 
     if p is None:
-        p = np.linspace(0, 1, len(xL))  # p should have one more element than xL/xR
+        p = np.linspace(0, 1,len(xL))  # p should have one more element than xL/xR
 
     if p.min() > 0:
         p = np.concatenate(([0], p))
@@ -503,35 +503,35 @@ def main():
 
         return np.array([deflection, stress])
 #     # example
-    y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
-    L = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
-    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
-    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
-    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
+    # y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
+    # L = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
+    # I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
+    # F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
+    # E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
     
-#     y = UncertainNumber(name='beam width', symbol='y', units='m', essence='interval', bounds=[0.145, 0.155]) 
-  #  L = UncertainNumber(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
-    # I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
-    # F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
-    # E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
+    y = UncertainNumber(name='beam width', symbol='y', units='m', essence='interval', bounds=[0.145, 0.155]) 
+    L = UncertainNumber(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
+    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
+    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
+    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
   
     METHOD = "extremepoints"
     base_path = "C:\\Users\\Ioanna\\OneDrive - The University of Liverpool\\DAWS2_code\\UP\\"
 
-    a = mixed_propagation(vars= [ y,L, I, F, E], 
-                            fun= cantilever_beam_func, 
-                            method= 'second_order_extremepoints', 
+    a = propagation(vars= [ L, I, F, E], 
+                            fun= cantilever_beam_deflection, 
+                            method= 'extremepoints', 
                             n_disc=8,
                             #save_raw_data= "no"#,
                             save_raw_data= "yes",
                             base_path= base_path
                         )
-    plotPbox(a.raw_data['min'][0]['f'], a.raw_data['max'][0]['f'], p=None)
-    plt.show()
-    plotPbox(a.raw_data['min'][1]['f'], a.raw_data['max'][1]['f'], p=None)
-    plt.show()
-
+    
     a.print()
+    # plotPbox(a.raw_data['min'][0]['f'], a.raw_data['max'][0]['f'], p=None)
+    # plt.show()
+    # plotPbox(a.raw_data['min'][1]['f'], a.raw_data['max'][1]['f'], p=None)
+    # plt.show() 
    
     return a
 
