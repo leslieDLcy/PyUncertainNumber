@@ -67,10 +67,8 @@ def envelope(*args: nInterval | Pbox | float) -> nInterval | Pbox:
         ``TypeError``: If none of the arguments are intervals or p-boxes.
 
     '''
-    # args = list(*args)
-
     # Raise error if <2 arguments are given
-    assert len(args) < 2,  'At least two arguments are required'
+    assert len(args) >= 2,  'At least two arguments are required'
 
     # get the type of all arguments
     types = [arg.__class__.__name__ for arg in args]
