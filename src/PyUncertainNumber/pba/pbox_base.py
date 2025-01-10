@@ -39,7 +39,7 @@ class Pbox:
 
     STEPS = Params.steps
 
-    """ 
+    """
     Leslie:
     - Essentially, from the code implementation, a Pbox object is defined by the left and right bounds (i.e. nd.arrays).
     - Advantage is that this unifies both parametric and non-parametric pboxes but disadvantage is it discards the parameter
@@ -299,6 +299,7 @@ class Pbox:
         return self.right[-1]
 
     ### Local functions ###
+
     def _computemoments(
         self,
     ):  # should we compute mean if it is a Cauchy, var if it's a t distribution?
@@ -349,7 +350,6 @@ class Pbox:
 
 # ---------------------dual interpretation ---------------------#
 
-
     def cutv(self, x):
         """ get the bounds on the cumulative probability associated with any x-value """
         lo_ind = find_nearest(self.right, x)
@@ -363,7 +363,7 @@ class Pbox:
         return nInterval(self.left[ind], self.right[ind])
 
     def outer_approximate(self, n=100):
-        """ outer approximation of a p-box 
+        """ outer approximation of a p-box
 
         note:
             - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
@@ -1023,18 +1023,10 @@ class Pbox:
         return self.straddles(0, endpoints)
 
     def imp(self, other):
+        """ Returns the imposition of self with other 
+        note:
+            - binary imposition between two pboxes only
         """
-        Returns the imposition of self with other
-        """
-        if other.__class__.__name__ != "Pbox":
-            try:
-                pbox = Pbox(pbox)
-            except:
-                raise TypeError(
-                    "Unable to convert %s object (%s) to Pbox" % (
-                        type(pbox), pbox)
-                )
-
         u = []
         d = []
 
@@ -1106,8 +1098,8 @@ class Pbox:
             return fig, ax
     plot = show
 
-    @mpl.rc_context({"text.usetex": True})
-    def display(self, title="", ax=None, style="simple", fill_color='lightgray', **kwargs):
+    @ mpl.rc_context({"text.usetex": True})
+    def display(self, title="", ax=None, style="band", fill_color='lightgray', **kwargs):
         """quickly plot the pba object
 
         # !Leslie defined plotting function"""
@@ -1186,7 +1178,7 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
 
 
 def pbox_from_pseudosamples(samples):
-    """ a tmp constructor for pbox/cbox from approximate solution of the confidence/next value distribution 
+    """ a tmp constructor for pbox/cbox from approximate solution of the confidence/next value distribution
 
     args:
         samples: the approximate Monte Carlo samples of the confidence/next value distribution
@@ -1411,46 +1403,13 @@ def truncate(pbox, min, max):
     return pbox.truncate(min, max)
 
 
-def imposition(*args: Union[Pbox, nInterval, float, int]):
-    """
-    Returns the imposition of the p-boxes in *args
-
-    Parameters
-    ----------
-    *args :
-        Number of p-boxes or objects to be mixed
-
-    Returns
-    ----------
-    Pbox
-    """
-    x = []
-    for pbox in args:
-        if pbox.__class__.__name__ != "Pbox":
-            try:
-                pbox = Pbox(pbox)
-            except:
-                raise TypeError(
-                    "Unable to convert %s object (%s) to Pbox" % (
-                        type(pbox), pbox)
-                )
-        x.append(pbox)
-
-    p = x[0]
-
-    for i in range(1, len(x)):
-        p.imp(x[i])
-
-    return p
-
-
 def mixture(
     uns: Union[Pbox, nInterval, float, int],
     weights: List[Union[float, int]] = [],
     steps: int = Pbox.STEPS,
 ) -> Pbox:
     """
-    stochastic mixture for uncertain numbers 
+    stochastic mixture for uncertain numbers
 
     Mixes the pboxes in *args
     args:

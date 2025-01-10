@@ -875,7 +875,6 @@ def tukeylambda(*args):
     return 'tukeylambda'
 
 
-@makePbox
 def uniform_sps(*args):
     return 'uniform'
 
@@ -971,30 +970,21 @@ def uniform(a, b, steps=Params.steps):
         - b: (float) upper endpoints
     """
 
-    loc, scale = uniform_reparameterisation(a,  b)
-    return uniform_sps(loc, scale)
+    # loc, scale = uniform_reparameterisation(a,  b)
+    # return uniform_sps(loc, scale)
 
-#     # if a.__class__.__name__ != "nInterval":
-#     #     a = nInterval(a, a)
-#     # if b.__class__.__name__ != "nInterval":
-#     #     b = nInterval(b, b)
+    a, b = [nInterval(arg)
+            for arg in [a, b] if arg is not isinstance(arg, nInterval)]
 
-#     # Left = np.linspace(a.left, b.left, steps)
-#     # Right = np.linspace(a.right, b.right, steps)
+    Left = np.linspace(a.left, b.left, steps)
+    Right = np.linspace(a.right, b.right, steps)
 
-#     # mean = 0.5 * (a + b)
-#     # var = ((b - a) ** 2) / 12
-
-#     # return Pbox(
-#     #     Left,
-#     #     Right,
-#     #     steps=steps,
-#     #     shape="uniform",
-#     #     mean_left=mean.left,
-#     #     mean_right=mean.right,
-#     #     var_left=var.left,
-#     #     var_right=var.right,
-#     # )
+    return Pbox(
+        Left,
+        Right,
+        steps=steps,
+        shape="uniform",
+    )
 
 
 def weibull(*args, steps=Params.steps):

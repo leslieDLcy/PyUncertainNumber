@@ -10,6 +10,7 @@ dempstershafer_element = namedtuple(
 
 
 class DempsterShafer:
+    # TODO add a new constructor see C report P. 76
     """ Class for Dempester-Shafer structures. """
 
     def __init__(self, intervals, masses: list[float]):
@@ -32,20 +33,12 @@ class DempsterShafer:
     def masses(self):
         return self._masses
 
-    # def __add__(self, other):
-    #     if isinstance(other, DempsterShafer):
-    #         lo = np.concatenate((self.intervals.lo, other.intervals.lo))
-    #         hi = np.concatenate((self.intervals.hi, other.intervals.hi))
-    #         masses = np.concatenate((self.masses, other.masses))
-
-    #     else:
-    #         raise ValueError("Can only add DempsterShafer objects together")
-
     def disassemble(self,):
         return self._intrep, self._masses
 
     def display(self, style='box'):
         # TODO cannot take kwargs (such as title='') yet. to be fixed
+        # TODO slightly different call signature compared to pbox & Interval
         intervals, masses = self.disassemble()
         match style:
             case 'box':

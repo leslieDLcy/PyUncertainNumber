@@ -27,7 +27,8 @@ __all__ = [
 ]
 
 from intervals import Interval
-from .pbox_base import Pbox, imposition, NotIncreasingError
+from .pbox_base import Pbox, NotIncreasingError
+from .operation import imposition
 from typing import *
 from warnings import warn
 import numpy as np

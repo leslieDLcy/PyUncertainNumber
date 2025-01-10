@@ -86,6 +86,7 @@ def round():
 
 def uniform_reparameterisation(a, b):
     """ reparameterise the uniform distribution to a, b """
+    #! incorrect in the case of Interval args
     a, b = wc_interval(a), wc_interval(b)
     return a, b-a
 
