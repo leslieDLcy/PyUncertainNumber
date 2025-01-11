@@ -1,6 +1,3 @@
-from .pbox_base import Pbox
-from .interval import Interval as nInterval
-from .ds import DempsterShafer
 
 
 def convert(un):
@@ -9,6 +6,10 @@ def convert(un):
     note:
         - theorically 'un' can be {Interval, DempsterShafer, Distribution, float, int}
     """
+
+    from .pbox_base import Pbox
+    from .interval import Interval as nInterval
+    from .ds import DempsterShafer
     if isinstance(un, nInterval):
         return Pbox(un.left, un.right)
     elif isinstance(un, Pbox):

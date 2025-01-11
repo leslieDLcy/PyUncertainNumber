@@ -351,7 +351,6 @@ class Pbox:
 
 # ---------------------dual interpretation ---------------------#
 
-
     def cutv(self, x):
         """ get the bounds on the cumulative probability associated with any x-value """
         lo_ind = find_nearest(self.right, x)
@@ -407,19 +406,109 @@ class Pbox:
         )
 
 # * ---------------------binary operations--------------------- *#
-    def add(self, other: Self | nInterval | float | int, method="f") -> Self:
-        """addtion of uncertain numbers with the defined dependency method """
-
+    @staticmethod
+    def check_dependency(method):
         if method not in ["f", "p", "o", "i"]:
             raise ArithmeticError("dependency not registered")
 
-        if isinstance(other, nInterval):
-            other = convert(other)
+    def constant_shape_check(self):
+        """ a helper drop in for define binary ops """
+        if self.shape in [
+            "uniform",
+            "normal",
+            "cauchy",
+            "triangular",
+            "skew-normal",
+        ]:
+            s = self.shape
+        else:
+            s = ""
+        return s
 
-        if isinstance(other, Self):
-            if self.steps != other.steps:
-                raise ArithmeticError(
-                    "Both Pboxes must have the same number of steps")
+    def steps_check(self, other):
+        if self.steps != other.steps:
+            raise ArithmeticError(
+                "Both Pboxes must have the same number of steps")
+
+    def add(self, other: Self | nInterval | float | int, method="f") -> Self:
+        """addtion of uncertain numbers with the defined dependency method """
+
+        self.check_dependency(method)
+        if isinstance(other, (float, int)):
+            # case with constant
+            try:
+                s = self.constant_shape_check()
+                return Pbox(
+                    left=self.left + other,
+                    right=self.right + other,
+                    shape=s,
+                    mean_left=self.mean_left + other,
+                    mean_right=self.mean_right + other,
+                    var_left=self.var_left,
+                    var_right=self.var_right,
+                    steps=self.steps,
+                )
+            except:
+                return NotImplemented
+
+        else:
+            other = convert(other)
+            self.steps_check(other)
+
+            match method:
+                case "f":
+                    nleft = np.empty(self.steps)
+                    nright = np.empty(self.steps)
+                    for i in range(0, self.steps):
+                        j = np.array(range(i, self.steps))
+                        k = np.array(range(self.steps - 1, i - 1, -1))
+                        nright[i] = np.min(self.right[j] + other.right[k])
+                        jj = np.array(range(0, i + 1))
+                        kk = np.array(range(i, -1, -1))
+                        nleft[i] = np.max(self.left[jj] + other.left[kk])
+                case "p":
+                    nleft = self.left + other.left
+                    nright = self.right + other.right
+                case "o":
+                    nleft = self.left + np.flip(other.right)
+                    nright = self.right + np.flip(other.left)
+                case "i":
+                    nleft = []
+                    nright = []
+                    for i in self.left:
+                        for j in other.left:
+                            nleft.append(i + j)
+                    for ii in self.right:
+                        for jj in other.right:
+                            nright.append(ii + jj)
+            nleft.sort()
+            nright.sort()
+
+            return Pbox(left=nleft, right=nright, steps=self.steps)
+
+    def pow(self, other: Self | nInterval | float | int, method="f") -> Self:
+        """ Raises a p-box to the power of other using the defined dependency method """
+
+        self.check_dependency(method)
+        if isinstance(other, (float, int)):
+            # case with constant
+            try:
+                s = self.constant_shape_check()
+                return Pbox(
+                    left=self.left**other,
+                    right=self.right**other,
+                    shape=s,
+                    mean_left=self.mean_left**other,
+                    mean_right=self.mean_right**other,
+                    var_left=self.var_left,
+                    var_right=self.var_right,
+                    steps=self.steps,
+                )
+            except:
+                return NotImplemented
+        else:
+            other = convert(other)
+            self.steps_check(other)
 
             match method:
                 case "f":
@@ -430,21 +519,22 @@ class Pbox:
                         j = np.array(range(i, self.steps))
                         k = np.array(range(self.steps - 1, i - 1, -1))
 
-                        nright[i] = np.min(self.right[j] + other.right[k])
+                        nright[i] = np.min(self.right[j] ** other.right[k])
 
                         jj = np.array(range(0, i + 1))
                         kk = np.array(range(i, -1, -1))
-                        nleft[i] = np.max(self.left[jj] + other.left[kk])
 
+                        nleft[i] = np.max(self.left[jj] ** other.left[kk])
                 case "p":
-                    nleft = self.left + other.left
-                    nright = self.right + other.right
+
+                    nleft = self.left**other.left
+                    nright = self.right**other.right
                 case "o":
 
-                    nleft = self.left + np.flip(other.right)
-                    nright = self.right + np.flip(other.left)
-
+                    nleft = self.left ** np.flip(other.right)
+                    nright = self.right ** np.flip(other.left)
                 case "i":
+
                     nleft = []
                     nright = []
                     for i in self.left:
@@ -459,118 +549,6 @@ class Pbox:
 
             return Pbox(left=nleft, right=nright, steps=self.steps)
 
-        else:
-            try:
-                # Try adding constant
-                if self.shape in [
-                    "uniform",
-                    "normal",
-                    "cauchy",
-                    "triangular",
-                    "skew-normal",
-                ]:
-                    s = self.shape
-                else:
-                    s = ""
-
-                return Pbox(
-                    left=self.left + other,
-                    right=self.right + other,
-                    shape=s,
-                    mean_left=self.mean_left + other,
-                    mean_right=self.mean_right + other,
-                    var_left=self.var_left,
-                    var_right=self.var_right,
-                    steps=self.steps,
-                )
-
-            except:
-                return NotImplemented
-
-    def pow(self, other: Self | nInterval | float | int, method="f") -> Self:
-        """ Raises a p-box to the power of other using the defined dependency method """
-
-        if method not in ["f", "p", "o", "i"]:
-            raise ArithmeticError("dependency not registered")
-
-        if isinstance(other, nInterval):
-            other = convert(other)
-
-        if isinstance(other, Self):
-            if self.steps != other.steps:
-                raise ArithmeticError(
-                    "Both Pboxes must have the same number of steps")
-
-            if method == "f":
-
-                nleft = np.empty(self.steps)
-                nright = np.empty(self.steps)
-
-                for i in range(0, self.steps):
-                    j = np.array(range(i, self.steps))
-                    k = np.array(range(self.steps - 1, i - 1, -1))
-
-                    nright[i] = np.min(self.right[j] ** other.right[k])
-
-                    jj = np.array(range(0, i + 1))
-                    kk = np.array(range(i, -1, -1))
-
-                    nleft[i] = np.max(self.left[jj] ** other.left[kk])
-
-            elif method == "p":
-
-                nleft = self.left**other.left
-                nright = self.right**other.right
-
-            elif method == "o":
-
-                nleft = self.left ** np.flip(other.right)
-                nright = self.right ** np.flip(other.left)
-
-            elif method == "i":
-
-                nleft = []
-                nright = []
-                for i in self.left:
-                    for j in other.left:
-                        nleft.append(i + j)
-                for ii in self.right:
-                    for jj in other.right:
-                        nright.append(ii + jj)
-
-            nleft.sort()
-            nright.sort()
-
-            return Pbox(left=nleft, right=nright, steps=self.steps)
-
-        else:
-            try:
-                # Try adding constant
-                if self.shape in [
-                    "uniform",
-                    "normal",
-                    "cauchy",
-                    "triangular",
-                    "skew-normal",
-                ]:
-                    s = self.shape
-                else:
-                    s = ""
-
-                return Pbox(
-                    left=self.left**other,
-                    right=self.right**other,
-                    shape=s,
-                    mean_left=self.mean_left**other,
-                    mean_right=self.mean_right**other,
-                    var_left=self.var_left,
-                    var_right=self.var_right,
-                    steps=self.steps,
-                )
-
-            except:
-                return NotImplemented
-
     def sub(self, other, method="f"):
 
         if method == "o":
@@ -581,74 +559,13 @@ class Pbox:
         return self.add(-other, method)
 
     def mul(self, other, method="f"):
+        """ Multiplication of uncertain numbers with the defined dependency method """
 
-        if method not in ["f", "p", "o", "i"]:
-            raise ArithmeticError("dependency not registered")
-
-        if isinstance(other, nInterval):
-            other = convert(other)
-
-        if isinstance(other, Self):
-            if self.steps != other.steps:
-                raise ArithmeticError(
-                    "Both Pboxes must have the same number of steps")
-
-            if method == "f":
-
-                nleft = np.empty(self.steps)
-                nright = np.empty(self.steps)
-
-                for i in range(0, self.steps):
-                    j = np.array(range(i, self.steps))
-                    k = np.array(range(self.steps - 1, i - 1, -1))
-
-                    nright[i] = np.min(self.right[j] * other.right[k])
-
-                    jj = np.array(range(0, i + 1))
-                    kk = np.array(range(i, -1, -1))
-
-                    nleft[i] = np.max(self.left[jj] * other.left[kk])
-
-            elif method == "p":
-
-                nleft = self.left * other.left
-                nright = self.right * other.right
-
-            elif method == "o":
-
-                nleft = self.left * np.flip(other.right)
-                nright = self.right * np.flip(other.left)
-
-            elif method == "i":
-
-                nleft = []
-                nright = []
-                for i in self.left:
-                    for j in other.left:
-                        nleft.append(i * j)
-                for ii in self.right:
-                    for jj in other.right:
-                        nright.append(ii * jj)
-
-            nleft.sort()
-            nright.sort()
-
-            return Pbox(left=nleft, right=nright, steps=self.steps)
-
-        else:
+        self.check_dependency(method)
+        if isinstance(other, (float, int)):
+            # case with constant
             try:
-                # Try adding constant
-                if self.shape in [
-                    "uniform",
-                    "normal",
-                    "cauchy",
-                    "triangular",
-                    "skew-normal",
-                ]:
-                    s = self.shape
-                else:
-                    s = ""
-
+                s = self.constant_shape_check()
                 return Pbox(
                     left=self.left * other,
                     right=self.right * other,
@@ -659,9 +576,47 @@ class Pbox:
                     var_right=self.var_right,
                     steps=self.steps,
                 )
-
             except:
                 return NotImplemented
+        else:
+            other = convert(other)
+            self.steps_check(other)
+
+            match method:
+                case "f":
+                    nleft = np.empty(self.steps)
+                    nright = np.empty(self.steps)
+
+                    for i in range(0, self.steps):
+                        j = np.array(range(i, self.steps))
+                        k = np.array(range(self.steps - 1, i - 1, -1))
+
+                        nright[i] = np.min(self.right[j] * other.right[k])
+
+                        jj = np.array(range(0, i + 1))
+                        kk = np.array(range(i, -1, -1))
+
+                        nleft[i] = np.max(self.left[jj] * other.left[kk])
+                case "p":
+                    nleft = self.left * other.left
+                    nright = self.right * other.right
+                case "o":
+                    nleft = self.left * np.flip(other.right)
+                    nright = self.right * np.flip(other.left)
+                case "i":
+                    nleft = []
+                    nright = []
+                    for i in self.left:
+                        for j in other.left:
+                            nleft.append(i * j)
+                    for ii in self.right:
+                        for jj in other.right:
+                            nright.append(ii * jj)
+
+            nleft.sort()
+            nright.sort()
+
+            return Pbox(left=nleft, right=nright, steps=self.steps)
 
     def div(self, other, method="f"):
 
@@ -695,29 +650,21 @@ class Pbox:
         return b.get_probability(0)
 
     def min(self, other, method="f"):
-        """
-        Returns a new Pbox object that represents the element-wise minimum of two Pboxes.
+        """ Returns a new Pbox object that represents the element-wise minimum of two Pboxes.
 
-        Parameters:
+        args:
             - other: Another Pbox object or a numeric value.
             - method: Calculation method to determine the minimum. Can be one of 'f', 'p', 'o', 'i'.
 
-        Returns:
+        returns:
             Pbox
         """
 
-        if method not in ["f", "p", "o", "i"]:
-            raise ArithmeticError("dependency not registered")
-
-        if isinstance(other, nInterval):
-            other = convert(other)
-
-        if isinstance(other, Self):
-            if self.steps != other.steps:
-                raise ArithmeticError(
-                    "Both Pboxes must have the same number of steps")
-
-            if method == "f":
+        self.check_dependency(method)
+        other = convert(other)
+        self.steps_check(other)
+        match method:
+            case "f":
 
                 nleft = np.empty(self.steps)
                 nright = np.empty(self.steps)
@@ -732,19 +679,13 @@ class Pbox:
                     kk = np.array(range(i, -1, -1))
 
                     nleft[i] = min(list(self.left[jj]) + list(other.left[kk]))
-
-            elif method == "p":
-
+            case "p":
                 nleft = np.minimum(self.left, other.left)
                 nright = np.minimum(self.right, other.right)
-
-            elif method == "o":
-
+            case "o":
                 nleft = np.minimum(self.left, np.flip(other.left))
                 nright = np.minimum(self.right, np.flip(other.right))
-
-            elif method == "i":
-
+            case "i":
                 nleft = []
                 nright = []
                 for i in self.left:
@@ -753,56 +694,34 @@ class Pbox:
                 for ii in self.right:
                     for jj in other.right:
                         nright.append(np.minimum(ii, jj))
+        nleft.sort()
+        nright.sort()
 
-            nleft.sort()
-            nright.sort()
-
-            return Pbox(left=nleft, right=nright, steps=self.steps)
+        return Pbox(left=nleft, right=nright, steps=self.steps)
 
     def max(self, other, method="f"):
 
-        if method not in ["f", "p", "o", "i"]:
-            raise ArithmeticError("dependency not registered")
-
-        if isinstance(other, nInterval):
-            other = convert(other)
-
-        if isinstance(other, Self):
-            if self.steps != other.steps:
-                raise ArithmeticError(
-                    "Both Pboxes must have the same number of steps")
-
-            # if self.steps != other.steps:
-            #     raise ArithmeticError("Both Pboxes must have the same number of steps")
-
-            if method == "f":
-
+        self.check_dependency(method)
+        other = convert(other)
+        self.steps_check(other)
+        match method:
+            case "f":
                 nleft = np.empty(self.steps)
                 nright = np.empty(self.steps)
-
                 for i in range(0, self.steps):
                     j = np.array(range(i, self.steps))
                     k = np.array(range(self.steps - 1, i - 1, -1))
-
                     nright[i] = max(list(self.right[j]) + list(other.right[k]))
-
                     jj = np.array(range(0, i + 1))
                     kk = np.array(range(i, -1, -1))
-
                     nleft[i] = max(list(self.left[jj]) + list(other.left[kk]))
-
-            elif method == "p":
-
+            case "p":
                 nleft = np.maximum(self.left, other.left)
                 nright = np.maximum(self.right, other.right)
-
-            elif method == "o":
-
+            case "o":
                 nleft = np.maximum(self.left, np.flip(other.right))
                 nright = np.maximum(self.right, np.flip(other.left))
-
-            elif method == "i":
-
+            case "i":
                 nleft = []
                 nright = []
                 for i in self.left:
@@ -812,21 +731,21 @@ class Pbox:
                     for jj in other.right:
                         nright.append(np.maximum(ii, jj))
 
-            nleft.sort()
-            nright.sort()
+        nleft.sort()
+        nright.sort()
 
-            return Pbox(left=nleft, right=nright, steps=self.steps)
+        return Pbox(left=nleft, right=nright, steps=self.steps)
 
-        else:
-            try:
-                # Try constant
-                nleft = [i if i > other else other for i in self.left]
-                nright = [i if i > other else other for i in self.right]
+        # else:
+        #     try:
+        #         # Try constant
+        #         nleft = [i if i > other else other for i in self.left]
+        #         nright = [i if i > other else other for i in self.right]
 
-                return Pbox(left=nleft, right=nright, steps=self.steps)
+        #         return Pbox(left=nleft, right=nright, steps=self.steps)
 
-            except:
-                return NotImplemented
+        #     except:
+        #         return NotImplemented
 
     def truncate(self, a, b, method="f"):
         """
