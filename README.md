@@ -26,6 +26,7 @@ _ = un.display(style='band')
 ```
 
 <!-- add some pbox plots herein -->
+![pbox dynamic visualisation](./assets/myAnimation.gif)
 
 ## Installation of the development version
 

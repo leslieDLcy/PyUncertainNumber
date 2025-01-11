@@ -1,8 +1,6 @@
 from typing import *
 from .interval import *
 from .pbox_base import Pbox
-from .cbox_Nick import *
-
 import numpy as np
 import warnings
 
@@ -65,16 +63,16 @@ def envelope(*args: Union[Interval, Pbox, float]) -> Union[Interval, Pbox]:
     return e
 
 
-def env(*args):
-    '''
-    .. warning::
+# def env(*args):
+#     '''
+#     .. warning::
 
-        Deprecated function, use envelope() instead.
+#         Deprecated function, use envelope() instead.
 
-    '''
-    warnings.warn('env() is deprecated, use envelope() instead',
-                  DeprecationWarning)
-    return envelope(*args)
+#     '''
+#     warnings.warn('env() is deprecated, use envelope() instead',
+#                   DeprecationWarning)
+#     return envelope(*args)
 
 # def min(x,y):
 #     if x.__class__.__name__ == 'Pbox':
