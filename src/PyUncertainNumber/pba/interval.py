@@ -1024,7 +1024,7 @@ class Interval:
     # ---------------------methods---------------------#
 
     @mpl.rc_context({"text.usetex": True})
-    def display(self, title="", ax=None, style="simple", **kwargs):
+    def display(self, title="", ax=None, style="band", **kwargs):
 
         if ax is None:
             fig, ax = plt.subplots()
@@ -1053,6 +1053,8 @@ class Interval:
                 facecolor=("blue", 0.2),
                 **kwargs,
             )
+        else:
+            raise ValueError(f"Style {style} not recognised")
         ax.margins(x=0.1)
         ax.set_xlabel(r"$x$")
         ax.set_ylabel("CDF")

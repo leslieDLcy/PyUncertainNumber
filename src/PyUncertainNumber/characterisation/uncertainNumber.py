@@ -40,17 +40,19 @@ class UncertainNumber:
     # ---------------------Basic---------------------#
     name: str = field(default=None)
     symbol: str = field(default=None)
-    units: str = field(default=None)
+    # string input of units, e.g. 'm/s'
+    units: Type[any] = field(default=None, repr=False)
+    _Q: Type[any] = field(default=None, repr=False)
 
     # ---------------------Value---------------------#
     # ensemble: Type[Ensemble] = field(default=None)
-    uncertainty_type: Type[Uncertainty_types] = field(default=None)
+    uncertainty_type: Type[Uncertainty_types] = field(default=None, repr=False)
     essence: str = field(default=None)  # [interval, distribution, pbox]
     bounds: Union[List[float], str] = field(default=None)
     distribution_parameters: list[str, float | int] = field(default=None)
     pbox_parameters: list[str, Sequence[nInterval]] = field(
-        default=None)
-    hedge: str = field(default=None)
+        default=None, repr=False)
+    hedge: str = field(default=None, repr=False)
     # this is the deterministic numeric representation of the
     # UN object, which shall be linked with the 'pba' or `Intervals` package
     naked_value: float = field(default=None)
@@ -60,20 +62,20 @@ class UncertainNumber:
     # lat: float = field(default=0.0, metadata={'unit': 'degrees'})
     # ensemble: Type[Ensemble] = field(default=None)
 
-    measurand: str = field(default=None)
-    nature: str = field(default=None)
-    provenence: str = field(default=None)
-    justification: str = field(default=None)
-    structure: str = field(default=None)
-    security: str = field(default=None)
+    measurand: str = field(default=None, repr=False)
+    nature: str = field(default=None, repr=False)
+    provenence: str = field(default=None, repr=False)
+    justification: str = field(default=None, repr=False)
+    structure: str = field(default=None, repr=False)
+    security: str = field(default=None, repr=False)
 
     # * ---------------------aleatoric component--------------------- *#
-    ensemble: Type[Ensemble] = field(default=None)
-    variability: str = field(default=None)
-    dependence: str = field(default=None)
+    ensemble: Type[Ensemble] = field(default=None, repr=False)
+    variability: str = field(default=None, repr=False)
+    dependence: str = field(default=None, repr=False)
 
     # * ---------------------epistemic component---------------------*#
-    uncertainty: str = field(default=None)
+    uncertainty: str = field(default=None, repr=False)
 
     # class variable
     instances = []  # TODO named as registry later on
@@ -81,7 +83,7 @@ class UncertainNumber:
     # * --------------------- additional ---------------------*#
     _samples: np.ndarray | list = field(default=None, repr=False)
 
-    # ---------------------more on initialisation---------------------#
+    # *  ---------------------more on initialisation---------------------*#
 
     def __post_init__(self):
         """the de facto initialisation method for the core math objects of the UN class
@@ -106,21 +108,9 @@ class UncertainNumber:
                 self.essence = "interval"
                 self.bounds = [-np.inf, np.inf]
 
-        # TODO to create the Quantity object defined as <value * unit>
-        """get the 'unit' representation of the uncertain number"""
-        ureg = UnitRegistry()
         UncertainNumber.instances.append(self)
-        # I can use the following logic to double check the arithmetic operations of the UN object
-        # if isinstance(self.naked_value, float) or isinstance(
-        #     self.naked_value, int
-        # ):
-        #     self._UnitsRep = self.naked_value * ureg(self.units)
-        # else:
-        #     self._UnitsRep = 1 * ureg(self.units)
 
-        self._UnitsRep = 1 * ureg(self.units)
-
-        ### create the underlying construct ###
+        ### the underlying construct ###
         match self.essence:
             case "interval":
                 self._construct = _parse_bounds(self.bounds)
@@ -133,17 +123,22 @@ class UncertainNumber:
                         dist_family=self.distribution_parameters[0],
                         dist_params=self.distribution_parameters[1],
                     )
-
-                self.naked_value = 'not specified yet'
-                # TODO the error is here where the numeric value is NOT a value
-                # TODO continue getting familar with the 'pba' package for computing mean etc...
-                # TODO I've put `mean_left` there but unsure if correct or not
+                self.naked_value = self._construct._naked_value
             case "pbox":
                 self._construct = self.match_pbox(
                     self.distribution_parameters[0],
                     self.distribution_parameters[1],
                 )
-                self.naked_value = self._construct.mean()
+                self.naked_value = self._construct.mean().midpoint()
+
+        ### 'unit' representation of the un ###
+        ureg = UnitRegistry()
+
+        # I can use the following logic to double check the arithmetic operations of the UN object
+        if isinstance(self.naked_value, float | int):
+            self._Q = self.naked_value * ureg(self.units)  # Quantity object
+        else:
+            self._Q = 1 * ureg(self.units)
 
     @staticmethod
     def match_pbox(keyword, parameters):
@@ -153,7 +148,6 @@ class UncertainNumber:
             - keyword: (str) the distribution keyword
             - parameters: (list) the parameters of the distribution
         """
-
         obj = named_pbox.get(keyword,
                              "You're lucky as the distribution is not supported")
         if isinstance(obj, str):
@@ -344,8 +338,9 @@ class UncertainNumber:
         """add two uncertain numbers"""
         left = (self._construct + other._construct).left
         right = (self._construct + other._construct).right
+        newQ = self._Q + other._Q
         essence = self.essence
-        return type(self)(essence=essence, bounds=[left, right])
+        return type(self)(essence=essence, bounds=[left, right], _Q=newQ, units=newQ.units)
 
     def __radd__(self, other):
         return self.__add__(other)
