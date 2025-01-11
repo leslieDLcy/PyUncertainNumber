@@ -1,5 +1,5 @@
 from decimal import DivisionByZero
-from typing import *
+from typing import Self
 from warnings import *
 from ..characterisation.utils import tranform_ecdf
 import numpy as np
@@ -9,12 +9,11 @@ from .interval import Interval as nInterval
 from .utils import find_nearest, check_increasing, NotIncreasingError, _interval_list_to_array
 from .params import Params
 from .ds import DempsterShafer
+from .operation import convert
 
 __all__ = [
     "Pbox",
-    "mixture",
     "truncate",
-    "imposition",
     "NotIncreasingError",
 ]
 
@@ -191,7 +190,7 @@ class Pbox:
         for val in np.array([self.left, self.right]).flatten():
             yield val
 
-    # ---------------------Basic arithmetics---------------------#
+    # * ---------------------Basic arithmetics---------------------*#
 
     def __neg__(self):
         if self.shape in ["uniform", "normal", "cauchy", "triangular", "skew-normal"]:
@@ -286,12 +285,14 @@ class Pbox:
         except:
             return NotImplemented
 
+    @property
     def lo(self):
         """
         Returns the left-most value in the interval
         """
         return self.left[0]
 
+    @property
     def hi(self):
         """
         Returns the right-most value in the interval
@@ -350,6 +351,7 @@ class Pbox:
 
 # ---------------------dual interpretation ---------------------#
 
+
     def cutv(self, x):
         """ get the bounds on the cumulative probability associated with any x-value """
         lo_ind = find_nearest(self.right, x)
@@ -388,67 +390,69 @@ class Pbox:
 
         ints = [function(nInterval(l, r), *args)
                 for l, r in zip(self.left, self.right)]
-        print("'referred to ints'", ints)
         return Pbox(
             left=np.array([i.left for i in ints]),
             right=np.array([i.right for i in ints]),
         )
 
-    # Access Functions
-    def add(self, other: Union["Pbox", nInterval, float, int], method="f") -> "Pbox":
-        """
-        Adds to Pbox to other using the defined dependency method
+    def exp(self):
+        return self._unary(function=lambda x: x.exp())
 
+    def sqrt(self):
+        return self._unary(function=lambda x: x.sqrt())
 
-        """
+    def recip(self):
+        return Pbox(
+            left=1 / np.flip(self.right), right=1 / np.flip(self.left), steps=self.steps
+        )
+
+# * ---------------------binary operations--------------------- *#
+    def add(self, other: Self | nInterval | float | int, method="f") -> Self:
+        """addtion of uncertain numbers with the defined dependency method """
+
         if method not in ["f", "p", "o", "i"]:
-            raise ArithmeticError("Calculation method unkown")
+            raise ArithmeticError("dependency not registered")
 
-        if other.__class__.__name__ == "nInterval":
-            other = Pbox(other, steps=self.steps)
+        if isinstance(other, nInterval):
+            other = convert(other)
 
-        if other.__class__.__name__ == "Pbox":
-
+        if isinstance(other, Self):
             if self.steps != other.steps:
                 raise ArithmeticError(
                     "Both Pboxes must have the same number of steps")
 
-            if method == "f":
+            match method:
+                case "f":
+                    nleft = np.empty(self.steps)
+                    nright = np.empty(self.steps)
 
-                nleft = np.empty(self.steps)
-                nright = np.empty(self.steps)
+                    for i in range(0, self.steps):
+                        j = np.array(range(i, self.steps))
+                        k = np.array(range(self.steps - 1, i - 1, -1))
 
-                for i in range(0, self.steps):
-                    j = np.array(range(i, self.steps))
-                    k = np.array(range(self.steps - 1, i - 1, -1))
+                        nright[i] = np.min(self.right[j] + other.right[k])
 
-                    nright[i] = np.min(self.right[j] + other.right[k])
+                        jj = np.array(range(0, i + 1))
+                        kk = np.array(range(i, -1, -1))
+                        nleft[i] = np.max(self.left[jj] + other.left[kk])
 
-                    jj = np.array(range(0, i + 1))
-                    kk = np.array(range(i, -1, -1))
+                case "p":
+                    nleft = self.left + other.left
+                    nright = self.right + other.right
+                case "o":
 
-                    nleft[i] = np.max(self.left[jj] + other.left[kk])
+                    nleft = self.left + np.flip(other.right)
+                    nright = self.right + np.flip(other.left)
 
-            elif method == "p":
-
-                nleft = self.left + other.left
-                nright = self.right + other.right
-
-            elif method == "o":
-
-                nleft = self.left + np.flip(other.right)
-                nright = self.right + np.flip(other.left)
-
-            elif method == "i":
-
-                nleft = []
-                nright = []
-                for i in self.left:
-                    for j in other.left:
-                        nleft.append(i + j)
-                for ii in self.right:
-                    for jj in other.right:
-                        nright.append(ii + jj)
+                case "i":
+                    nleft = []
+                    nright = []
+                    for i in self.left:
+                        for j in other.left:
+                            nleft.append(i + j)
+                    for ii in self.right:
+                        for jj in other.right:
+                            nright.append(ii + jj)
 
             nleft.sort()
             nright.sort()
@@ -483,25 +487,16 @@ class Pbox:
             except:
                 return NotImplemented
 
-    def pow(self, other: Union["Pbox", nInterval, float, int], method="f") -> "Pbox":
-        """
-        Raises a p-box to the power of other using the defined dependency method
+    def pow(self, other: Self | nInterval | float | int, method="f") -> Self:
+        """ Raises a p-box to the power of other using the defined dependency method """
 
-        :param other: Pbox, nInterval or numeric type
-        :param method:
-
-        :return: Pbox
-        :rtype: Pbox
-
-        """
         if method not in ["f", "p", "o", "i"]:
-            raise ArithmeticError("Calculation method unkown")
+            raise ArithmeticError("dependency not registered")
 
-        if other.__class__.__name__ == "nInterval":
-            other = Pbox(other, steps=self.steps)
+        if isinstance(other, nInterval):
+            other = convert(other)
 
-        if other.__class__.__name__ == "Pbox":
-
+        if isinstance(other, Self):
             if self.steps != other.steps:
                 raise ArithmeticError(
                     "Both Pboxes must have the same number of steps")
@@ -588,13 +583,12 @@ class Pbox:
     def mul(self, other, method="f"):
 
         if method not in ["f", "p", "o", "i"]:
-            raise ArithmeticError("Calculation method unkown")
+            raise ArithmeticError("dependency not registered")
 
-        if other.__class__.__name__ == "nInterval":
-            other = Pbox(other, steps=self.steps)
+        if isinstance(other, nInterval):
+            other = convert(other)
 
-        if other.__class__.__name__ == "Pbox":
-
+        if isinstance(other, Self):
             if self.steps != other.steps:
                 raise ArithmeticError(
                     "Both Pboxes must have the same number of steps")
@@ -678,17 +672,6 @@ class Pbox:
 
         return self.mul(1 / other, method)
 
-    def exp(self):
-        return self._unary(function=lambda x: x.exp())
-
-    def sqrt(self):
-        return self._unary(function=lambda x: x.sqrt())
-
-    def recip(self):
-        return Pbox(
-            left=1 / np.flip(self.right), right=1 / np.flip(self.left), steps=self.steps
-        )
-
     def lt(self, other, method="f"):
         b = self.add(-other, method)
         return b.get_probability(
@@ -724,15 +707,15 @@ class Pbox:
         """
 
         if method not in ["f", "p", "o", "i"]:
-            raise ArithmeticError("Calculation method unkown")
+            raise ArithmeticError("dependency not registered")
 
-        if other.__class__.__name__ != "Pbox":
-            other = Pbox(other)
+        if isinstance(other, nInterval):
+            other = convert(other)
 
-        if other.__class__.__name__ == "Pbox":
-
-            # if self.steps != other.steps:
-            #     raise ArithmeticError("Both Pboxes must have the same number of steps")
+        if isinstance(other, Self):
+            if self.steps != other.steps:
+                raise ArithmeticError(
+                    "Both Pboxes must have the same number of steps")
 
             if method == "f":
 
@@ -779,12 +762,15 @@ class Pbox:
     def max(self, other, method="f"):
 
         if method not in ["f", "p", "o", "i"]:
-            raise ArithmeticError("Calculation method unkown")
+            raise ArithmeticError("dependency not registered")
 
-        if other.__class__.__name__ == "nInterval":
-            other = Pbox(other, steps=self.steps)
+        if isinstance(other, nInterval):
+            other = convert(other)
 
-        if other.__class__.__name__ == "Pbox":
+        if isinstance(other, Self):
+            if self.steps != other.steps:
+                raise ArithmeticError(
+                    "Both Pboxes must have the same number of steps")
 
             # if self.steps != other.steps:
             #     raise ArithmeticError("Both Pboxes must have the same number of steps")
@@ -960,10 +946,6 @@ class Pbox:
 
         return nInterval(lb, ub)
 
-    def summary(self) -> str:
-
-        return self.__repr__()
-
     def mean(self) -> nInterval:
         """
         Returns the mean of the pbox
@@ -1023,7 +1005,8 @@ class Pbox:
         return self.straddles(0, endpoints)
 
     def imp(self, other):
-        """ Returns the imposition of self with other 
+        """ Returns the imposition of self with other pbox
+
         note:
             - binary imposition between two pboxes only
         """
@@ -1401,125 +1384,3 @@ def _DivByZeroCheck(bound):
 
 def truncate(pbox, min, max):
     return pbox.truncate(min, max)
-
-
-def mixture(
-    uns: Union[Pbox, nInterval, float, int],
-    weights: List[Union[float, int]] = [],
-    steps: int = Pbox.STEPS,
-) -> Pbox:
-    """
-    stochastic mixture for uncertain numbers
-
-    Mixes the pboxes in *args
-    args:
-        uns (list): a list of Uncertain Numbers (which includes Pbox, nInterval, float, int)
-        weights (list): a list of weights for the uncertain numbers to be mixed
-
-    Returns:
-        Pbox
-    """
-    # TODO: IMPROVE READBILITY
-
-    def check_pbox(un):
-        try:
-            return Pbox(un)
-        except:
-            raise TypeError(
-                f"Unable to convert {type(un)} object {un} to Pbox")
-
-    x = [un if isinstance(un, Pbox) else check_pbox(un) for un in uns]
-
-    k = len(x)
-    if weights == []:
-        weights = [1] * k
-
-    # temporary hack
-    # k = 2
-    # x = [self, x]
-    # w = [1,1]
-
-    if k != len(weights):
-        return "Need same number of weights as arguments for mixture"
-    weights = [i / sum(weights) for i in weights]  # w = w / sum(w)
-    u = []
-    d = []
-    n = []
-    ml = []
-    mh = []
-    m = []
-    vl = []
-    vh = []
-    v = []
-    for i in range(k):
-        u = u + list(x[i].left)
-        d = np.append(d, x[i].right)
-        n = (
-            n + [weights[i] / x[i].steps] * x[i].steps
-        )  # w[i]*rep(1/x[i].steps,x[i].steps))
-
-        # mu = mean(x[i])
-        # ml = ml + [mu.left()]
-        # mh = mh + [mu.right()]
-        # m = m + [mu]               # don't need?
-        # sigma2 = var(x[[i]])  ### !!!! shouldn't be the sample variance, but the population variance
-        # vl = vl + [sigma2.left()]
-        # vh = vh + [sigma2.right()]
-        # v = v + [sigma2]
-
-        ML = x[i].mean_left
-        MR = x[i].mean_right
-        VL = x[i].var_left
-        VR = x[i].var_right
-        m = m + [nInterval(ML, MR)]
-        v = v + [nInterval(VL, VR)]
-        ml = ml + [ML]
-        mh = mh + [MR]
-        vl = vl + [VL]
-        vh = vh + [VR]
-
-    n = [_ / sum(n) for _ in n]  # n = n / sum(n)
-    su = sorted(u)
-    su = [su[0]] + su
-    pu = [0] + list(
-        np.cumsum([n[i] for i in np.argsort(u)])
-    )  # pu = c(0,cumsum(n[order(u)]))
-    sd = sorted(d)
-    sd = sd + [sd[-1]]
-    pd = list(np.cumsum([n[i] for i in np.argsort(d)])) + [
-        1
-    ]  # pd = c(cumsum(n[order(d)]),1)
-    u = []
-    d = []
-    j = len(pu) - 1
-    for p in reversed(
-        np.arange(steps) / steps
-    ):  # ii = np.arange(steps))/steps  #    ii = 0: (Pbox$steps-1) / Pbox$steps
-        while p < pu[j]:
-            j = j - 1  # repeat {if (pu[j] <= p) break; j = j - 1}
-        u = [su[j]] + u
-    j = 0
-    for p in (
-        np.arange(steps) + 1
-    ) / steps:  # jj = (np.arange(steps)+1)/steps #  jj =  1: Pbox$steps / Pbox$steps
-        while pd[j] < p:
-            j = j + 1  # repeat {if (p <= pu[j]) break; j = j + 1}
-        d = d + [sd[j]]
-    mu = nInterval(
-        np.sum([W * M for M, W in zip(weights, ml)]),
-        np.sum([W * M for M, W in zip(weights, mh)]),
-    )
-    s2 = 0
-    for i in range(k):
-        s2 = s2 + weights[i] * (v[i] + m[i] ** 2)
-    s2 = s2 - mu**2
-
-    return Pbox(
-        np.array(u),
-        np.array(d),
-        mean_left=mu.left,
-        mean_right=mu.right,
-        var_left=s2.left,
-        var_right=s2.right,
-        steps=steps,
-    )
