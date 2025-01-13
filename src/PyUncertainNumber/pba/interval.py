@@ -761,6 +761,7 @@ class Interval:
 
         return self.left == other.left and self.right == other.right
 
+    @property
     def lo(self):
         """
         **Returns**:
@@ -773,6 +774,7 @@ class Interval:
         """
         return self._left
 
+    @property
     def hi(self):
         """
         **Returns**:

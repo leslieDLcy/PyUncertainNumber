@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Tuple, List
-from PyUncertainNumber.UC.utils import initial_list_checking
+from PyUncertainNumber.characterisation.utils import initial_list_checking
 
 """ This module is for checking the logic for the instantiation and propagation of the Uncertain Number object"""
 
@@ -25,4 +25,6 @@ class DistributionSpecification:
         if isinstance(self.dist_params, str):
             return [self.dist_family, initial_list_checking(self.dist_params)]
         elif isinstance(self.dist_params, list):
+            return [self.dist_family, self.dist_params]
+        else:
             return [self.dist_family, self.dist_params]

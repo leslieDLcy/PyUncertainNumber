@@ -1,15 +1,13 @@
 # PyUncertainNumber
+
 --------
+<!-- some banners -->
 
-<a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
+<!-- <a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
-</a>
+</a> -->
 
-
-PyUncertainNumber is an generic computational tasks focusing on uncertainty quantification.
-It provides a research-grade computing environment for uncertainty characterisation, propagation, validation
-and uncertainty extrapolation. Four key modules comprised of the UQ ecosystem:
-Uncertainty characterisation module, Uncertainty propagation module, Uncertainty validation module and Uncertainty extrapolation module.
+**Uncertain Number** refers to a class of mathematical objects useful for risk analysis that generalize real numbers, intervals, probability distributions, interval bounds on probability distributions (i.e. [probability boxes](https://en.wikipedia.org/wiki/Probability_box)), and finite DempsterShafer structures.
 
 ## Usage
 
@@ -28,6 +26,7 @@ _ = un.display(style='band')
 ```
 
 <!-- add some pbox plots herein -->
+![pbox dynamic visualisation](./assets/myAnimation.gif)
 
 ## Installation of the development version
 

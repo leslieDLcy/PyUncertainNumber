@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Confidence box" href="cbox.html" /><link rel="prev" title="Propagation" href="guides/up.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Probability box - PyUncertainNumber documentation</title>
+        <title>Probability box - </title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -167,7 +167,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">PyUncertainNumber  documentation</div></a>
+      <a href="index.html"><div class="brand"> </div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -190,8 +190,11 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/UNlogo3.png" alt="Logo"/>
+  </div>
   
-  <span class="sidebar-brand-text">PyUncertainNumber  documentation</span>
+  <span class="sidebar-brand-text"> </span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -253,21 +256,59 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="probability-box">
+          <section class="tex2jax_ignore mathjax_ignore" id="probability-box">
 <h1>Probability box<a class="headerlink" href="#probability-box" title="Link to this heading">¶</a></h1>
-<p>Content can have inline markup like <em>emphasis</em>, <strong>strong emphasis</strong>,
-<code class="docutils literal notranslate"><span class="pre">inline</span> <span class="pre">literals</span></code>, <sub>subscript</sub>, <sup>superscript</sup> and so much more.
-Providing a reference to <span class="target" id="index-0"></span><a class="pep reference external" href="https://peps.python.org/pep-0008/"><strong>PEP 8</strong></a> is straightforward. You can also include
-abbreviations like <abbr title="Hyper Text Markup Language">HTML</abbr>.</p>
-<blockquote>
-<div><p>This is blockquoted text.</p>
-</div></blockquote>
-<p>It is possible to have multiple paragraphs of text, which get separated
+<p>A conspicuous problem in probability distribution elicition, for example in probabilistic modelling analysis, is that the specification is typically precise, despite hardly justified by empirical informtion in many cases.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>epistemic uncertainy remains on the shape, parameters, and dependencies of the distributions.</p>
+</div>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Probability_box">Probability box</a> (abbreviated as <code class="docutils literal notranslate"><span class="pre">p-box</span></code>) essentially represents bounds on the cumulative distribution function (c.d.f) of the underlying random variable. Let <span class="math notranslate nohighlight">\([\overline{F}, \underline{F}]\)</span> denotes the <strong>set</strong> of all nondecreasing functions from the reals into <span class="math notranslate nohighlight">\([0,1]\)</span> such that <span class="math notranslate nohighlight">\(\underline{F} \le F \le \overline{F}\)</span>. This means that, <span class="math notranslate nohighlight">\([\overline{F}, \underline{F}]\)</span> denotes a p-box for a random varaible <span class="math notranslate nohighlight">\(X\)</span> whose c.d.f <span class="math notranslate nohighlight">\(F\)</span> is unknown except that it is within the “box” circumscribed by the lower (<span class="math notranslate nohighlight">\(\underline{F}\)</span>) and upper bound (<span class="math notranslate nohighlight">\(\overline{F}\)</span>).</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+\underline{F} \le F(x) \le \overline{F}
+\]</div>
+</div>
+<p>p-box collectively reflects the variability (aleatoric uncertainty) and incertitude (epistemic uncertainty) in one structure for the uncertain quantity of interest.</p>
+<!-- a plot -->
+<img alt="_images/pbox_illustration.png" class="align-center" src="_images/pbox_illustration.png" />
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>There is a storng link between p-box and Dempster-Shafer structures (which <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> also explicitly provides support :boom:). Each can be converted to the other. However, it should be noted such translation is not one-to-one.</p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> provides support for operations with p-boxes ranging from <a class="reference internal" href="guides/uc.html"><span class="std std-doc">characterisation</span></a>, aggregation, propagation. Go check out these links for details as to the computation with p-boxes. Meanwhile, quick examples show below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PyUncertainNumber</span> <span class="kn">import</span> <span class="n">UncertainNumber</span> <span class="k">as</span> <span class="n">UN</span>
+
+<span class="n">un</span> <span class="o">=</span> <span class="n">UN</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;elas_modulus&#39;</span><span class="p">,</span> 
+    <span class="n">symbol</span><span class="o">=</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> 
+    <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Pa&#39;</span><span class="p">,</span> 
+    <span class="n">essence</span><span class="o">=</span><span class="s1">&#39;pbox&#39;</span><span class="p">,</span> 
+    <span class="n">distribution_parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)]])</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">un</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;band&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<!-- a plot -->
+<a class="reference internal image-reference" href="_images/myAnimation.gif"><img alt="_images/myAnimation.gif" class="align-center" src="_images/myAnimation.gif" style="width: 600px;" />
+</a>
+<!-- the idea is for motivating purposes not to educate them. -->
+<!-- Content can have inline markup like *emphasis*, **strong emphasis**,
+`inline literals`, {sub}`subscript`, {sup}`superscript` and so much more.
+Providing a reference to {pep}`8` is straightforward. You can also include
+abbreviations like {abbr}`HTML (Hyper Text Markup Language)`.
+
+> This is blockquoted text.
+
+It is possible to have multiple paragraphs of text, which get separated
 from each other visually. When stronger visual separation is desired, a
-horizontal separator can be used (3 or more punctuation characters on a line).</p>
-<hr class="docutils" />
-<p>This is written in Markdown.</p>
-</section>
+horizontal separator can be used (3 or more punctuation characters on a line).
+
+---
+
+This is written in Markdown. -->
+<!--1.  when there is limited knowledge in terms of characterisation of input variables -->
+<!-- 2. aggregating expert judgement --></section>
 
         </article>
       </div>
@@ -298,7 +339,7 @@ horizontal separator can be used (3 or more punctuation characters on a line).</
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2024, Yu Chen (Leslie)
+                Copyright &#169; 2025, Yu Chen (Leslie)
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -324,5 +365,7 @@ horizontal separator can be used (3 or more punctuation characters on a line).</
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

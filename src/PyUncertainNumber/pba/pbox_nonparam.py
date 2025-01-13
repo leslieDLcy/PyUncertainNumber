@@ -9,7 +9,7 @@ mode, standard deviation, variance, and coefficient of variation of the variable
 
 
 __all__ = [
-    'known_properties',
+    'known_constraints',
     'box',
     'min_max',
     'min_max_mean',
@@ -27,7 +27,8 @@ __all__ = [
 ]
 
 from intervals import Interval
-from .pbox_base import Pbox, imposition, NotIncreasingError
+from .pbox_base import Pbox, NotIncreasingError
+from .aggregation import imposition
 from typing import *
 from warnings import warn
 import numpy as np
@@ -107,7 +108,7 @@ def KS_bounds(s, alpha: float, display=True) -> Tuple[np.ndarray, np.ndarray]:
 
 # ---------------------top level func for known statistical properties---------------------#
 
-def known_properties(
+def known_constraints(
         minimum: Optional[Union[Interval, float, int]] = None,
         maximum: Optional[Union[Interval, float, int]] = None,
         mean: Optional[Union[Interval, float, int]] = None,
