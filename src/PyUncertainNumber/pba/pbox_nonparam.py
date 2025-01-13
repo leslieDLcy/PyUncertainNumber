@@ -23,10 +23,12 @@ __all__ = [
     'mean_var',
     'pos_mean_std',
     'symmetric_mean_std',
-    'from_percentiles'
+    'from_percentiles',
+    'KS_bounds',
 ]
 
-from .interval import Interval
+from intervals import Interval
+from .interval import Interval as nInterval
 from .pbox_base import Pbox, NotIncreasingError
 from .aggregation import imposition
 from typing import *
@@ -64,7 +66,7 @@ def KS_bounds(s, alpha: float, display=True) -> Tuple[np.ndarray, np.ndarray]:
     """ construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
 
     args:
-        - s (array-like): sample data;
+        - s (array-like): sample data, precise and imprecise
         - dn (scalar): KS critical value at significance level \alpha and sample size N;
     """
     dn = d_alpha(len(s), alpha)
@@ -72,7 +74,6 @@ def KS_bounds(s, alpha: float, display=True) -> Tuple[np.ndarray, np.ndarray]:
         ecdf = sps.ecdf(s)
         ecdf_l, ecdf_r = ecdf.cdf.probabilities + dn, ecdf.cdf.probabilities - dn
         ecdf_l, ecdf_r = logical_bounding(ecdf_l), logical_bounding(ecdf_r)
-
         if display:
             fig, ax = plt.subplots()
             ax.plot(ecdf.cdf.quantiles, ecdf_l, label='upper bound',
@@ -102,23 +103,23 @@ def KS_bounds(s, alpha: float, display=True) -> Tuple[np.ndarray, np.ndarray]:
 
     else:
         raise ValueError("Invalid input data type")
-
+    # TODO introduce namedtuple `cdf_bundle` to the returns below
     return ecdf_l, ecdf_r
 
 
 # * ---------------------top level func for known statistical properties---------------------*#
 
 def known_constraints(
-        minimum: Optional[Union[Interval, float, int]] = None,
-        maximum: Optional[Union[Interval, float, int]] = None,
-        mean: Optional[Union[Interval, float, int]] = None,
-        median: Optional[Union[Interval, float, int]] = None,
-        mode: Optional[Union[Interval, float, int]] = None,
-        std: Optional[Union[Interval, float, int]] = None,
-        var: Optional[Union[Interval, float, int]] = None,
-        cv: Optional[Union[Interval, float, int]] = None,
-        percentiles: Optional[dict[Union[Interval, float, int]]] = None,
-        # coverages: Optional[Union[Interval,float,int]] = None,
+        minimum: Optional[Union[nInterval, float, int]] = None,
+        maximum: Optional[Union[nInterval, float, int]] = None,
+        mean: Optional[Union[nInterval, float, int]] = None,
+        median: Optional[Union[nInterval, float, int]] = None,
+        mode: Optional[Union[nInterval, float, int]] = None,
+        std: Optional[Union[nInterval, float, int]] = None,
+        var: Optional[Union[nInterval, float, int]] = None,
+        cv: Optional[Union[nInterval, float, int]] = None,
+        percentiles: Optional[dict[Union[nInterval, float, int]]] = None,
+        # coverages: Optional[Union[nInterval,float,int]] = None,
         # shape: Optional[Literal['unimodal', 'symmetric', 'positive', 'nonnegative', 'concave', 'convex', 'increasinghazard', 'decreasinghazard', 'discrete', 'integervalued', 'continuous', '', 'normal', 'lognormal']] = None,
         # data: Optional[list] = None,
         # confidence: Optional[float] = 0.95,
@@ -140,7 +141,7 @@ def known_constraints(
         ``std``: Standard deviation of the variable
         ``var``: Variance of the variable
         ``cv``: Coefficient of variation of the variable
-        ``percentiles``: Dictionary of percentiles and their values (e.g. {0.1: 1, 0.5: 2, 0.9: Interval(3,4)})
+        ``percentiles``: Dictionary of percentiles and their values (e.g. {0.1: 1, 0.5: 2, 0.9: nInterval(3,4)})
         ``steps``: Number of steps to use in the p-box
 
     .. error::
@@ -234,13 +235,13 @@ def known_constraints(
 # * ---------------------functions---------------------*#
 
 def box(
-        a: Union[Interval, float, int],
-        b: Union[Interval, float, int] = None,
+        a: Union[nInterval, float, int],
+        b: Union[nInterval, float, int] = None,
         steps=Pbox.STEPS,
         shape='box'
 ) -> Pbox:
     '''
-    Returns a box shaped Pbox. This is equivalent to an Interval expressed as a Pbox.
+    Returns a box shaped Pbox. This is equivalent to an nInterval expressed as a Pbox.
 
     **Parameters**:
 
@@ -255,7 +256,7 @@ def box(
     '''
     if b == None:
         b = a
-    i = Interval(a, b)
+    i = nInterval(a, b)
     return Pbox(
         left=np.repeat(i.left, steps),
         right=np.repeat(i.right, steps),
@@ -272,9 +273,9 @@ min_max = box
 
 
 def min_max_mean(
-    minimum: Union[Interval, float, int],
-    maximum: Union[Interval, float, int],
-    mean: Union[Interval, float, int],
+    minimum: Union[nInterval, float, int],
+    maximum: Union[nInterval, float, int],
+    mean: Union[nInterval, float, int],
     steps: int = Pbox.STEPS
 ) -> Pbox:
     '''
@@ -307,8 +308,8 @@ def min_max_mean(
 
 
 def min_mean(
-    minimum: Union[Interval, float, int],
-    mean: Union[Interval, float, int],
+    minimum: Union[nInterval, float, int],
+    mean: Union[nInterval, float, int],
     steps=Pbox.STEPS
 ) -> Pbox:
     '''
@@ -338,8 +339,8 @@ def min_mean(
 
 
 def max_mean(
-    maximum: Union[Interval, float, int],
-    mean: Union[Interval, float, int],
+    maximum: Union[nInterval, float, int],
+    mean: Union[nInterval, float, int],
     steps=Pbox.STEPS
 ) -> Pbox:
     '''
@@ -360,8 +361,8 @@ def max_mean(
 
 
 def mean_std(
-        mean: Union[Interval, float, int],
-        std: Union[Interval, float, int],
+        mean: Union[nInterval, float, int],
+        std: Union[nInterval, float, int],
         steps=Pbox.STEPS
 ) -> Pbox:
     '''
@@ -397,8 +398,8 @@ def mean_std(
 
 
 def mean_var(
-        mean: Union[Interval, float, int],
-        var: Union[Interval, float, int],
+        mean: Union[nInterval, float, int],
+        var: Union[nInterval, float, int],
         steps=Pbox.STEPS
 ) -> Pbox:
     '''
@@ -422,8 +423,8 @@ def mean_var(
 
 
 def pos_mean_std(
-        mean: Union[Interval, float, int],
-        std: Union[Interval, float, int],
+        mean: Union[nInterval, float, int],
+        std: Union[nInterval, float, int],
         steps=Pbox.STEPS
 ) -> Pbox:
     '''
@@ -459,9 +460,9 @@ def pos_mean_std(
 
 
 def min_max_mode(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        mode: Union[Interval, float, int],
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        mode: Union[nInterval, float, int],
         steps: int = Pbox.STEPS
 ) -> Pbox:
     '''
@@ -498,9 +499,9 @@ def min_max_mode(
 
 
 def min_max_median(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        median: Union[Interval, float, int],
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        median: Union[nInterval, float, int],
         steps: int = Pbox.STEPS
 ) -> Pbox:
     '''
@@ -537,9 +538,9 @@ def min_max_median(
 
 
 def min_max_median_is_mode(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        m: Union[Interval, float, int],
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        m: Union[nInterval, float, int],
         steps: int = Pbox.STEPS
 ) -> Pbox:
     '''
@@ -577,8 +578,8 @@ def min_max_median_is_mode(
 
 
 def symmetric_mean_std(
-        mean: Union[Interval, float, int],
-        std: Union[Interval, float, int],
+        mean: Union[nInterval, float, int],
+        std: Union[nInterval, float, int],
         steps: int = Pbox.STEPS
 ) -> Pbox:
     '''
@@ -611,10 +612,10 @@ def symmetric_mean_std(
 
 
 def min_max_mean_std(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        mean: Union[Interval, float, int],
-        std: Union[Interval, float, int],
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        mean: Union[nInterval, float, int],
+        std: Union[nInterval, float, int],
         steps: int = Pbox.STEPS
 ) -> Pbox:
     '''
@@ -642,7 +643,7 @@ def min_max_mean_std(
     def _left(x):
         if isinstance(x, (int, float, np.number)):
             return x
-        if x.__class__.__name__ == "Interval":
+        if x.__class__.__name__ == "nInterval":
             return x.left
         if x.__class__.__name__ == "Pbox":
             return min(x.left)
@@ -650,16 +651,16 @@ def min_max_mean_std(
     def _right(x):
         if isinstance(x, (int, float, np.number)):
             return x
-        if x.__class__.__name__ == "Interval":
+        if x.__class__.__name__ == "nInterval":
             return x.right
         if x.__class__.__name__ == "Pbox":
             return max(x.right)
 
     def _imp(a, b):
-        return Interval(max(_left(a), _left(b)), min(_right(a), _right(b)))
+        return nInterval(max(_left(a), _left(b)), min(_right(a), _right(b)))
 
     def _env(a, b):
-        return Interval(min(_left(a), _left(b)), max(_right(a), _right(b)))
+        return nInterval(min(_left(a), _left(b)), max(_right(a), _right(b)))
 
     def _constrain(a, b, msg):
         if ((_right(a) < _left(b)) or (_right(b) < _left(a))):
@@ -669,8 +670,8 @@ def min_max_mean_std(
     zero = 0.0
     one = 1.0
     ran = maximum - minimum
-    m = _constrain(mean, Interval(minimum, maximum), "(mean)")
-    s = _constrain(std, _env(Interval(0.0), (abs(
+    m = _constrain(mean, nInterval(minimum, maximum), "(mean)")
+    s = _constrain(std, _env(nInterval(0.0), (abs(
         ran*ran/4.0 - (maximum-mean-ran/2.0)**2))**0.5), " (dispersion)")
     ml = (m.left-minimum)/ran
     sl = s.left/ran
@@ -738,10 +739,10 @@ def min_max_mean_std(
 
 
 def min_max_mean_var(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        mean: Union[Interval, float, int],
-        var: Union[Interval, float, int],
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        mean: Union[nInterval, float, int],
+        var: Union[nInterval, float, int],
         steps: int = Pbox.STEPS
 ) -> Pbox:
     '''
@@ -777,13 +778,13 @@ def from_percentiles(percentiles: dict, steps: int = Pbox.STEPS) -> Pbox:
 
     **Parameters**
 
-        ``percentiles`` : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: Interval(3,4), 1:5})
+        ``percentiles`` : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: nInterval(3,4), 1:5})
 
         ``steps`` : number of steps to use in the p-box
 
     .. important::
 
-        The percentiles dictionary is of the form {percentile: value}. Where value can either be a number or an Interval. If value is a number, the percentile is assumed to be a point percentile. If value is an Interval, the percentile is assumed to be an interval percentile.
+        The percentiles dictionary is of the form {percentile: value}. Where value can either be a number or an nInterval. If value is a number, the percentile is assumed to be a point percentile. If value is an nInterval, the percentile is assumed to be an interval percentile.
 
     .. warning::
 
@@ -831,8 +832,8 @@ def from_percentiles(percentiles: dict, steps: int = Pbox.STEPS) -> Pbox:
 
     # transform values to intervals
     for k, v in percentiles.items():
-        if not isinstance(v, Interval):
-            percentiles[k] = Interval(v)
+        if not isinstance(v, nInterval):
+            percentiles[k] = nInterval(v)
 
     if any([p < 0 or p > 1 for p in percentiles.keys()]):
         raise ValueError("Percentiles must be between 0 and 1")
@@ -855,10 +856,10 @@ def from_percentiles(percentiles: dict, steps: int = Pbox.STEPS) -> Pbox:
         p = list(percentiles.keys())
         for i, j, k in zip(p, p[1:], p[2:]):
             if sometimes(percentiles[j] < percentiles[i]):
-                percentiles[j] = Interval(
+                percentiles[j] = nInterval(
                     percentiles[i].right, percentiles[j].right)
             if sometimes(percentiles[j] > percentiles[k]):
-                percentiles[j] = Interval(
+                percentiles[j] = nInterval(
                     percentiles[j].left, percentiles[k].left)
 
         left = []
@@ -887,10 +888,10 @@ def MLnorm(data):
 
 
 def ME_min_max_mean_std(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        mean: Union[Interval, float, int],
-        stddev: Union[Interval, float, int],
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        mean: Union[nInterval, float, int],
+        stddev: Union[nInterval, float, int],
         steps: int = Pbox.STEPS
 ) -> Pbox:
 

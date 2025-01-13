@@ -1,9 +1,12 @@
 """ Constructors for Dempester-Shafer structures. """
 import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 from .intervalOperators import make_vec_interval
 from collections import namedtuple
-from .utils import reweighting, stacking, plot_DS_structure
-from .constructors import pbox_fromDiscreteF
+from .aggregation import stacking
+from .interval import Interval as nInterval
+from intervals import Interval
 
 dempstershafer_element = namedtuple(
     'dempstershafer_element', ['interval', 'mass'])
@@ -48,16 +51,29 @@ class DempsterShafer:
 
     def to_pbox(self):
         intervals, masses = self.disassemble()
-        return stacking(intervals, masses, return_pbox=True)
+        return stacking(intervals, masses, return_type='pbox')
 
 
-def mixture_ds(l_ds, display=False):
-    """ mixture operation for DS structure """
+@mpl.rc_context({"text.usetex": True})
+def plot_DS_structure(vec_interval: list[nInterval | Interval], weights=None, offset=0.3, ax=None, **kwargs):
+    """ plot the intervals in a vectorised form
 
-    intervals = np.concatenate([ds.disassemble()[0] for ds in l_ds], axis=0)
-    # TODO check the duplicate intervals
-    # assert sorted(intervals) == np.unique(intervals), "intervals replicate"
-    masses = reweighting([ds.disassemble()[1] for ds in l_ds])
-    return DempsterShafer(intervals, masses)
-    # below is to return the mixture as in a pbox
-    # return stacking(intervals, masses, display=display)
+    args:
+        vec_interval: vectorised interval objects
+        weights: weights of the intervals
+        offset: offset for display the weights next to the intervals
+    """
+    vec_interval = make_vec_interval(vec_interval)
+    fig, ax = plt.subplots() if ax is None else (ax.figure, ax)
+    for i, intl in enumerate(vec_interval):  # horizontally plot the interval
+        ax.plot([intl.lo, intl.hi], [i, i], **kwargs)
+        if weights is not None:
+            ax.text(intl.hi + offset,
+                    i,
+                    f"{weights[i]:.2f}",
+                    verticalalignment='center',
+                    horizontalalignment='right'
+                    )
+    ax.margins(x=0.2, y=0.1)
+    ax.set_yticks([])
+    return ax

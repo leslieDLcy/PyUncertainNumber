@@ -6,40 +6,15 @@ from .interval import Interval
 from .intervalOperators import wc_interval, make_vec_interval
 from collections import namedtuple
 from .interval import Interval as nInterval
-from .constructors import pbox_fromDiscreteF
+
 
 cdf_bundle = namedtuple('cdf_bundle', ['quantile', 'probability'])
+""" a handy composition object for a c.d.f which is a tuple of quantile and probability 
+#TODO I mean `ecdf_bundle` essentially, but changing name may introduce compatibility issues now
+note:
+    - handy to represent bounding c.d.fs for pbox, especially for free-form pbox
 
-
-def stacking(vec_interval: list[nInterval | Interval], weights, display=False, return_pbox=False):
-    """ stochastic mixture operation for DS structure and Intervals 
-
-    args:
-        - l_un (list): list of uncertain numbers
-        - weights (list): list of weights
-        - display (Boolean): boolean for plotting
-
-    return:
-        - the left and right bound F in `cdf_bundlebounds` by default 
-        but can choose to return a p-box
-    """
-
-    vec_interval = make_vec_interval(vec_interval)
-
-    q1, p1 = weighted_ecdf(vec_interval.lo, weights)
-    q2, p2 = weighted_ecdf(vec_interval.hi, weights)
-
-    if display:
-        fig, ax = plt.subplots()
-        ax.step(q1, p1, marker='+', c='g', where='post')
-        ax.step(q2, p2, marker='+', c='b', where='post')
-        ax.plot([q1[0], q2[0]], [0, 0], c='g')
-        ax.plot([q1[-1], q2[-1]], [1, 1], c='b')
-
-    if return_pbox:
-        return pbox_fromDiscreteF(cdf_bundle(q1, p1), cdf_bundle(q2, p2))
-    else:
-        return cdf_bundle(q1, p1), cdf_bundle(q2, p2)
+"""
 
 
 def sorting(list1, list2):
@@ -98,31 +73,6 @@ def find_nearest(array, value):
     # find the nearest value
     ind = (np.abs(array - value)).argmin()
     return ind
-
-
-@mpl.rc_context({"text.usetex": True})
-def plot_DS_structure(vec_interval: list[nInterval | Interval], weights=None, offset=0.3, ax=None, **kwargs):
-    """ plot the intervals in a vectorised form
-
-    args:
-        vec_interval: vectorised interval objects
-        weights: weights of the intervals
-        offset: offset for display the weights next to the intervals
-    """
-    vec_interval = make_vec_interval(vec_interval)
-    fig, ax = plt.subplots() if ax is None else (ax.figure, ax)
-    for i, intl in enumerate(vec_interval):  # horizontally plot the interval
-        ax.plot([intl.lo, intl.hi], [i, i], **kwargs)
-        if weights is not None:
-            ax.text(intl.hi + offset,
-                    i,
-                    f"{weights[i]:.2f}",
-                    verticalalignment='center',
-                    horizontalalignment='right'
-                    )
-    ax.margins(x=0.2, y=0.1)
-    ax.set_yticks([])
-    return ax
 
 
 @mpl.rc_context({"text.usetex": True})

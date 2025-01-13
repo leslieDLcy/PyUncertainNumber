@@ -1,15 +1,15 @@
+from .operation import convert
 from decimal import DivisionByZero
 from typing import Self
 from warnings import *
-from ..characterisation.utils import tranform_ecdf
+
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from .interval import Interval as nInterval
 from .utils import find_nearest, check_increasing, NotIncreasingError, _interval_list_to_array
 from .params import Params
-from .ds import DempsterShafer
-from .operation import convert
+import importlib
 
 __all__ = [
     "Pbox",
@@ -1049,46 +1049,15 @@ class Pbox:
         """
         p_values = np.arange(0, discretisation) / discretisation
         interval_list = [self.cuth(p_v) for p_v in p_values]
-        return DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation))
+        ds = importlib.import_module("DempsterShafer")
+        return ds.DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation))
 
     def to_ds(self, discretisation=Params.steps):
         """convert to ds object"""
 
         _, interval_list = self.outer_approximate(discretisation)
-        return DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation-1))
-
-
-# * ---------------------constructors--------------------- *#
-''' initially used for cbox next-value distribution '''
-
-
-def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
-    """ transform into pbox object from extreme bounds represented by sps.dist
-
-    args:
-        rvs (list): list of scipy.stats.rv_continuous objects"""
-
-    # x_sup
-    bounds = [rv.ppf(Params.p_values) for rv in rvs]
-    if extre_bound_params is not None:
-        print(extre_bound_params)
-    return Pbox(
-        left=bounds[0],
-        right=bounds[1],
-        shape=shape,
-    )
-
-
-def pbox_from_pseudosamples(samples):
-    """ a tmp constructor for pbox/cbox from approximate solution of the confidence/next value distribution
-
-    args:
-        samples: the approximate Monte Carlo samples of the confidence/next value distribution
-
-    note:
-        ecdf is estimted from the samples and bridge to pbox/cbox
-    """
-    return Pbox(tranform_ecdf(samples, display=False))
+        ds = importlib.import_module("DempsterShafer")
+        return ds.DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation-1))
 
 
 # * ---------------------functions--------------------- *#

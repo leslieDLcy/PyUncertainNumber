@@ -1,12 +1,12 @@
 # Confidence box
 
-Traditionally [confidence interval](https://en.wikipedia.org/wiki/Confidence_interval) is widely used in engineering to making inference with respect to parameters of interest. It is appealing as it provides a gurantee of statistical performance through repeated use. Studies in frequetist inference continue to wonder the possibility of a *distributional estimator* just like the Bayesian posterior, which leads to significant developments towards the **confidence distribution** though it is not technically the same as a distribution in the canonical sense.
+Traditionally [confidence interval](https://en.wikipedia.org/wiki/Confidence_interval) is widely used in engineering to make inference with respect to parameters of interest. It is appealing as it provides a gurantee of statistical performance through repeated use. Studies in frequetist inference continue to wonder the possibility of a *distributional estimator* just like the Bayesian posterior, which leads to significant developments towards the **confidence distribution**, though it is not technically the same as a distribution in the canonical sense.
 
 ```{tip}
 A confidence distribution is essentially a ciphering device that encodes confidence intervals for each possible confidence level.
 ```
 
-It conveniently provides confidence intervals of all levels for a parameter of interest. **Confidence boxes**, or confidence structures[^1], (abbreviated as c-box) are imprecise generalisations of confidence distributions and they can be applied to problems with discrete observatons, interval-censored data, and even inference problems in which no assumption about the distribution shape can be made.
+The confidence distribution conveniently provides confidence intervals of all levels for a parameter of interest. **Confidence boxes**, or confidence structures[^1], (abbreviated as c-box) are imprecise generalisations of confidence distributions and they can be applied to problems with discrete observatons, interval-censored data, and even inference problems in which no assumption about the distribution shape can be made.
 
 The figure below provides an illustration of the confidence box which yields several confidence intrevals for the parameter $\theta$.
 

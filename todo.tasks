@@ -27,6 +27,7 @@ interval stuff:
 DS structure:
     ✔ create a class for that @done (08/12/2024, 16:04:08)
     ✔ stochastic mixture of DS structure not finished @done (08/12/2024, 16:04:09)
+    ☐ color of both bounds seem to be reversed as in (stacking())
 
 
 pbox:

@@ -2,7 +2,6 @@ from typing import *
 from .interval import *
 from .pbox_base import Pbox
 import numpy as np
-import warnings
 
 
 # def envelope(*args: Union[Interval, Pbox, float]) -> Union[Interval, Pbox]:
