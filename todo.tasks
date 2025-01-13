@@ -3,6 +3,7 @@ UC module:
     ✔ add the auxiliary information to UC module @done (30/09/2024, 07:12:12)
     ☐ unified style of plotting funcs for interval, pbox
     ☐ change to a dispatcher for bounds specification (i.e. work on `parse_description`)
+    ☐ `from_constraints()` entry-level func does not work from `pba` API and `UN` API
 
 
 fit distribution:
@@ -13,7 +14,8 @@ fit distribution:
 other:
     ✔ plot function @done (03/12/2024, 14:45:18)
     ☐ matplotlib what if `latex` not installed
-    add `importlib` to operation.py
+    ☐ add `importlib` to operation.py
+    ☐ unit not finished due to the stupid two Registry stuff
 
 
 

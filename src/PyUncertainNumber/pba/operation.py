@@ -17,7 +17,7 @@ def convert(un):
     elif isinstance(un, Pbox):
         return un
     elif isinstance(un, Distribution):
-        pass
+        return un.to_pbox()
     elif isinstance(un, DempsterShafer):
         return un.to_pbox()
     else:

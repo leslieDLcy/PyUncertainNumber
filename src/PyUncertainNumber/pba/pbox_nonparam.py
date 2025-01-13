@@ -26,7 +26,7 @@ __all__ = [
     'from_percentiles'
 ]
 
-from intervals import Interval
+from .interval import Interval
 from .pbox_base import Pbox, NotIncreasingError
 from .aggregation import imposition
 from typing import *
@@ -106,7 +106,7 @@ def KS_bounds(s, alpha: float, display=True) -> Tuple[np.ndarray, np.ndarray]:
     return ecdf_l, ecdf_r
 
 
-# ---------------------top level func for known statistical properties---------------------#
+# * ---------------------top level func for known statistical properties---------------------*#
 
 def known_constraints(
         minimum: Optional[Union[Interval, float, int]] = None,
@@ -231,7 +231,7 @@ def known_constraints(
     return imposition(imp)
 
 
-# ---------------------functions---------------------#
+# * ---------------------functions---------------------*#
 
 def box(
         a: Union[Interval, float, int],

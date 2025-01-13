@@ -22,6 +22,8 @@ from typing import Sequence
 from functools import singledispatch
 from ..pba.intervalOperators import wc_interval
 from ..pba.distributions import Distribution
+from ..pba.operation import convert
+
 
 """ Uncertain Number class """
 
@@ -53,9 +55,11 @@ class UncertainNumber:
     pbox_parameters: list[str, Sequence[nInterval]] = field(
         default=None, repr=False)
     hedge: str = field(default=None, repr=False)
+    _construct: Type[any] = field(default=None, repr=False)
     # this is the deterministic numeric representation of the
     # UN object, which shall be linked with the 'pba' or `Intervals` package
     naked_value: float = field(default=None)
+    p_flag: bool = field(default=True, repr=False)  # parameterised flag
 
     # * ---------------------auxlliary information---------------------*#
     # some simple boiler plates
@@ -103,14 +107,14 @@ class UncertainNumber:
                 raise ValueError(
                     "The 'essence' of the Uncertain Number is not specified"
                 )
-            else:
+            if ((self._construct is None) | (not self._construct)):
                 print("a vacuous interval is created")
                 self.essence = "interval"
                 self.bounds = [-np.inf, np.inf]
 
         UncertainNumber.instances.append(self)
 
-        ### the underlying construct ###
+        ### create the underlying construct ###
         match self.essence:
             case "interval":
                 self._construct = _parse_bounds(self.bounds)
@@ -125,20 +129,22 @@ class UncertainNumber:
                     )
                 self.naked_value = self._construct._naked_value
             case "pbox":
-                self._construct = self.match_pbox(
-                    self.distribution_parameters[0],
-                    self.distribution_parameters[1],
-                )
-                self.naked_value = self._construct.mean().midpoint()
+                if self.p_flag:
+                    self._construct = self.match_pbox(
+                        self.distribution_parameters[0],
+                        self.distribution_parameters[1],
+                    )
+                    self.naked_value = self._construct.mean().midpoint()
 
         ### 'unit' representation of the un ###
         ureg = UnitRegistry()
-
+        Q_ = ureg.Quantity
         # I can use the following logic to double check the arithmetic operations of the UN object
         if isinstance(self.naked_value, float | int):
-            self._Q = self.naked_value * ureg(self.units)  # Quantity object
+            self._Q = Q_(self.naked_value, self.units)
+            # self.naked_value * ureg(self.units)  # Quantity object
         else:
-            self._Q = 1 * ureg(self.units)
+            self._Q = Q_(1, self.units)
 
     @staticmethod
     def match_pbox(keyword, parameters):
@@ -305,15 +311,34 @@ class UncertainNumber:
                 _samples=D.sample_data,
             )
 
-    @classmethod
-    def from_distributionProperties(cls, min, max, mean, median, variance, **kwargs):
-        """to construct a pbox given the properties of the distribution
+    # @classmethod
+    # def from_constraints(cls, min, max, mean, median, variance, **kwargs):
+    #     """to construct a pbox given the properties of the distribution
 
-        returns:
-            - a pbox-type UN object
-        note:
-            - whether differentiate explicitly if free/parametric pbox
-        """
+    #     returns:
+    #         - a pbox-type UN object
+    #     note:
+    #         - whether differentiate explicitly if free/parametric pbox
+    #     """
+    #     pass
+    @classmethod
+    def from_Interval(cls, u):
+        return cls(essence="interval", bounds=u)
+
+    @classmethod
+    def from_pbox(cls, p):
+        """ genenal from  pbox """
+        # passPboxParameters()
+        return cls(essence="pbox", p_flag=False, _construct=p)
+
+    @classmethod
+    def from_ppbox(cls):
+        """ from parameterised pbox """
+        pass
+
+    @classmethod
+    def from_npbox(cls,):
+        """ from non-parametric pbox """
         pass
 
     @classmethod
@@ -332,39 +357,44 @@ class UncertainNumber:
         """
         pass
 
-    # ---------------------arithmetic operations---------------------#
+    # * ---------------------arithmetic operations---------------------#
 
     def __add__(self, other):
         """add two uncertain numbers"""
-        left = (self._construct + other._construct).left
-        right = (self._construct + other._construct).right
-        newQ = self._Q + other._Q
-        essence = self.essence
-        return type(self)(essence=essence, bounds=[left, right], _Q=newQ, units=newQ.units)
+        # TODO add a diciper constructor
+        a, b = self._construct, other._construct
+        if (isinstance(a, nInterval) and isinstance(b, nInterval)):
+            r = a + b
+            return UncertainNumber.from_Interval(r)
+        else:
+            r = convert(a) + convert(b)
+        # TODO unit handling for arithmetic operations not implemented
+        # TODO due to the stupid multi Registry error
+        # newQ = self._Q + other._Q
+        return UncertainNumber.from_pbox(r)
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
-        """subtract two uncertain numbers"""
-        left = (self._construct - other._construct).left
-        right = (self._construct - other._construct).right
-        essence = self.essence
-        return type(self)(essence=essence, bounds=[left, right])
+        a, b = self._construct, other._construct
+        if (isinstance(a, nInterval) and isinstance(b, nInterval)):
+            r = a - b
+            return UncertainNumber.from_Interval(r)
+        else:
+            r = convert(a) - convert(b)
+        return UncertainNumber.from_pbox(r)
 
     def __mul__(self, other):
         """multiply two uncertain numbers"""
 
-        if isinstance(other, int | float):
-            left = (self._construct * other).left
-            right = (self._construct * other).right
-            essence = self.essence
-            return type(self)(essence=essence, bounds=[left, right])
-        elif isinstance(other, UncertainNumber):
-            left = (self._construct * other._construct).left
-            right = (self._construct * other._construct).right
-            essence = self.essence
-            return type(self)(essence=essence, bounds=[left, right])
+        a, b = self._construct, other._construct
+        if (isinstance(a, nInterval) and isinstance(b, nInterval)):
+            r = a * b
+            return UncertainNumber.from_Interval(r)
+        else:
+            r = convert(a) * convert(b)
+        return UncertainNumber.from_pbox(r)
 
     def __rmul__(self, other):
         return self.__mul__(other)
@@ -372,16 +402,13 @@ class UncertainNumber:
     def __truediv__(self, other):
         """divide two uncertain numbers"""
 
-        if isinstance(other, int | float):
-            left = (self._construct / other).left
-            right = (self._construct / other).right
-            essence = self.essence
-            return type(self)(essence=essence, bounds=[left, right])
-        elif isinstance(other, UncertainNumber):
-            left = (self._construct / other._construct).left
-            right = (self._construct / other._construct).right
-            essence = self.essence
-            return type(self)(essence=essence, bounds=[left, right])
+        a, b = self._construct, other._construct
+        if (isinstance(a, nInterval) and isinstance(b, nInterval)):
+            r = a / b
+            return UncertainNumber.from_Interval(r)
+        else:
+            r = convert(a) / convert(b)
+        return UncertainNumber.from_pbox(r)
 
     def __rtruediv__(self, other):
         return self.__truediv__(other)
@@ -389,16 +416,13 @@ class UncertainNumber:
     def __pow__(self, other):
         """power of two uncertain numbers"""
 
-        if isinstance(other, int | float):
-            left = (self._construct**other).left
-            right = (self._construct**other).right
-            essence = self.essence
-            return type(self)(essence=essence, bounds=[left, right])
-        elif isinstance(other, UncertainNumber):
-            left = (self._construct**other._construct).left
-            right = (self._construct**other._construct).right
-            essence = self.essence
-            return type(self)(essence=essence, bounds=[left, right])
+        a, b = self._construct, other._construct
+        if (isinstance(a, nInterval) and isinstance(b, nInterval)):
+            r = a ** b
+            return UncertainNumber.from_Interval(r)
+        else:
+            r = convert(a) ** convert(b)
+        return UncertainNumber.from_pbox(r)
 
     @classmethod
     def _toIntervalBackend(cls, vars=None) -> np.array:
