@@ -99,8 +99,8 @@ def first_order_propagation_method(x: list, f:Callable = None,
                 ranges[:, i] = np.array([un.bounds])
 
             case "pbox":
-                temp_xl = un.ppf(u_list[i])[0].tolist()  # Assuming un.ppf(u) returns a list of lists
-                temp_xr = un.ppf(u_list[i])[1].tolist()
+                temp_xl = un.ppf(u_list[i][:-1])[0].tolist()  # Assuming un.ppf(u) returns a list of lists
+                temp_xr = un.ppf(u_list[i][1:])[1].tolist()
                 ranges[:, i] = np.array([temp_xl[0], temp_xr[-1]])
             case _:
                 raise ValueError(f"Unsupported uncertainty type: {un.essence}")

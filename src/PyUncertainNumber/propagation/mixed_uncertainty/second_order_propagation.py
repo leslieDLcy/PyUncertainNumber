@@ -88,8 +88,8 @@ def second_order_propagation_method(x: list, f:Callable = None,
                 ranges[:, i] = un.bounds #np.array([un.bounds])
 
             case "pbox":
-                temp_xl = un.ppf(u_list[i])[0]  
-                temp_xr = un.ppf(u_list[i])[1]               
+                temp_xl = un.ppf(u_list[i][:-1])[0]  
+                temp_xr = un.ppf(u_list[i][1:])[1]           
                 rang = np.array([temp_xl, temp_xr]).T  # Create a 2D array of bounds
                 bounds_x.append(rang)
                 ranges[:, i] = np.array([temp_xl[0], temp_xr[-1]])
