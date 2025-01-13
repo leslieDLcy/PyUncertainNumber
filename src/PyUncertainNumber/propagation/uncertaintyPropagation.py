@@ -4,22 +4,21 @@ from typing import Callable, Union
 import matplotlib.pyplot as plt
 
 # import plotly.express as ps
-from PyUncertainNumber.UP.endpoints import endpoints_method
-from PyUncertainNumber.UP.extremepoints import extremepoints_method
-from PyUncertainNumber.UP.subinterval import subinterval_method
-from PyUncertainNumber.UP.sampling import sampling_method
-from PyUncertainNumber.UP.genetic_optimisation import genetic_optimisation_method
-from PyUncertainNumber.UP.local_optimisation import local_optimisation_method
-from PyUncertainNumber.UP.endpoints_cauchy import cauchydeviates_method
-from PyUncertainNumber.UP.sampling_aleatory import sampling_aleatory_method
-from PyUncertainNumber.UP.mixed_uncertainty.second_order_propagation import second_order_propagation_method
-from PyUncertainNumber.UP.mixed_uncertainty.first_order_propagation import first_order_propagation_method
-from PyUncertainNumber.UP.utils import create_folder, save_results, propagation_results
-from PyUncertainNumber.UC.uncertainNumber import UncertainNumber, Distribution #_parse_interverl_inputs,
+from PyUncertainNumber.propagation.epistemic_uncertainty.endpoints import endpoints_method
+from PyUncertainNumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
+from PyUncertainNumber.propagation.epistemic_uncertainty.subinterval import subinterval_method
+from PyUncertainNumber.propagation.epistemic_uncertainty.sampling import sampling_method
+from PyUncertainNumber.propagation.epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
+from PyUncertainNumber.propagation.epistemic_uncertainty.local_optimisation import local_optimisation_method
+from PyUncertainNumber.propagation.epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
+from PyUncertainNumber.propagation.aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
+from PyUncertainNumber.propagation.mixed_uncertainty.second_order_propagation import second_order_propagation_method
+from PyUncertainNumber.propagation.mixed_uncertainty.first_order_propagation import first_order_propagation_method
+from PyUncertainNumber.propagation.utils import create_folder, save_results, propagation_results
+from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber, Distribution #_parse_interverl_inputs,
 
 #TODO fix the distribution parameters if we only  have sample values. 
-#TODO the cauchy with save_raw_data = 'yes' raises issues. 
-#TODO incorporate the mixed uncertainty 
+#TODO the cauchy with save_raw_data = 'yes' raises issues.  
 #TODO update the descriptions for all functions one last time. 
 # ---------------------the top level UP function ---------------------#
        

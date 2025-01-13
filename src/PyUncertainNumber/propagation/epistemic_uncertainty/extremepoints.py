@@ -1,9 +1,9 @@
 import numpy as np
 import tqdm
 from typing import Callable
-from PyUncertainNumber.UP.cartesian_product import cartesian
-from PyUncertainNumber.UP.extreme_point_func import extreme_pointX
-from PyUncertainNumber.UP.utils import propagation_results
+from PyUncertainNumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
+from PyUncertainNumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
+from PyUncertainNumber.propagation.utils import propagation_results
 
 def extremepoints_method(x:np.ndarray, f:Callable, 
                                    results: propagation_results =None, 

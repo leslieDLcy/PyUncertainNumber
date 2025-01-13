@@ -1,7 +1,7 @@
 from decimal import DivisionByZero
 from typing import *
 from warnings import *
-from ..UC.utils import tranform_ecdf
+from ..characterisation.utils import tranform_ecdf
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt

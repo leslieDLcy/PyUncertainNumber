@@ -1,9 +1,9 @@
 import numpy as np
 from typing import Callable, Union
 import tqdm
-from PyUncertainNumber.UP.extreme_point_func import extreme_pointX
-from PyUncertainNumber.UP.extremepoints import extremepoints_method
-from PyUncertainNumber.UP.utils import propagation_results, condense_bounds
+from PyUncertainNumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
+from PyUncertainNumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
+from PyUncertainNumber.propagation.utils import propagation_results, condense_bounds
 
 def imp(X):
     """Imposition of intervals."""
@@ -51,7 +51,7 @@ def first_order_propagation_method(x: list, f:Callable = None,
     for i, un in enumerate(x):
         print(f"Processing variable {i + 1} with essence: {un.essence}")
 
-        if un.essence == "distribution":
+        if un.essence != "interval":
 
             distribution_family = un.distribution_parameters[0]
             
@@ -76,28 +76,6 @@ def first_order_propagation_method(x: list, f:Callable = None,
             else:             
                 u = np.linspace(bot, top, nd)  # Use bOt and tOp here
 
-        elif un.essence == "pbox":
-            distribution_family = un.distribution_parameters[0]
-            if isinstance(n_disc, int):
-                    nd = n_disc
-            else:
-                    nd = n_disc[i]  # Use the i-th element of n_disc array            
-            n_slices[i] = nd ## this is wrong, why do we even need it?
-
-            if isinstance(tOp, np.ndarray):
-                top = tOp[i]
-            else:
-                top = tOp
-            if isinstance(bOt, np.ndarray):
-                bot = bOt[i]
-            else:
-                bot = bOt
-            
-            if distribution_family == 'triang':                 
-                u = np.linspace(0, 1, nd)
-            else:
-                u = np.linspace(bot, top, nd)  # Use bOt and tOp here
-                
         else:  # un.essence == "interval"
             u = np.array([0.0, 1.0])  # Or adjust as needed for intervals
             n_slices[i] = 2

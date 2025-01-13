@@ -2,7 +2,7 @@ import numpy as np
 import tqdm
 from typing import Callable
 from scipy.stats import qmc  # Import Latin Hypercube Sampling from SciPy
-from PyUncertainNumber.UP.utils import propagation_results
+from PyUncertainNumber.propagation.utils import propagation_results
 
 def sampling_aleatory_method(x: list, f: Callable, 
                              results: propagation_results = None,

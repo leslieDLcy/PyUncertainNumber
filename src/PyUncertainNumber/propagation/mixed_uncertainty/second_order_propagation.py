@@ -1,12 +1,12 @@
 import numpy as np
 from typing import Callable, Union
 import tqdm
-from PyUncertainNumber.UP.cartesian_product import cartesian
-from PyUncertainNumber.UP.extreme_point_func import extreme_pointX
-from PyUncertainNumber.UP.extremepoints import extremepoints_method
-from PyUncertainNumber.UP.utils import propagation_results, condense_bounds
+from PyUncertainNumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
+from PyUncertainNumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
+from PyUncertainNumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
+from PyUncertainNumber.propagation.utils import propagation_results, condense_bounds
 
-#TODO add tail concentratig algorithms.
+#TODO add tail concentrating algorithms.
 #TODO add x valus for min and max
 def second_order_propagation_method(x: list, f:Callable = None,  
                                     results: propagation_results = None, 
@@ -43,7 +43,7 @@ def second_order_propagation_method(x: list, f:Callable = None,
     for i, un in enumerate(x):
         print(f"Processing variable {i + 1} with essence: {un.essence}")
 
-        if un.essence == "distribution":
+        if un.essence != "interval":
             # perform outward directed discretisation 
             if isinstance(n_disc, int):
                 nd = n_disc + 1
@@ -65,31 +65,6 @@ def second_order_propagation_method(x: list, f:Callable = None,
                     bot = bOt
                 u = np.linspace(bot, top, nd)  # Use bOt and tOp here
 
-
-        elif un.essence == "pbox":
-            distribution_family = un.distribution_parameters[0]
-            if distribution_family == 'triang': 
-                if isinstance(n_disc, int):
-                    nd = n_disc
-                else:
-                    nd = n_disc[i]  # Use the i-th element of n_disc array
-                u = np.linspace(0, 1, nd)
-            else:
-                if isinstance(n_disc, int):
-                    nd = n_disc
-                else:
-                    nd = n_disc[i]  # Use the i-th element of n_disc array
-
-                if isinstance(tOp, np.ndarray):
-                    top = tOp[i]
-                else:
-                    top = tOp
-                if isinstance(bOt, np.ndarray):
-                    bot = bOt[i]
-                else:
-                    bot = bOt
-                u = np.linspace(bot, top, nd)  # Use bOt and tOp here
-                
         else:  # un.essence == "interval"
             u = np.array([0.0, 1.0])  # Or adjust as needed for intervals
 
@@ -146,7 +121,7 @@ def second_order_propagation_method(x: list, f:Callable = None,
         numRun = 0
 
         match method:
-            case "endpoints":
+            case "endpoints" | "second_order_endpoints":
                 x_combinations = np.empty(( focal_elements_comb.shape[0]*(2**d), d), dtype=float)  # Pre-allocate the array
                 current_index = 0  # Keep track of the current insertion index
 
@@ -202,7 +177,7 @@ def second_order_propagation_method(x: list, f:Callable = None,
                     bounds[i, 0, :] = lower_bound[i,:]
                     bounds[i, 1, :] = upper_bound[i,:]
 
-            case "extremepoints":
+            case "extremepoints"| "second_order_extremepoints":
                 # Determine the positive or negative signs for each input
 
                 res = extremepoints_method(ranges.T, f)

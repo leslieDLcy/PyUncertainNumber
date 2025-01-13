@@ -5,7 +5,7 @@ Construct a pbox from the specification of distributional parameters in the form
 In short, distribution-based p-boxes or parametric pboxes
 """
 
-from PyUncertainNumber.UC.params import Params
+from PyUncertainNumber.characterisation.params import Params
 from .interval  import Interval
 from .pbox_base import Pbox
 import scipy.stats as sps
@@ -18,8 +18,6 @@ from warnings import *
 
 
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
-
-
 
 # a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
 dists = {
