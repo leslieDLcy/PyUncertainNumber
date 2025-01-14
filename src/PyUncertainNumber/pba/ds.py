@@ -10,11 +10,20 @@ from intervals import Interval
 
 dempstershafer_element = namedtuple(
     'dempstershafer_element', ['interval', 'mass'])
+""" Named tuple for Dempster-Shafer elements.
+
+note:
+    - e.g. dempstershafer_element([0, 1], 0.5)
+"""
 
 
 class DempsterShafer:
-    # TODO add a new constructor see C report P. 76
-    """ Class for Dempester-Shafer structures. """
+    """ Class for Dempester-Shafer structures.
+
+    args:
+        - the `intervals` argument accepts wildcard vector intervals {list of list pairs, Interval, pairs of nInterval};
+        - masses (list): probability masses
+    """
 
     def __init__(self, intervals, masses: list[float]):
         self._intrep = np.array(intervals)
@@ -39,19 +48,29 @@ class DempsterShafer:
     def disassemble(self,):
         return self._intrep, self._masses
 
-    def display(self, style='box'):
-        # TODO cannot take kwargs (such as title='') yet. to be fixed
-        # TODO slightly different call signature compared to pbox & Interval
+    def display(self, style='box', **kwargs):
         intervals, masses = self.disassemble()
         match style:
+            # TODO the to_pbox() interpolation is not perfect
             case 'box':
-                stacking(intervals, masses, display=True)
+                stacking(intervals, masses, display=True, return_type='pbox')
+                # _ = self.to_pbox()
+                # _.display(**kwargs)
             case 'interval':
-                plot_DS_structure(intervals, masses)
+                plot_DS_structure(intervals, masses, **kwargs)
 
     def to_pbox(self):
         intervals, masses = self.disassemble()
         return stacking(intervals, masses, return_type='pbox')
+
+    @classmethod
+    def from_dsElements(cls, *ds_elements: dempstershafer_element):
+        """ Create a Dempster-Shafer structure from a list of Dempster-Shafer elements. """
+
+        ds_elements = list(*ds_elements)
+        intervals = [elem.interval for elem in ds_elements]
+        masses = [elem.mass for elem in ds_elements]
+        return cls(intervals, masses)
 
 
 @mpl.rc_context({"text.usetex": True})

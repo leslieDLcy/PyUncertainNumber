@@ -36,6 +36,7 @@ from warnings import warn
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as sps
+from .params import Params
 
 # ---------------------from data---------------------#
 
@@ -124,7 +125,7 @@ def known_constraints(
         # data: Optional[list] = None,
         # confidence: Optional[float] = 0.95,
         debug: bool = False,
-        steps: int = Pbox.STEPS
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution free p-box based upon the information given.
@@ -237,7 +238,7 @@ def known_constraints(
 def box(
         a: Union[nInterval, float, int],
         b: Union[nInterval, float, int] = None,
-        steps=Pbox.STEPS,
+        steps=Params.steps,
         shape='box'
 ) -> Pbox:
     '''
@@ -276,7 +277,7 @@ def min_max_mean(
     minimum: Union[nInterval, float, int],
     maximum: Union[nInterval, float, int],
     mean: Union[nInterval, float, int],
-    steps: int = Pbox.STEPS
+    steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum and mean of the variable
@@ -310,7 +311,7 @@ def min_max_mean(
 def min_mean(
     minimum: Union[nInterval, float, int],
     mean: Union[nInterval, float, int],
-    steps=Pbox.STEPS
+    steps=Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum and mean of the variable
@@ -341,7 +342,7 @@ def min_mean(
 def max_mean(
     maximum: Union[nInterval, float, int],
     mean: Union[nInterval, float, int],
-    steps=Pbox.STEPS
+    steps=Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum and mean of the variable
@@ -363,7 +364,7 @@ def max_mean(
 def mean_std(
         mean: Union[nInterval, float, int],
         std: Union[nInterval, float, int],
-        steps=Pbox.STEPS
+        steps=Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the mean and standard deviation of the variable
@@ -400,7 +401,7 @@ def mean_std(
 def mean_var(
         mean: Union[nInterval, float, int],
         var: Union[nInterval, float, int],
-        steps=Pbox.STEPS
+        steps=Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the mean and variance of the variable
@@ -425,7 +426,7 @@ def mean_var(
 def pos_mean_std(
         mean: Union[nInterval, float, int],
         std: Union[nInterval, float, int],
-        steps=Pbox.STEPS
+        steps=Params.steps
 ) -> Pbox:
     '''
     Generates a positive distribution-free p-box based upon the mean and standard deviation of the variable
@@ -463,7 +464,7 @@ def min_max_mode(
         minimum: Union[nInterval, float, int],
         maximum: Union[nInterval, float, int],
         mode: Union[nInterval, float, int],
-        steps: int = Pbox.STEPS
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum, and mode of the variable
@@ -502,7 +503,7 @@ def min_max_median(
         minimum: Union[nInterval, float, int],
         maximum: Union[nInterval, float, int],
         median: Union[nInterval, float, int],
-        steps: int = Pbox.STEPS
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum and median of the variable
@@ -541,7 +542,7 @@ def min_max_median_is_mode(
         minimum: Union[nInterval, float, int],
         maximum: Union[nInterval, float, int],
         m: Union[nInterval, float, int],
-        steps: int = Pbox.STEPS
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum and median/mode of the variable when median = mode.
@@ -580,7 +581,7 @@ def min_max_median_is_mode(
 def symmetric_mean_std(
         mean: Union[nInterval, float, int],
         std: Union[nInterval, float, int],
-        steps: int = Pbox.STEPS
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a symmetrix distribution-free p-box based upon the mean and standard deviation of the variable
@@ -616,7 +617,7 @@ def min_max_mean_std(
         maximum: Union[nInterval, float, int],
         mean: Union[nInterval, float, int],
         std: Union[nInterval, float, int],
-        steps: int = Pbox.STEPS
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
@@ -743,7 +744,7 @@ def min_max_mean_var(
         maximum: Union[nInterval, float, int],
         mean: Union[nInterval, float, int],
         var: Union[nInterval, float, int],
-        steps: int = Pbox.STEPS
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
@@ -772,7 +773,7 @@ def min_max_mean_var(
     return min_max_mean_std(minimum, maximum, mean, np.sqrt(var))
 
 
-def from_percentiles(percentiles: dict, steps: int = Pbox.STEPS) -> Pbox:
+def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
     '''
     Generates a distribution-free p-box based upon percentiles of the variable
 
@@ -892,7 +893,7 @@ def ME_min_max_mean_std(
         maximum: Union[nInterval, float, int],
         mean: Union[nInterval, float, int],
         stddev: Union[nInterval, float, int],
-        steps: int = Pbox.STEPS
+        steps: int = Params.steps
 ) -> Pbox:
 
     μ = ((mean - minimum) / (maximum - minimum))

@@ -19,7 +19,7 @@ __all__ = [
 
 
 class Pbox:
-    """not the main constructor BUT the base constructor """
+    """ the base constructor """
 
     r"""
     A probability distribution is a mathematical function that gives the probabilities of occurrence for diﬀerent possible values of a variable. Probability boxes (p-boxes) represent interval bounds on probability distributions. The simplest kind of p-box can be expressed mathematically as
@@ -36,15 +36,6 @@ class Pbox:
     Distribution-free p-boxes can also be generated when the underlying distribution is unknown but parameters such as the mean, variance or minimum/maximum bounds are known. Such p-boxes make no assumption about the shape of the distribution and instead return bounds expressing all possible distributions that are valid given the known information. Such p-boxes can be constructed making use of Chebyshev, Markov and Cantelli inequalities from probability theory.
     """
 
-    STEPS = Params.steps
-
-    """
-    Leslie:
-    - Essentially, from the code implementation, a Pbox object is defined by the left and right bounds (i.e. nd.arrays).
-    - Advantage is that this unifies both parametric and non-parametric pboxes but disadvantage is it discards the parameter
-    information of the bounds which we may desire in the case of Cbox.
-    """
-
     def __init__(
         self,
         left=None,
@@ -58,81 +49,80 @@ class Pbox:
         interpolation="linear",
     ):
         """
-        .. attention::
+        args:
+            - left (list, NumPy array, nInterval or numeric type): Left bound of the p-box.
 
-            It is usually better to define p-boxes using distributions or non-parametric methods (see ). This constructor is provided for completeness and for the construction of p-boxes with precise inputs.
-
-        :arg left: Left bound of the p-box. Can be a list, NumPy array, nInterval or numeric type. If left is None, the left bound is set to -inf.
-
+        note:
+            - If left is None, the left bound is set to -inf.
         """
-
-        # TODO: re-work on the initialisation logic as some arguments are not necessary
-        if isinstance(left, np.ndarray) and isinstance(right, np.ndarray):
-            if len(left) != len(right):
-                raise Exception(
-                    "Left and right arrays must be the same length")
-            else:
-                steps = len(left)
-
-        if steps is None:
-            if hasattr(left, "__len__"):
-                steps = len(left)
-            elif hasattr(right, "__len__"):
-                steps = len(right)
-            else:
-                steps = Pbox.STEPS
-
-        if (left is not None) and (right is None):
-            right = left
-
-        if left is None and right is None:
-            left = np.array([-np.inf] * steps)
-            right = np.array([np.inf] * steps)
-
-        if isinstance(left, nInterval):
-            left = np.array([left.left] * steps)
-        elif isinstance(left, list):
-            left = _interval_list_to_array(left)
-        elif not isinstance(left, np.ndarray):
-            left = np.array([left] * steps)
-
-        if isinstance(right, nInterval):
-            right = np.array([right.right] * steps)
-        elif isinstance(right, list):
-            right = _interval_list_to_array(right, left=False)
-        elif not isinstance(right, np.ndarray):
-            right = np.array([right] * steps)
-
-        # if len(left) == len(right) and len(left) != steps:
-        #     print("WARNING: The left and right arrays have the same length which is inconsistent with steps.")
-
-        if len(left) != steps:
-            left = _interpolate(
-                left, interpolation=interpolation, left=False, steps=steps
-            )
-
-        if len(right) != steps:
-            right = _interpolate(
-                right, interpolation=interpolation, left=True, steps=steps
-            )
-
-        if not check_increasing(left) or not check_increasing(right):
-            raise NotIncreasingError(
-                "Left and right arrays must be increasing")
-
-        l, r = zip(*[(min(i), max(i)) for i in zip(left, right)])
-        self.left = np.array(l)
-        self.right = np.array(r)
-        self.steps = steps
         self.shape = shape
-        self.mean_left = -np.inf
-        self.mean_right = np.inf
-        self.var_left = 0
-        self.var_right = np.inf
 
-        self._computemoments()
-        if shape is not None:
-            self.shape = shape
+        def init_check(left, right, steps):
+            """ initialisation logic """
+
+            if isinstance(left, np.ndarray) and isinstance(right, np.ndarray):
+                if len(left) != len(right):
+                    raise Exception(
+                        "Left and right arrays must be the same length")
+                else:
+                    steps = len(left)
+
+            if steps is None:
+                if hasattr(left, "__len__"):
+                    steps = len(left)
+                elif hasattr(right, "__len__"):
+                    steps = len(right)
+                else:
+                    steps = Params.steps
+
+            if (left is not None) and (right is None):
+                right = left
+
+            if left is None and right is None:
+                left = np.array([-np.inf] * steps)
+                right = np.array([np.inf] * steps)
+
+            if isinstance(left, nInterval):
+                left = np.array([left.left] * steps)
+            elif isinstance(left, list):
+                left = _interval_list_to_array(left)
+            elif not isinstance(left, np.ndarray):
+                left = np.array([left] * steps)
+
+            if isinstance(right, nInterval):
+                right = np.array([right.right] * steps)
+            elif isinstance(right, list):
+                right = _interval_list_to_array(right, left=False)
+            elif not isinstance(right, np.ndarray):
+                right = np.array([right] * steps)
+
+            # if len(left) == len(right) and len(left) != steps:
+            #     print("WARNING: The left and right arrays have the same length which is inconsistent with steps.")
+
+            if len(left) != steps:
+                left = _interpolate(
+                    left, interpolation=interpolation, left=False, steps=steps
+                )
+
+            if len(right) != steps:
+                right = _interpolate(
+                    right, interpolation=interpolation, left=True, steps=steps
+                )
+
+            if not check_increasing(left) or not check_increasing(right):
+                raise NotIncreasingError(
+                    "Left and right arrays must be increasing")
+
+            l, r = zip(*[(min(i), max(i)) for i in zip(left, right)])
+            self.left = np.array(l)
+            self.right = np.array(r)
+            self.steps = steps
+            self.mean_left = -np.inf
+            self.mean_right = np.inf
+            self.var_left = 0
+            self.var_right = np.inf
+        init_check(left, right, steps)
+
         if mean_left is not None:
             self.mean_left = np.max([mean_left, self.mean_left])
         if mean_right is not None:
@@ -141,24 +131,10 @@ class Pbox:
             self.var_left = np.max([var_left, self.var_left])
         if var_right is not None:
             self.var_right = np.min([var_right, self.var_right])
+
+        self._computemoments()
         self._checkmoments()
         self.get_range()
-
-    def get_range(self):
-        """get the range for either a pbox or a distribution
-
-        note:
-            - #! added by Leslie
-        """
-        self._range_list = [
-            np.min([self.left, self.right]).tolist(),
-            np.max([self.left, self.right]).tolist(),
-        ]
-
-    @property
-    def rangel(self):
-        """leslie defined range property"""
-        return self._range_list
 
     def __repr__(self):
 
@@ -285,6 +261,12 @@ class Pbox:
         except:
             return NotImplemented
 
+    # * ---------------------properties---------------------*#
+    @property
+    def range(self):
+        """leslie defined range property"""
+        return self._range_list
+
     @property
     def lo(self):
         """
@@ -299,7 +281,14 @@ class Pbox:
         """
         return self.right[-1]
 
-    ### Local functions ###
+    # * --------------------- methods---------------------*#
+
+    def get_range(self):
+        """get the quantile range of either a pbox or a distribution"""
+        self._range_list = [
+            np.min([self.left, self.right]).tolist(),
+            np.max([self.left, self.right]).tolist(),
+        ]
 
     def _computemoments(
         self,
@@ -348,8 +337,7 @@ class Pbox:
             self.var_left = left(b)
             self.var_right = right(b)
 
-
-# ---------------------dual interpretation ---------------------#
+    # * ---------------------dual interpretation ---------------------#
 
     def cutv(self, x):
         """ get the bounds on the cumulative probability associated with any x-value """
@@ -753,6 +741,7 @@ class Pbox:
         """
         return self.min(a, method=method).max(b, method=method)
 
+# * --------------------- aggregations--------------------- *#
     def env(self, other):
         """
         .. _interval.env:
@@ -770,18 +759,42 @@ class Pbox:
         Raises:
         - ArithmeticError: If both Pboxes have different number of steps.
         """
+        # legacy bp
+        # if other.__class__.__name__ == "Pbox":
+        #     if self.steps != other.steps:
+        #         raise ArithmeticError(
+        #             "Both Pboxes must have the same number of steps")
+        # else:
+        #     other = Pbox(other, steps=self.steps)
 
-        if other.__class__.__name__ == "Pbox":
-            if self.steps != other.steps:
-                raise ArithmeticError(
-                    "Both Pboxes must have the same number of steps")
-        else:
-            other = Pbox(other, steps=self.steps)
-
+        self.steps_check()
         nleft = np.minimum(self.left, other.left)
         nright = np.maximum(self.right, other.right)
-
         return Pbox(left=nleft, right=nright, steps=self.steps)
+
+    def imp(self, other):
+        """ Returns the imposition of self with other pbox
+
+        note:
+            - binary imposition between two pboxes only
+        """
+        u = []
+        d = []
+
+        assert self.steps == other.steps
+
+        for sL, sR, oL, oR in zip(self.left, self.right, other.left, other.right):
+
+            if max(sL, oL) > min(sR, oR):
+                raise Exception("Imposition does not exist")
+
+            u.append(max(sL, oL))
+            d.append(min(sR, oR))
+
+        return Pbox(left=u, right=d)
+
+
+# * ---------------------other operations--------------------- *#
 
     def logicaland(self, other, method="f"):  # conjunction
         if method == "i":
@@ -923,30 +936,10 @@ class Pbox:
         """
         return self.straddles(0, endpoints)
 
-    def imp(self, other):
-        """ Returns the imposition of self with other pbox
-
-        note:
-            - binary imposition between two pboxes only
-        """
-        u = []
-        d = []
-
-        assert self.steps == other.steps
-
-        for sL, sR, oL, oR in zip(self.left, self.right, other.left, other.right):
-
-            if max(sL, oL) > min(sR, oR):
-                raise Exception("Imposition does not exist")
-
-            u.append(max(sL, oL))
-            d.append(min(sR, oR))
-
-        return Pbox(left=u, right=d)
-
-    # ---------------------plotting stuff---------------------#
+    # * ---------------------plotting stuff---------------------#
 
     def show(self, figax=None, now=True, title="", x_axis_label="x", **kwargs):
+        """ legacy plotting function """
 
         if figax is None:
             fig, ax = plt.subplots()
@@ -998,13 +991,10 @@ class Pbox:
             # fig.show() # keep the original figure open
         else:
             return fig, ax
-    plot = show
 
     @ mpl.rc_context({"text.usetex": True})
     def display(self, title="", ax=None, style="band", fill_color='lightgray', **kwargs):
-        """quickly plot the pba object
-
-        # !Leslie defined plotting function"""
+        """ default plotting function """
 
         if ax is None:
             fig, ax = plt.subplots()
@@ -1060,7 +1050,7 @@ class Pbox:
         return ds.DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation-1))
 
 
-# * ---------------------functions--------------------- *#
+# * ---------------------module functions--------------------- *#
 
 
 def env_int(*args):
