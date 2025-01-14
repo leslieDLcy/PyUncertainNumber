@@ -2,7 +2,8 @@
 
 from dataclasses import dataclass
 import numpy as np
-''' notes: '''
+
+""" hyperparameters for the pba """
 
 
 @dataclass(frozen=True)  # Instances of this class are immutable.
@@ -70,6 +71,20 @@ class Data:
     data = np.random.uniform(size=25) * 30
     x2 = 5 + np.random.uniform(size=25) * 30
     error = np.random.normal(size=25)
+
+    # @property
+    # # template for property
+    # def sth(self):
+    #     """ template for property"""
+    #     return int(round(self.patch_window_seconds / self.stft_hop_seconds))
+
+
+@dataclass(frozen=True)  # Instances of this class are immutable.
+class Named:
+
+    k = 22
+    m = 11
+    n = k + m
 
     # @property
     # # template for property

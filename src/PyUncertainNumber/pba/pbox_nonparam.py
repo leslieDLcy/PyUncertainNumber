@@ -1,16 +1,7 @@
-'''
-re: non-parametric pbox construction
-
-Functions that can be used to generate non-parametric p-boxes.
-These functions are used to generate p-boxes based upon the minimum, maximum, mean, median,
-mode, standard deviation, variance, and coefficient of variation of the variable.
-- Leslie made many changes
-'''
 
 
 __all__ = [
     'known_constraints',
-    'box',
     'min_max',
     'min_max_mean',
     'min_mean',
@@ -37,6 +28,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as sps
 from .params import Params
+from .logical import sometimes
+from .utils import transform_ecdf_bundle, cdf_bundle, pl_ecdf_bounding_bundles
+from .imprecise import imprecise_ecdf
+""" non-parametric pbox  """
 
 # ---------------------from data---------------------#
 
@@ -71,41 +66,47 @@ def KS_bounds(s, alpha: float, display=True) -> Tuple[np.ndarray, np.ndarray]:
         - dn (scalar): KS critical value at significance level \alpha and sample size N;
     """
     dn = d_alpha(len(s), alpha)
+    # precise data
     if isinstance(s, list | np.ndarray):
         ecdf = sps.ecdf(s)
-        ecdf_l, ecdf_r = ecdf.cdf.probabilities + dn, ecdf.cdf.probabilities - dn
-        ecdf_l, ecdf_r = logical_bounding(ecdf_l), logical_bounding(ecdf_r)
+        b = transform_ecdf_bundle(ecdf)
+        f_l, f_r = b.probability + dn, b.probability - dn
+        f_l, f_r = logical_bounding(f_l), logical_bounding(f_r)
+        # new ecdf bundles
+        b_l, b_r = cdf_bundle(b.quantile, f_l), cdf_bundle(b.quantile, f_r)
+
         if display:
             fig, ax = plt.subplots()
-            ax.plot(ecdf.cdf.quantiles, ecdf_l, label='upper bound',
-                    drawstyle='steps-post', color='g')
-            ax.plot(ecdf.cdf.quantiles, ecdf_r, label='lower bound',
-                    drawstyle='steps-post', color='b')
             ecdf.cdf.plot(ax,  ls=':', color='black', label='empirical')
-            ax.set_title(
-                f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
-            ax.legend()
+            pl_ecdf_bounding_bundles(b_l, b_r, alpha, ax)
+        return b_l, b_r
 
+    # imprecise data
     elif isinstance(s, Interval):
-        fl = sps.ecdf(s.lo)
-        fr = sps.ecdf(s.hi)
-        ecdf_l, ecdf_r = fl.cdf.probabilities + dn, fr.cdf.probabilities - dn
-        ecdf_l, ecdf_r = logical_bounding(ecdf_l), logical_bounding(ecdf_r)
+        b_l, b_r = imprecise_ecdf(s)
+        b_l.probability += dn
+        b_r.probability -= dn
+
+        b_l.probability, b_r.probability = logical_bounding(
+            b_l.probability), logical_bounding(b_r.probability)
 
         if display:
             fig, ax = plt.subplots()
-            ax.plot(fl.cdf.quantiles, ecdf_l, label='upper bound',
-                    drawstyle='steps-post', color='g')
-            ax.plot(fr.cdf.quantiles, ecdf_r, label='lower bound',
-                    drawstyle='steps-post', color='b')
-            ax.set_title(
-                f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
-            ax.legend()
-
+            pl_ecdf_bounding_bundles(b_l, b_r, alpha, ax)
     else:
         raise ValueError("Invalid input data type")
-    # TODO introduce namedtuple `cdf_bundle` to the returns below
-    return ecdf_l, ecdf_r
+    return b_l, b_r
+
+
+# def pl_bounding_ecdf():
+#     fig, ax = plt.subplots()
+#     ax.plot(fl.cdf.quantiles, ecdf_l, label='upper bound',
+#             drawstyle='steps-post', color='g')
+#     ax.plot(fr.cdf.quantiles, ecdf_r, label='lower bound',
+#             drawstyle='steps-post', color='b')
+#     ax.set_title(
+#         f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
+#     ax.legend()
 
 
 # * ---------------------top level func for known statistical properties---------------------*#
@@ -235,7 +236,7 @@ def known_constraints(
 
 # * ---------------------functions---------------------*#
 
-def box(
+def min_max(
         a: Union[nInterval, float, int],
         b: Union[nInterval, float, int] = None,
         steps=Params.steps,
@@ -268,9 +269,6 @@ def box(
         steps=steps,
         shape=shape
     )
-
-
-min_max = box
 
 
 def min_max_mean(
@@ -484,7 +482,7 @@ def min_max_mode(
 
     '''
     if minimum == maximum:
-        return box(minimum, maximum)
+        return min_max(minimum, maximum)
 
     ii = np.array([i/steps for i in range(steps)])
     jj = np.array([j/steps for j in range(1, steps+1)])
@@ -523,7 +521,7 @@ def min_max_median(
 
     '''
     if minimum == maximum:
-        return box(minimum, maximum)
+        return min_max(minimum, maximum)
 
     ii = np.array([i/steps for i in range(steps)])
     jj = np.array([j/steps for j in range(1, steps+1)])
@@ -639,7 +637,7 @@ def min_max_mean_std(
 
     '''
     if minimum == maximum:
-        return box(minimum, maximum)
+        return min_max(minimum, maximum)
 
     def _left(x):
         if isinstance(x, (int, float, np.number)):
@@ -678,7 +676,7 @@ def min_max_mean_std(
     sl = s.left/ran
     mr = (m.right-minimum)/ran
     sr = s.right/ran
-    z = box(minimum, maximum)
+    z = min_max(minimum, maximum)
     n = len(z.left)
     L = [0.0] * n
     R = [1.0] * n
@@ -884,23 +882,19 @@ Maximum likelihood estimation (MLE) is a method of estimating the parameters of 
 '''
 
 
-def MLnorm(data):
-    return norm(np.mean(data), np.std(data))
+# def ME_min_max_mean_std(
+#         minimum: Union[nInterval, float, int],
+#         maximum: Union[nInterval, float, int],
+#         mean: Union[nInterval, float, int],
+#         stddev: Union[nInterval, float, int],
+#         steps: int = Params.steps
+# ) -> Pbox:
 
+#     μ = ((mean - minimum) / (maximum - minimum))
 
-def ME_min_max_mean_std(
-        minimum: Union[nInterval, float, int],
-        maximum: Union[nInterval, float, int],
-        mean: Union[nInterval, float, int],
-        stddev: Union[nInterval, float, int],
-        steps: int = Params.steps
-) -> Pbox:
+#     σ = (stddev/(maximum - minimum))
 
-    μ = ((mean - minimum) / (maximum - minimum))
+#     a = ((1-μ)/(σ**2) - 1/μ)*μ**2
+#     b = a*(1/μ - 1)
 
-    σ = (stddev/(maximum - minimum))
-
-    a = ((1-μ)/(σ**2) - 1/μ)*μ**2
-    b = a*(1/μ - 1)
-
-    return beta(a, b, steps=steps) * (maximum - minimum) + minimum
+#     return beta(a, b, steps=steps) * (maximum - minimum) + minimum

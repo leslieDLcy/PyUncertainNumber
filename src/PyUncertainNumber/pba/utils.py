@@ -6,15 +6,42 @@ from .interval import Interval
 from .intervalOperators import wc_interval, make_vec_interval
 from collections import namedtuple
 from .interval import Interval as nInterval
-
+from dataclasses import dataclass
 
 cdf_bundle = namedtuple('cdf_bundle', ['quantile', 'probability'])
 """ a handy composition object for a c.d.f which is a tuple of quantile and probability 
 #TODO I mean `ecdf_bundle` essentially, but changing name may introduce compatibility issues now
 note:
     - handy to represent bounding c.d.fs for pbox, especially for free-form pbox
-
 """
+
+
+@dataclass
+class CDF_bundle:
+    quantiles: np.ndarray
+    probabilities: np.ndarray
+
+    @classmethod
+    def from_sps_ecdf(cls, e):
+        """ utility to tranform sps.ecdf to cdf_bundle """
+        return cls(e.cdf.quantiles, e.cdf.probabilities)
+
+
+def transform_ecdf_bundle(e):
+    """ utility to tranform sps.ecdf to cdf_bundle """
+    return CDF_bundle(e.cdf.quantiles, e.cdf.probabilities)
+
+
+def pl_ecdf_bounding_bundles(b_l: CDF_bundle, b_r: CDF_bundle, alpha=0.025, ax=None):
+    if ax is None:
+        fig, ax = plt.subplots()
+    ax.plot(b_l.quantiles, b_l.probabilities, label='upper bound',
+            drawstyle='steps-post', color='g')
+    ax.plot(b_r.quantiles, b_r.probabilities, label='lower bound',
+            drawstyle='steps-post', color='b')
+    ax.set_title(
+        f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
+    ax.legend()
 
 
 def sorting(list1, list2):
