@@ -645,17 +645,20 @@ def min_max_mean_std(
         return min_max(minimum, maximum)
 
     def _left(x):
+
         if isinstance(x, (int, float, np.number)):
             return x
-        if x.__class__.__name__ == "nInterval":
+        if x.__class__.__name__ == "Interval":
             return x.left
         if x.__class__.__name__ == "Pbox":
             return min(x.left)
+        else:
+            raise Exception("wrong type encountered")
 
     def _right(x):
         if isinstance(x, (int, float, np.number)):
             return x
-        if x.__class__.__name__ == "nInterval":
+        if x.__class__.__name__ == "Interval":
             return x.right
         if x.__class__.__name__ == "Pbox":
             return max(x.right)

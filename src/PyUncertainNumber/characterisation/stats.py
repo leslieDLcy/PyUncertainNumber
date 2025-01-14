@@ -12,6 +12,8 @@ from ..pba.distributions import Distribution as D
 from ..pba.distributions import named_dists
 from ..pba.pbox import named_pbox
 import functools
+from .core import makeUN
+
 
 ''' Here we define the statistical inference functions from data for the UncertainNumber class. '''
 
@@ -35,6 +37,7 @@ def singleParamPattern(x, shape: str):
         raise TypeError('Input data type not supported')
 
 
+@makeUN
 def fit(method: str, family: str, data: np.ndarray):
     """ top-level fit function
 
