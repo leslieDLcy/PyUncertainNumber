@@ -88,6 +88,13 @@ class UncertainNumber:
     _samples: np.ndarray | list = field(default=None, repr=False)
 
     # *  ---------------------more on initialisation---------------------*#
+    def parameterised_pbox_specification(self):
+        if self.p_flag:
+            self._construct = self.match_pbox(
+                self.distribution_parameters[0],
+                self.distribution_parameters[1],
+            )
+            self.naked_value = self._construct.mean().midpoint()
 
     def __post_init__(self):
         """the de facto initialisation method for the core math objects of the UN class
@@ -123,18 +130,19 @@ class UncertainNumber:
                 if self._samples is not None:
                     self._construct = Distribution(sample_data=self._samples)
                 elif self.distribution_parameters is not None:
-                    self._construct = Distribution(
+                    p_ = DistributionSpecification(
                         dist_family=self.distribution_parameters[0],
-                        dist_params=self.distribution_parameters[1],
-                    )
-                self.naked_value = self._construct._naked_value
+                        dist_params=self.distribution_parameters[1],)
+                    if p_.i_flag:
+                        self.parameterised_pbox_specification()
+                    else:
+                        self._construct = Distribution(
+                            dist_family=self.distribution_parameters[0],
+                            dist_params=self.distribution_parameters[1],
+                        )
+                        self.naked_value = self._construct._naked_value
             case "pbox":
-                if self.p_flag:
-                    self._construct = self.match_pbox(
-                        self.distribution_parameters[0],
-                        self.distribution_parameters[1],
-                    )
-                    self.naked_value = self._construct.mean().midpoint()
+                self.parameterised_pbox_specification()
 
         ### 'unit' representation of the un ###
         ureg = UnitRegistry()
@@ -544,29 +552,6 @@ class UncertainNumber:
         with open(filepath, "w") as fp:
             json.dump(self, fp, cls=UNEncoder, indent=4)
 
-
-# ---------------------class related methods---------------------#
-
-# TODO unfinished logic: currently if suffices in creating only `Interval` object
-# @classmethod
-
-    # def __add__(self, other):
-    #     """ Add two uncertain numbers.
-    #     #TODO unfinished logic for adding uncertain numbers
-    # ! this code is kept for working with units
-    #     """
-
-    #     if not isinstance(other, type(self)):
-    #         raise TypeError(
-    #             "unsupported operand for +: "
-    #             f"'{type(self).__name__}' and '{type(other).__name__}'"
-    #         )
-    #     if not self.unit == other.unit:
-    #         raise TypeError(
-    #             f"incompatible units: '{self.unit}' and '{other.unit}'"
-    #         )
-
-    #     return type(self)(super().__add__(other), self.unit)
 
 def parse_description(description):
     # TODO add functionality for pbox
