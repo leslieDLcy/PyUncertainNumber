@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Type, Union
-
+from typing import Type, Union, List
+import functools
 # from .measurand import Measurand
 # from .variability import Variability
 from .uncertainty_types import Uncertainty_types
@@ -9,7 +9,6 @@ from PyUncertainNumber.pba.interval import Interval as nInterval
 from PyUncertainNumber.pba.interval import PM
 from .utils import *
 from .params import Params
-from typing import List
 from pint import UnitRegistry
 from pathlib import Path
 from PyUncertainNumber.propagation.vertex import vertexMethod as vM
@@ -49,7 +48,8 @@ class UncertainNumber:
     # ---------------------Value---------------------#
     # ensemble: Type[Ensemble] = field(default=None)
     uncertainty_type: Type[Uncertainty_types] = field(default=None, repr=False)
-    essence: str = field(default=None)  # [interval, distribution, pbox]
+    essence: str = field(default=None)  # [interval, distribution, pbox, ds]
+    masses: list[float] = field(default=None, repr=False)
     bounds: Union[List[float], str] = field(default=None)
     distribution_parameters: list[str, float | int] = field(default=None)
     pbox_parameters: list[str, Sequence[nInterval]] = field(
@@ -293,6 +293,25 @@ class UncertainNumber:
         return cls(essence=essence, bounds=[left, right])
 
     @classmethod
+    def fromConstruct(cls, construct):
+        """create an Uncertain Number from a construct object"""
+        from ..pba.pbox_base import Pbox
+        from ..pba.interval import Interval as nInterval
+        from ..pba.ds import DempsterShafer
+        from ..pba.distributions import Distribution
+
+        if isinstance(construct, Pbox):
+            return cls.from_pbox(construct)
+        if isinstance(construct, nInterval):
+            return cls.from_Interval(construct)
+        if isinstance(construct, DempsterShafer):
+            return cls.from_ds(construct)
+        if isinstance(construct, Distribution):
+            return cls.fromDistribution(construct)
+        else:
+            raise ValueError("The construct object is not recognised")
+
+    @classmethod
     def fromDistribution(cls, D, **kwargs):
         # dist_family: str, dist_params,
         """create an Uncertain Number from specification of distribution
@@ -340,20 +359,20 @@ class UncertainNumber:
         return cls(essence="pbox", p_flag=False, _construct=p)
 
     @classmethod
-    def from_ppbox(cls):
-        """ from parameterised pbox """
-        pass
+    def from_ds(cls, ds):
+        cls.from_pbox(ds.to_pbox())
+
+    # @classmethod
+    # def from_ppbox(cls):
+    #     """ from parameterised pbox """
+    #     pass
+
+    # @classmethod
+    # def from_npbox(cls,):
+    #     """ from non-parametric pbox """
+    #     pass
 
     @classmethod
-    def from_npbox(cls,):
-        """ from non-parametric pbox """
-        pass
-
-    @classmethod
-    def I(cls, bounds, **kwargs):
-        """a shortcut for creating an interval-type Uncertain Number"""
-        return cls(essence="interval", bounds=bounds, **kwargs)
-
     def from_sps(cls, sps_dist):
         """ create an UN object from a parametric scipy.stats dist object
         #! it seems that a function will suffice

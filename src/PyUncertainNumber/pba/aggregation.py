@@ -4,18 +4,24 @@ import itertools
 import numpy as np
 from .operation import convert
 from .intervalOperators import make_vec_interval
-from .utils import weighted_ecdf, cdf_bundle, reweighting
+from .utils import weighted_ecdf, CDF_bundle, reweighting
 import matplotlib.pyplot as plt
 from .constructors import pbox_fromeF
 from typing import TYPE_CHECKING
 from intervals import Interval
+import importlib
+
 
 if TYPE_CHECKING:
     from .pbox_base import Pbox
     from .interval import nInterval
     from .ds import DempsterShafer
 
+makeUN = importlib.import_module(
+    'PyUncertainNumber.characterisation.core').makeUN
 
+
+@makeUN
 def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
     """ it could work for either Pbox, distribution, DS structure or Intervals 
 
@@ -73,11 +79,11 @@ def stacking(vec_interval: nInterval | Interval, weights, display=False, return_
 
     match return_type:
         case 'pbox':
-            return pbox_fromeF(cdf_bundle(q1, p1), cdf_bundle(q2, p2))
+            return pbox_fromeF(CDF_bundle(q1, p1), CDF_bundle(q2, p2))
         case 'ds':
             return DempsterShafer(intervals=vec_interval, masses=weights)
         case 'bounds':
-            return cdf_bundle(q1, p1), cdf_bundle(q2, p2)
+            return CDF_bundle(q1, p1), CDF_bundle(q2, p2)
         case _:
             raise ValueError(
                 "return_type must be one of {'pbox', 'ds', 'bounds'}")

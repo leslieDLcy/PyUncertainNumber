@@ -1,13 +1,17 @@
-
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from scipy.interpolate import interp1d
 import numpy as np
 from .pbox_base import Pbox
 from .params import Params
 from ..characterisation.utils import tranform_ecdf
-from .utils import cdf_bundle
 
 
-def pbox_fromeF(a: cdf_bundle, b: cdf_bundle):
+if TYPE_CHECKING:
+    from .utils import CDF_bundle
+
+
+def pbox_fromeF(a: CDF_bundle, b: CDF_bundle):
     """ pbox from emipirical CDF bundle 
     args:
         - a : CDF bundle of lower extreme F;
@@ -15,8 +19,8 @@ def pbox_fromeF(a: cdf_bundle, b: cdf_bundle):
     """
     from .pbox_base import Pbox
     # TODO currently the interpolation is not perfect
-    p_lo, q_lo = interpolate_p(a.probability, a.quantile)
-    p_hi, q_hi = interpolate_p(b.probability, b.quantile)
+    p_lo, q_lo = interpolate_p(a.probabilities, a.quantiles)
+    p_hi, q_hi = interpolate_p(b.probabilities, b.quantiles)
     return Pbox(left=q_lo, right=q_hi)
 
 
