@@ -115,6 +115,7 @@ def outward_direction(x: list,
                 raise ValueError(f"Unsupported uncertainty type: {un.essence}")
 
     return temp_xl, temp_xr
+
 def plotPbox_pbox(xL, xR,  p=None):
     """
     Plots a p-box (probability box) using matplotlib.

@@ -21,21 +21,48 @@ def first_order_propagation_method(x: list, f:Callable = None,
 
     """
     args:
-        x (list): A list of UncertainNumber objects.
-        f (Callable): The function to evaluate.
-        results (dict): A dictionary to store the results (optional).
-        lim_Q (np.array): Quantile limits for discretization.
-        n_disc (int): Number of discretization points.
+        - x (list): A list of `UncertainNumber` objects representing the uncertain inputs.
+        - f (Callable): The function to evaluate.
+        - results (propagation_results, optional): An object to store propagation results.
+                                    Defaults to None, in which case a new
+                                    `propagation_results` object is created.
+        - n_disc (Union[int, np.ndarray], optional): The number of discretization points 
+                                    for each uncertain input. If an integer 
+                                    is provided, it is used for all inputs. 
+                                    If a NumPy array is provided, each element 
+                                    specifies the number of discretization 
+                                    points for the corresponding input. 
+                                    Defaults to 10.
+        - condensation (Union[float, np.ndarray], optional): A parameter or array of parameters 
+                                    to control the condensation of the output p-boxes. 
+                                    Defaults to None.
+        - tOp (Union[float, np.ndarray], optional): Upper threshold or array of thresholds for 
+                                    discretization. 
+                                    Defaults to 0.999.
+        - bOt (Union[float, np.ndarray], optional): Lower threshold or array of thresholds for 
+                                    discretization. 
+                                    Defaults to 0.001.
+        - save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). 
+                                   Defaults to 'no'.
     
     signature:
-        first_order_propagation_method(x: list, f: Callable, results: dict, lim_Q: np.array, n_disc: int, save_raw_data='no') -> dict
+        first_order_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results
 
     notes:
-        Performs first-order uncertainty propagation for mixed uncertain numbers 
+        - Performs first-order uncertainty propagation for mixed uncertain numbers.
+        - The function handles different types of uncertain numbers (distributions 
+          and p-boxes for this version) and discretizes them with the same number of n_disc.
+        - It uses the `extremepoints` to determine the signs of the partial 
+          derivatives of the function.
+        - The output p-boxes are constructed by imposing the results from individual 
+          input discretizations.
+        - The `condensation` parameter can be used to reduce the number of intervals in 
+          the output p-boxes.
     
     returns:
-        dict: A dictionary containing the results
-
+        propagation_results: A `propagation_results` object containing the results of the 
+                          uncertainty propagation. The results include p-boxes representing 
+                          the output uncertainty.
 
     example:
         #TODO to add an example for this method.

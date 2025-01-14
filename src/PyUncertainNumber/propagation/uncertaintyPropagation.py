@@ -16,16 +16,16 @@ from PyUncertainNumber.propagation.mixed_uncertainty.second_order_propagation im
 from PyUncertainNumber.propagation.mixed_uncertainty.first_order_propagation import first_order_propagation_method
 from PyUncertainNumber.propagation.utils import create_folder, save_results, propagation_results
 from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber, Distribution #_parse_interverl_inputs,
-
-#TODO fix the distribution parameters if we only  have sample values. 
+ 
 #TODO the cauchy with save_raw_data = 'yes' raises issues.  
-#TODO update the descriptions for all functions one last time. 
+#TODO update the descriptions and code for process_results once more. 
+
 # ---------------------the top level UP function ---------------------#
        
 def aleatory_propagation(vars:list = None,
         results: propagation_results = None,
         fun:Callable = None,
-        n_sam:int = None,
+        n_sam:int = 500,
         method:str = "monte_carlo",       
         save_raw_data="no",
         *,  # Keyword-only arguments start here
@@ -38,35 +38,36 @@ def aleatory_propagation(vars:list = None,
         - vars (list): A list of UncertainNumber objects, each representing an input 
                     variable with its associated uncertainty.
         - fun (Callable): The function to propagate uncertainty through.
-        - n (int): The number of samples to generate.
-        - conf_level (float, optional): The confidence level for K-S bounds. Defaults to 0.95.
-        - ks_bound_points (int, optional): The number of points to evaluate K-S bounds at. Defaults to 100.
-        - method (str, optional): The sampling method ('monte_carlo' or 'latin_hypercube'). Defaults to 'monte_carlo'.
-        - save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). Defaults to 'no'.
-        - base_path (str, optional): Path for saving results (if save_raw_data is 'yes'). Defaults to np.nan.
+        - n_sam (int): The number of samples to generate.
+                    Default is 500.
+        - method (str, optional): The sampling method ('monte_carlo' or 'latin_hypercube'). 
+                    Defaults to 'monte_carlo'.
+        - save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). 
+                    Defaults to 'no'.
+        - base_path (str, optional): Path for saving results (if save_raw_data is 'yes'). 
+                    Defaults to np.nan.
         - **kwargs: Additional keyword arguments to be passed to the UncertainNumber constructor.
 
     signature:
-        aleatory_propagation(x:np.ndarray, f:Callable, n:int, method ='montecarlo',  save_raw_data = 'no') -> dict of np.ndarrays
+        aleatory_propagation(x:np.ndarray, f:Callable, n:int, ...) -> propagation_results
 
     note:
-        - This function propagates uncertainty through a given function (`fun`) using either 
+        - This function propagates aleatory uncertainty through a given function (`fun`) using either 
             Monte Carlo or Latin Hypercube sampling, considering the aleatory uncertainty 
             represented by a list of `UncertainNumber` objects (`vars`). 
-        - It calculates Kolmogorov-Smirnov (K-S) bounds for the output(s) to provide a non-parametric 
-            confidence region.
         - If the `f` function returns multiple outputs, the `all_output` array will be 2-dimensional y and x for all x samples.
 
     returns:
-        dict: A dictionary containing:
-            - 'un': A list of UncertainNumber objects, each representing the output(s)
-                    of the function with K-S bounds as uncertainty.
-            - 'ks_bounds': A list of dictionaries, one for each output of fun, containing the K-S bounds.
-            - 'raw_data': A dictionary containing raw data (if save_raw_data is 'yes'):
-                - 'x': All generated input samples.
-                - 'f': Corresponding output values for each input sample.
+        propagation_results: A  `propagation_results` object containing:
+                          - 'un': A list of UncertainNumber objects, each representing 
+                                  the output(s) of the function.
+                          - 'raw_data': A dictionary containing raw data (if 
+                                        save_raw_data is 'yes'):
+                                          - 'x': All generated input samples.
+                                          - 'f': Corresponding output values for each 
+                                                input sample.
 
-    Raises:
+    raises:
         ValueError: For invalid method, save_raw_data, or missing arguments.
  
     """
@@ -76,7 +77,72 @@ def aleatory_propagation(vars:list = None,
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
     
     def process_alea_results(results):
+        """
+        args:
+            - results (propagation_results): A `propagation_results` object containing raw 
+                                    epistemic propagation results. This object is 
+                                    modified in-place.
+       
+        signature:
+            - process_alea_results(results: propagation_results) -> propagation_results
         
+        notes:
+            - Processes the results of aleatory uncertainty propagation.
+
+            - This function takes a `propagation_results` object containing raw aleatory 
+              propagation results and performs the following actions:
+
+                1. Creates `Distribution` objects: 
+                    - If output data exists in `results.raw_data['f']`, it creates an 'UncertainNumber' 
+                      object  for each output dimension using the sample data. 
+                    - These `UncertainNumber` objects are stored in `results.un`.
+                    - They have essense = 'distribution'
+
+                2. Saves raw data (optional):
+                    - If `save_raw_data` is set to 'yes', it saves the raw propagation data 
+                      (input samples and corresponding output values) to a file.
+
+        returns:
+            - propagation_results: The modified `propagation_results` object with 
+                          `UncertainNumber` objects added to `results.un` and 
+                          potentially with raw data saved to a file.
+
+        raises:
+            - ValueError: If the shape of `results.raw_data['f']` is invalid
+        
+        examples:
+            def cantilever_beam_func(x):
+        
+                y = x[0]
+                beam_length = x[1]
+                I = x[2]
+                F = x[3]
+                E = x[4]
+                try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
+                    deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+                    stress     = F * beam_length * y / I / 1000  # stress in MPa
+        
+                except:
+                    deflection = np.nan
+                    stress = np.nan
+
+                return np.array([deflection, stress])
+
+        y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
+        L = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
+        I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
+        F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
+        E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
+ 
+        a = mixed_propagation(vars= [y, L, I, F, E], 
+                            fun= cantilever_beam_func, 
+                            method= 'monte_carlo', 
+                            n_disc=8,
+                            save_raw_data= "no"
+                        )
+    
+        a.print()
+        """        
         if results.raw_data['f'] is None:  # Access raw_data from results object
             results.un = None #UncertainNumber(essence="distribution", distribution_parameters=None, **kwargs)
         else:
@@ -104,7 +170,7 @@ def aleatory_propagation(vars:list = None,
 
 def mixed_propagation(vars: list, fun:Callable = None,  
                     results: propagation_results = None, 
-                    method = 'endpoints',
+                    method = 'second_order_extremepoints',
                     n_disc: Union[int, np.ndarray] = 10, 
                     condensation:int = None,
                     tOp: Union[float, np.ndarray] = 0.999,
@@ -112,12 +178,123 @@ def mixed_propagation(vars: list, fun:Callable = None,
                     save_raw_data= 'no', 
                     *,  # Keyword-nly arguments start here
                     base_path=np.nan,
-                    **kwargs,):  
+                    **kwargs,):
+    """
+    args:
+        - vars (list): A list of uncertain variables, which can be a mix of different
+                 uncertainty types (e.g., intervals, distributions).
+        - fun (Callable): The function to propagate uncertainty through.
+        - results (propagation_results, optional): An object to store propagation results.
+                                Defaults to None, in which case a new
+                                `propagation_results` object is created.
+        - method (str, optional): The mixed uncertainty propagation method. Can be one of:
+                                'second_order_endpoints', 'second_order_vertex', 'second_order_extremepoints',
+                                'first_order_extremepoints'.
+                                Defaults to 'second_order_extremepoints'.
+        - n_disc (Union[int, np.ndarray], optional): Number of discretization points for 
+                                interval variables. 
+                                Defaults to 10.
+        - condensation (int, optional): Parameter for reducing the complexity of the output 
+                                uncertainty representation. 
+                                Defaults to None.
+        - tOp (Union[float, np.ndarray], optional): Upper threshold or bound used in some methods. 
+                                Defaults to 0.999.
+        - bOt (Union[float, np.ndarray], optional): Lower threshold or bound used in some methods. 
+                                Defaults to 0.001.
+        - save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). 
+                                Defaults to 'no'.
+        - base_path (str, optional): Path for saving results (if save_raw_data is 'yes'). 
+                               Defaults to np.nan.
+        - **kwargs: Additional keyword arguments passed to the underlying propagation methods.
+    
+    signature:
+       mixed_propagation(vars: list, fun: Callable, results: propagation_results = None, ...) -> propagation_results 
+    
+    notes:
+        - Performs mixed uncertainty propagation through a given function.
+        - This function handles uncertainty propagation when there's a mix of 
+          aleatory and epistemic uncertainty in the input variables. 
+        - It can be used if each uncertain number is exrpessed in terms of precise distributions. 
+
+    returns:
+        propagation_results: A `propagation_results` object containing the results of 
+                          the mixed uncertainty propagation. The format of the results 
+                          depends on the chosen `method`.
+
+    raises:
+        ValueError: For invalid `method` or `save_raw_data`.  
+    
+    examples:
+        def cantilever_beam_func(x):
+        
+            y = x[0]
+            beam_length = x[1]
+            I = x[2]
+            F = x[3]
+            E = x[4]
+            try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
+                deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+                stress     = F * beam_length * y / I / 1000  # stress in MPa
+        
+            except:
+                deflection = np.nan
+                stress = np.nan
+
+            return np.array([deflection, stress])
+
+        y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
+        L = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
+        I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
+        F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
+        E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
+ 
+        a = mixed_propagation(vars= [y, L, I, F, E], 
+                            fun= cantilever_beam_func, 
+                            method= 'second_order_extremepoints', 
+                            n_disc=8,
+                            #save_raw_data= "no"#,
+                            save_raw_data= "yes",
+                            base_path= base_path
+                        )
+    
+        a.print()
+    """
     
     if save_raw_data not in ("yes", "no"):  # Input validation
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
     
     def process_mixed_results(results: propagation_results):  
+        """
+        args:
+            - results (propagation_results): A `propagation_results` object containing raw 
+                                    epistemic propagation results. This object is 
+                                    modified in-place.
+       
+        signature:
+            - process_mixed_results(results: propagation_results) -> propagation_results
+
+        notes:
+            - Processes the results of mixed uncertainty propagation.
+
+            - This function takes a `propagation_results` object containing raw aleatory 
+              propagation results and performs the following actions:
+
+                1. Creates `UncertainNumber` objects: 
+                    - If output data exists in `results.raw_data['bounds']`, it creates an 'UncertainNumber' 
+                      object  for each output dimension using the sample data. 
+                    - These `UncertainNumber` objects are stored in `results.un`.
+                    - The `UncertainNumber` has essense = 'pbox'.
+
+                2. Saves raw data (optional):
+                    - If `save_raw_data` is set to 'yes', it saves the raw propagation data 
+                      (input samples and corresponding output values) to a file.
+        
+        returns:
+            - propagation_results: The modified `propagation_results` object with 
+                          `UncertainNumber` objects added to `results.un` and 
+                          potentially with raw data saved to a file.
+
+        """
         # if results.raw_data['bounds'] is None or results.raw_data['bounds'].size == 0:
         #     results.un = None
         # else:
@@ -200,30 +377,116 @@ def epistemic_propagation(vars,
           **kwargs,
           ):
     
-    """Performs uncertainty propagation (UP) using various methods.
+    """
+    args:
+        - vars (list): A list of `UncertainNumber` objects representing the input variables 
+                 with their associated interval uncertainty.
+        - fun (Callable): The function to propagate uncertainty through.
+        - results (propagation_results, optional): An object to store propagation results.
+                        Defaults to None, in which case a new
+                        `propagation_results` object is created.
+        - n_sub (np.integer, optional): Number of subintervals for subinterval methods. 
+                        Defaults to None.
+        - n_sam (np.integer, optional): Number of samples for sampling-based methods. 
+                        Defaults to None.
+        - x0 (np.ndarray, optional): Initial guess for local optimization methods. 
+                        Defaults to None.
+        - method (str, optional): The uncertainty propagation method to use. 
+                        Defaults to "endpoint".
+        - save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). 
+                        Defaults to "no".
+        - base_path (str, optional): Path for saving results (if save_raw_data is 'yes'). 
+                        Defaults to np.nan.
+        - tol_loc (np.ndarray, optional): Tolerance for local optimization. 
+                        Defaults to None.
+        - options_loc (dict, optional): Options for local optimization. 
+                        Defaults to None.
+        - method_loc (str, optional): Method for local optimization. 
+                        Defaults to 'Nelder-Mead'.
+        - pop_size (int, optional): Population size for genetic algorithms. 
+                        Defaults to 1000.
+        - n_gen (int, optional): Number of generations for genetic algorithms. 
+                        Defaults to 100.
+        - tol (float, optional): Tolerance for genetic algorithms. Defaults to 1e-3.
+        - n_gen_last (int, optional): Number of last generations for genetic algorithms. 
+                        Defaults to 10.
+        - algorithm_type (str, optional): Type of genetic algorithm. 
+                        Defaults to 'NSGA2'.
+        - **kwargs: Additional keyword arguments passed to the `UncertainNumber` constructor.
 
-    Args:
-        vars (np.ndarray or list of UN objects): Input intervals.
-        fun (Callable): The function to propagate.
-        n (np.integer, optional): Number of subintervals/samples. Defaults to None.
-        method (str, optional): UP method. Defaults to "endpoint".
-        save_raw_data (str, optional): Whether to save raw data. Defaults to "no".
-        base_path (str, optional): Path for results. Defaults to np.nan.
-        x0 (np.array, optional): Initial guess for local optimisation.
-        objective (str, optional): Optimisation objective. Defaults to 'minimize'.
-        pop_size (int, optional): Population size for genetic algorithm. Defaults to 1000.
-        n_gen (int, optional): Number of generations for genetic algorithm. Defaults to 100.
-        tol (float, optional): Tolerance for genetic algorithm. Defaults to 1e-3.
-        n_gen_last (int, optional):  Generations for last population. Defaults to 10.
-        algorithm_type (str, optional): Genetic algorithm type. Defaults to "NSGA2".
+    signature:
+        epistemic_propagation(vars: list, fun: Callable, results: propagation_results = None, ...) -> propagation_results 
+    notes:
+        - Performs epistemic uncertainty propagation through a given function.
 
-    Returns:
-        tuple: Results of the UP method.
+        - This function implements various methods for propagating epistemic uncertainty, 
+          typically represented as intervals. It supports a wide range of techniques, 
+          including:
 
-    Raises:
-        ValueError: For invalid method, save_raw_data, or missing arguments.
-        #TODO update the description. 
- 
+            1. Interval-based methods:
+                - `endpoints` or `vertex`:  Calculates the function output at the endpoints 
+                                 or vertices of the input intervals.
+                - `extremepoints`: Considers all possible combinations of interval endpoints 
+                       to find the extreme values of the output.
+                - `subinterval` or `subinterval_reconstitution`: Divides the input intervals 
+                                                    into subintervals and performs 
+                                                    propagation on each subinterval.
+
+            2. Sampling-based methods:
+                - `monte_carlo`, `latin_hypercube`:  Uses Monte Carlo or Latin Hypercube 
+                                        sampling within the input intervals.
+                - `monte_carlo_endpoints`, `latin_hypercube_endpoints`:  Combines sampling with
+                                                            evaluation at interval 
+                                                            endpoints.
+                - `cauchy`, `endpoint_cauchy`, `endpoints_cauchy`: Uses Cauchy deviates for 
+                                                      sampling.
+
+            3. Optimization-based methods:
+                - `local_optimization` or `local_optimisation`:  Uses local optimization 
+                                                      algorithms to find the minimum 
+                                                      or maximum output values.
+                - `genetic_optimisation` or `genetic_optimization`: Uses genetic algorithms for 
+                                                        global optimization.
+    returns:
+        - propagation_results: A  `propagation_results` object containing the results of 
+                          the epistemic uncertainty propagation. The format of the 
+                          results depends on the chosen `method`.
+
+    raises:
+        - ValueError: For invalid `method`, `save_raw_data`, or missing arguments.
+        - TypeError: If `fun` is not callable for optimization methods.
+    example:
+    def cantilever_beam_func(x):
+        
+        y = x[0]
+        beam_length = x[1]
+        I = x[2]
+        F = x[3]
+        E = x[4]
+        try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
+            deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+            stress     = F * beam_length * y / I / 1000  # stress in MPa
+        
+        except:
+            deflection = np.nan
+            stress = np.nan
+
+        return np.array([deflection, stress])
+
+    y = UncertainNumber(name='beam width', symbol='y', units='m', essence='interval', bounds=[0.145, 0.155]) 
+    L = UncertainNumber(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
+    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
+    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
+    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
+
+    a = epistemic_propagation(vars= [ y, L, I, F, E], 
+                            fun= cantilever_beam_func, 
+                            method= 'extremepoints', 
+                            n_disc=8,
+                            save_raw_data= "no"
+                        )
+    
+    a.print()
     """ 
     #vars = _parse_interverl_inputs(vars)
     x = np.zeros((len(vars),2))
@@ -237,7 +500,43 @@ def epistemic_propagation(vars,
     if save_raw_data not in ("yes", "no"):  # Input validation
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
     
-    def process_results(results: propagation_results):  # Add type hint
+    def process_results(results: propagation_results):  
+        """
+        args:
+            - results (propagation_results): A `propagation_results` object containing raw 
+                                    epistemic propagation results. This object is 
+                                    modified in-place.
+        
+        notes:
+            - Processes the results of epistemic uncertainty propagation.
+
+            - This function takes a `propagation_results` object containing raw epistemic 
+              propagation results and performs the following actions:
+
+                1. Creates `UncertainNumber` objects:
+                    - If output bounds exist in `results.raw_data['bounds']`, it creates 
+                     `UncertainNumber` objects with "interval" essence, representing the 
+                     resulting interval uncertainty.
+                    - It handles both single-output (1D array of bounds) and multi-output 
+                     (2D array of bounds) cases.
+                    - These `UncertainNumber` objects are stored in `results.un`.
+
+                2. Saves raw data (optional):
+                    - If `save_raw_data` is set to 'yes', it saves the raw propagation data 
+                      to a file.
+    
+        signature:
+            - process_results(results: propagation_results) -> propagation_results
+
+        returns:
+            - propagation_results: The modified `propagation_results` object with 
+                          `UncertainNumber` objects added to `results.un` and 
+                          potentially with raw data saved to a file.
+
+        raises:
+            - ValueError: If the shape of `results.raw_data['bounds']` is invalid.
+  
+  """
         if results.raw_data['bounds'] is None or results.raw_data['bounds'].size == 0:
             results.un = UncertainNumber(essence="interval", bounds=None, **kwargs)
         else:
@@ -314,7 +613,7 @@ def epistemic_propagation(vars,
         case _:
             raise ValueError("Invalid UP method.")
 
-def propagation(vars:list,
+def Propagation(vars:list,
         fun:Callable,
         results:propagation_results = None,
         n_sub: np.integer = 3,
@@ -338,7 +637,98 @@ def propagation(vars:list,
         algorithm_type="NSGA2",        
           **kwargs
           ):
+    """ 
+    args:
+        - vars (list): A list of uncertain variables.
+        - fun (Callable): The function through which to propagate uncertainty.
+        - results (propagation_results, optional): An object to store propagation results. 
+                                Defaults to None, in which case a new 
+                                `propagation_results` object is created.
+        - n_sub (np.integer, optional): Number of subintervals for interval-based methods. 
+                            Defaults to 3.
+        - n_sam (np.integer, optional): Number of samples for Monte Carlo simulation. 
+                            Defaults to 500.
+        - x0 (np.ndarray, optional): Initial guess for optimization-based methods. 
+                            Defaults to None.
+        - method (str, optional):  Specifies the uncertainty propagation method. 
+                            Defaults to None, which triggers automatic selection.
+        - n_disc (Union[int, np.ndarray], optional): Number of discretization points. 
+                            Defaults to 10.
+        - condensation (int, optional): Parameter for reducing output complexity. 
+                            Defaults to None.
+        - tOp (Union[float, np.ndarray], optional): Upper threshold or bound. 
+                            Defaults to 0.999.
+        - bOt (Union[float, np.ndarray], optional): Lower threshold or bound. 
+                            Defaults to 0.001.
+        - save_raw_data (str, optional): Whether to save intermediate results ('yes' or 'no'). 
+                            Defaults to 'no'.
+        - base_path (str, optional): Path for saving data. Defaults to np.nan.
+        - tol_loc (np.ndarray, optional): Tolerance for local optimization. 
+                            Defaults to None.
+        - options_loc (dict, optional): Options for local optimization. 
+                            Defaults to None.
+        - method_loc (str, optional): Method for local optimization. 
+                            Defaults to 'Nelder-Mead'.
+        - pop_size (int, optional): Population size for genetic algorithms. 
+                            Defaults to 1000.
+        - n_gen (int, optional): Number of generations for genetic algorithms. 
+                           Defaults to 100.
+        - tol (float, optional): Tolerance for genetic algorithms. Defaults to 1e-3.
+        - n_gen_last (int, optional): Number of last generations for genetic algorithms. 
+                            Defaults to 10.
+        - algorithm_type (str, optional): Type of genetic algorithm. 
+                            Defaults to 'NSGA2'.
+        **kwargs: Additional keyword arguments passed to the underlying propagation methods.
 
+    signature:
+       - Propagation(vars: list, fun: Callable, results: propagation_results = None, ...) -> propagation_results 
+
+    note:
+       - Performs uncertainty propagation through a given function with uncertain inputs.
+       - This function automatically selects and executes an appropriate uncertainty 
+        propagation method based on the types of uncertainty in the input variables. 
+        It supports interval analysis, probabilistic methods, and mixed uncertainty 
+        propagation.
+
+    return:
+        - propagation_results: A  `propagation_results` object including:
+                        - 'un': A list of UncertainNumber objects, each representing 
+                                  the output(s) of the function.
+                        - 'raw_data': depending on the method selected. 
+
+    example:
+        def cantilever_beam_func(x):
+        
+            y = x[0]
+            beam_length = x[1]
+            I = x[2]
+            F = x[3]
+            E = x[4]
+            try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
+                deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+                stress     = F * beam_length * y / I / 1000  # stress in MPa
+        
+            except:
+                deflection = np.nan
+                stress = np.nan
+
+            return np.array([deflection, stress])
+        
+        y = UncertainNumber(name='beam width', symbol='y', units='m', essence='interval', bounds=[0.145, 0.155]) 
+        L = UncertainNumber(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
+        I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
+        F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
+        E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
+       
+        a = Propagation(vars= [ y, L, I, F, E], 
+                            fun= cantilever_beam_func, 
+                            method= 'extremepoints', 
+                            n_disc=8,
+                            save_raw_data= "no"
+                        )
+    
+    a.print()
+    """
     essences = [un.essence for un in vars]  # Get a list of all essences
 
     if results is None:
@@ -517,7 +907,7 @@ def main():
     METHOD = "extremepoints"
     base_path = "C:\\Users\\Ioanna\\OneDrive - The University of Liverpool\\DAWS2_code\\UP\\"
 
-    a = propagation(vars= [ L, I, F, E], 
+    a = Propagation(vars= [ L, I, F, E], 
                             fun= cantilever_beam_deflection, 
                             method= 'extremepoints', 
                             n_disc=8,
