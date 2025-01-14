@@ -1,3 +1,20 @@
+from __future__ import annotations
+from intervals import Interval
+from .interval import Interval as nInterval
+from .pbox_base import Pbox, NotIncreasingError
+from .aggregation import imposition
+from typing import *
+from warnings import warn
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.stats as sps
+from .params import Params
+from .logical import sometimes
+from .utils import transform_ecdf_bundle, cdf_bundle, pl_ecdf_bounding_bundles
+from .imprecise import imprecise_ecdf
+
+
+""" non-parametric pbox  """
 
 
 __all__ = [
@@ -17,23 +34,10 @@ __all__ = [
     'from_percentiles',
     'KS_bounds',
 ]
-
-from intervals import Interval
-from .interval import Interval as nInterval
-from .pbox_base import Pbox, NotIncreasingError
-from .aggregation import imposition
-from typing import *
-from warnings import warn
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy.stats as sps
-from .params import Params
-from .logical import sometimes
-from .utils import transform_ecdf_bundle, cdf_bundle, pl_ecdf_bounding_bundles
-from .imprecise import imprecise_ecdf
-""" non-parametric pbox  """
-
 # ---------------------from data---------------------#
+
+if TYPE_CHECKING:
+    from .utils import CDF_bundle
 
 
 def logical_bounding(a):
@@ -58,22 +62,24 @@ def d_alpha(n, alpha):
     return np.sqrt(np.log(1/alpha) / (2*n)) - 0.16693 * (1/n) - A.get(alpha, 1000) * (n ** (-3/2))
 
 
-def KS_bounds(s, alpha: float, display=True) -> Tuple[np.ndarray, np.ndarray]:
+def KS_bounds(s, alpha: float, display=True) -> Tuple[CDF_bundle, CDF_bundle]:
     """ construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
 
     args:
         - s (array-like): sample data, precise and imprecise
         - dn (scalar): KS critical value at significance level \alpha and sample size N;
     """
+    # TODO quantile of two bounds have different support ergo not a box yet
+    # TODO to make the output as a pbox
     dn = d_alpha(len(s), alpha)
     # precise data
     if isinstance(s, list | np.ndarray):
         ecdf = sps.ecdf(s)
         b = transform_ecdf_bundle(ecdf)
-        f_l, f_r = b.probability + dn, b.probability - dn
+        f_l, f_r = b.probabilities + dn, b.probabilities - dn
         f_l, f_r = logical_bounding(f_l), logical_bounding(f_r)
         # new ecdf bundles
-        b_l, b_r = cdf_bundle(b.quantile, f_l), cdf_bundle(b.quantile, f_r)
+        b_l, b_r = cdf_bundle(b.quantiles, f_l), cdf_bundle(b.quantiles, f_r)
 
         if display:
             fig, ax = plt.subplots()
@@ -84,29 +90,28 @@ def KS_bounds(s, alpha: float, display=True) -> Tuple[np.ndarray, np.ndarray]:
     # imprecise data
     elif isinstance(s, Interval):
         b_l, b_r = imprecise_ecdf(s)
-        b_l.probability += dn
-        b_r.probability -= dn
+        b_lbp, b_rbp = imprecise_ecdf(s)
 
-        b_l.probability, b_r.probability = logical_bounding(
-            b_l.probability), logical_bounding(b_r.probability)
+        b_l.probabilities += dn
+        b_r.probabilities -= dn
+
+        b_l.probabilities, b_r.probabilities = logical_bounding(
+            b_l.probabilities), logical_bounding(b_r.probabilities)
 
         if display:
             fig, ax = plt.subplots()
-            pl_ecdf_bounding_bundles(b_l, b_r, alpha, ax)
+            # plot the epimirical ecdf
+            ax.plot(b_lbp.quantiles, b_lbp.probabilities,
+                    drawstyle='steps-post', ls=':', color='gray')
+            ax.plot(b_rbp.quantiles, b_rbp.probabilities,
+                    drawstyle='steps-post', ls=':', color='gray')
+
+            # plot the KS bounds
+            pl_ecdf_bounding_bundles(
+                b_l, b_r, alpha, ax, title=f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
     else:
         raise ValueError("Invalid input data type")
     return b_l, b_r
-
-
-# def pl_bounding_ecdf():
-#     fig, ax = plt.subplots()
-#     ax.plot(fl.cdf.quantiles, ecdf_l, label='upper bound',
-#             drawstyle='steps-post', color='g')
-#     ax.plot(fr.cdf.quantiles, ecdf_r, label='lower bound',
-#             drawstyle='steps-post', color='b')
-#     ax.set_title(
-#         f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
-#     ax.legend()
 
 
 # * ---------------------top level func for known statistical properties---------------------*#

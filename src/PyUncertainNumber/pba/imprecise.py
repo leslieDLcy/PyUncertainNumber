@@ -1,9 +1,14 @@
+from __future__ import annotations
+from typing import *
 from intervals import Interval
 import scipy.stats as sps
-from .utils import cdf_bundle, transform_ecdf_bundle
+from .utils import transform_ecdf_bundle
+
+if TYPE_CHECKING:
+    from .utils import CDF_bundle
 
 
-def imprecise_ecdf(s: Interval):
+def imprecise_ecdf(s: Interval) -> tuple[CDF_bundle, CDF_bundle]:
     """ empirical cdf for interval valued data
 
     returns:
