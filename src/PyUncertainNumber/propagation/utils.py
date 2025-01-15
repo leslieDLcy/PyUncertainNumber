@@ -3,38 +3,355 @@ import csv
 import pandas as pd
 import numpy as np
 
+class propagation_results:
+    """
+    attributes:
+        un (np.ndarray): np.array of UncertainNumber objects (one for each output).
+        raw_data (dict): Dictionary containing raw data shared across outputs:
+            x (np.ndarray): Input values.
+            f (np.ndarray): Output values.
+            min (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'x', 'f' for the minimum of that output.
+            max (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'x', 'f' for the maximum of that output.
+            bounds (np.ndarray): 2D array of lower and upper bounds for each output.
+    notes:
+        - Stores the results of uncertainty propagation with multiple outputs,
+            sharing raw_data x and f.
+    """
+
+    def __init__(self, un: np.ndarray = None, raw_data: dict = None):
+        if un is None:
+            self.un = np.array([])  # Initialize as an empty array if un is None
+        else:
+            self.un = un 
+
+        if raw_data is not None:
+            self.raw_data = raw_data
+        else:
+            self.raw_data = {
+                'x': None,
+                'f': None,
+                'min': np.array([]),
+                'max': np.array([]),
+                'bounds': np.array([])
+            }
+
+    def add_raw_data(self, x=None, f=None, K=None, sign_x:np.ndarray = None):
+        """Adds raw data to the results."""
+        if x is not None:
+            self.raw_data['x'] = x
+        if K is not None:
+            self.raw_data['K'] = K
+        if f is not None:
+            self.raw_data['f'] = f
+        if sign_x is not None:
+            if isinstance(sign_x, np.ndarray) and len(sign_x.shape) > 1:  # Multiple outputs
+                self.raw_data['sign_x'] = sign_x
+            else:  # Single output
+                self.raw_data['sign_x'] = np.array([sign_x])  # Wrap in an array
+
+    def print(self):
+        """Prints the results in a formatted way, handling None values and multiple outputs."""
+
+        if self.raw_data['f'] is not None:  # Check if 'f' exists and is not None
+            if len(self.raw_data['f'].shape) == 1:  # 1D array, single output
+                num_outputs = 1
+            else:  # 2D array, multiple outputs
+                num_outputs = self.raw_data['f'].shape[1]  # Number of columns
+        elif self.raw_data['bounds'] is not None and len(self.raw_data['bounds']) > 0 :  # Check if 'bounds' exists and is not None (Corrected)
+            if len(self.raw_data['bounds'].shape) == 3:  # 1D array, single output
+                num_outputs = 1
+            else:  # 2D array, multiple outputs
+                num_outputs = self.raw_data['bounds'].shape[0]  # Number of rows (Corrected)
+        else:
+            num_outputs = 1  # Or handle the case where 'f' is None appropriately
+
+        for i in range(num_outputs):
+            print("-" * 30)
+            print(f"Output {i+1}:")
+            print("-" * 30)
+
+            if self.un is not None:
+                if num_outputs == 1:
+                    print("Uncertain Number:", self.un)
+                else:
+                    print("Uncertain Number:", self.un[i])            
+            else:
+                print("Uncertain Number: None")
+
+            if 'bounds' in self.raw_data and self.raw_data['bounds'] is not None and len(self.raw_data['bounds']) > 0:
+                print("-" * 30)
+                if num_outputs == 1:
+                    print("Bounds:", self.raw_data['bounds'])
+                else:
+                    print("Bounds:", self.raw_data['bounds'][i])
+
+            if 'min' in self.raw_data and self.raw_data['min'] is not None and len(self.raw_data['min']) > 0:
+                print("-" * 30)
+                print("Minimum:")
+                min_data = self.raw_data['min'][i]
+                if min_data.get('f') is not None:
+                    print("f:", min_data.get('f'))
+                    if min_data.get('x') is None:  # Handle the case where 'x' is None
+                        print("x: None") 
+                    else:
+                        print("x:", min_data.get('x'))
+                    #Print additional results only for local_optimisation
+                    if 'final_simplex' in min_data:
+                        print("niterations:", min_data.get('niterations'))
+                        print("nfevaluations:", min_data.get('nfevaluations'))
+                        print("final_simplex:", min_data.get('final_simplex'))
+                        print("message:", min_data.get('message'))
+                    if 'ngenerations' in min_data:
+                        print("niterations:", min_data.get('niterations'))
+                        print("ngenerations", min_data.get('ngenerations'))
+                        print("message:", min_data.get('message'))
+                
+            if 'max' in self.raw_data and self.raw_data['max'] is not None and len(self.raw_data['max']) > 0:
+                print("-" * 30)
+                print("Maximum:")
+                max_data = self.raw_data['max'][i]
+                if max_data.get('f') is not None:
+                    print("f:", max_data.get('f'))
+                    if max_data.get('x') is None:  # Handle the case where 'x' is None
+                        print("x: None") 
+                    else:
+                        print("x:", max_data.get('x'))
+                    if 'final_simplex' in max_data:                        
+                        print("niterations:", max_data.get('niterations'))
+                        print("nfevaluations:", max_data.get('nfevaluations'))
+                        print("final_simplex:", max_data.get('final_simplex'))
+                        print("message:", max_data.get('message'))
+                    if 'ngenerations' in max_data:                        
+                        print("niterations:", max_data.get('niterations'))
+                        print("ngenerations:", max_data.get('ngenerations'))
+                        print("message:", max_data.get('message'))
+
+            if 'sign_x' in self.raw_data:
+                print("-" * 30)
+                print("sign_x:", self.raw_data['sign_x'][i]) 
+       
+        print("-" * 30)
+        print("Input combinations and corresponding output(s):")
+        if self.raw_data['x'] is not None and len(self.raw_data['x']) > 0:  # Check if 'x' is not None
+            print("x:", self.raw_data['x'])
+        else:
+            print("x: None")
+            
+        if 'K' in self.raw_data:  # Check if the keys exist
+            print("-" * 30)
+            print("K:", self.raw_data['K'])
+        print("-" * 30)
+
+        if self.raw_data['f'] is not None and len(self.raw_data['f']) > 0:  # Check if 'x' is not None
+            print("f:", self.raw_data['f'])  # Print directly if single output
+        else:
+            print("f: None")
+        print("-" * 30)
+    # def print(self):
+    #     """Prints the results in a formatted way, handling None values and multiple outputs."""
+
+    #     if self.raw_data['f'] is not None:  # Check if 'f' exists and is not None
+    #         if len(self.raw_data['f'].shape) == 1:  # 1D array, single output
+    #             num_outputs = 1
+    #         else:  # 2D array, multiple outputs
+    #             num_outputs = self.raw_data['f'].shape[1]  # Number of columns
+    #     else:
+    #         num_outputs = 0  # Or handle the case where 'f' is None appropriately
 
 
+    #     for i in range(num_outputs):
+    #         print("-" * 30)
+    #         print(f"Output {i+1}:")
 
+    #         print("-" * 30)
+    #         if 'un' in self.un and len(self.un) > 0:
+    #             print("Uncertain Number:", self.un[i])
+    #         else:
+    #             print("Uncertain Number: None")
 
-def header_results(all_output:np.ndarray, all_input:np.ndarray):
-    """ Generates generic header names for output and input dataframes.
+    #         if self.raw_data['bounds'] is not None and len(self.raw_data['bounds']) > 0:
+    #             print("-" * 30)
+    #             if num_outputs == 1:
+    #                 print("Bounds:", self.raw_data['bounds'])
+    #             else:
+    #                 print("Bounds:", self.raw_data['bounds'][i])
 
-    This function creates a list of column names suitable for a combined DataFrame 
-    containing both output and input data. It dynamically generates header names based on 
-    the shapes of the `all_output` and `all_input` NumPy arrays. 
+    #         if self.raw_data['min'] is not None and len(self.raw_data['min']) > 0:
+    #             print("-" * 30)
+    #             print("Minimum:")
+    #             if num_outputs == 1:  # Handle single output case
+    #                 min_data = self.raw_data['min'][0]  # Access the first element directly
+    #             else:
+    #                 min_data = self.raw_data['min'][i]
+                
+    #             if min_data.get('f') is not None :  # Only print if 'x' is present
+    #                 print("x:", min_data.get('x'))
+    #                 print("f:", min_data.get('f'))
+
+    #                 # # Print additional results only for local_optimisation
+    #                 # if 'niterations' in min_data:
+    #                 #     print("niterations:", min_data.get('niterations'))
+    #                 #     print("nfevaluations:", min_data.get('nfevaluations'))
+    #                 #     print("final_simplex:", min_data.get('final_simplex'))
+                
+    #             # elif min_data.get('f') is not None and min_data.get('x') is None :  # Only print if 'x' is present
+    #             #     print("x:", None)
+    #             #     print("f:", min_data.get('f'))
+
+    #             #     # Print additional results only for local_optimisation
+    #             #     if 'niterations' in min_data:
+    #             #         print("niterations:", min_data.get('niterations'))
+    #             #         print("nfevaluations:", min_data.get('nfevaluations'))
+    #             #         print("final_simplex:", min_data.get('final_simplex'))
+
+    #         if self.raw_data['max'] is not None and len(self.raw_data['max']) > 0:
+    #             print("-" * 30)
+    #             print("Maximum:")
+    #             max_data = self.raw_data['max'][i]
+    #             if max_data.get('f') is not None :  # Only print if 'x' is present
+    #                 print("x:", max_data.get('x'))
+    #                 print("f:", max_data.get('f'))
+
+    #                 # # Print additional results only for local_optimisation
+    #                 # if 'niterations' in max_data:
+    #                 #     print("niterations:", max_data.get('niterations'))
+    #                 #     print("nfevaluations:", max_data.get('nfevaluations'))
+    #                 #     print("final_simplex:", max_data.get('final_simplex'))
+                
+    #             # elif max_data.get('f') is not None and max_data.get('x') is None :  # Only print if 'x' is present
+    #             #     print("x:", None)
+    #             #     print("f:", max_data.get('f'))
+
+    #             #     # Print additional results only for local_optimisation
+    #             #     if 'niterations' in max_data:
+    #             #         print("niterations:", max_data.get('niterations'))
+    #             #         print("nfevaluations:", max_data.get('nfevaluations'))
+    #             #         print("final_simplex:", max_data.get('final_simplex'))
+        
+    #     print("-" * 30)
+    #     if 'sign_x' in self.raw_data:
+    #         print("Input combinations and corresponding output(s):")
+    #         print("sign_x:", self.raw_data['sign_x'][i])
+    #     print("-" * 30)
+    #     print("Input combinations and corresponding output(s):")
+    #     if self.raw_data['x'] is not None and len(self.raw_data['x']) > 0:  # Check if 'x' is not None
+    #         print("x:", self.raw_data['x'])
+    #     else:
+    #         print("x: None")
+        
+    #     if 'K' in self.raw_data:  # Check if the keys exist
+    #         print("K:", self.raw_data['K'])
+
+    #     if self.raw_data['f'] is not None and len(self.raw_data['f']) > 0:  # Check if 'x' is not None
+    #         if num_outputs == 1:
+    #             print("f:", self.raw_data['f'])  # Print directly if single output
+    #         else:
+    #             print("f:", self.raw_data['f'][i])  # Print the i-th output if multiple outputs
+    #     else:
+    #         print("f: None")
+    #     print("-" * 30)
+
+def header_results(all_output, all_input, method = None):
+    """
+    Determine generic header for output and input.
 
     Args:
-        all_output: A NumPy array representing the output data. It can be 1-dimensional or 
-                2-dimensional. If 1D, it's assumed to represent a single output variable.
-        all_input: A NumPy array representing the input data. It's assumed to be 2-dimensional, 
-               where each row corresponds to a sample and each column represents an input variable.
+        all_output (np.ndarray): A NumPy array containing the output values.
+        all_input (np.ndarray): A NumPy array containing the input values.
 
     Returns:
-        - A list of strings representing the header names. The first part of the list 
-        contains headers for the output variables (e.g., 'y0', 'y1', ...), and the second
-        part contains headers for the input variables (e.g., 'x0', 'x1', ...).
+        list: A list of strings representing the header for the combined DataFrame.
     """
-    header = []
+    if all_output is None:
+        header_y = []
+    else:
+        if all_output.ndim == 1:
+            len_y = 1
+        else:
+            len_y = all_output.shape[1]
+        header_y = ["y" + str(i) for i in range(len_y)]
 
-    for i in range(0, len(all_output[1])):
-        output = "y" + str(i)
-        header.append(output)
-    for i in range(0, len(all_input[1])):
-        Input = "x" + str(i)
-        header.append(Input)
+    if method in "cauchy": 
+        m = all_input.shape[1] - 1  # Exclude 'K' from the count
+        header_x = ["x" + str(i) for i in range(m)] + ["K"]  # Add 'K' at the end
+    else:
+        m = all_input.shape[1]
+        header_x = ["x" + str(i) for i in range(m)]
 
+    header = header_y + header_x
     return header
+
+def post_processing(all_input: np.ndarray, all_output: np.ndarray = None, method = None, res_path=None):
+
+    """Post-processes the results of an uncertainty propagation (UP) method.
+
+    This function takes the input and output values from a UP method, combines them into a 
+    pandas DataFrame, and optionally saves the raw data to a CSV file. It also checks for 
+    NaN values in the output and logs them with their corresponding input values if found.
+    If all_output is None, it creates a DataFrame with only the input data.
+
+    Args:
+        all_input (np.ndarray): A NumPy array containing the input values used in the UP method.
+        all_output (np.ndarray, optional): A NumPy array containing the corresponding output 
+                                            values from the UP method. Defaults to None.
+        res_path (str, optional): The path to the directory where the results will be saved. 
+                                    Defaults to None.
+
+    Returns:
+        pandas.DataFrame: A pandas DataFrame containing the combined output and input data 
+                        (if all_output is provided). If all_output is None, it returns a 
+                        DataFrame with only the input data.
+    """
+
+    if all_output is None:
+        print("No function was evaluated. Only input is available")
+
+        df_input = pd.DataFrame(all_input)
+
+        # Handle Cauchy input with 'x' and 'K' (moved outside the if block)
+        # if method in ( "endpoints_cauchy"):  
+        #     x_fields = pd.DataFrame(all_input)  # Get all 'x' field names
+        #     print("x_fields", x_fields)
+        #     x_data = all_input[x_fields]  # Select only the 'x' fields
+        #     df_input = pd.DataFrame(x_data)
+        # else:
+        #     df_input = pd.DataFrame(all_input)
+
+        header = header_results(all_output=None, all_input=all_input, method = method)  
+        df_input.columns = header
+        df_output_input = df_input  
+
+    else:
+        # Transform np.array input-output into pandas data.frame 
+        df_input = pd.DataFrame(all_input)
+        df_output = pd.DataFrame(all_output)
+
+        # Create a single output input data.frame
+        df_output_input = pd.concat([df_output, df_input], axis=1)
+
+        # determine generic header for output and input
+        header = header_results(all_output, all_input, method)
+        df_output_input.columns = header
+
+    # Return .csv with raw data only if asked ###
+    if res_path is not None:
+        create_csv(res_path, "Raw_data.csv", df_output_input)
+
+    # Check for NaN values ONLY if all_output is provided
+    if all_output is not None:  
+        df_NA = df_output_input[df_output_input.isna().any(axis=1)]
+        if len(df_NA) != 0:
+            # The input values are rounded to ensure equality
+            df_NA = df_NA.apply(np.round, args=[4])
+            df_NA_unique = df_NA.drop_duplicates(keep="first", ignore_index=True)
+
+            create_csv(res_path, "NAlog.csv", df_NA_unique)
+        else:
+            print("There are no NA values produced by the input")
+
+    return df_output_input
 
 def create_folder(base_path, method):
     """Creates a folder named after the called UP method where the results files are stored
@@ -106,219 +423,48 @@ def create_csv(res_path, filename, data):
 
     return filename
 
-
-def Upper_lower_values_with_input(df_OUTPUT_INPUT, i):
-    # Removes possible NAN values from a given output QoI.
-    # Estimates the min and max for each output QoI from the remaining non NAN values.
-    # Creates a dataframe with the output-input for the min and max of each Qof.
-    ## Issues: if more than one combinations produce min/max it canot be recorded.
-    ## if some variables are responsible for one QoI and not hte others it cannot be accounted for
-    y = df_OUTPUT_INPUT[df_OUTPUT_INPUT.columns[i]]
-
-    # create a data.frame with one Qof and input
-    x = df_OUTPUT_INPUT.filter(regex="x")
-
-    filtered_df = pd.concat([y, x], axis=1)
-
-    filtered_df_OUTPUT_INPUT = filtered_df[filtered_df.iloc[:, 0].notnull()]
-    yint = [
-        min(filtered_df_OUTPUT_INPUT.iloc[:, 0]),
-        max(filtered_df_OUTPUT_INPUT.iloc[:, 0]),
-    ]
-
-    dat_ymin = filtered_df_OUTPUT_INPUT[filtered_df_OUTPUT_INPUT.iloc[:, 0] == yint[0]]
-    dat_ymax = filtered_df_OUTPUT_INPUT[filtered_df_OUTPUT_INPUT.iloc[:, 0] == yint[1]]
-
-    y_dat_com = pd.concat([dat_ymin, dat_ymax])
-    y_dat_com = y_dat_com.drop_duplicates(subset=[y_dat_com.columns[0]], keep="first")
-    y_dat_com = y_dat_com.rename(columns={y_dat_com.columns[0]: "y"})
-
-    y_dat_com.insert(0, "Name", df_OUTPUT_INPUT.columns[i])
-    y_dat_com.insert(1, "fun", ["min", "max"])
-
-    return y_dat_com
-
-def post_processing(all_input:np.ndarray, all_output:np.ndarray, res_path):
-    
-    """Post processing the results of a UP method
-
-    args:
-        - all_input: A NumPy array containing the input values used in the UP method.
-        - all_output: A NumPy array containing the corresponding output values from the UP method.
-        - res_path: The path to the directory where the results will be saved.
-
-    signature:
-        post_processing(all_input:np.ndarray, all_output:np.ndarray, res_path: path ) -> pandas.DataFrame
-
-    note:
-        - the augument `df_OUTPUT_INPUT` will specify pandas.dataframe of the min-max values for each output 
-        - arguement `res_path` will provide the location of the directory of the results. 
-
-    return:
-        - df_output_input: A pandas DataFrame containing the combined output and input data.
-        - Creates "Raw_data.csv" in `res_path` containing the raw output and input data.
-        - Creates "NAlog.csv" in `res_path` if any NaN values are present in the output, 
-          logging the corresponding input values.
-        - Prints a message if no NaN values are found.
-
-
-    example:
-        df = pd.DataFrame(
-         {"y0" : [4, 5, 5, 6],
-          "x0" : [1, 2, 1, 2],
-          "x1" : [3, 3, 4, 4]}, index = [1, 2, 3])
-        res_path = "C:/Users/DAWS2_code/UP/vertex"
-        y = post_processing(df, res_path)
-
-    # TODO create a .csv with all min,max and associated x values ...
-    # units ...
-    # fields: None...
-    """     
-    # Transform np.array input-output into pandas data.frame 
-    df_input = pd.DataFrame(all_input)
-    df_output = pd.DataFrame(all_output)
-    # Create a single output input data.frame
-    df_output_input = pd.concat([df_output, df_input], axis=1)
-    # determine generic header for output and input
-    header = header_results(all_output, all_input)
-    df_output_input.columns = header
-    #header = df_output_input.columns.values.tolist()
-    
-    # Return .csv with raw data only if asked ###
-    create_csv(res_path, "Raw_data.csv", df_output_input)
-
-    # if NA output create a log file with the input which caused these values.
-    df_NA = df_output_input[df_output_input.isna().any(axis=1)]
-    if len(df_NA) != 0:
-        # The input values are rounded to ensure equality
-        df_NA = df_NA.apply(np.round, args=[4])
-        df_NA_unique = df_NA.drop_duplicates(keep="first", ignore_index=True)
-
-        create_csv(res_path, "NAlog.csv", df_NA_unique)
+def save_results(data, method, res_path, fun=None):
+    if fun is None:
+        Results = post_processing(data['x'], all_output=None, method=method, res_path=res_path)
     else:
-        print("There are no NA values produced by the input")
-     
+        Results = post_processing(data['x'], data.get('f'), method, res_path)
+            
+    return Results
 
-  #       df_NA_unique = NA_values_with_input(df_output_input, res_path)
-   #  else:
-   #      print("Warning: NA values are produced with given input")
+def condense_bounds(bounds, N):
+    """
+    Condenses lower and upper bounds of a probability distribution to a specified size.
 
-   #  # min-max of all output QoI and corresponding input values
-   #  y_dat_all = []
+    Args:
+      bounds: A NumPy array of shape (num_outputs, 2, num_points) representing the lower 
+              and upper bounds of a probability distribution for potentially multiple outputs.
+              The first dimension corresponds to different outputs of the function, 
+              the second dimension corresponds to lower and upper bounds (0 for lower, 1 for upper),
+              and the third dimension corresponds to the original discretization points.
+      N: The desired size of the condensed arrays.
 
-   #  for i in range(sum("y" in s for s in header)):
-   #      for j in range(2):
-   #          y_dat = Upper_lower_values_with_input(df_OUTPUT_INPUT, i)
-   #          y_dat_all.append(y_dat.values.tolist()[j])
+    Returns:
+      A NumPy array of shape (num_outputs, 2, N) containing the condensed lower and upper bounds.
+    """
+    num_outputs = bounds.shape[0]
+    num_points = bounds.shape[2]
 
-   #  df_y_dat_all = pd.DataFrame(y_dat_all)
-   #  df_y_dat_all.columns = y_dat.columns
+    # Handle different condensation sizes for each output
+    if isinstance(N, int):
+        N = [N] * num_outputs  # Create a list with the same size for all outputs
 
-   #  create_csv(res_path, "min_max_input.csv", df_y_dat_all)
+    condensed_bounds = np.zeros((num_outputs, 2, max(N)))  # Initialize with the maximum size
 
-   #  # keep only y values
-   #  min_max_y_values = df_y_dat_all[["Name", "fun", "y"]]
+    for i in range(num_outputs):
+        interval_size = num_points // N[i]
 
-    return df_output_input #min_max_y_values
+        lower_bounds_sorted = np.sort(bounds[i, 0, :])
+        upper_bounds_sorted = np.sort(bounds[i, 1, :])
 
-def NA_values_with_input(df_OUTPUT_INPUT, res_path):
-   """Searching for NAN values in the output of a called UP method and create .csv file to store them.
+        condensed_lower = np.array([lower_bounds_sorted[j * interval_size + interval_size - 1] for j in range(N[i])])
+        condensed_upper = np.array([upper_bounds_sorted[j * interval_size] for j in range(N[i])])
 
-    args:
-        - df_OUTPUT_INPUT: a pandas.DataFrame containing output and associated input produced by UP method
-        - res_path: The path, named after the UP method, where the results will be saved
+        condensed_bounds[i, 0, :N[i]] = condensed_lower  # Assign to the correct slice
+        condensed_bounds[i, 1, :N[i]] = condensed_upper
 
-    signature:
-        post_processing(df_OUTPUT_INPUT: pandas.dataframe, res_path: path ) -> pandas.DataFrame
-
-    note:
-        - the augument `df_OUTPUT_INPUT` will specify pandas.dataframe of the min-max values for each output 
-        - arguement `res_path` will provide the location of the directory of the results. 
-
-    return:
-        -  A .csv file to store possible NAN output values and their associated input values.
-
-    example:
-        df = pd.DataFrame(
-         {"y0" : [4, 5, 5, 6],
-          "x0" : [1, 2, 1, 2],
-          "x1" : [3, 3, 4, 4]}, index = [1, 2, 3])
-        res_path = "C:/Users/DAWS2_code/UP/vertex"
-        y = post_processing(df, res_path)
-
-    """     
-   df_NA = df_OUTPUT_INPUT[df_OUTPUT_INPUT.isna().any(axis=1)]
-   # The input values are rounded to ensure equality
-   df_NA = df_NA.apply(np.round, args=[4])
-   df_NA_unique = df_NA.drop_duplicates(keep="first", ignore_index=True)
-
-   create_csv(res_path, "NAlog.csv", df_NA_unique, df_NA_unique.columns())
-
-   return df_NA_unique
-
-def post_processing_old(df_OUTPUT_INPUT, res_path):
-    """Post processing the results of a UP method
-
-    args:
-        - df_OUTPUT_INPUT: a pandas.DataFrame containing output and associated input produced by UP method
-        - res_path: The path, named after the UP method, where the results will be saved
-
-    signature:
-        post_processing(df_OUTPUT_INPUT: pandas.dataframe, res_path: path ) -> pandas.DataFrame
-
-    note:
-        - the augument `df_OUTPUT_INPUT` will specify pandas.dataframe of the min-max values for each output 
-        - arguement `res_path` will provide the location of the directory of the results. 
-
-    return:
-        -  A pandas.Dataframe with the min-max for each output QoI
-        -  A path, named after the called UP method 
-        -  A warning if input values produce NAN output. 
-        -  A .csv file to store a pandas dataframe of the raw results saved in the specified folder.
-        -  A .csv file  to store the min/max output values and their associated input values. 
-
-    example:
-        df = pd.DataFrame(
-         {"y0" : [4, 5, 5, 6],
-          "x0" : [1, 2, 1, 2],
-          "x1" : [3, 3, 4, 4]}, index = [1, 2, 3])
-        res_path = "C:/Users/DAWS2_code/UP/vertex"
-        y = post_processing(df, res_path)
-
-    # TODO post-process the df into UN objects ...
-    # units ...
-    # fields: None...
-    """     
-    # header
-    header = df_OUTPUT_INPUT.columns.values.tolist()
-
-    # Return .csv with raw data only if asked ###
-    create_csv(res_path, "Raw_data.csv", df_OUTPUT_INPUT)
-
-    # if NA output create a log file with the input which caused these values.
-    df_NA_unique = NA_values_with_input(df_OUTPUT_INPUT, res_path)
-    if df_NA_unique.empty == True:
-        print("NA values are NOT produced with given input")
-    else:
-        print("Warning: NA values are produced with given input")
-
-    # min-max of all output QoI and corresponding input values
-    y_dat_all = []
-
-    for i in range(sum("y" in s for s in header)):
-        for j in range(2):
-            y_dat = Upper_lower_values_with_input(df_OUTPUT_INPUT, i)
-            y_dat_all.append(y_dat.values.tolist()[j])
-
-    df_y_dat_all = pd.DataFrame(y_dat_all)
-    df_y_dat_all.columns = y_dat.columns
-
-    create_csv(res_path, "min_max_input.csv", df_y_dat_all)
-
-    # keep only y values
-    min_max_y_values = df_y_dat_all[["Name", "fun", "y"]]
-    
-    return min_max_y_values
-
-def post_process():
-    pass
+    return condensed_bounds

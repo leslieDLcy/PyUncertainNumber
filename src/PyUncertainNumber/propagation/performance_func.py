@@ -3,7 +3,7 @@ import numpy as np
 """ This module contains the performance functions  """
 
 
-def cantilever_beam_func(x):
+def cb_func(x):
     """Calculates deflection and stress for a cantilever beam.
 
     Args:
@@ -35,7 +35,7 @@ def cantilever_beam_func(x):
     return np.array([deflection, stress])
 
 
-def cantilever_beam_deflection(x):
+def cb_deflection(x):
     """Calculates deflection and stress for a cantilever beam.
 
     Args:
@@ -65,7 +65,7 @@ def cantilever_beam_deflection(x):
 
 # --------------------- by Leslie ---------------------#
 
-def cantilever_beam_deflection(beam_length, I, F, E):
+def cb_deflection(beam_length, I, F, E):
     """compute the deflection in the cantilever beam example
 
     # TODO add typing for UncertainNumber
@@ -88,7 +88,7 @@ def cantilever_beam_deflection(beam_length, I, F, E):
     return deflection
 
 
-def cantilever_beam_stress(y, beam_length, I, F):
+def cb_stress(y, beam_length, I, F):
     """to compute bending stress in the cantilever beam example"""
 
     try:

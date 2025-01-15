@@ -11,8 +11,8 @@ from .utils import *
 from .params import Params
 from pint import UnitRegistry
 from pathlib import Path
-from PyUncertainNumber.propagation.vertex import vertexMethod as vM
-from PyUncertainNumber.propagation.endpoints import endpoints_propagation_2n
+import itertools
+from ..pba.dists import dists
 from PyUncertainNumber.nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
@@ -61,7 +61,7 @@ class UncertainNumber:
     naked_value: float = field(default=None)
     p_flag: bool = field(default=True, repr=False)  # parameterised flag
 
-    # * ---------------------auxlliary information---------------------*#
+    # ---------------------auxlliary information---------------------#
     # some simple boiler plates
     # lat: float = field(default=0.0, metadata={'unit': 'degrees'})
     # ensemble: Type[Ensemble] = field(default=None)
@@ -84,8 +84,8 @@ class UncertainNumber:
     # class variable
     instances = []  # TODO named as registry later on
 
-    # * --------------------- additional ---------------------*#
-    _samples: np.ndarray | list = field(default=None, repr=False)
+    # --------------------- additional ---------------------#
+    _samples: np.ndarray | list = None
 
     # *  ---------------------more on initialisation---------------------*#
     def parameterised_pbox_specification(self):
@@ -128,7 +128,7 @@ class UncertainNumber:
                 self.naked_value = self._construct.midpoint()
             case "distribution":
                 if self._samples is not None:
-                    self._construct = Distribution(sample_data=self._samples)
+                    self._construct = Distribution(sample=self._samples)
                 elif self.distribution_parameters is not None:
                     p_ = DistributionSpecification(
                         dist_family=self.distribution_parameters[0],
@@ -272,12 +272,7 @@ class UncertainNumber:
 
         return self._construct.display(**kwargs)
 
-    # * ---------------------getters --------------------- *#
-    @property
-    def construct(self):
-        return self._construct
-
-    # * ---------------------other constructors--------------------- *#
+    # ---------------------other constructors---------------------#
 
     @classmethod
     def from_hedge(cls, hedged_language):
@@ -317,7 +312,6 @@ class UncertainNumber:
         """create an Uncertain Number from specification of distribution
 
         args:
-            - D: Distribution object
             dist_family: str
                 the distribution family
             dist_params: list, tuple or string
@@ -380,7 +374,7 @@ class UncertainNumber:
             - sps_dist: scipy.stats dist object
 
         note:
-            - sps_dist --> UN.Distribution object
+            - sps_dist - -> UN.Distribution object
         """
         pass
 
@@ -488,7 +482,7 @@ class UncertainNumber:
 
         note:
             - it will automatically convert all the UN objects in array-like to the computational backend
-            - essentially vars shall be all interval-typed UNs by now;
+            - essentially vars shall be all interval-typed UNs by now
 
         returns:
             - nd.array or Marco's Interval object
@@ -506,61 +500,61 @@ class UncertainNumber:
 
     # ---------------------Uncertainty propatation methods---------------------#
 
-    @classmethod
-    def vertexMethod(cls, vars, func):
-        """implementation of the endpoints method for the uncertain number
+    # @classmethod
+    # def vertexMethod(cls, vars, func):
+    #     """implementation of the endpoints method for the uncertain number
 
-        args:
-            vars: list
-                the selected list of the symbols of UN or a list of arrays
-            func: function
-                the function to be applied to the uncertain number
-        """
+    #     args:
+    #         vars: list
+    #             the selected list of the symbols of UN or a list of arrays
+    #         func: function
+    #             the function to be applied to the uncertain number
+    #     """
 
-        if isinstance(vars[0], str):
-            # _UNintervals = UncertainNumber._IntervaltoCompBackend(vars) # bp
-            _UNintervals = UncertainNumber._toIntervalBackend(vars)
-            df = vM(_UNintervals, func)
-            return df
-        elif isinstance(vars[0], int | float):
-            # create a list of UN objects using hedge interpretation
-            def get_hedgedUN(a_num_list):
-                return [cls.from_hedge(f"{i}") for i in a_num_list]
+    #     if isinstance(vars[0], str):
+    #         # _UNintervals = UncertainNumber._IntervaltoCompBackend(vars) # bp
+    #         _UNintervals = UncertainNumber._toIntervalBackend(vars)
+    #         df = vM(_UNintervals, func)
+    #         return df
+    #     elif isinstance(vars[0], int | float):
+    #         # create a list of UN objects using hedge interpretation
+    #         def get_hedgedUN(a_num_list):
+    #             return [cls.from_hedge(f"{i}") for i in a_num_list]
 
-            UN_list = get_hedgedUN(vars)
-            _UNintervals = [k.bounds for k in UN_list]
-            _UNintervals = np.array(_UNintervals).reshape(-1, 2)
+    #         UN_list = get_hedgedUN(vars)
+    #         _UNintervals = [k.bounds for k in UN_list]
+    #         _UNintervals = np.array(_UNintervals).reshape(-1, 2)
 
-            df = vM(_UNintervals, func)
+    #         df = vM(_UNintervals, func)
 
-            return df
+    #         return df
 
-    @classmethod
-    def endpointsMethod(cls, vars, func, **kwargs):
-        """implementation of the endpoints method for the uncertain number using
-        Marco's implementation
+    # @classmethod
+    # def endpointsMethod(cls, vars, func, **kwargs):
+    #     """implementation of the endpoints method for the uncertain number using
+    #     Marco's implementation
 
-        note:
-            `vars` shall be consistent with the signature of `func`. This means that
-            only a selected list of uncertain numbers will be used according to the func provided.
+    #     note:
+    #         `vars` shall be consistent with the signature of `func`. This means that
+    #         only a selected list of uncertain numbers will be used according to the func provided.
 
-        args:
-            vars: list
-                the chosen list of uncertain numbers
-            func: function
-                the function to be applied to the uncertain number
-        """
-        # _UNintervals = UncertainNumber._IntervaltoCompBackend(vars) # bp
-        _UNintervals = UncertainNumber._toIntervalBackend(vars)
-        output_bounds_lo, output_bounds_hi, _, _ = endpoints_propagation_2n(
-            _UNintervals, func
-        )
-        return cls(
-            essence="interval",
-            bounds=(output_bounds_lo, output_bounds_hi),
-            **kwargs,
-        )
-        # return endpoints_propagation_2n(_UNintervals, func)
+    #     args:
+    #         vars: list
+    #             the chosen list of uncertain numbers
+    #         func: function
+    #             the function to be applied to the uncertain number
+    #     """
+    #     # _UNintervals = UncertainNumber._IntervaltoCompBackend(vars) # bp
+    #     _UNintervals = UncertainNumber._toIntervalBackend(vars)
+    #     output_bounds_lo, output_bounds_hi, _, _ = endpoints_propagation_2n(
+    #         _UNintervals, func
+    #     )
+    #     return cls(
+    #         essence="interval",
+    #         bounds=(output_bounds_lo, output_bounds_hi),
+    #         **kwargs,
+    #     )
+    #     # return endpoints_propagation_2n(_UNintervals, func)
 
     # ---------------------serialisation functions---------------------#
 
@@ -570,6 +564,70 @@ class UncertainNumber:
         filepath = Path(Params.result_path) / filename
         with open(filepath, "w") as fp:
             json.dump(self, fp, cls=UNEncoder, indent=4)
+
+    def random(self, size=None):
+        """Generate random samples from the distribution."""
+        match self.essence:
+            case "interval":
+                return ValueError("Random sampling is only supported for distribution-type UncertainNumbers.")
+            case "distribution":
+                which_dist = self.distribution_parameters[0]
+                return dists[which_dist].rvs(*self.distribution_parameters[1], size=size)
+            case "pbox":
+                return ValueError("Random sampling is only supported for distribution-type UncertainNumbers.")
+
+    def ppf(self, q=None):
+        """"Calculate the percent point function (inverse of CDF) at quantile q."""
+        match self.essence:
+            case "interval":
+                return ValueError("PPF calculation is not supported for interval-type UncertainNumbers.")
+            case "distribution":
+                which_dist = self.distribution_parameters[0]
+                # Define the distribution
+                dist = dists[which_dist](*self.distribution_parameters[1])
+                return dist.ppf(q)
+            case "pbox":
+                which_dist = self.distribution_parameters[0]
+                # Assuming the p-box parameters are stored as a list of intervals
+                param_specs = self.distribution_parameters[1]
+
+                # Helper function to create parameter lists from specs
+                def get_param_list(spec):
+                    if isinstance(spec, list):
+                        return spec  # Already a list
+                    else:
+                        # Create a list with repeated value
+                        return [spec, spec]
+
+                # Generate parameter lists
+                param_lists = [get_param_list(spec) for spec in param_specs]
+
+                # Generate all combinations of lower and upper bounds for each parameter
+                param_combinations = list(itertools.product(*param_lists))
+
+                # Calculate the PPF for each combination (handling array q)
+                if isinstance(q, np.ndarray):
+                    ppf_values = np.array([
+                        [
+                            dists[which_dist](*params).ppf(qi)
+                            for qi in q
+                        ]
+                        for params in param_combinations
+                    ])
+                    return np.array([np.min(ppf_values, axis=0), np.max(ppf_values, axis=0)])
+
+                else:  # If q is a single value
+                    ppf_values = []
+                    for params in param_combinations:
+                        dist = dists[which_dist](*params)
+                        ppf_value = dist.ppf(q)
+
+                        if isinstance(ppf_value, np.ndarray):
+                            ppf_values.extend(ppf_value)
+                        else:
+                            ppf_values.append(ppf_value)
+
+                    return [min(ppf_values), max(ppf_values)]
 
 
 def parse_description(description):

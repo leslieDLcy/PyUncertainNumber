@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from PyUncertainNumber.UN import UncertainNumber
-from PyUncertainNumber.utils import UNEncoder
+from PyUncertainNumber.UC import UncertainNumber
+from PyUncertainNumber.UC.utils import UNEncoder
 from typing import List
 import json
 
