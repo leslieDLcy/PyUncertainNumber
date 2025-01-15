@@ -9,6 +9,7 @@
         <title>interval analysis - </title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=4c969af8" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -179,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -208,7 +209,7 @@
 <p class="caption" role="heading"><span class="caption-text">User Guides</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="guides/installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="guides/uc.html">Characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/uc.html">Uncertainty characterisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="guides/up.html">Propagation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">probability bounds analysis</span></p>
@@ -250,7 +251,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -258,28 +259,59 @@
         <article role="main" id="furo-main-content">
           <section class="tex2jax_ignore mathjax_ignore" id="interval-analysis">
 <h1>interval analysis<a class="headerlink" href="#interval-analysis" title="Link to this heading">¶</a></h1>
-<p>Intervals play a central role in the <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_bounds_analysis">probability bounds analysis</a>.</p>
+<p>Intervals play a central role in the <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_bounds_analysis">probability bounds analysis</a> and has been discussed in the context of computational functional analysis. It is known for making rigourous computations in terms of three kinds of errors in numerical analysis: rounding errors, truncation errors, and input errors.</p>
+<section id="interval-arithmetic">
+<h2>Interval arithmetic<a class="headerlink" href="#interval-arithmetic" title="Link to this heading">¶</a></h2>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>the key point of the definitions of basic arithmetic operations between intervals is <strong>computing with intervals is computing with sets</strong>.</p>
 </div>
-<p>Interval arithmetics can be defined as :</p>
+<p>Interval arithmetic operations can be defined as :</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[
-bla bla
+X \odot Y = \{ x \odot  y : x \in X, y \in Y \}
 \]</div>
 </div>
-<p>A key consideration of the propagation of interval objects is the <em>dependency</em> issue, which hinders the naive uses of interval arithmetic in many problems as it often yields inflated interval outputs. The <em>image set</em> under a real-valued function mapping <span class="math notranslate nohighlight">\(f\)</span> as <span class="math notranslate nohighlight">\(x\)</span> varies through a given interval <span class="math notranslate nohighlight">\([X]\)</span> can be defined as:</p>
+<p>where <span class="math notranslate nohighlight">\(\odot\)</span> stands for the elementary binary operations such as addition or product etc.</p>
+<p>A key consideration of the propagation of interval objects is the <em>dependency</em> issue, which hinders the naive uses of interval arithmetic in many problems as it often yields inflated interval outputs. The <em>image set</em> under a real-valued function mapping <span class="math notranslate nohighlight">\(f\)</span> as <span class="math notranslate nohighlight">\(x\)</span> varies through a given interval <span class="math notranslate nohighlight">\([X]\)</span> (or simply <span class="math notranslate nohighlight">\(X\)</span>) can be defined as:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Square backets are used to visually hint the nature of an Interval typed variable. In Python, square brackets suggest a list datatype which is ubiquitous, as such, in <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> we provide a parser for easy creation of interval objects with lists.</p>
+</div>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[
 f(X) = \{ f(x): x \in X \}
 \]</div>
 </div>
+<p>It should be noted that when interval arithmetic is naively used in computations, it may not necessary yield the best-possible (or sharpest) range. A useful interval extension is the <strong>mean value form</strong></p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+f(X) \subseteq F_{MV}(X) = f(m) + \sum_{i=1}^{n} D_{i}F(X) (X_{i} - m_{i})
+\]</div>
+</div>
+<p>where <span class="math notranslate nohighlight">\(X\)</span> denotes an interval vector and <span class="math notranslate nohighlight">\(m\)</span> is the midpoint vector while <span class="math notranslate nohighlight">\(D_{i}F\)</span> be an interval extension of the first derivatives <span class="math notranslate nohighlight">\(\partial f / \partial x_{i}\)</span>.</p>
+<p><strong>Vertex method, interval substitution, etc.</strong></p>
 <div class="highlight-{see notranslate"><div class="highlight"><pre><span></span>Propagation
 </pre></div>
 </div>
+</section>
+<section id="handling-with-measurement-uncertainty">
+<h2>handling with measurement uncertainty<a class="headerlink" href="#handling-with-measurement-uncertainty" title="Link to this heading">¶</a></h2>
+<p>Naturally, intervals serve as an intuitive representations for measurement error. Engineers often report measurement incertitude in the form of <span class="math notranslate nohighlight">\([m \pm w]\)</span>. Many statistical models arise based on the interval statistics. As an example, similar to using a probability distribution to characterise precise data, we can employ a p-box to characterise interval-valued data. Generalisation of empirical cumulative distribution function can also be intuitively made. In addition, Kolmogorov–Smirnov bounds can also be generalised to derive confidence limits for imprecise data.</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+[\overline{F}(x), \underline{F}(x)] = \big[ \min(1, \hat{F}_{L}(x) + D_{N}^{\alpha}), \ \max(0, \hat{F}_{R}(x) - D_{N}^{\alpha}) \big]
+\]</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> provides a straghtforward syntax in charactersing interval-valued data.</p>
+<div class="highlight-{see notranslate"><div class="highlight"><pre><span></span>characterisation
+</pre></div>
+</div>
+</section>
 </section>
 
         </article>
@@ -317,8 +349,28 @@ f(X) = \{ f(x): x \in X \}
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">interval analysis</a><ul>
+<li><a class="reference internal" href="#interval-arithmetic">Interval arithmetic</a></li>
+<li><a class="reference internal" href="#handling-with-measurement-uncertainty">handling with measurement uncertainty</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -327,6 +379,7 @@ f(X) = \{ f(x): x \in X \}
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/tabs.js?v=3ee01567"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>

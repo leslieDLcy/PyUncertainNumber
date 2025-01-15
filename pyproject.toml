@@ -24,10 +24,10 @@ license = {text = "MIT License"}
 maintainers = [
   {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
 ]
-name = "PyUncertainNumber"
+name = "pyuncertainnumber"
 readme = "README.md"
 requires-python = ">= 3.10"
-version = "0.0.2"
+version = "0.0.3"
 
 [tool.setuptools.packages.find]
 # All the following settings are optional:
