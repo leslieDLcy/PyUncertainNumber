@@ -9,6 +9,7 @@
         <title></title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=4c969af8" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -208,7 +209,7 @@
 <p class="caption" role="heading"><span class="caption-text">User Guides</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="guides/installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="guides/uc.html">Characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/uc.html">Uncertainty characterisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="guides/up.html">Propagation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">probability bounds analysis</span></p>
@@ -266,8 +267,8 @@
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a> -->
 <p><strong>Uncertain Number</strong> refers to a class of mathematical objects useful for risk analysis that generalize real numbers, intervals, probability distributions, interval bounds on probability distributions (i.e. <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_box">probability boxes</a>), and finite DempsterShafer structures.</p>
-<section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
+<section id="quick-start">
+<h2>quick start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> can be used to easily create a <code class="docutils literal notranslate"><span class="pre">PBox</span></code> or an <code class="docutils literal notranslate"><span class="pre">Interval</span></code> object:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PyUncertainNumber</span> <span class="kn">import</span> <span class="n">UncertainNumber</span> <span class="k">as</span> <span class="n">UN</span>
 
@@ -283,11 +284,14 @@
 <!-- add some pbox plots herein -->
 <p><img alt="pbox dynamic visualisation" src="assets/myAnimation.gif" /></p>
 </section>
-<section id="installation-of-the-development-version">
-<h2>Installation of the development version<a class="headerlink" href="#installation-of-the-development-version" title="Link to this heading">¶</a></h2>
+<section id="installation">
+<h2>installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </pre></div>
 </div>
+<section id="uq-multiverse">
+<h3>UQ multiverse<a class="headerlink" href="#uq-multiverse" title="Link to this heading">¶</a></h3>
+<p>UQ is a big world (like Marvel multiverse) consisting of abundant theories and software implementations on multiple platforms. Some notable examples include <a class="reference external" href="https://github.com/cossan-working-group/OpenCossan">OpenCossan</a> <a class="reference external" href="https://www.uqlab.com/">UQlab</a> in Matlab and <a class="reference external" href="https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl">ProbabilityBoundsAnalysis.jl</a> in Julia, and many others of course. <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> builds upon on a few pioneering projects and will continue to be dedicated to support imprecise analysis in engineering using Python.</p>
 <!-- ## Contributing
 
 Interested in contributing? Check out the contributing guidelines. 
@@ -297,64 +301,19 @@ By contributing to this project, you agree to abide by its terms. -->
 
 `PyUncertainNumber` was created by Yu Chen (Leslie). It is licensed under the terms
 of the MIT license. -->
-</section>
-<section id="features">
-<h2>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> includes the following core features:</p>
-<ul class="simple">
-<li><p><strong>Uncertain Number</strong>: A primitive that represents uncertainty in a conprehensive manner.</p></li>
-<li><p><strong>Uncertainty Characterisation</strong>: Ready for GitHub Actions Continuous Integration testing &amp; Deployment</p></li>
-<li><p><strong>Uncertainty Propagation</strong>: Code coverage report and badge using codecov and GitHub Actions</p></li>
-<li><p><strong>Uncertainty Discrepancy</strong> docs: Documentation ready for generation with, for
-example, <strong>ReadTheDocs</strong></p></li>
-<li><p><strong>Uncertainty extrapolation</strong>: Pre-configured version bumping upon merging pull request to main</p></li>
-<li><p>Auto-release to <strong>testPyPI</strong> upon merging pull request to main</p></li>
-</ul>
-</section>
-<section id="quick-start">
-<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
-<p>Install <a class="reference external" href="https://cookiecutter.readthedocs.io/en/latest/"><code class="docutils literal notranslate"><span class="pre">cookiecutter</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><style type="text/css">
-span.prompt1:before {
-  content: "$ ";
-}
-</style><span class="prompt1">pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.</span>
-</pre></div></div><p>Generate a Python package structure using <a class="reference external" href="https://github.com/py-pkgs/py-pkgs-cookiecutter"><code class="docutils literal notranslate"><span class="pre">py-pkgs-cookiecutter</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span class="prompt1">cookiecutter<span class="w"> </span>https://github.com/py-pkgs/py-pkgs-cookiecutter.git</span>
-</pre></div></div><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pkg
-├── .github                    ┐
-│   └── workflows              │ GitHub Actions workflow
-│       └── ci-cd.yml          ┘
-├── .gitignore                 ┐
-├── .readthedocs.yml           │
-├── CHANGELOG.md               │
-├── CONDUCT.md                 │
-├── CONTRIBUTING.md            │
-├── docs                       │
-│   ├── make.bat               │
-│   ├── Makefile               │
-│   ├── requirements.txt       │
-│   ├── changelog.md           │
-│   ├── conduct.md             │
-│   ├── conf.py                │ Package documentation
-│   ├── contributing.md        │
-│   ├── index.md               │
-│   └── usage.ipynb            │
-├── LICENSE                    │
-├── README.md                  ┘
-├── pyproject.toml             ┐ 
-├── src                        │
-│   └── pkg                    │ Package source code, metadata,
-│       ├── __init__.py        │ and build instructions 
-│       └── pkg.py             ┘
-└── tests                      ┐
-    └── test_pkg.py            ┘ Package tests
-</pre></div>
-</div>
+<!-- ## Features
+
+```{include} stubs/features-stub.md
+``` -->
+<!-- ## Quick Start
+
+```{include} stubs/quickstart-stub.md
+``` -->
 <!-- ## Parameters
 
 ```{include} stubs/parameters-stub.md
 ``` -->
+</section>
 </section>
 <section id="learn-more">
 <h2>Learn More<a class="headerlink" href="#learn-more" title="Link to this heading">¶</a></h2>
@@ -422,10 +381,11 @@ span.prompt1:before {
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">PyUncertainNumber</a><ul>
-<li><a class="reference internal" href="#usage">Usage</a></li>
-<li><a class="reference internal" href="#installation-of-the-development-version">Installation of the development version</a></li>
-<li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#quick-start">quick start</a></li>
+<li><a class="reference internal" href="#installation">installation</a><ul>
+<li><a class="reference internal" href="#uq-multiverse">UQ multiverse</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#learn-more">Learn More</a></li>
 <li><a class="reference internal" href="#acknowledgements">Acknowledgements</a><ul>
 </ul>
@@ -445,6 +405,7 @@ span.prompt1:before {
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/tabs.js?v=3ee01567"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>

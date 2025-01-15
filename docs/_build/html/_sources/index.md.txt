@@ -6,15 +6,15 @@
 ```{include} ../../README.md
 ```
 
-## Features
+<!-- ## Features
 
 ```{include} stubs/features-stub.md
-```
+``` -->
 
-## Quick Start
+<!-- ## Quick Start
 
 ```{include} stubs/quickstart-stub.md
-```
+``` -->
 
 <!-- ## Parameters
 

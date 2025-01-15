@@ -9,7 +9,7 @@
 
 **Uncertain Number** refers to a class of mathematical objects useful for risk analysis that generalize real numbers, intervals, probability distributions, interval bounds on probability distributions (i.e. [probability boxes](https://en.wikipedia.org/wiki/Probability_box)), and finite DempsterShafer structures.
 
-## Usage
+## quick start
 
 `PyUncertainNumber` can be used to easily create a `PBox` or an `Interval` object:
 
@@ -28,11 +28,15 @@ _ = un.display(style='band')
 <!-- add some pbox plots herein -->
 ![pbox dynamic visualisation](./assets/myAnimation.gif)
 
-## Installation of the development version
+## installation
 
 ```bash
 pip install -e .
 ```
+
+### UQ multiverse
+
+UQ is a big world (like Marvel multiverse) consisting of abundant theories and software implementations on multiple platforms. Some notable examples include [OpenCossan](https://github.com/cossan-working-group/OpenCossan) [UQlab](https://www.uqlab.com/) in Matlab and [ProbabilityBoundsAnalysis.jl](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl) in Julia, and many others of course. `PyUncertainNumber` builds upon on a few pioneering projects and will continue to be dedicated to support imprecise analysis in engineering using Python.
 
 <!-- ## Contributing
 

@@ -22,6 +22,7 @@ extensions = [
     #   "myst_nb",
     "myst_parser",
     # "autoapi.extension",
+    "sphinx_inline_tabs",
     "sphinx.ext.napoleon",
     "sphinx-prompt",
     "sphinx_copybutton"]

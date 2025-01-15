@@ -2,6 +2,7 @@ from functools import singledispatch
 from intervals import Interval
 import numpy as np
 from PyUncertainNumber.pba.interval import Interval as nInterval
+from intervals import intervalise
 
 
 @singledispatch
@@ -26,10 +27,9 @@ def _marco_interval_like(bound: Interval):
 def _nick_interval_like(bound: nInterval):
     return bound
 
-### vector interval implementation tmp ###
-
 
 def make_vec_interval(vec):
+    """  vector interval implementation tmp """
     assert len(vec) > 1, "Interval must have more than one element"
 
     if isinstance(vec, Interval):
@@ -41,9 +41,10 @@ def make_vec_interval(vec):
         return Interval(lo_endpoints, hi_endpoints)
 
     elif isinstance(vec[0], list | tuple | np.ndarray):
-        lo_endpoints = [un[0] for un in vec]
-        hi_endpoints = [un[1] for un in vec]
-        return Interval(lo_endpoints, hi_endpoints)
+        # lo_endpoints = [un[0] for un in vec]
+        # hi_endpoints = [un[1] for un in vec]
+        # return Interval(lo_endpoints, hi_endpoints)
+        return intervalise(vec)
     else:
         print("not implemented yet")
 

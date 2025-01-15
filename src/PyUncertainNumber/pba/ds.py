@@ -1,17 +1,29 @@
 """ Constructors for Dempester-Shafer structures. """
 import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 from .intervalOperators import make_vec_interval
 from collections import namedtuple
-from .utils import reweighting, stacking, plot_DS_structure
-from .constructors import pbox_fromDiscreteF
+from .aggregation import stacking
+from .interval import Interval as nInterval
+from intervals import Interval
 
 dempstershafer_element = namedtuple(
     'dempstershafer_element', ['interval', 'mass'])
+""" Named tuple for Dempster-Shafer elements.
+
+note:
+    - e.g. dempstershafer_element([0, 1], 0.5)
+"""
 
 
 class DempsterShafer:
-    # TODO add a new constructor see C report P. 76
-    """ Class for Dempester-Shafer structures. """
+    """ Class for Dempester-Shafer structures.
+
+    args:
+        - the `intervals` argument accepts wildcard vector intervals {list of list pairs, Interval, pairs of nInterval};
+        - masses (list): probability masses
+    """
 
     def __init__(self, intervals, masses: list[float]):
         self._intrep = np.array(intervals)
@@ -36,28 +48,51 @@ class DempsterShafer:
     def disassemble(self,):
         return self._intrep, self._masses
 
-    def display(self, style='box'):
-        # TODO cannot take kwargs (such as title='') yet. to be fixed
-        # TODO slightly different call signature compared to pbox & Interval
+    def display(self, style='box', **kwargs):
         intervals, masses = self.disassemble()
         match style:
+            # TODO the to_pbox() interpolation is not perfect
             case 'box':
-                stacking(intervals, masses, display=True)
+                stacking(intervals, masses, display=True, return_type='pbox')
+                # _ = self.to_pbox()
+                # _.display(**kwargs)
             case 'interval':
-                plot_DS_structure(intervals, masses)
+                plot_DS_structure(intervals, masses, **kwargs)
 
     def to_pbox(self):
         intervals, masses = self.disassemble()
-        return stacking(intervals, masses, return_pbox=True)
+        return stacking(intervals, masses, return_type='pbox')
+
+    @classmethod
+    def from_dsElements(cls, *ds_elements: dempstershafer_element):
+        """ Create a Dempster-Shafer structure from a list of Dempster-Shafer elements. """
+
+        ds_elements = list(*ds_elements)
+        intervals = [elem.interval for elem in ds_elements]
+        masses = [elem.mass for elem in ds_elements]
+        return cls(intervals, masses)
 
 
-def mixture_ds(l_ds, display=False):
-    """ mixture operation for DS structure """
+@mpl.rc_context({"text.usetex": True})
+def plot_DS_structure(vec_interval: list[nInterval | Interval], weights=None, offset=0.3, ax=None, **kwargs):
+    """ plot the intervals in a vectorised form
 
-    intervals = np.concatenate([ds.disassemble()[0] for ds in l_ds], axis=0)
-    # TODO check the duplicate intervals
-    # assert sorted(intervals) == np.unique(intervals), "intervals replicate"
-    masses = reweighting([ds.disassemble()[1] for ds in l_ds])
-    return DempsterShafer(intervals, masses)
-    # below is to return the mixture as in a pbox
-    # return stacking(intervals, masses, display=display)
+    args:
+        vec_interval: vectorised interval objects
+        weights: weights of the intervals
+        offset: offset for display the weights next to the intervals
+    """
+    vec_interval = make_vec_interval(vec_interval)
+    fig, ax = plt.subplots() if ax is None else (ax.figure, ax)
+    for i, intl in enumerate(vec_interval):  # horizontally plot the interval
+        ax.plot([intl.lo, intl.hi], [i, i], **kwargs)
+        if weights is not None:
+            ax.text(intl.hi + offset,
+                    i,
+                    f"{weights[i]:.2f}",
+                    verticalalignment='center',
+                    horizontalalignment='right'
+                    )
+    ax.margins(x=0.2, y=0.1)
+    ax.set_yticks([])
+    return ax

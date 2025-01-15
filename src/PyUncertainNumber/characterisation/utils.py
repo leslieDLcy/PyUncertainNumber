@@ -207,7 +207,7 @@ def get_concise_repr(a_dict):
 
     # remove some unwanted fields (keys)
     entries_to_remove(
-        remove_entries=["_UnitsRep", "_math_object", "deter_value_rep"],
+        remove_entries=["_UnitsRep", "_math_object", "deter_value_rep", "_Q"],
         the_dict=Noneremoved_dict,
     )
     return Noneremoved_dict

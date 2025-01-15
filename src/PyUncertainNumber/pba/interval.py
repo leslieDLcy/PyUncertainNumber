@@ -193,10 +193,10 @@ class Interval:
     def __mul__(self, other):
         if other.__class__.__name__ == "Interval":
 
-            b1 = self.lo() * other.lo()
-            b2 = self.lo() * other.hi()
-            b3 = self.hi() * other.lo()
-            b4 = self.hi() * other.hi()
+            b1 = self.lo * other.lo
+            b2 = self.lo * other.hi
+            b3 = self.hi * other.lo
+            b4 = self.hi * other.hi
 
             lo = min(b1, b2, b3, b4)
             hi = max(b1, b2, b3, b4)
@@ -209,8 +209,8 @@ class Interval:
 
             try:
 
-                lo = self.lo() * other
-                hi = self.hi() * other
+                lo = self.lo * other
+                hi = self.hi * other
 
             except:
 
@@ -227,19 +227,19 @@ class Interval:
 
             if other.straddles_zero():
                 if other.left == 0:
-                    lo = min(self.lo() / other.hi(), self.hi() / other.hi())
+                    lo = min(self.lo / other.hi, self.hi / other.hi)
                     hi = np.inf
                 elif other.right == 0:
                     lo = -np.inf
-                    hi = max(self.lo() / other.lo(), self.hi() / other.lo())
+                    hi = max(self.lo / other.lo, self.hi / other.lo)
                 else:
                     # Cant divide by zero
                     raise ZeroDivisionError()
             else:
-                b1 = self.lo() / other.lo()
-                b2 = self.lo() / other.hi()
-                b3 = self.hi() / other.lo()
-                b4 = self.hi() / other.hi()
+                b1 = self.lo / other.lo
+                b2 = self.lo / other.hi
+                b3 = self.hi / other.lo
+                b4 = self.hi / other.hi
 
                 lo = min(b1, b2, b3, b4)
                 hi = max(b1, b2, b3, b4)
@@ -250,8 +250,8 @@ class Interval:
 
         else:
             try:
-                lo = self.lo() / other
-                hi = self.hi() / other
+                lo = self.lo / other
+                hi = self.hi / other
             except:
 
                 return NotImplemented
@@ -718,10 +718,10 @@ class Interval:
             # Cant divide by zero
             raise ZeroDivisionError()
 
-        elif 1 / self.hi() < 1 / self.lo():
-            return Interval(1 / self.hi(), 1 / self.lo())
+        elif 1 / self.hi < 1 / self.lo:
+            return Interval(1 / self.hi, 1 / self.lo)
         else:
-            return Interval(1 / self.lo(), 1 / self.hi())
+            return Interval(1 / self.lo, 1 / self.hi)
 
     def equiv(self, other: "Interval") -> bool:
         """
@@ -1023,8 +1023,8 @@ class Interval:
 
     # ---------------------methods---------------------#
 
-   # @mpl.rc_context({"text.usetex": True})
-    def display(self, title="", ax=None, style="simple", **kwargs):
+    @mpl.rc_context({"text.usetex": True})
+    def display(self, title="", ax=None, style="band", **kwargs):
 
         if ax is None:
             fig, ax = plt.subplots()
@@ -1053,6 +1053,8 @@ class Interval:
                 facecolor=("blue", 0.2),
                 **kwargs,
             )
+        else:
+            raise ValueError(f"Style {style} not recognised")
         ax.margins(x=0.1)
         ax.set_xlabel(r"$x$")
         ax.set_ylabel("CDF")
