@@ -62,10 +62,46 @@ def second_order_propagation_method(x: list, f:Callable = None,
           p-boxes. 
     
     returns:
-        propagation_results: A `propagation_results` object containing the results of the 
-                          uncertainty propagation. The results include p-boxes representing 
-                          the output uncertainty.
+        propagation_results:  A `propagation_results` object containing:
+            - raw_data (dict): Dictionary containing raw data shared across output(s):
+                    - x (np.ndarray): Input values.
+                    - f (np.ndarray): Output values.
+                    - min (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'f' for the minimum of that output.
+                    - max (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'f' for the maximum of that output.
+                    - bounds (np.ndarray): 2D array of lower and upper bounds for each output.
+    
     example:
+        from PyUncertainNumber import UncertainNumber
+
+        def Fun(x):
+
+            input1= x[0]
+            input2=x[1]
+            input3=x[2]
+            input4=x[3]
+            input5=x[4]
+        
+            output1 = input1 + input2 + input3 + input4 + input5
+            output2 = input1 * input2 * input3 * input4 * input5
+        
+            return np.array([output1, output2])
+
+        means = np.array([1, 2, 3, 4, 5])
+        stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+
+        x = [
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
+
+            UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
+            UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
+            UncertainNumber(essence = 'interval', bounds= [means[3]-2* stds[3], means[3]+2* stds[3]]),
+            UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
+            ]
+    
+        results = second_order_propagation_method(x=x, f=Fun, method = 'endpoints', n_disc= 5)
+    
     """
     d = len(x) # dimension of uncertain numbers 
     results = propagation_results()
@@ -300,93 +336,4 @@ def second_order_propagation_method(x: list, f:Callable = None,
        
     return results 
 
-# from PyUncertainNumber import UncertainNumber
-
-# def myFunctionWithTwoOutputs(x):
-#     """
-#     Example function with two outputs.
-#     Replace this with your actual function logic.
-#     """
-#     input1= x[0]
-#     input2=x[1]
-#     input3=x[2]
-#     input4=x[3]
-#     input5=x[4]
-#     output1 = input1 + input2 + input3 + input4 + input5
-#     output2 = input1 * input2 * input3 * input4 * input5
-#     return np.array([output1])#np.array([output1, output2])
-
-# means = np.array([1, 2, 3, 4, 5])
-# stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
-
-# n_disc = 10  # Number of discretizations
-
-# x = [
-#         UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
-
-#         UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
-#         UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
-#         UncertainNumber(essence = 'interval', bounds= [means[3]-2* stds[3], means[3]+2* stds[3]]),
-#         UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
-#         #UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[1], stds[1]]]),
-#         # UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[2], stds[2]]]),
-#         # UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[3], stds[3]]]),
-#         # UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[4], stds[4]]]),
-#     ]
-        
-        
-       
-
-# results = second_order_propagation_method(x=x, f=myFunctionWithTwoOutputs, method = 'endpoints', n_disc= 100)
-    
-# import matplotlib.pyplot as plt
-
-# def plotPbox(xL, xR, p=None):
-#     """
-#     Plots a p-box (probability box) using matplotlib.
-
-#     Args:
-#         xL (np.ndarray): A 1D NumPy array of lower bounds.
-#         xR (np.ndarray): A 1D NumPy array of upper bounds.
-#         p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
-#                                    Defaults to None, which generates equally spaced probabilities.
-#         color (str, optional): The color of the plot. Defaults to 'k' (black).
-#     """
-#     xL = np.squeeze(xL)  # Ensure xL is a 1D array
-#     xR = np.squeeze(xR)  # Ensure xR is a 1D array
-
-#     if p is None:
-#         p = np.linspace(0, 1, len(xL))  # p should have one more element than xL/xR
-
-#     if p.min() > 0:
-#         p = np.concatenate(([0], p))
-#         xL = np.concatenate(([xL[0]], xL))
-#         xR = np.concatenate(([xR[0]], xR))
-
-#     if p.max() < 1:
-#         p = np.concatenate((p, [1]))
-#         xR = np.concatenate((xR, [xR[-1]]))
-#         xL = np.concatenate((xL, [xL[-1]]))
-    
-#     colors = 'black'
-#     # Highlight the points (xL, p)
-#     plt.scatter(xL, p, color=colors, marker='o', edgecolors='black', zorder=3)
-
-#     # Highlight the points (xR, p)
-#     plt.scatter(xR, p, color=colors, marker='o', edgecolors='black', zorder=3)
-
-
-#     plt.fill_betweenx(p, xL, xR, color=colors, alpha=0.5)
-#     plt.plot( [xL[0], xR[0]], [0, 0],color=colors, linewidth=3)
-#     plt.plot([xL[-1], xR[-1]],[1, 1],  color=colors, linewidth=3)
-#     plt.show()
-
-# results.print()
-
-
-# plotPbox(results.raw_data['min'][0]['f'], results.raw_data['max'][0]['f'], p=None)
-# plt.show()
-
-# # plotPbox(results.raw_data['min'][1]['f'], results.raw_data['max'][1]['f'], p=None)
-# # plt.show()
 

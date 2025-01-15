@@ -19,7 +19,7 @@ def sampling_aleatory_method(x: list, f: Callable,
                                             Defaults to None, in which case a new
                                             `propagation_results` object is created.
         - n_sam (int): The number of samples to generate for the chosen sampling method. 
-                 Defaults to 500.
+                Defaults to 500.
         - method (str, optional): The sampling method to use. Choose from:
                             - 'monte_carlo': Monte Carlo sampling (random sampling 
                                               from the distributions specified in 
@@ -51,34 +51,57 @@ def sampling_aleatory_method(x: list, f: Callable,
         - ValueError: If an invalid sampling method or `save_raw_data` option is provided.
 
     example:
-        from PyUncertainNumber import UncertainNumber as UN
+        from PyUncertainNumber import UncertainNumber
 
-        def cantilever_beam_deflection(x):
-            beam_length = x[0]
-            I = x[1]
-            F = x[2]
-            E = x[3]
-            try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
-                deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+        def Fun(x):
+
+            input1= x[0]
+            input2=x[1]
+            input3=x[2]
+            input4=x[3]
+            input5=x[4]
         
-            except:
-                deflection = np.nan
+            output1 = input1 + input2 + input3 + input4 + input5
+            output2 = input1 * input2 * input3 * input4 * input5
+        
+            return np.array([output1, output2])
 
-        return deflection
+        means = np.array([1, 2, 3, 4, 5])
+        stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
 
-        L = UN(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
-        I = UN(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
-        F = UN(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
-        E = UN(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
+        x = [
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
 
-        a = sampling_aleatory_method(x=[L, I, F, E],
-            f = None,#cantilever_beam_deflection, 
-            n_sam = 300, 
-            method = 'monte_carlo', 
-            save_raw_data = "no"
-            )
+        from PyUncertainNumber import UncertainNumber
 
-        a.print()
+        def Fun(x):
+
+            input1= x[0]
+            input2=x[1]
+            input3=x[2]
+            input4=x[3]
+            input5=x[4]
+        
+            output1 = input1 + input2 + input3 + input4 + input5
+            output2 = input1 * input2 * input3 * input4 * input5
+        
+            return np.array([output1, output2])
+
+        means = np.array([1, 2, 3, 4, 5])
+        stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+
+        x = [
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
+
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[1], stds[1]]]),
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[2], stds[2]]]),
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[3], stds[3]]]),
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[4], stds[4]]]),
+            ]
+        
+        results = sampling_aleatory_method(x=x, f=Fun, n_sam = 300, method = 'monte_carlo', save_raw_data = "no")
+
+        results.print()
 
     """
     if results is None:
@@ -91,16 +114,6 @@ def sampling_aleatory_method(x: list, f: Callable,
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
     
     print(f"Total number of input combinations for the {method} method: {n_sam}")
-    
-    if results is None:
-        results = {
-                'un': None, 
-            
-                'raw_data': {
-                        'f': None,
-                        'x': None
-                        }
-                }
     
     if method == 'monte_carlo':   
         parameter_samples = np.array([

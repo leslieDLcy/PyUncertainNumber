@@ -65,7 +65,55 @@ def first_order_propagation_method(x: list, f:Callable = None,
                           the output uncertainty.
 
     example:
-        #TODO to add an example for this method.
+        from PyUncertainNumber import UncertainNumber
+
+        def Fun(x):
+
+            input1= x[0]
+            input2=x[1]
+            input3=x[2]
+            input4=x[3]
+            input5=x[4]
+        
+            output1 = input1 + input2 + input3 + input4 + input5
+            output2 = input1 * input2 * input3 * input4 * input5
+        
+            return np.array([output1, output2])
+
+        means = np.array([1, 2, 3, 4, 5])
+        stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+
+        x = [
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
+
+        from PyUncertainNumber import UncertainNumber
+
+        def Fun(x):
+
+            input1= x[0]
+            input2=x[1]
+            input3=x[2]
+            input4=x[3]
+            input5=x[4]
+        
+            output1 = input1 + input2 + input3 + input4 + input5
+            output2 = input1 * input2 * input3 * input4 * input5
+        
+            return np.array([output1, output2])
+
+        means = np.array([1, 2, 3, 4, 5])
+        stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+
+        x = [
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
+
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[1], stds[1]]]),
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[2], stds[2]]]),
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[3], stds[3]]]),
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[4], stds[4]]]),
+            ]
+        
+        results = first_order_propagation_method(x=x, f=Fun, n_disc= 5)
     """
     d = len(x) # dimension of uncertain numbers 
     results = propagation_results()
