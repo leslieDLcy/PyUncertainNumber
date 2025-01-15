@@ -5,11 +5,10 @@ import matplotlib as mpl
 from warnings import *
 from dataclasses import dataclass
 from typing import *
-# TODO the __repr__ of a distribution is still showing as pbox, need to fix this
 from ..characterisation.utils import pl_pcdf, pl_ecdf
 import scipy
 from .params import Params
-
+from .pbox import named_pbox
 
 # a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
 named_dists = {
@@ -145,6 +144,7 @@ class Distribution:
                 "At least one of dist_family, dist_params or sample must be specified")
         self.flag()
         self._dist = self.rep()
+        self.make_naked_value()
 
     def __repr__(self):
         # if self.sample_data is not None:
@@ -180,6 +180,16 @@ class Distribution:
             raise ValueError(
                 "Sampling not supported for sample-approximated distributions")
 
+    def make_naked_value(self):
+        """ one value representation of the distribution 
+        note:
+            - use mean for now;
+        """
+        if self._flag:
+            self._naked_value = self._dist.mean()
+        else:
+            self._naked_value = np.mean(self.sample_data)
+
     @mpl.rc_context({"text.usetex": True})
     def display(self, **kwargs):
         """display the distribution"""
@@ -189,6 +199,14 @@ class Distribution:
 
     def _get_hint(self):
         pass
+
+    def fit(self, data):
+        """fit the distribution to the data"""
+        pass
+
+    @property
+    def naked_value(self):
+        return self._naked_value
 
     @property
     def hint(self):
@@ -202,21 +220,34 @@ class Distribution:
         return cls(dist_family=shape, dist_params=params)
 
 
+# *  ---------------------conversion---------------------* #
+
+
+    def to_pbox(self):
+        """ convert the distribution to a pbox 
+        note:
+            - this only works for parameteried distributions for now
+            - later on work with sample-approximated dist until `fit()`is implemented
+        """
+        if self._flag:
+            # pass
+            return named_pbox.get(self.dist_family)(*self.dist_params)
+
 # * ------------------ sample-approximated dist representation  ------------------ *#
 
-###############################################################################
-# Precise distribution constructors
-#
-# Most of these functions should be replaced by better Python implementations.
-# These functions serve as placeholders so that the other constructors using
-# MLE, maxent, MoMM, and Bayes, etc. can be implemented and tested.
-#
-# There are two problems that demand these functions be replaced.  (1) The
-# basic distribution constructors should yield p-boxes when any arguments are
-# intervals (which these algorithms don't do). (2) These algorithms produce
-# distributions represented internally as collections of Monte Carlo deviates
-# rather than some semi-analytical or discrete representation used in Risk Calc.
-# See the preamble to https://sites.google.com/site/confidenceboxes/software
+            ###############################################################################
+            # Precise distribution constructors
+            #
+            # Most of these functions should be replaced by better Python implementations.
+            # These functions serve as placeholders so that the other constructors using
+            # MLE, maxent, MoMM, and Bayes, etc. can be implemented and tested.
+            #
+            # There are two problems that demand these functions be replaced.  (1) The
+            # basic distribution constructors should yield p-boxes when any arguments are
+            # intervals (which these algorithms don't do). (2) These algorithms produce
+            # distributions represented internally as collections of Monte Carlo deviates
+            # rather than some semi-analytical or discrete representation used in Risk Calc.
+            # See the preamble to https://sites.google.com/site/confidenceboxes/software
 
 
 def bernoulli(p): return (np.random.uniform(size=Params.many) < p)

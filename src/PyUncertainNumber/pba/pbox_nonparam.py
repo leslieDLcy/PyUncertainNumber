@@ -1,16 +1,24 @@
-'''
-re: non-parametric pbox construction
+from __future__ import annotations
+from intervals import Interval
+from .interval import Interval as nInterval
+from .pbox_base import Pbox, NotIncreasingError
+from .aggregation import imposition
+from typing import *
+from warnings import warn
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.stats as sps
+from .params import Params
+from .logical import sometimes
+from .utils import transform_ecdf_bundle, cdf_bundle, pl_ecdf_bounding_bundles
+from .imprecise import imprecise_ecdf
 
-Functions that can be used to generate non-parametric p-boxes.
-These functions are used to generate p-boxes based upon the minimum, maximum, mean, median,
-mode, standard deviation, variance, and coefficient of variation of the variable.
-- Leslie made many changes
-'''
+
+""" non-parametric pbox  """
 
 
 __all__ = [
     'known_constraints',
-    'box',
     'min_max',
     'min_max_mean',
     'min_mean',
@@ -23,19 +31,13 @@ __all__ = [
     'mean_var',
     'pos_mean_std',
     'symmetric_mean_std',
-    'from_percentiles'
+    'from_percentiles',
+    'KS_bounds',
 ]
-
-from intervals import Interval
-from .pbox_base import Pbox, NotIncreasingError
-from .aggregation import imposition
-from typing import *
-from warnings import warn
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy.stats as sps
-
 # ---------------------from data---------------------#
+
+if TYPE_CHECKING:
+    from .utils import CDF_bundle
 
 
 def logical_bounding(a):
@@ -60,70 +62,76 @@ def d_alpha(n, alpha):
     return np.sqrt(np.log(1/alpha) / (2*n)) - 0.16693 * (1/n) - A.get(alpha, 1000) * (n ** (-3/2))
 
 
-def KS_bounds(s, alpha: float, display=True) -> Tuple[np.ndarray, np.ndarray]:
+def KS_bounds(s, alpha: float, display=True) -> Tuple[CDF_bundle, CDF_bundle]:
     """ construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
 
     args:
-        - s (array-like): sample data;
+        - s (array-like): sample data, precise and imprecise
         - dn (scalar): KS critical value at significance level \alpha and sample size N;
     """
+    # TODO quantile of two bounds have different support ergo not a box yet
+    # TODO to make the output as a pbox
     dn = d_alpha(len(s), alpha)
+    # precise data
     if isinstance(s, list | np.ndarray):
         ecdf = sps.ecdf(s)
-        ecdf_l, ecdf_r = ecdf.cdf.probabilities + dn, ecdf.cdf.probabilities - dn
-        ecdf_l, ecdf_r = logical_bounding(ecdf_l), logical_bounding(ecdf_r)
+        b = transform_ecdf_bundle(ecdf)
+        f_l, f_r = b.probabilities + dn, b.probabilities - dn
+        f_l, f_r = logical_bounding(f_l), logical_bounding(f_r)
+        # new ecdf bundles
+        b_l, b_r = cdf_bundle(b.quantiles, f_l), cdf_bundle(b.quantiles, f_r)
 
         if display:
             fig, ax = plt.subplots()
-            ax.plot(ecdf.cdf.quantiles, ecdf_l, label='upper bound',
-                    drawstyle='steps-post', color='g')
-            ax.plot(ecdf.cdf.quantiles, ecdf_r, label='lower bound',
-                    drawstyle='steps-post', color='b')
             ecdf.cdf.plot(ax,  ls=':', color='black', label='empirical')
-            ax.set_title(
-                f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
-            ax.legend()
+            pl_ecdf_bounding_bundles(b_l, b_r, alpha, ax)
+        return b_l, b_r
 
+    # imprecise data
     elif isinstance(s, Interval):
-        fl = sps.ecdf(s.lo)
-        fr = sps.ecdf(s.hi)
-        ecdf_l, ecdf_r = fl.cdf.probabilities + dn, fr.cdf.probabilities - dn
-        ecdf_l, ecdf_r = logical_bounding(ecdf_l), logical_bounding(ecdf_r)
+        b_l, b_r = imprecise_ecdf(s)
+        b_lbp, b_rbp = imprecise_ecdf(s)
+
+        b_l.probabilities += dn
+        b_r.probabilities -= dn
+
+        b_l.probabilities, b_r.probabilities = logical_bounding(
+            b_l.probabilities), logical_bounding(b_r.probabilities)
 
         if display:
             fig, ax = plt.subplots()
-            ax.plot(fl.cdf.quantiles, ecdf_l, label='upper bound',
-                    drawstyle='steps-post', color='g')
-            ax.plot(fr.cdf.quantiles, ecdf_r, label='lower bound',
-                    drawstyle='steps-post', color='b')
-            ax.set_title(
-                f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
-            ax.legend()
+            # plot the epimirical ecdf
+            ax.plot(b_lbp.quantiles, b_lbp.probabilities,
+                    drawstyle='steps-post', ls=':', color='gray')
+            ax.plot(b_rbp.quantiles, b_rbp.probabilities,
+                    drawstyle='steps-post', ls=':', color='gray')
 
+            # plot the KS bounds
+            pl_ecdf_bounding_bundles(
+                b_l, b_r, alpha, ax, title=f'Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level')
     else:
         raise ValueError("Invalid input data type")
+    return b_l, b_r
 
-    return ecdf_l, ecdf_r
 
-
-# ---------------------top level func for known statistical properties---------------------#
+# * ---------------------top level func for known statistical properties---------------------*#
 
 def known_constraints(
-        minimum: Optional[Union[Interval, float, int]] = None,
-        maximum: Optional[Union[Interval, float, int]] = None,
-        mean: Optional[Union[Interval, float, int]] = None,
-        median: Optional[Union[Interval, float, int]] = None,
-        mode: Optional[Union[Interval, float, int]] = None,
-        std: Optional[Union[Interval, float, int]] = None,
-        var: Optional[Union[Interval, float, int]] = None,
-        cv: Optional[Union[Interval, float, int]] = None,
-        percentiles: Optional[dict[Union[Interval, float, int]]] = None,
-        # coverages: Optional[Union[Interval,float,int]] = None,
+        minimum: Optional[Union[nInterval, float, int]] = None,
+        maximum: Optional[Union[nInterval, float, int]] = None,
+        mean: Optional[Union[nInterval, float, int]] = None,
+        median: Optional[Union[nInterval, float, int]] = None,
+        mode: Optional[Union[nInterval, float, int]] = None,
+        std: Optional[Union[nInterval, float, int]] = None,
+        var: Optional[Union[nInterval, float, int]] = None,
+        cv: Optional[Union[nInterval, float, int]] = None,
+        percentiles: Optional[dict[Union[nInterval, float, int]]] = None,
+        # coverages: Optional[Union[nInterval,float,int]] = None,
         # shape: Optional[Literal['unimodal', 'symmetric', 'positive', 'nonnegative', 'concave', 'convex', 'increasinghazard', 'decreasinghazard', 'discrete', 'integervalued', 'continuous', '', 'normal', 'lognormal']] = None,
         # data: Optional[list] = None,
         # confidence: Optional[float] = 0.95,
         debug: bool = False,
-        steps: int = Pbox.STEPS
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution free p-box based upon the information given.
@@ -140,7 +148,7 @@ def known_constraints(
         ``std``: Standard deviation of the variable
         ``var``: Variance of the variable
         ``cv``: Coefficient of variation of the variable
-        ``percentiles``: Dictionary of percentiles and their values (e.g. {0.1: 1, 0.5: 2, 0.9: Interval(3,4)})
+        ``percentiles``: Dictionary of percentiles and their values (e.g. {0.1: 1, 0.5: 2, 0.9: nInterval(3,4)})
         ``steps``: Number of steps to use in the p-box
 
     .. error::
@@ -231,16 +239,16 @@ def known_constraints(
     return imposition(imp)
 
 
-# ---------------------functions---------------------#
+# * ---------------------functions---------------------*#
 
-def box(
-        a: Union[Interval, float, int],
-        b: Union[Interval, float, int] = None,
-        steps=Pbox.STEPS,
+def min_max(
+        a: Union[nInterval, float, int],
+        b: Union[nInterval, float, int] = None,
+        steps=Params.steps,
         shape='box'
 ) -> Pbox:
     '''
-    Returns a box shaped Pbox. This is equivalent to an Interval expressed as a Pbox.
+    Returns a box shaped Pbox. This is equivalent to an nInterval expressed as a Pbox.
 
     **Parameters**:
 
@@ -255,7 +263,7 @@ def box(
     '''
     if b == None:
         b = a
-    i = Interval(a, b)
+    i = nInterval(a, b)
     return Pbox(
         left=np.repeat(i.left, steps),
         right=np.repeat(i.right, steps),
@@ -268,14 +276,11 @@ def box(
     )
 
 
-min_max = box
-
-
 def min_max_mean(
-    minimum: Union[Interval, float, int],
-    maximum: Union[Interval, float, int],
-    mean: Union[Interval, float, int],
-    steps: int = Pbox.STEPS
+    minimum: Union[nInterval, float, int],
+    maximum: Union[nInterval, float, int],
+    mean: Union[nInterval, float, int],
+    steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum and mean of the variable
@@ -307,9 +312,9 @@ def min_max_mean(
 
 
 def min_mean(
-    minimum: Union[Interval, float, int],
-    mean: Union[Interval, float, int],
-    steps=Pbox.STEPS
+    minimum: Union[nInterval, float, int],
+    mean: Union[nInterval, float, int],
+    steps=Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum and mean of the variable
@@ -338,9 +343,9 @@ def min_mean(
 
 
 def max_mean(
-    maximum: Union[Interval, float, int],
-    mean: Union[Interval, float, int],
-    steps=Pbox.STEPS
+    maximum: Union[nInterval, float, int],
+    mean: Union[nInterval, float, int],
+    steps=Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum and mean of the variable
@@ -360,9 +365,9 @@ def max_mean(
 
 
 def mean_std(
-        mean: Union[Interval, float, int],
-        std: Union[Interval, float, int],
-        steps=Pbox.STEPS
+        mean: Union[nInterval, float, int],
+        std: Union[nInterval, float, int],
+        steps=Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the mean and standard deviation of the variable
@@ -397,9 +402,9 @@ def mean_std(
 
 
 def mean_var(
-        mean: Union[Interval, float, int],
-        var: Union[Interval, float, int],
-        steps=Pbox.STEPS
+        mean: Union[nInterval, float, int],
+        var: Union[nInterval, float, int],
+        steps=Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the mean and variance of the variable
@@ -422,9 +427,9 @@ def mean_var(
 
 
 def pos_mean_std(
-        mean: Union[Interval, float, int],
-        std: Union[Interval, float, int],
-        steps=Pbox.STEPS
+        mean: Union[nInterval, float, int],
+        std: Union[nInterval, float, int],
+        steps=Params.steps
 ) -> Pbox:
     '''
     Generates a positive distribution-free p-box based upon the mean and standard deviation of the variable
@@ -459,10 +464,10 @@ def pos_mean_std(
 
 
 def min_max_mode(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        mode: Union[Interval, float, int],
-        steps: int = Pbox.STEPS
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        mode: Union[nInterval, float, int],
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum, and mode of the variable
@@ -482,7 +487,7 @@ def min_max_mode(
 
     '''
     if minimum == maximum:
-        return box(minimum, maximum)
+        return min_max(minimum, maximum)
 
     ii = np.array([i/steps for i in range(steps)])
     jj = np.array([j/steps for j in range(1, steps+1)])
@@ -498,10 +503,10 @@ def min_max_mode(
 
 
 def min_max_median(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        median: Union[Interval, float, int],
-        steps: int = Pbox.STEPS
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        median: Union[nInterval, float, int],
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum and median of the variable
@@ -521,7 +526,7 @@ def min_max_median(
 
     '''
     if minimum == maximum:
-        return box(minimum, maximum)
+        return min_max(minimum, maximum)
 
     ii = np.array([i/steps for i in range(steps)])
     jj = np.array([j/steps for j in range(1, steps+1)])
@@ -537,10 +542,10 @@ def min_max_median(
 
 
 def min_max_median_is_mode(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        m: Union[Interval, float, int],
-        steps: int = Pbox.STEPS
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        m: Union[nInterval, float, int],
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum and median/mode of the variable when median = mode.
@@ -577,9 +582,9 @@ def min_max_median_is_mode(
 
 
 def symmetric_mean_std(
-        mean: Union[Interval, float, int],
-        std: Union[Interval, float, int],
-        steps: int = Pbox.STEPS
+        mean: Union[nInterval, float, int],
+        std: Union[nInterval, float, int],
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a symmetrix distribution-free p-box based upon the mean and standard deviation of the variable
@@ -611,11 +616,11 @@ def symmetric_mean_std(
 
 
 def min_max_mean_std(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        mean: Union[Interval, float, int],
-        std: Union[Interval, float, int],
-        steps: int = Pbox.STEPS
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        mean: Union[nInterval, float, int],
+        std: Union[nInterval, float, int],
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
@@ -637,15 +642,18 @@ def min_max_mean_std(
 
     '''
     if minimum == maximum:
-        return box(minimum, maximum)
+        return min_max(minimum, maximum)
 
     def _left(x):
+
         if isinstance(x, (int, float, np.number)):
             return x
         if x.__class__.__name__ == "Interval":
             return x.left
         if x.__class__.__name__ == "Pbox":
             return min(x.left)
+        else:
+            raise Exception("wrong type encountered")
 
     def _right(x):
         if isinstance(x, (int, float, np.number)):
@@ -656,10 +664,10 @@ def min_max_mean_std(
             return max(x.right)
 
     def _imp(a, b):
-        return Interval(max(_left(a), _left(b)), min(_right(a), _right(b)))
+        return nInterval(max(_left(a), _left(b)), min(_right(a), _right(b)))
 
     def _env(a, b):
-        return Interval(min(_left(a), _left(b)), max(_right(a), _right(b)))
+        return nInterval(min(_left(a), _left(b)), max(_right(a), _right(b)))
 
     def _constrain(a, b, msg):
         if ((_right(a) < _left(b)) or (_right(b) < _left(a))):
@@ -669,14 +677,14 @@ def min_max_mean_std(
     zero = 0.0
     one = 1.0
     ran = maximum - minimum
-    m = _constrain(mean, Interval(minimum, maximum), "(mean)")
-    s = _constrain(std, _env(Interval(0.0), (abs(
+    m = _constrain(mean, nInterval(minimum, maximum), "(mean)")
+    s = _constrain(std, _env(nInterval(0.0), (abs(
         ran*ran/4.0 - (maximum-mean-ran/2.0)**2))**0.5), " (dispersion)")
     ml = (m.left-minimum)/ran
     sl = s.left/ran
     mr = (m.right-minimum)/ran
     sr = s.right/ran
-    z = box(minimum, maximum)
+    z = min_max(minimum, maximum)
     n = len(z.left)
     L = [0.0] * n
     R = [1.0] * n
@@ -738,11 +746,11 @@ def min_max_mean_std(
 
 
 def min_max_mean_var(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        mean: Union[Interval, float, int],
-        var: Union[Interval, float, int],
-        steps: int = Pbox.STEPS
+        minimum: Union[nInterval, float, int],
+        maximum: Union[nInterval, float, int],
+        mean: Union[nInterval, float, int],
+        var: Union[nInterval, float, int],
+        steps: int = Params.steps
 ) -> Pbox:
     '''
     Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
@@ -771,19 +779,19 @@ def min_max_mean_var(
     return min_max_mean_std(minimum, maximum, mean, np.sqrt(var))
 
 
-def from_percentiles(percentiles: dict, steps: int = Pbox.STEPS) -> Pbox:
+def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
     '''
     Generates a distribution-free p-box based upon percentiles of the variable
 
     **Parameters**
 
-        ``percentiles`` : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: Interval(3,4), 1:5})
+        ``percentiles`` : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: nInterval(3,4), 1:5})
 
         ``steps`` : number of steps to use in the p-box
 
     .. important::
 
-        The percentiles dictionary is of the form {percentile: value}. Where value can either be a number or an Interval. If value is a number, the percentile is assumed to be a point percentile. If value is an Interval, the percentile is assumed to be an interval percentile.
+        The percentiles dictionary is of the form {percentile: value}. Where value can either be a number or an nInterval. If value is a number, the percentile is assumed to be a point percentile. If value is an nInterval, the percentile is assumed to be an interval percentile.
 
     .. warning::
 
@@ -831,8 +839,8 @@ def from_percentiles(percentiles: dict, steps: int = Pbox.STEPS) -> Pbox:
 
     # transform values to intervals
     for k, v in percentiles.items():
-        if not isinstance(v, Interval):
-            percentiles[k] = Interval(v)
+        if not isinstance(v, nInterval):
+            percentiles[k] = nInterval(v)
 
     if any([p < 0 or p > 1 for p in percentiles.keys()]):
         raise ValueError("Percentiles must be between 0 and 1")
@@ -855,10 +863,10 @@ def from_percentiles(percentiles: dict, steps: int = Pbox.STEPS) -> Pbox:
         p = list(percentiles.keys())
         for i, j, k in zip(p, p[1:], p[2:]):
             if sometimes(percentiles[j] < percentiles[i]):
-                percentiles[j] = Interval(
+                percentiles[j] = nInterval(
                     percentiles[i].right, percentiles[j].right)
             if sometimes(percentiles[j] > percentiles[k]):
-                percentiles[j] = Interval(
+                percentiles[j] = nInterval(
                     percentiles[j].left, percentiles[k].left)
 
         left = []
@@ -882,23 +890,19 @@ Maximum likelihood estimation (MLE) is a method of estimating the parameters of 
 '''
 
 
-def MLnorm(data):
-    return norm(np.mean(data), np.std(data))
+# def ME_min_max_mean_std(
+#         minimum: Union[nInterval, float, int],
+#         maximum: Union[nInterval, float, int],
+#         mean: Union[nInterval, float, int],
+#         stddev: Union[nInterval, float, int],
+#         steps: int = Params.steps
+# ) -> Pbox:
 
+#     μ = ((mean - minimum) / (maximum - minimum))
 
-def ME_min_max_mean_std(
-        minimum: Union[Interval, float, int],
-        maximum: Union[Interval, float, int],
-        mean: Union[Interval, float, int],
-        stddev: Union[Interval, float, int],
-        steps: int = Pbox.STEPS
-) -> Pbox:
+#     σ = (stddev/(maximum - minimum))
 
-    μ = ((mean - minimum) / (maximum - minimum))
+#     a = ((1-μ)/(σ**2) - 1/μ)*μ**2
+#     b = a*(1/μ - 1)
 
-    σ = (stddev/(maximum - minimum))
-
-    a = ((1-μ)/(σ**2) - 1/μ)*μ**2
-    b = a*(1/μ - 1)
-
-    return beta(a, b, steps=steps) * (maximum - minimum) + minimum
+#     return beta(a, b, steps=steps) * (maximum - minimum) + minimum

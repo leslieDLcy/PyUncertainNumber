@@ -9,6 +9,7 @@
         <title>Confidence box - </title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=4c969af8" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -208,7 +209,7 @@
 <p class="caption" role="heading"><span class="caption-text">User Guides</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="guides/installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="guides/uc.html">Characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/uc.html">Uncertainty characterisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="guides/up.html">Propagation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">probability bounds analysis</span></p>
@@ -258,12 +259,12 @@
         <article role="main" id="furo-main-content">
           <section class="tex2jax_ignore mathjax_ignore" id="confidence-box">
 <h1>Confidence box<a class="headerlink" href="#confidence-box" title="Link to this heading">¶</a></h1>
-<p>Traditionally <a class="reference external" href="https://en.wikipedia.org/wiki/Confidence_interval">confidence interval</a> is widely used in engineering to making inference with respect to parameters of interest. It is appealing as it provides a gurantee of statistical performance through repeated use. Studies in frequetist inference continue to wonder the possibility of a <em>distributional estimator</em> just like the Bayesian posterior, which leads to significant developments towards the <strong>confidence distribution</strong> though it is not technically the same as a distribution in the canonical sense.</p>
+<p>Traditionally <a class="reference external" href="https://en.wikipedia.org/wiki/Confidence_interval">confidence interval</a> is widely used in engineering to make inference with respect to parameters of interest. It is appealing as it provides a gurantee of statistical performance through repeated use. Studies in frequetist inference continue to wonder the possibility of a <em>distributional estimator</em> just like the Bayesian posterior, which leads to significant developments towards the <strong>confidence distribution</strong>, though it is not technically the same as a distribution in the canonical sense.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>A confidence distribution is essentially a ciphering device that encodes confidence intervals for each possible confidence level.</p>
 </div>
-<p>It conveniently provides confidence intervals of all levels for a parameter of interest. <strong>Confidence boxes</strong>, or confidence structures<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, (abbreviated as c-box) are imprecise generalisations of confidence distributions and they can be applied to problems with discrete observatons, interval-censored data, and even inference problems in which no assumption about the distribution shape can be made.</p>
+<p>The confidence distribution conveniently provides confidence intervals of all levels for a parameter of interest. <strong>Confidence boxes</strong>, or confidence structures<a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, (abbreviated as c-box) are imprecise generalisations of confidence distributions and they can be applied to problems with discrete observatons, interval-censored data, and even inference problems in which no assumption about the distribution shape can be made.</p>
 <p>The figure below provides an illustration of the confidence box which yields several confidence intrevals for the parameter <span class="math notranslate nohighlight">\(\theta\)</span>.</p>
 <a class="bg-primary reference internal image-reference" href="_images/confidence_distribution_illustration.png"><img alt="confidence distribution illustration" class="bg-primary align-center" src="_images/confidence_distribution_illustration.png" style="width: 1000px;" />
 </a>
@@ -356,6 +357,7 @@ H_{\chi^{2}}(\sigma^2, \mathbf{x}) = 1 - F_{\chi_{n-1}^2} \Big( \frac{(n-1) s_{x
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/tabs.js?v=3ee01567"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>

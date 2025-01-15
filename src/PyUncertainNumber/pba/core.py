@@ -2,77 +2,7 @@ from typing import *
 from .interval import *
 from .pbox_base import Pbox
 import numpy as np
-import warnings
 
-
-# def envelope(*args: Union[Interval, Pbox, float]) -> Union[Interval, Pbox]:
-#     '''
-#     .. _core.envelope:
-
-#     Allows the envelope to be calculated for intervals and p-boxes.
-
-#     The envelope is the smallest interval/pbox that contains all values within the arguments.
-
-#     **Parameters**:
-#         ``*args``: The arguments for which the envelope needs to be calculated. The arguments can be intervals, p-boxes, or floats.
-
-#     **Returns**:
-#         ``Pbox|Interval``: The envelope of the given arguments, which can be an interval or a p-box.
-
-#     .. error::
-
-#         ``ValueError``: If less than two arguments are given.
-
-#         ``TypeError``: If none of the arguments are intervals or p-boxes.
-
-#     '''
-#     # args = list(*args)
-
-#     # Raise error if <2 arguments are given
-#     if len(args) < 2:
-#         raise ValueError('At least two arguments are required')
-
-#     # get the type of all arguments
-#     types = [arg.__class__.__name__ for arg in args]
-
-#     # check if all arguments are intervals or pboxes
-#     if 'Interval' not in types and 'Pbox' not in types:
-#         raise TypeError(
-#             'At least one argument needs to be an Interval or Pbox')
-#     # check if there is a p-box in the arguments
-#     elif 'Pbox' in types:
-#         # find first p-box
-#         i = types.index('Pbox')
-#         # move previous values to the end
-#         args = args[i:] + args[:i]
-
-#         e = args[0].env(args[1])
-#         for arg in args[2:]:
-#             e = e.env(arg)
-
-#     else:  # Intervals only
-
-#         left = np.min([arg.left if isinstance(
-#             arg, Interval) else arg for arg in args])
-
-#         right = np.max([arg.right if isinstance(
-#             arg, Interval) else arg for arg in args])
-
-#         e = Interval(left, right)
-
-#     return e
-
-
-# def env(*args):
-#     '''
-#     .. warning::
-
-#         Deprecated function, use envelope() instead.
-
-#     '''
-#     warnings.warn('env() is deprecated, use envelope() instead',
-#                   DeprecationWarning)
-#     return envelope(*args)
 
 # def min(x,y):
 #     if x.__class__.__name__ == 'Pbox':

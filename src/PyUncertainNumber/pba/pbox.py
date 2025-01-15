@@ -1,15 +1,8 @@
-"""
-the parametric pbox constructors
-currently this file stores all the codes in the `.dist` module as an attempt to replace the odd-naming `.dist` module
-two reasons:
-1. I keep the `.dist` module such that I won't break existing code;
-2. I'd like to reorganise the constructors for pbox, which is a mess now.
-"""
+
 
 import functools
 from PyUncertainNumber.characterisation.params import Params
 from .interval import Interval as nInterval
-from intervals import Interval
 from .pbox_base import Pbox
 import scipy.stats as sps
 import numpy as np
@@ -18,10 +11,10 @@ from .params import Params
 from typing import *
 from warnings import *
 from .intervalOperators import wc_interval
-from .utils import uniform_reparameterisation
 
 # TODO the __repr__ of a distribution is still showing as pbox, need to fix this
 
+""" parametric pboxes"""
 
 # a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
 dists = {
@@ -214,7 +207,7 @@ def makePbox(func):
     return wrapper_decorator
 
 
-# ---------------------supported distribution objects for pboxes ---------------------#
+# * ---------------------supported distributional objects for pboxes ---------------------#
 
 
 @makePbox
