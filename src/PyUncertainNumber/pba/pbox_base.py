@@ -362,6 +362,7 @@ class Pbox:
 # ---------------------unary operations---------------------#
     ##### the top-level functions for unary operations #####
 
+
     def _unary(self, *args, function=lambda x: x):
 
         ints = [function(nInterval(l, r), *args)
@@ -881,6 +882,7 @@ class Pbox:
 
 # * ---------------------other operations--------------------- *#
 
+
     def logicaland(self, other, method="f"):  # conjunction
         if method == "i":
             return self.mul(other, method)  # independence a * b
@@ -1386,128 +1388,129 @@ def imposition(*args: Union[Pbox, nInterval, float, int]):
     return p
 
 
-def mixture(
-    *args: Union[Pbox, nInterval, float, int],
-    weights: List[Union[float, int]] = [],
-    steps: int = Pbox.STEPS,
-) -> Pbox:
-    """
-    Mixes the pboxes in *args
-    Parameters
-    ----------
-    *args :
-        Number of p-boxes or objects to be mixed
-    weights:
-        Right side of box
+# def mixture(
+#     *args: Union[Pbox, nInterval, float, int],
+#     weights: List[Union[float, int]] = [],
+#     steps: int = Pbox.STEPS,
+# ) -> Pbox:
+#     # * legacy code from Nick
+#     """
+#     Mixes the pboxes in *args
+#     Parameters
+#     ----------
+#     *args :
+#         Number of p-boxes or objects to be mixed
+#     weights:
+#         Right side of box
 
-    Returns
-    ----------
-    Pbox
-    """
-    # TODO: IMPROVE READBILITY
+#     Returns
+#     ----------
+#     Pbox
+#     """
+#     # TODO: IMPROVE READBILITY
 
-    x = []
-    for pbox in args:
-        if pbox.__class__.__name__ != "Pbox":
-            try:
-                pbox = Pbox(pbox)
-            except:
-                raise TypeError(
-                    "Unable to convert %s object (%s) to Pbox" % (
-                        type(pbox), pbox)
-                )
-        x.append(pbox)
+#     x = []
+#     for pbox in args:
+#         if pbox.__class__.__name__ != "Pbox":
+#             try:
+#                 pbox = Pbox(pbox)
+#             except:
+#                 raise TypeError(
+#                     "Unable to convert %s object (%s) to Pbox" % (
+#                         type(pbox), pbox)
+#                 )
+#         x.append(pbox)
 
-    k = len(x)
-    if weights == []:
-        weights = [1] * k
+#     k = len(x)
+#     if weights == []:
+#         weights = [1] * k
 
-    # temporary hack
-    # k = 2
-    # x = [self, x]
-    # w = [1,1]
+#     # temporary hack
+#     # k = 2
+#     # x = [self, x]
+#     # w = [1,1]
 
-    if k != len(weights):
-        return "Need same number of weights as arguments for mixture"
-    weights = [i / sum(weights) for i in weights]  # w = w / sum(w)
-    u = []
-    d = []
-    n = []
-    ml = []
-    mh = []
-    m = []
-    vl = []
-    vh = []
-    v = []
-    for i in range(k):
-        u = u + list(x[i].left)
-        d = np.append(d, x[i].right)
-        n = (
-            n + [weights[i] / x[i].steps] * x[i].steps
-        )  # w[i]*rep(1/x[i].steps,x[i].steps))
+#     if k != len(weights):
+#         return "Need same number of weights as arguments for mixture"
+#     weights = [i / sum(weights) for i in weights]  # w = w / sum(w)
+#     u = []
+#     d = []
+#     n = []
+#     ml = []
+#     mh = []
+#     m = []
+#     vl = []
+#     vh = []
+#     v = []
+#     for i in range(k):
+#         u = u + list(x[i].left)
+#         d = np.append(d, x[i].right)
+#         n = (
+#             n + [weights[i] / x[i].steps] * x[i].steps
+#         )  # w[i]*rep(1/x[i].steps,x[i].steps))
 
-        # mu = mean(x[i])
-        # ml = ml + [mu.left()]
-        # mh = mh + [mu.right()]
-        # m = m + [mu]               # don't need?
-        # sigma2 = var(x[[i]])  ### !!!! shouldn't be the sample variance, but the population variance
-        # vl = vl + [sigma2.left()]
-        # vh = vh + [sigma2.right()]
-        # v = v + [sigma2]
+#         # mu = mean(x[i])
+#         # ml = ml + [mu.left()]
+#         # mh = mh + [mu.right()]
+#         # m = m + [mu]               # don't need?
+#         # sigma2 = var(x[[i]])  ### !!!! shouldn't be the sample variance, but the population variance
+#         # vl = vl + [sigma2.left()]
+#         # vh = vh + [sigma2.right()]
+#         # v = v + [sigma2]
 
-        ML = x[i].mean_left
-        MR = x[i].mean_right
-        VL = x[i].var_left
-        VR = x[i].var_right
-        m = m + [nInterval(ML, MR)]
-        v = v + [nInterval(VL, VR)]
-        ml = ml + [ML]
-        mh = mh + [MR]
-        vl = vl + [VL]
-        vh = vh + [VR]
+#         ML = x[i].mean_left
+#         MR = x[i].mean_right
+#         VL = x[i].var_left
+#         VR = x[i].var_right
+#         m = m + [nInterval(ML, MR)]
+#         v = v + [nInterval(VL, VR)]
+#         ml = ml + [ML]
+#         mh = mh + [MR]
+#         vl = vl + [VL]
+#         vh = vh + [VR]
 
-    n = [_ / sum(n) for _ in n]  # n = n / sum(n)
-    su = sorted(u)
-    su = [su[0]] + su
-    pu = [0] + list(
-        np.cumsum([n[i] for i in np.argsort(u)])
-    )  # pu = c(0,cumsum(n[order(u)]))
-    sd = sorted(d)
-    sd = sd + [sd[-1]]
-    pd = list(np.cumsum([n[i] for i in np.argsort(d)])) + [
-        1
-    ]  # pd = c(cumsum(n[order(d)]),1)
-    u = []
-    d = []
-    j = len(pu) - 1
-    for p in reversed(
-        np.arange(steps) / steps
-    ):  # ii = np.arange(steps))/steps  #    ii = 0: (Pbox$steps-1) / Pbox$steps
-        while p < pu[j]:
-            j = j - 1  # repeat {if (pu[j] <= p) break; j = j - 1}
-        u = [su[j]] + u
-    j = 0
-    for p in (
-        np.arange(steps) + 1
-    ) / steps:  # jj = (np.arange(steps)+1)/steps #  jj =  1: Pbox$steps / Pbox$steps
-        while pd[j] < p:
-            j = j + 1  # repeat {if (p <= pu[j]) break; j = j + 1}
-        d = d + [sd[j]]
-    mu = nInterval(
-        np.sum([W * M for M, W in zip(weights, ml)]),
-        np.sum([W * M for M, W in zip(weights, mh)]),
-    )
-    s2 = 0
-    for i in range(k):
-        s2 = s2 + weights[i] * (v[i] + m[i] ** 2)
-    s2 = s2 - mu**2
+#     n = [_ / sum(n) for _ in n]  # n = n / sum(n)
+#     su = sorted(u)
+#     su = [su[0]] + su
+#     pu = [0] + list(
+#         np.cumsum([n[i] for i in np.argsort(u)])
+#     )  # pu = c(0,cumsum(n[order(u)]))
+#     sd = sorted(d)
+#     sd = sd + [sd[-1]]
+#     pd = list(np.cumsum([n[i] for i in np.argsort(d)])) + [
+#         1
+#     ]  # pd = c(cumsum(n[order(d)]),1)
+#     u = []
+#     d = []
+#     j = len(pu) - 1
+#     for p in reversed(
+#         np.arange(steps) / steps
+#     ):  # ii = np.arange(steps))/steps  #    ii = 0: (Pbox$steps-1) / Pbox$steps
+#         while p < pu[j]:
+#             j = j - 1  # repeat {if (pu[j] <= p) break; j = j - 1}
+#         u = [su[j]] + u
+#     j = 0
+#     for p in (
+#         np.arange(steps) + 1
+#     ) / steps:  # jj = (np.arange(steps)+1)/steps #  jj =  1: Pbox$steps / Pbox$steps
+#         while pd[j] < p:
+#             j = j + 1  # repeat {if (p <= pu[j]) break; j = j + 1}
+#         d = d + [sd[j]]
+#     mu = nInterval(
+#         np.sum([W * M for M, W in zip(weights, ml)]),
+#         np.sum([W * M for M, W in zip(weights, mh)]),
+#     )
+#     s2 = 0
+#     for i in range(k):
+#         s2 = s2 + weights[i] * (v[i] + m[i] ** 2)
+#     s2 = s2 - mu**2
 
-    return Pbox(
-        np.array(u),
-        np.array(d),
-        mean_left=mu.left,
-        mean_right=mu.right,
-        var_left=s2.left,
-        var_right=s2.right,
-        steps=steps,
-    )
+#     return Pbox(
+#         np.array(u),
+#         np.array(d),
+#         mean_left=mu.left,
+#         mean_right=mu.right,
+#         var_left=s2.left,
+#         var_right=s2.right,
+#         steps=steps,
+#     )
