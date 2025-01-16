@@ -6,13 +6,12 @@ In short, distribution-based p-boxes or parametric pboxes
 """
 
 from PyUncertainNumber.characterisation.params import Params
-from .interval  import Interval
+from .interval import Interval
 from .pbox_base import Pbox
 import scipy.stats as sps
 import numpy as np
 import itertools
 from .params import Params
-
 from typing import *
 from warnings import *
 
@@ -140,11 +139,9 @@ dists = {
 }
 
 
-
 def __get_bounds(function_name=None, steps=Params.steps, *args):
-
     """ heavy lifting function that returns the bounds of the distribution for defining pboxes
-    
+
     returns:
         Left: (array-like or list) left-bound of the pbox
         Right: (array-like or list) right-bound of the pbox
@@ -185,7 +182,6 @@ def __get_bounds(function_name=None, steps=Params.steps, *args):
     Right = np.array(Right)
 
     return Left, Right, mean, var
-
 
 
 # ---------------------supported distribution objects for pboxes ---------------------#
@@ -239,8 +235,10 @@ def lognormal(
     bound2 = __lognorm(mean.left, var.right).ppf(x)
     bound3 = __lognorm(mean.right, var.right).ppf(x)
 
-    Left = [min(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
-    Right = [max(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
+    Left = [min(bound0[i], bound1[i], bound2[i], bound3[i])
+            for i in range(steps)]
+    Right = [max(bound0[i], bound1[i], bound2[i], bound3[i])
+             for i in range(steps)]
 
     Left = np.array(Left)
     Right = np.array(Right)
@@ -2064,7 +2062,8 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
     a, b = (left - mean) / stddev, (right - mean) / stddev
 
-    Left, Right, mean, var = __get_bounds("truncnorm", steps, a, b, mean, stddev)
+    Left, Right, mean, var = __get_bounds(
+        "truncnorm", steps, a, b, mean, stddev)
 
     return Pbox(
         Left,
@@ -2126,44 +2125,44 @@ def uniform(a, b, steps=Params.steps):
     )
 
 
-# def vonmises(*args, steps=Pbox.STEPS):
-#     args = list(args)
-#     for i in range(0, len(args)):
-#         if args[i].__class__.__name__ != "Interval":
-#             args[i] = Interval(args[i])
+def vonmises(*args, steps=Params.steps):
+    args = list(args)
+    for i in range(0, len(args)):
+        if args[i].__class__.__name__ != "Interval":
+            args[i] = Interval(args[i])
 
-#     Left, Right, mean, var = __get_bounds("vonmises", steps, *args)
+    Left, Right, mean, var = __get_bounds("vonmises", steps, *args)
 
-#     return Pbox(
-#         Left,
-#         Right,
-#         steps=steps,
-#         shape="vonmises",
-#         mean_left=mean.left,
-#         mean_right=mean.right,
-#         var_left=var.left,
-#         var_right=var.right,
-#     )
+    return Pbox(
+        Left,
+        Right,
+        steps=steps,
+        shape="vonmises",
+        mean_left=mean.left,
+        mean_right=mean.right,
+        var_left=var.left,
+        var_right=var.right,
+    )
 
 
-# def vonmises_line(*args, steps=Params.steps):
-#     args = list(args)
-#     for i in range(0, len(args)):
-#         if args[i].__class__.__name__ != "Interval":
-#             args[i] = Interval(args[i])
+def vonmises_line(*args, steps=Params.steps):
+    args = list(args)
+    for i in range(0, len(args)):
+        if args[i].__class__.__name__ != "Interval":
+            args[i] = Interval(args[i])
 
-#     Left, Right, mean, var = __get_bounds("vonmises_line", steps, *args)
+    Left, Right, mean, var = __get_bounds("vonmises_line", steps, *args)
 
-#     return Pbox(
-#         Left,
-#         Right,
-#         steps=steps,
-#         shape="vonmises_line",
-#         mean_left=mean.left,
-#         mean_right=mean.right,
-#         var_left=var.left,
-#         var_right=var.right,
-#     )
+    return Pbox(
+        Left,
+        Right,
+        steps=steps,
+        shape="vonmises_line",
+        mean_left=mean.left,
+        mean_right=mean.right,
+        var_left=var.left,
+        var_right=var.right,
+    )
 
 
 def wald(*args, steps=Params.steps):
@@ -2554,7 +2553,7 @@ def yulesimon(*args, steps=Params.steps):
     )
 
 
-### Other distributions
+# Other distributions
 def KM(k, m, steps=Params.steps):
     with catch_warnings():
         simplefilter("ignore")
@@ -2563,7 +2562,6 @@ def KM(k, m, steps=Params.steps):
 
 def KN(k, n, steps=Params.steps):
     return KM(k, n - k, steps=steps)
-
 
 
 named_pbox = {
@@ -2642,7 +2640,7 @@ named_pbox = {
     "nct": nct,
     "norm": norm,
     "normal": norm,
-    "gaussian": norm,  
+    "gaussian": norm,
     "norminvgauss": norminvgauss,
     "pareto": pareto,
     "pearson3": pearson3,
@@ -2688,7 +2686,7 @@ named_pbox = {
 
 # ---------------------aliases---------------------#
 
-### Alternate names
+# Alternate names
 normal = norm
 N = normal
 unif = uniform
@@ -2701,7 +2699,6 @@ lognorm = lognormal
 #     alpha1 = (mu - minimum)*(2*mode - minimum - maximum)/((mode - mu)*(maximum - minimum))
 #     alpha2 = alpha1*(maximum - mu)/(mu - minimum)
 #     return minimum + (maximum - minimum) * beta(alpha1, alpha2)
-
 
 
 # __all__ = [

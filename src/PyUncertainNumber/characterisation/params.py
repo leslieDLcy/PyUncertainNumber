@@ -9,7 +9,6 @@ from dataclasses import dataclass
 class Params:
 
     result_path = "./results/"
-    steps = 500
     hw = 0.5  # default half-width during an interval instantiation via PM method
 
     @property
