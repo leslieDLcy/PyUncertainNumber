@@ -2,12 +2,51 @@
 
 from dataclasses import dataclass
 import numpy as np
-
+import scipy.stats as sps
 """ hyperparameters for the pba """
+
+
+@dataclass
+class ApproximatorRegCoefficients:
+    A: float
+    B: float
+    C: float
+    D: float
+    E: float
+    F: float
+    G: float
+    H: float
+    sigma: float
+
+    @staticmethod
+    def lognormal(m, s):
+        m2 = m**2
+        s2 = s**2
+        mlog = np.log(m2/np.sqrt(m2+s2))
+        slog = np.sqrt(np.log((m2+s2)/m2))
+        return (sps.lognorm.rvs(s=slog, scale=np.exp(mlog), size=2000))
+
+    @staticmethod
+    def env(x, y): return np.concatenate((x, y))
+
+    def _cp(self, z, r, f):
+        self.L = self.A + self.B * z + self.C * r + self.D * f + self.E * \
+            z * r + self.F * z * f + self.G * r * f + self.H * z * r * f
+        self.w = 10**self.L
+        self.a = 10**z + self.w / 2 * np.array([-1, 1])
+        self.q = self.lognormal(m=10**(self.sigma**2/2),
+                                s=np.sqrt(10**(2*self.sigma**2) -
+                                          10**(self.sigma**2)),
+                                )
+        # self.p = self.env(min(self.a) - self.q, self.q + max(self.a))
+        self.p = (min(self.a) - self.q, self.q + max(self.a))
 
 
 @dataclass(frozen=True)  # Instances of this class are immutable.
 class Params:
+
+    about = ApproximatorRegCoefficients(-0.2085, 0.4285, 0.2807,
+                                        0.0940, 0.0147, -0.0640, -0.0102, 0.0404, 0.5837)
 
     steps = 200
     many = 2000

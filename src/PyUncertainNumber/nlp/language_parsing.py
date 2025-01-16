@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import re
 import math
 from decimal import Decimal
@@ -7,8 +9,11 @@ import numpy as np
 from ..characterisation.utils import PlusMinus_parser, parser4, percentage_finder, percentage_converter, initial_list_checking, bad_list_checking
 from ..pba.params import Params
 
+if TYPE_CHECKING:
+    from ..pba.pbox_base import Pbox
 
-def hedge_interpret(hedge: str):
+
+def hedge_interpret(hedge: str, return_type='interval') -> I | Pbox:
     """interpret linguistic hedge words into UncertainNumber objects"""
 
     assert isinstance(hedge, str), "hedge must be a string"
@@ -23,6 +28,8 @@ def hedge_interpret(hedge: str):
     else:
         x = int(x)
 
+    # we get the number at this step
+
     # parse the decimal place 'd'
     d = count_sigfigs(str(x))
     bias_num = count_sig_digits_bias(x)
@@ -35,37 +42,43 @@ def hedge_interpret(hedge: str):
     except:
         kwd = ""
 
-    match kwd:
-        case "exactly":
-            return PM(x, 10 ** (-(d + 1)))
-        case "":
-            return PM(x, 0.5 * 10 ** (-d))
-        case "about":
-            return PM(x, 2 * 10 ** (-d))
-        case "around":
-            return PM(x, 10 * 10 ** (-d))
-        case "count":
-            return PM(x, np.sqrt(np.abs(x)))
-        case "almost":
-            return I(x - 0.5 * (10 ** (-d)), x)
-        case "over":
-            return I(x, x + 0.5 * (10 ** (-d)))
-        case "below":
-            return I(x - 2 * (10 ** (-d)), x)
-        case "above":
-            return I(x, x + 2 * (10 ** (-d)))
-        case "at most":
-            return I(-np.inf, x)
-        # TODO conditonal based on unit and common sense....
-        # TODO optional negative or not
-        case "at least":
-            return I(x, np.inf)
-        case "order":
-            return I(x / 2, 5 * x)
-        case "between":
-            return f"why not directly use an interval object?"
-        case _:
-            return "not a hedge word"
+    if return_type == 'interval':
+        # return the interval object
+        match kwd:
+            case "exactly":
+                return PM(x, 10 ** (-(d + 1)))
+            case "":
+                return PM(x, 0.5 * 10 ** (-d))
+            case "about":
+                return PM(x, 2 * 10 ** (-d))
+            case "around":
+                return PM(x, 10 * 10 ** (-d))
+            case "count":
+                return PM(x, np.sqrt(np.abs(x)))
+            case "almost":
+                return I(x - 0.5 * (10 ** (-d)), x)
+            case "over":
+                return I(x, x + 0.5 * (10 ** (-d)))
+            case "below":
+                return I(x - 2 * (10 ** (-d)), x)
+            case "above":
+                return I(x, x + 2 * (10 ** (-d)))
+            case "at most":
+                return I(-np.inf, x)
+            # TODO conditonal based on unit and common sense....
+            # TODO optional negative or not
+            case "at least":
+                return I(x, np.inf)
+            case "order":
+                return I(x / 2, 5 * x)
+            case "between":
+                return f"why not directly use an interval object?"
+            case _:
+                return "not a hedge word"
+    elif return_type == 'pbox':
+        pass
+    else:
+        raise ValueError("return_type must be either 'interval' or 'pbox'")
 
 
 def parse_interval_expression(expression):
@@ -105,6 +118,26 @@ def parse_interval_expression(expression):
     else:
         return "not a valid expression"
 
+# * ---------------------moduels  --------------------- *#
+
+
+def decipher_zrf(num, d):
+    """ decipher the value of z, r, and f
+
+    args:
+        num (float | int): a number parsed from the string
+        d (int): the decimal place of the last significant digit in the exemplar number
+    #TODO d can be inferred from the number itself
+    """
+    def is_last_digit_five(number):
+        # Convert the number to a string and check its last character
+        return str(number)[-1] == '5'
+
+    z = math.log(num, 10)
+    r = -1 * d
+    f = is_last_digit_five(num)
+    return z, r, f
+
 
 def is_number(n):
     """check if a string is a number 
@@ -139,8 +172,8 @@ def count_sig_digits_bias(number):
 def findWholeWord(w):
     """Find a whole word in a string
 
-    note:
-        - this returns the matched word, but not directly a boolean
+        note:
+            this returns the matched word, but not directly a boolean
     """
 
     return re.compile(r"\b({0})\b".format(w), flags=re.IGNORECASE).search
