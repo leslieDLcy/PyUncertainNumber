@@ -1,4 +1,7 @@
 from __future__ import annotations
+from ..characterisation.utils import tranform_ecdf
+import scipy.stats as sps
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 import re
 import math
@@ -23,17 +26,14 @@ def hedge_interpret(hedge: str, return_type='interval') -> I | Pbox:
     x = [s for s in splitted_list if is_number(s)][0]
 
     # decide if the number is a float or an integer
+    # we get the number at this step
     if "." in x:
         x = float(x)
     else:
         x = int(x)
 
-    # we get the number at this step
-
     # parse the decimal place 'd'
-    d = count_sigfigs(str(x))
-    bias_num = count_sig_digits_bias(x)
-    d = d - bias_num
+    d = decipher_d(x)
 
     # parse the keyword
     try:
@@ -76,7 +76,8 @@ def hedge_interpret(hedge: str, return_type='interval') -> I | Pbox:
             case _:
                 return "not a hedge word"
     elif return_type == 'pbox':
-        pass
+        coefs = Params.hedge_cofficients.get(kwd, "approximator not found")
+        return ApproximatorRegCoefficients(*coefs)._cp(*decipher_zrf(x, d))
     else:
         raise ValueError("return_type must be either 'interval' or 'pbox'")
 
@@ -121,12 +122,56 @@ def parse_interval_expression(expression):
 # * ---------------------moduels  --------------------- *#
 
 
+@dataclass
+class ApproximatorRegCoefficients:
+    A: float
+    B: float
+    C: float
+    D: float
+    E: float
+    F: float
+    G: float
+    H: float
+    sigma: float
+
+    @staticmethod
+    def lognormal(m, s):
+        m2 = m**2
+        s2 = s**2
+        mlog = np.log(m2/np.sqrt(m2+s2))
+        slog = np.sqrt(np.log((m2+s2)/m2))
+        return (sps.lognorm.rvs(s=slog, scale=np.exp(mlog), size=2000))
+
+    def _cp(self, z, r, f):
+        from ..pba.pbox_base import Pbox
+        self.L = self.A + self.B * z + self.C * r + self.D * f + self.E * \
+            z * r + self.F * z * f + self.G * r * f + self.H * z * r * f
+        self.w = 10**self.L  # the width
+        # the interval of the exemplar value
+        self.a = 10**z + self.w / 2 * np.array([-1, 1])
+        self.q = self.lognormal(m=10**(self.sigma**2/2),
+                                s=np.sqrt(10**(2*self.sigma**2) -
+                                          10**(self.sigma**2)),
+                                )
+        # self.p = self.env(min(self.a) - self.q, self.q + max(self.a))
+        # the left and right extreme bounds of the pbox in approximated sample form
+        self.p = (min(self.a) - self.q, self.q + max(self.a))
+        l, r = tranform_ecdf(self.p[0]), tranform_ecdf(self.p[1])
+        return Pbox(l, r)
+
+
 def decipher_zrf(num, d):
     """ decipher the value of z, r, and f
 
     args:
         num (float | int): a number parsed from the string
         d (int): the decimal place of the last significant digit in the exemplar number
+
+    return:
+        z: order of magnitude, defined to be the base-ten logoriathm of the exemplar number;
+        r: roundness, defined as the $-d$
+        f: if the last digit is 5 or 0. If the last digit is 5, $f=1$, otherwise $f=0$
+
     #TODO d can be inferred from the number itself
     """
     def is_last_digit_five(number):
@@ -137,6 +182,14 @@ def decipher_zrf(num, d):
     r = -1 * d
     f = is_last_digit_five(num)
     return z, r, f
+
+
+def decipher_d(x):
+    """ parse the decimal place d from a number"""
+    d = count_sigfigs(str(x))
+    bias_num = count_sig_digits_bias(x)
+    d = d - bias_num
+    return d
 
 
 def is_number(n):
