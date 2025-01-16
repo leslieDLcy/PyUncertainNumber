@@ -2126,44 +2126,44 @@ def uniform(a, b, steps=Params.steps):
     )
 
 
-def vonmises(*args, steps=Pbox.STEPS):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
+# def vonmises(*args, steps=Pbox.STEPS):
+#     args = list(args)
+#     for i in range(0, len(args)):
+#         if args[i].__class__.__name__ != "Interval":
+#             args[i] = Interval(args[i])
 
-    Left, Right, mean, var = __get_bounds("vonmises", steps, *args)
+#     Left, Right, mean, var = __get_bounds("vonmises", steps, *args)
 
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="vonmises",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+#     return Pbox(
+#         Left,
+#         Right,
+#         steps=steps,
+#         shape="vonmises",
+#         mean_left=mean.left,
+#         mean_right=mean.right,
+#         var_left=var.left,
+#         var_right=var.right,
+#     )
 
 
-def vonmises_line(*args, steps=Params.steps):
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "Interval":
-            args[i] = Interval(args[i])
+# def vonmises_line(*args, steps=Params.steps):
+#     args = list(args)
+#     for i in range(0, len(args)):
+#         if args[i].__class__.__name__ != "Interval":
+#             args[i] = Interval(args[i])
 
-    Left, Right, mean, var = __get_bounds("vonmises_line", steps, *args)
+#     Left, Right, mean, var = __get_bounds("vonmises_line", steps, *args)
 
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="vonmises_line",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+#     return Pbox(
+#         Left,
+#         Right,
+#         steps=steps,
+#         shape="vonmises_line",
+#         mean_left=mean.left,
+#         mean_right=mean.right,
+#         var_left=var.left,
+#         var_right=var.right,
+#     )
 
 
 def wald(*args, steps=Params.steps):
