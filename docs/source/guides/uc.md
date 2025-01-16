@@ -18,7 +18,7 @@ e = UN(
     symbol='E', 
     units='Pa', 
     essence='pbox', 
-    distribution_parameters=['gaussian', [(0,12),(1,4)]])
+    distribution_parameters=['gaussian', ([0,12],[1,4])])
 ```
 ````
 
@@ -42,5 +42,7 @@ The different sub-types of uncertain number can normally convert to one another 
 ```
 
 ### hedged numerical expression
+
+An important part of processing elicited numerical inputs is an ability to quantitatively decode natural-language words that are commonly used to express or modify numerical values. Some example include ‘about’, ‘around’, ‘almost’, ‘exactly’, ‘nearly’, ‘below’, ‘at least’, ‘order of’, etc. These are called *hedges*
 
 ### interval measurements
