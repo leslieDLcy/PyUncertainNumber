@@ -1,12 +1,10 @@
 from dataclasses import dataclass, field
 from typing import Type, Union, List
-import functools
 # from .measurand import Measurand
 # from .variability import Variability
 from .uncertainty_types import Uncertainty_types
 from .ensemble import Ensemble
 from PyUncertainNumber.pba.interval import Interval as nInterval
-from PyUncertainNumber.pba.interval import PM
 from .utils import *
 from .params import Params
 from pint import UnitRegistry
@@ -18,11 +16,9 @@ from scipy.stats import norm
 from .check import DistributionSpecification
 from PyUncertainNumber.pba.pbox import named_pbox
 from typing import Sequence
-from functools import singledispatch
-from ..pba.intervalOperators import wc_interval
 from ..pba.distributions import Distribution
 from ..pba.operation import convert
-
+from ..pba.intervalOperators import parse_bounds
 
 """ Uncertain Number class """
 
@@ -124,7 +120,7 @@ class UncertainNumber:
         ### create the underlying construct ###
         match self.essence:
             case "interval":
-                self._construct = _parse_bounds(self.bounds)
+                self._construct = parse_bounds(self.bounds)
                 self.naked_value = self._construct.midpoint()
             case "distribution":
                 if self._samples is not None:
@@ -629,41 +625,7 @@ class UncertainNumber:
 
                     return [min(ppf_values), max(ppf_values)]
 
-
-def parse_description(description):
-    # TODO add functionality for pbox
-    """Parse the description of the uncertain number when initialising an Uncertain Number object
-
-    args:
-        description: str
-            the flexible string desired by Scott to instantiate a Uncertain Number
-
-    caveat:
-        the description needs to have space between the values and the operators, such as '[15 +- 10%]'
-    """
-
-    ### type 1 ###
-    # initial check if string-rep of list
-    if initial_list_checking(description):
-        an_int = initial_list_checking(description)
-        if len(an_int) == 1:
-            return PM(an_int[0], hw=Params.hw)
-        elif len(an_int) > 1:
-            return nInterval(*an_int)
-    ### type 2 ###
-    elif bad_list_checking(description):
-        if PlusMinus_parser(description) & (not percentage_finder(description)):
-            parsed_list = parser4(description)
-            return PM(*parsed_list)
-        elif PlusMinus_parser(description) & percentage_finder(description):
-            # parse the percentage first
-            mid_range = percentage_converter(description)
-            parsed_mid_value = parser4(description)[0]
-
-            # if we take the percentage literally
-            # return PM(parsed_mid_value, hw=mid_range)
-            # if we take the percentage based on the context
-            return PM(parsed_mid_value, hw=parsed_mid_value * mid_range)
+# * ---------------------parse inputs for UN only  --------------------- *#
 
 
 def _parse_interverl_inputs(vars):
@@ -672,6 +634,7 @@ def _parse_interverl_inputs(vars):
     note:
         - Ioanna's funcs typically take 2D NumPy arra
     """
+
     if isinstance(vars, np.ndarray):
         if vars.shape[1] != 2:
             raise ValueError(
@@ -681,14 +644,3 @@ def _parse_interverl_inputs(vars):
 
     if isinstance(vars, list):
         return UncertainNumber._toIntervalBackend(vars)
-
-
-@singledispatch
-def _parse_bounds(bounds):
-    """ parse the self.bounds argument """
-    return wc_interval(bounds)
-
-
-@_parse_bounds.register(str)
-def _str(bounds: str):
-    return parse_description(bounds)

@@ -3,6 +3,34 @@ from intervals import Interval
 import numpy as np
 from PyUncertainNumber.pba.interval import Interval as nInterval
 from intervals import intervalise
+from ..nlp.language_parsing import parse_interval_expression, hedge_interpret
+
+""" operations for generic Interval objects """
+
+# see the hedged interpretation for Interval in `nlp/language_parsing.py`
+
+
+@singledispatch
+def parse_bounds(bounds):
+    """ parse the self.bounds argument """
+    return wc_interval(bounds)
+
+
+@parse_bounds.register(str)
+def _str(bounds: str):
+
+    try:
+        return hedge_interpret(bounds)
+    except Exception:
+        pass
+
+    try:
+        return parse_interval_expression(bounds)
+    except Exception:
+        raise ValueError("Invalid input")
+
+
+# * ---------------------make scalar interval object --------------------- *#
 
 
 @singledispatch
@@ -26,6 +54,8 @@ def _marco_interval_like(bound: Interval):
 @wc_interval.register(nInterval)
 def _nick_interval_like(bound: nInterval):
     return bound
+
+# * ---------------------make vector interval object --------------------- *#
 
 
 def make_vec_interval(vec):
