@@ -4,14 +4,14 @@ Originally written by Scott in R and translated to Python also expanded function
 
 import functools
 import numpy as np
-from PyUncertainNumber import pba
+from pyuncertainnumber import pba
 from scipy.stats import beta, t, gamma, betabinom, nbinom
 from .params import Params
 from intervals import Interval
 import scipy
 from .cbox_Leslie import cbox_from_extredists, cbox_from_pseudosamples
 from .pbox_base import pbox_from_extredists, pbox_from_pseudosamples
-import PyUncertainNumber.pba.distributions as d
+import pyuncertainnumber.pba.distributions as d
 
 
 def interval_measurements(func):

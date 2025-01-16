@@ -4,17 +4,17 @@ from typing import Type, Union, List
 # from .variability import Variability
 from .uncertainty_types import Uncertainty_types
 from .ensemble import Ensemble
-from PyUncertainNumber.pba.interval import Interval as nInterval
+from ..pba.interval import Interval as nInterval
 from .utils import *
-from .params import Params
+from ..pba.params import Params
 from pint import UnitRegistry
 from pathlib import Path
 import itertools
 from ..pba.dists import dists
-from PyUncertainNumber.nlp.language_parsing import hedge_interpret
+from ..nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
-from PyUncertainNumber.pba.pbox import named_pbox
+from ..pba.pbox import named_pbox
 from typing import Sequence
 from ..pba.distributions import Distribution
 from ..pba.operation import convert

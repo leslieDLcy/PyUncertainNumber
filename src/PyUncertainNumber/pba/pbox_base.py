@@ -1083,7 +1083,7 @@ class Pbox:
         else:
             return fig, ax
 
-    @ mpl.rc_context({"text.usetex": True})
+    # @ mpl.rc_context({"text.usetex": True})
     def display(self, title="", ax=None, style="band", fill_color='lightgray', **kwargs):
         """ default plotting function """
 

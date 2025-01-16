@@ -5,7 +5,6 @@ Construct a pbox from the specification of distributional parameters in the form
 In short, distribution-based p-boxes or parametric pboxes
 """
 
-from PyUncertainNumber.characterisation.params import Params
 from .interval import Interval
 from .pbox_base import Pbox
 import scipy.stats as sps

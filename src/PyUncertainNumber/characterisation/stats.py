@@ -7,7 +7,7 @@ from scipy.stats import (bernoulli, beta, betabinom, binom, chi2,
 import scipy.stats as sps
 from ..pba.intervalOperators import mean
 from intervals import Interval
-from PyUncertainNumber import pba
+from pyuncertainnumber import pba
 from ..pba.distributions import Distribution as D
 from ..pba.distributions import named_dists
 from ..pba.pbox import named_pbox

@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from .ds import DempsterShafer
 
 makeUN = importlib.import_module(
-    'PyUncertainNumber.characterisation.core').makeUN
+    'pyuncertainnumber.characterisation.core').makeUN
 
 
 @makeUN

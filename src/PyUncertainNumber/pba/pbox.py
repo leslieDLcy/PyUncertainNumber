@@ -1,7 +1,6 @@
 
 
 import functools
-from PyUncertainNumber.characterisation.params import Params
 from .interval import Interval as nInterval
 from .pbox_base import Pbox
 import scipy.stats as sps
