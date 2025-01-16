@@ -23,6 +23,8 @@ class Params:
     # user-defined
     user_hedged_interpretation = {}
 
+    result_path = "./results/"
+    hw = 0.5  # default half-width during an interval instantiation via PM method
     # @property
     # # template for property
     # def sth(self):
