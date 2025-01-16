@@ -48,7 +48,7 @@ def pbox_from_pseudosamples(samples):
     """ a tmp constructor for pbox/cbox from approximate solution of the confidence/next value distribution
 
     args:
-        samples: the approximate Monte Carlo samples of the confidence/next value distribution
+        samples (nd.array): the approximate Monte Carlo samples of the confidence/next value distribution
 
     note:
         ecdf is estimted from the samples and bridge to pbox/cbox
