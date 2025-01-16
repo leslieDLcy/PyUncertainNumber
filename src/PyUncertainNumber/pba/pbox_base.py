@@ -362,6 +362,7 @@ class Pbox:
 # ---------------------unary operations---------------------#
     ##### the top-level functions for unary operations #####
 
+
     def _unary(self, *args, function=lambda x: x):
 
         ints = [function(nInterval(l, r), *args)
@@ -881,6 +882,7 @@ class Pbox:
 
 # * ---------------------other operations--------------------- *#
 
+
     def logicaland(self, other, method="f"):  # conjunction
         if method == "i":
             return self.mul(other, method)  # independence a * b
@@ -1391,6 +1393,7 @@ def mixture(
     weights: List[Union[float, int]] = [],
     steps: int = Pbox.STEPS,
 ) -> Pbox:
+    # * legacy code from Nick
     """
     Mixes the pboxes in *args
     Parameters
