@@ -2126,7 +2126,7 @@ def uniform(a, b, steps=Params.steps):
     )
 
 
-def vonmises(*args, steps=Pbox.STEPS):
+def vonmises(*args, steps=Params.steps):#Pbox.STEPS Leslie also this breaks hte code
     args = list(args)
     for i in range(0, len(args)):
         if args[i].__class__.__name__ != "Interval":

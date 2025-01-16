@@ -156,24 +156,24 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable,
 
     return results
 
-# Example usage with different parameters for minimisation and maximisation
-f = lambda x: x[0] + x[1] + x[2] # Example function
-x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+# # Example usage with different parameters for minimisation and maximisation
+# f = lambda x: x[0] + x[1] + x[2] # Example function
+# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
 
-# Different population sizes for min and max
-pop_size = np.array([500, 1500])  
+# # Different population sizes for min and max
+# pop_size = np.array([500, 1500])  
 
-# Different number of generations
-n_gen = np.array([50, 150])     
+# # Different number of generations
+# n_gen = np.array([50, 150])     
 
-# Different tolerances
-tol = np.array([1e-2, 1e-4])     
+# # Different tolerances
+# tol = np.array([1e-2, 1e-4])     
 
-# Different algorithms
-algorithm_type = np.array(["GA", "NSGA2"])  
+# # Different algorithms
+# algorithm_type = np.array(["GA", "NSGA2"])  
 
-y = genetic_optimisation_method(x_bounds, f, pop_size=pop_size, n_gen=n_gen,
-                                        tol=tol, n_gen_last=10, algorithm_type=algorithm_type)
+# y = genetic_optimisation_method(x_bounds, f, pop_size=pop_size, n_gen=n_gen,
+#                                         tol=tol, n_gen_last=10, algorithm_type=algorithm_type)
 
-# Print the results                                               
-y.print()
+# # Print the results                                               
+# y.print()

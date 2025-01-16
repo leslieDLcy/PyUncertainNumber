@@ -1391,7 +1391,7 @@ def imposition(*args: Union[Pbox, nInterval, float, int]):
 def mixture(
     *args: Union[Pbox, nInterval, float, int],
     weights: List[Union[float, int]] = [],
-    steps: int = Pbox.STEPS,
+    steps: int = Params.steps, #Pbox.STEPS, # leslie this seems box.STEPS breaks the code. 
 ) -> Pbox:
     # * legacy code from Nick
     """

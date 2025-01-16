@@ -607,7 +607,8 @@ def epistemic_propagation(vars,
             if save_raw_data == 'yes':
                 print("The intermediate steps cannot be saved for genetic optimisation")            
             results = genetic_optimisation_method(x, fun, results, pop_size, n_gen, tol, n_gen_last, 
-                                               algorithm_type)                          
+                                               algorithm_type) 
+            print('results', results)                     
             return process_results(results) 
         
         case _:
@@ -759,7 +760,7 @@ def Propagation(vars:list,
  
     elif all(essence == "distribution" for essence in essences):
         if method in ("second_order_endpoints", "second_order_vertex", 
-                      "second_order_extremepoints"):
+                      "second_order_extremepoints", "first_order_extremepoints"):
             y = mixed_propagation(vars=vars, 
                                   fun=fun, 
                                   results=results,
