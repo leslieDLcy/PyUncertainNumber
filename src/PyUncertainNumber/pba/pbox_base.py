@@ -362,7 +362,6 @@ class Pbox:
 # ---------------------unary operations---------------------#
     ##### the top-level functions for unary operations #####
 
-
     def _unary(self, *args, function=lambda x: x):
 
         ints = [function(nInterval(l, r), *args)
@@ -882,7 +881,6 @@ class Pbox:
 
 # * ---------------------other operations--------------------- *#
 
-
     def logicaland(self, other, method="f"):  # conjunction
         if method == "i":
             return self.mul(other, method)  # independence a * b
@@ -1084,7 +1082,7 @@ class Pbox:
             return fig, ax
 
     # @ mpl.rc_context({"text.usetex": True})
-    def display(self, title="", ax=None, style="band", fill_color='lightgray', **kwargs):
+    def display(self, title="", ax=None, style="band", fill_color='lightgray', bound_colors=None, **kwargs):
         """ default plotting function """
 
         if ax is None:
@@ -1098,8 +1096,12 @@ class Pbox:
         LL_n = np.concatenate((L, np.array([R[-1]])))
         RR_n = np.concatenate((np.array([L[0]]), R))
 
-        ax.plot(LL_n, p_axis, color='g')
-        ax.plot(RR_n, p_axis, color='b')
+        if bound_colors is None:
+            ax.plot(LL_n, p_axis, color='g')
+            ax.plot(RR_n, p_axis, color='b')
+        else:
+            ax.plot(LL_n, p_axis, color=bound_colors[0])
+            ax.plot(RR_n, p_axis, color=bound_colors[1])
 
         if title is not None:
             ax.set_title(title, **kwargs)

@@ -257,50 +257,37 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <br>
-<!-- `PyUncertainNumber` is a Python function library for generic computational tasks focussing on aleatory and epistemic uncertainty, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation. -->
-<section class="tex2jax_ignore mathjax_ignore" id="pyuncertainnumber">
+          <section class="tex2jax_ignore mathjax_ignore" id="pyuncertainnumber">
 <h1>PyUncertainNumber<a class="headerlink" href="#pyuncertainnumber" title="Link to this heading">¶</a></h1>
-<hr class="docutils" />
-<!-- some banners -->
-<!-- <a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
-    <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
-</a> -->
-<p><strong>Uncertain Number</strong> refers to a class of mathematical objects useful for risk analysis that generalize real numbers, intervals, probability distributions, interval bounds on probability distributions (i.e. <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_box">probability boxes</a>), and finite DempsterShafer structures.</p>
+<br>
+<p><strong>Uncertain Number</strong> refers to a class of mathematical objects useful for risk analysis that generalize real numbers, <a class="reference external" href="https://en.wikipedia.org/wiki/Interval_arithmetic">intervals</a>, probability distributions, interval bounds on probability distributions (i.e. <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_box">probability boxes</a>), and <a class="reference external" href="https://en.wikipedia.org/wiki/Dempster%E2%80%93Shafer_theory#:~:text=Often%20used%20as%20a%20method,on%20independent%20items%20of%20evidence.">finite DempsterShafer structures</a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> is a Python package for generic computational tasks focussing on rigourou uncertainty analysis, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation.</p>
 <section id="quick-start">
 <h2>quick start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> can be used to easily create a <code class="docutils literal notranslate"><span class="pre">PBox</span></code> or an <code class="docutils literal notranslate"><span class="pre">Interval</span></code> object:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PyUncertainNumber</span> <span class="kn">import</span> <span class="n">UncertainNumber</span> <span class="k">as</span> <span class="n">UN</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyuncertainnumber</span> <span class="kn">import</span> <span class="n">UncertainNumber</span> <span class="k">as</span> <span class="n">UN</span>
 
-<span class="n">un</span> <span class="o">=</span> <span class="n">UN</span><span class="p">(</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">UN</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s1">&#39;elas_modulus&#39;</span><span class="p">,</span> 
     <span class="n">symbol</span><span class="o">=</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> 
     <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Pa&#39;</span><span class="p">,</span> 
     <span class="n">essence</span><span class="o">=</span><span class="s1">&#39;pbox&#39;</span><span class="p">,</span> 
-    <span class="n">distribution_parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)]])</span>
-<span class="n">_</span> <span class="o">=</span> <span class="n">un</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;band&#39;</span><span class="p">)</span>
+    <span class="n">distribution_parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">])])</span>
 </pre></div>
 </div>
 <!-- add some pbox plots herein -->
-<p><img alt="pbox dynamic visualisation" src="assets/myAnimation.gif" /></p>
-</section>
-<section id="installation">
-<h2>installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-</pre></div>
-</div>
+<a class="bg-primary reference internal image-reference" href="_images/myAnimation.gif"><img alt="pbox dynamic visualisation" class="bg-primary align-center" src="_images/myAnimation.gif" style="width: 600px;" />
+</a>
+<p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> also features great natural language support as such characterisatin of input uncertainty can be intuitively done by using natural language like <code class="docutils literal notranslate"><span class="pre">about</span> <span class="pre">7</span></code> or simple expression like <code class="docutils literal notranslate"><span class="pre">[15</span> <span class="pre">+-</span> <span class="pre">10%]</span></code>, without worrying about the elicitation.</p>
 <section id="uq-multiverse">
 <h3>UQ multiverse<a class="headerlink" href="#uq-multiverse" title="Link to this heading">¶</a></h3>
-<p>UQ is a big world (like Marvel multiverse) consisting of abundant theories and software implementations on multiple platforms. Some notable examples include <a class="reference external" href="https://github.com/cossan-working-group/OpenCossan">OpenCossan</a> <a class="reference external" href="https://www.uqlab.com/">UQlab</a> in Matlab and <a class="reference external" href="https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl">ProbabilityBoundsAnalysis.jl</a> in Julia, and many others of course. <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> builds upon on a few pioneering projects and will continue to be dedicated to support imprecise analysis in engineering using Python.</p>
-<!-- ## Contributing
-
-Interested in contributing? Check out the contributing guidelines. 
-Please note that this project is released with a Code of Conduct. 
-By contributing to this project, you agree to abide by its terms. -->
+<p>UQ is a big world (like Marvel multiverse) consisting of abundant theories and software implementations on multiple platforms. Some notable examples include <a class="reference external" href="https://github.com/cossan-working-group/OpenCossan">OpenCossan</a>, <a class="reference external" href="https://www.uqlab.com/">UQlab</a> in Matlab and <a class="reference external" href="https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl">ProbabilityBoundsAnalysis.jl</a> in Julia, and many others of course. <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> builds upon on a few pioneering projects and will continue to be dedicated to support imprecise analysis in engineering using Python.</p>
 <!-- ## License
 
 `PyUncertainNumber` was created by Yu Chen (Leslie). It is licensed under the terms
 of the MIT license. -->
+<!-- ```{include} ../../README.md
+``` -->
 <!-- ## Features
 
 ```{include} stubs/features-stub.md
@@ -313,15 +300,17 @@ of the MIT license. -->
 
 ```{include} stubs/parameters-stub.md
 ``` -->
+<!-- ## Learn More
+
+To learn more, checkout the sections below.
+
+```{eval-rst}
+.. container:: button
+
+   :doc:`Quick Start <quickstart>` :doc:`User Guide <user-guide>`
+   `Python Packages Book <https://py-pkgs.org/>`_ :doc:`Contributing Guidelines <contributing>`
+``` -->
 </section>
-</section>
-<section id="learn-more">
-<h2>Learn More<a class="headerlink" href="#learn-more" title="Link to this heading">¶</a></h2>
-<p>To learn more, checkout the sections below.</p>
-<div class="button docutils container">
-<p><a class="reference internal" href="quickstart.html"><span class="doc">Quick Start</span></a> <a class="reference internal" href="user-guide.html"><span class="doc">User Guide</span></a>
-<a class="reference external" href="https://py-pkgs.org/">Python Packages Book</a> <a class="reference internal" href="contributing.html"><span class="doc">Contributing Guidelines</span></a></p>
-</div>
 </section>
 <section id="acknowledgements">
 <h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Link to this heading">¶</a></h2>
@@ -381,12 +370,10 @@ of the MIT license. -->
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">PyUncertainNumber</a><ul>
-<li><a class="reference internal" href="#quick-start">quick start</a></li>
-<li><a class="reference internal" href="#installation">installation</a><ul>
+<li><a class="reference internal" href="#quick-start">quick start</a><ul>
 <li><a class="reference internal" href="#uq-multiverse">UQ multiverse</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#learn-more">Learn More</a></li>
 <li><a class="reference internal" href="#acknowledgements">Acknowledgements</a><ul>
 </ul>
 </li>

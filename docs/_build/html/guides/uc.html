@@ -263,18 +263,29 @@
 <section id="variability-and-incertitude">
 <h2>variability and incertitude<a class="headerlink" href="#variability-and-incertitude" title="Link to this heading">¶</a></h2>
 <p>Partial specification given information, bla bla ..</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>It is suggested to use interval analysis for propagating ignorance and the methods of probability theory for propagating variability.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>propagation</p>
+</div>
+</div>
 </section>
 <section id="bounding-distributional-parameters">
 <h2>bounding distributional parameters<a class="headerlink" href="#bounding-distributional-parameters" title="Link to this heading">¶</a></h2>
+<p>The mean of a normal distribution may be elicited from an expert but this expert cannot be precise to a certain value but rather give a range based on past experience.</p>
 <div class="tab-set docutils">
 <input checked="True" class="tab-input" id="tab-set--0-input--1" name="tab-set--0" type="radio"><label class="tab-label" for="tab-set--0-input--1">verbose</label><div class="tab-content docutils">
 <p>To comprehensively characterise a pbox, specify the bounds for the parameters along with many other ancillary fields.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">un</span> <span class="o">=</span> <span class="n">UN</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyuncertainnumber</span> <span class="kn">import</span> <span class="n">UncertainNumber</span> <span class="k">as</span> <span class="n">UN</span>
+
+<span class="n">e</span> <span class="o">=</span> <span class="n">UN</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s1">&#39;elas_modulus&#39;</span><span class="p">,</span> 
     <span class="n">symbol</span><span class="o">=</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> 
     <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Pa&#39;</span><span class="p">,</span> 
     <span class="n">essence</span><span class="o">=</span><span class="s1">&#39;pbox&#39;</span><span class="p">,</span> 
-    <span class="n">distribution_parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)]])</span>
+    <span class="n">distribution_parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">])])</span>
 </pre></div>
 </div>
 </div>
@@ -290,14 +301,33 @@
 <section id="aggregation-of-multiple-sources-of-information">
 <h2>aggregation of multiple sources of information<a class="headerlink" href="#aggregation-of-multiple-sources-of-information" title="Link to this heading">¶</a></h2>
 <p>Expert elicitation has been a challenging topic, especially when knowledge is limited and measurements are sparse. Multiple experts may not necessarily agree on the choice of elicited prbability distributions, which leads to the need for aggregation. Below shows two situations for illustration.</p>
-<p>Assume the expert opinions are expressed in closed intervals and their relative credibility are expresses in probabilities. Essentially such information creates a <strong>Dempster-Shafer structure</strong>. On the basis of a mixture operation, such information can be aggregated into a <strong>pbox</strong>.</p>
+<p>Assume the expert opinions are expressed in closed intervals. There may well be multiple such intervals from different experts and these collections of interval can be overlapping, partially contradictory or even completely contradictory. Their relative credibility may be expressed in probabilities. Essentially such information creates a <strong>Dempster-Shafer structure</strong>. On the basis of a mixture operation, such information can be aggregated into a <strong>pbox</strong>.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>The different sub-types of uncertain number can normally convert to one another (though may not be one by one), ergo the uncertain number been said to be a unified representation.</p>
 </div>
+<p>Pbox arithmetic also extends the convolution of probability distributions which has typically been done with the independence assumption. However, often in engineering modelling practices independence is assumed for mathematical easiness rather than warranted. Fortunately, the uncertainty about the dependency between random variables can be characterised by the probability bounds, as seen below. It should be noted that such dependency bound does not imply independence.</p>
+<a class="bg-primary reference internal image-reference" href="../_images/addition_bound.png"><img alt="sum of two random variables without dependency specification" class="bg-primary align-center" src="../_images/addition_bound.png" style="width: 600px;" />
+</a>
+</section>
+<section id="known-statistical-properties">
+<h2>known statistical properties<a class="headerlink" href="#known-statistical-properties" title="Link to this heading">¶</a></h2>
+<p>When the knowledge of a quantity is limited to the point where only some statistical information is available, such as the <em>min</em>, <em>max</em>, <em>median</em> etc. but not about the distribution and parameters, such partial information can serve as <strong>constraints</strong> to bound the underlying distribution:</p>
+<a class="bg-primary reference internal image-reference" href="../_images/known_constraints.png"><img alt="known constraints" class="bg-primary align-center" src="../_images/known_constraints.png" style="width: 1000px;" />
+</a>
 </section>
 <section id="hedged-numerical-expression">
 <h2>hedged numerical expression<a class="headerlink" href="#hedged-numerical-expression" title="Link to this heading">¶</a></h2>
+<p>Sometimes only purely qualitive information is available. An important part of processing elicited numerical inputs is an ability to quantitatively decode natural-language words, the linguistic information, that are commonly used to express or modify numerical values. Some example include ‘about’, ‘around’, ‘almost’, ‘exactly’, ‘nearly’, ‘below’, ‘at least’, ‘order of’, etc. A numerical expression with these approximators are called <em>hedges</em>. Extending upon the significant-digit convention, a series of interval interpretations of common hedged numerical expressions are proposed.</p>
+<a class="bg-primary reference internal image-reference" href="../_images/interval_hedge.png"><img alt="interval hedges" class="bg-primary align-center" src="../_images/interval_hedge.png" style="width: 1000px;" />
+</a>
+<p>Besides intervals, <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> also supports interpreting hedged expressions into p-boxes. As an example, assume one wants to find out what “about” is about in terms of the uncertainty. The syntax and result is shown below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyuncertainnumber</span> <span class="k">as</span> <span class="nn">pun</span>
+<span class="n">pun</span><span class="o">.</span><span class="n">hedge_interpret</span><span class="p">(</span><span class="s1">&#39;about 200&#39;</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;pbox&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="bg-primary reference internal image-reference" href="../_images/about_200.png"><img alt="about 200" class="bg-primary align-center" src="../_images/about_200.png" style="width: 600px;" />
+</a>
 </section>
 <section id="interval-measurements">
 <h2>interval measurements<a class="headerlink" href="#interval-measurements" title="Link to this heading">¶</a></h2>
@@ -363,6 +393,7 @@
 <li><a class="reference internal" href="#variability-and-incertitude">variability and incertitude</a></li>
 <li><a class="reference internal" href="#bounding-distributional-parameters">bounding distributional parameters</a></li>
 <li><a class="reference internal" href="#aggregation-of-multiple-sources-of-information">aggregation of multiple sources of information</a></li>
+<li><a class="reference internal" href="#known-statistical-properties">known statistical properties</a></li>
 <li><a class="reference internal" href="#hedged-numerical-expression">hedged numerical expression</a></li>
 <li><a class="reference internal" href="#interval-measurements">interval measurements</a></li>
 </ul>
