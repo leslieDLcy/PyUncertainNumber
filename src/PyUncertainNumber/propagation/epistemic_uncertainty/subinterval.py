@@ -10,6 +10,10 @@ def subinterval_method(x:np.ndarray, f:Callable,
                        save_raw_data = 'no') -> propagation_results:  # Specify return type
 
     """ 
+    description:
+    - Propagates intervals through a black box models by dividing the input intervals into smaller subintervals 
+      and evaluating the function at combinations of points within these subintervals.
+    - The method estimates the bound(s) of the output(s).
     args:
         - x: A 2D NumPy array where each row represents an input variable and the two columns
            define its lower and upper bounds (interval).

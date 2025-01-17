@@ -8,6 +8,13 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
                               tol_loc: np.ndarray = None, options_loc: dict = None,
                               *, method_loc='Nelder-Mead') -> propagation_results:  # Specify return type
     """
+    description:
+        - Propagates intervals through a function by performing local optimization to find both the minimum 
+          and maximum values of a given output, within the specified input bounds.
+        - The function should yield only one output. 
+        - This function utilizes the `scipy.optimize.minimize` function to perform local optimization. 
+        - Refer to `scipy.optimize.minimize` documentation for available options
+
     args:
         x (np.ndarray): A 2D NumPy array where each row represents an input variable and 
                         the two columns define its lower and upper bounds (interval).
@@ -41,14 +48,11 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
         local_optimisation_method(x:np.ndarray, f:Callable,  results:dict = None,
                               *, x0:np.ndarray = None,  
                               tol_loc:np.ndarray = None, options_loc: dict = None, method_loc = 'Nelder-Mead') -> dict
-
-    note:
-        - Performs local optimization to find both the minimum and maximum values of a given function, within specified bounds.
-        - This function utilizes the `scipy.optimize.minimize` function to perform local optimization. 
-        - Refer to `scipy.optimize.minimize` documentation for available options
    
     returns:
-        dict: A dictionary containing the optimization results:
+        - propagation_results: A `propagation_results` object containing the results of the 
+            uncertainty propagation. The results include p-boxes representing 
+            the output uncertainty. The raw_data are a dictionary containing a summary of the optimization results:
             - 'bounds': An np.ndarray of the bounds for the output parameter (if f is not None). 
             - 'min': Results for minimization, including 'x', 'f', 'message', 'nit', 'nfev', 'final_simplex'.
             - 'max': Results for maximization, including 'x', 'f', 'message', 'nit', 'nfev', 'final_simplex'.

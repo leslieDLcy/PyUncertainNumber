@@ -20,6 +20,23 @@ def first_order_propagation_method(x: list, f:Callable = None,
                                 save_raw_data= 'no')-> propagation_results:  # Specify return type
 
     """
+    description:
+        - Performs first-order uncertainty propagation for mixed uncertain numbers.
+        - The function handles different types of uncertain numbers (distributions 
+          and p-boxes for this version) and discretizes them with the same number of n_disc.
+        - To ensure conservative results, the function employs an outward-directed discretization approach when 
+          discretizing probability distributions and pboxes. 
+        - For distributions that extend to infinity (e.g., normal distribution), the discretization process 
+          incorporates cut-off points defined by the tOp (upper) and bOt (lower) parameters 
+          to bound the distribution.
+        - The function analyses the effect of each input individually assuming all other are reduced to intervals.
+          It uses the `extremepoints` to determine the signs of the partial derivatives of the function. 
+        - For each input, the function constructs a pbox output.  It then combines these individual p-boxes by finding 
+          the overlapping region of uncertainty that is common to all of them.  This overlapping region 
+          represents the overall uncertainty in the output(s).
+        - The `condensation` parameter can be used to reduce the number of intervals in the output p-boxes.
+          
+
     args:
         - x (list): A list of `UncertainNumber` objects representing the uncertain inputs.
         - f (Callable): The function to evaluate.
@@ -47,18 +64,9 @@ def first_order_propagation_method(x: list, f:Callable = None,
     
     signature:
         first_order_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results
-
+   
     notes:
-        - Performs first-order uncertainty propagation for mixed uncertain numbers.
-        - The function handles different types of uncertain numbers (distributions 
-          and p-boxes for this version) and discretizes them with the same number of n_disc.
-        - It uses the `extremepoints` to determine the signs of the partial 
-          derivatives of the function.
-        - The output p-boxes are constructed by imposing the results from individual 
-          input discretizations.
-        - The `condensation` parameter can be used to reduce the number of intervals in 
-          the output p-boxes.
-    
+        - It is more efficient and more conserative than the second order propagation.
     returns:
         propagation_results: A `propagation_results` object containing the results of the 
                           uncertainty propagation. The results include p-boxes representing 

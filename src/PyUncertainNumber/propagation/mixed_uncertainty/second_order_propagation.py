@@ -17,6 +17,23 @@ def second_order_propagation_method(x: list, f:Callable = None,
                                     bOt: Union[float, np.ndarray] = 0.001,
                                     save_raw_data= 'no')-> propagation_results:  # Specify return type
     """
+    description:
+        - This function performs second-order uncertainty propagation for a mix of uncertain numbers. 
+        - It is designed to handle situations where there are different types of uncertainty in the model's inputs, 
+           such as probability distributions, intervals, and p-boxes. 
+        - To ensure conservative results, the function employs an outward-directed discretization approach when 
+          discretizing probability distributions and pboxes. 
+        - For distributions that extend to infinity (e.g., normal distribution), the discretization process 
+          incorporates cut-off points defined by the tOp (upper) and bOt (lower) parameters 
+          to bound the distribution.
+        - The function generates the cartesian product of the focal elements from the discretized uncertain inputs.
+            - For the 'endpoints' method, it evaluates the function at all combinations of endpoints 
+              of the focal elements.
+            - For the 'extremepoints' method, it uses the `extremepoints_method` to determine the 
+              signs of the partial derivatives and evaluates the function at the extreme points.
+        - The output p-boxes are constructed by considering the minimum and maximum values obtained 
+          from the function evaluations
+        - `condensation` can be used to reduce the number of intervals in the output p-boxes. 
     args:
         - x (list): A list of `UncertainNumber` objects representing the uncertain inputs.
         - f (Callable): The function to evaluate.
@@ -45,21 +62,7 @@ def second_order_propagation_method(x: list, f:Callable = None,
                                    Defaults to 'no'.
     
     signature:
-        second_order_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results
-            
-    notes:
-        - Performs second-order uncertainty propagation for mixed uncertain numbers.
-        - The function handles different types of uncertain numbers (distributions, intervals, 
-          p-boxes) and discretizes them accordingly.
-        - It generates combinations of focal elements from the discretized uncertain inputs.
-        - For the 'endpoints' method, it evaluates the function at all combinations of endpoints 
-          of the focal elements.
-        - For the 'extremepoints' method, it uses the `extremepoints_method` to determine the 
-          signs of the partial derivatives and evaluates the function at the extreme points.
-        - The output p-boxes are constructed by considering the minimum and maximum values obtained 
-          from the function evaluations.
-        - The `condensation` parameter can be used to reduce the number of intervals in the output 
-          p-boxes. 
+        second_order_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results      
     
     returns:
         propagation_results:  A `propagation_results` object containing:

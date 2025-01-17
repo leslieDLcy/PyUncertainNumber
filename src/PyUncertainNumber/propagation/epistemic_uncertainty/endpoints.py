@@ -9,6 +9,10 @@ def endpoints_method(x:np.ndarray, f:Callable,
                     save_raw_data = 'no') -> propagation_results:  # Specify return type
 
     """ 
+    description:
+        - Performs interval propagation by evaluating the function at all possible combinations
+          of the endpoints (lower and upper bounds) of the input intervals. 
+
     args:
         - x: A 2D NumPy array where each row represents an input variable and 
           the two columns define its lower and upper bounds (interval).
@@ -25,9 +29,6 @@ def endpoints_method(x:np.ndarray, f:Callable,
         endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no') -> dict
 
     note:
-        - Performs uncertainty propagation using the Endpoints Method. 
-        - The function assumes that the intervals in `x` represent uncertainties and aims to provide conservative
-          bounds on the output uncertainty.
         - If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.
 
     return:
