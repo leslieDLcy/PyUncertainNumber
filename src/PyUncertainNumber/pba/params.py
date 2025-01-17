@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 import numpy as np
-
 """ hyperparameters for the pba """
 
 
