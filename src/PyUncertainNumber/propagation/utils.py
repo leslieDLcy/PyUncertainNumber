@@ -60,7 +60,10 @@ class propagation_results:
             else:  # 2D array, multiple outputs
                 num_outputs = self.raw_data['f'].shape[1]  # Number of columns
         elif self.raw_data['bounds'] is not None and len(self.raw_data['bounds']) > 0 :  # Check if 'bounds' exists and is not None (Corrected)
+            
             if len(self.raw_data['bounds'].shape) == 3:  # 1D array, single output
+                num_outputs = 1
+            elif len(self.raw_data['bounds'].shape) == 1:  # 1D array, single output
                 num_outputs = 1
             else:  # 2D array, multiple outputs
                 num_outputs = self.raw_data['bounds'].shape[0]  # Number of rows (Corrected)

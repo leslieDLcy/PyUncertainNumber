@@ -15,6 +15,12 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable,
                                  pop_size=1000, n_gen=100, tol=1e-3,
                                  n_gen_last=10, algorithm_type="NSGA2")-> propagation_results:  # Specify return type
     """
+    description:
+        - Propagates intervals through a function by performing genetic optimization to find both the minimum 
+          and maximum values of a given output, within the specified input bounds.
+        - The function should yield only one output. 
+        - This function utilizes the `pymoo` function to perform genetic optimization. 
+
     args:
         x_bounds: Bounds for decision variables (NumPy array).
         f: Objective function to optimize.
@@ -31,11 +37,10 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable,
                                     pop_size=1000, n_gen=100, tol=1e-3,
                                     n_gen_last=10, algorithm_type="NSGA2") -> dict
 
-    note:
-        Performs both minimisation and maximisation using a genetic algorithm.
-
     returns:
-        dict: A dictionary containing the optimisation results:
+        propagation_results: A `propagation_results` object containing the results of the 
+            uncertainty propagation. The results include p-boxes representing 
+            the output uncertainty. The raw_data are a dictionary containing a summary of the optimization results:
             - 'bounds': An np.ndarray of the bounds for the output parameter (if f is not None). 
             - 'min': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for minimisation results.
             - 'max': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for maximisation results.
