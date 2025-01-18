@@ -10,7 +10,6 @@ from ..pba.params import Params
 from pint import UnitRegistry
 from pathlib import Path
 import itertools
-from ..pba.dists import dists
 from ..nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
@@ -19,6 +18,7 @@ from typing import Sequence
 from ..pba.distributions import Distribution
 from ..pba.operation import convert
 from ..pba.intervalOperators import parse_bounds
+import pyuncertainnumber.pba.distributions as dists
 
 """ Uncertain Number class """
 

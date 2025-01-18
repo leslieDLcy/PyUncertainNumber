@@ -1,13 +1,13 @@
 import numpy as np
 import tqdm
 from typing import Callable
-from PyUncertainNumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
-from PyUncertainNumber.propagation.utils import propagation_results
+from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
+from pyuncertainnumber.propagation.utils import Propagation_results
 
-def endpoints_method(x:np.ndarray, f:Callable, 
-                    results: propagation_results=None, 
-                    save_raw_data = 'no') -> propagation_results:  # Specify return type
 
+def endpoints_method(x: np.ndarray, f: Callable,
+                     results: Propagation_results = None,
+                     save_raw_data='no') -> Propagation_results:  # Specify return type
     """ 
     args:
         - x: A 2D NumPy array where each row represents an input variable and 
@@ -53,55 +53,63 @@ def endpoints_method(x:np.ndarray, f:Callable,
     y = endpoints_method(x_bounds, f)
     # print the results
     y.print()
-    
+
     """
-    
+
     if results is None:
-        results = propagation_results()  # Create an instance of propagation_results
+        results = Propagation_results()  # Create an instance of Propagation_results
 
-
-    # Create a sequence of values for each interval based on the number of divisions provided 
+    # Create a sequence of values for each interval based on the number of divisions provided
     # The divisions may be the same for all intervals or they can vary.
     m = x.shape[0]
-    print(f"Total number of input combinations for the endpoint method: {2**m}") 
-    
-    # create an array with the unique combinations of all intervals 
-    X = cartesian(*x) 
-    
-    # propagates the epistemic uncertainty through subinterval reconstitution   
+    print(
+        f"Total number of input combinations for the endpoint method: {2**m}")
+
+    # create an array with the unique combinations of all intervals
+    X = cartesian(*x)
+
+    # propagates the epistemic uncertainty through subinterval reconstitution
     if f is not None:
-        all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Evaluating samples")])
+        all_output = np.array(
+            [f(xi) for xi in tqdm.tqdm(X, desc="Evaluating samples")])
 
         try:
             num_outputs = len(all_output[0])
         except TypeError:
             num_outputs = 1  # If f returns a single value
-        
+
          # Reshape all_output to a 2D array (Corrected)
-        all_output = np.array(all_output).reshape(-1, num_outputs)  
+        all_output = np.array(all_output).reshape(-1, num_outputs)
 
         if all_output.shape[1] == 1:  # Single output
-            results.raw_data['bounds'] = np.array([np.min(all_output, axis=0)[0], np.max(all_output, axis=0)[0]])
+            results.raw_data['bounds'] = np.array(
+                [np.min(all_output, axis=0)[0], np.max(all_output, axis=0)[0]])
         else:  # Multiple outputs
             bounds = np.empty((all_output.shape[1], 2))
             for i in range(all_output.shape[1]):
-                bounds[i, :] = np.array([np.min(all_output[:, i], axis=0), np.max(all_output[:, i], axis=0)])
+                bounds[i, :] = np.array(
+                    [np.min(all_output[:, i], axis=0), np.max(all_output[:, i], axis=0)])
             results.raw_data['bounds'] = bounds
 
         for i in range(num_outputs):  # Iterate over outputs
-            min_indices = np.where(all_output[:, i] == np.min(all_output[:, i], axis=0))[0]
-            max_indices = np.where(all_output[:, i] == np.max(all_output[:, i], axis=0))[0]
-            
+            min_indices = np.where(
+                all_output[:, i] == np.min(all_output[:, i], axis=0))[0]
+            max_indices = np.where(
+                all_output[:, i] == np.max(all_output[:, i], axis=0))[0]
+
             # Convert to 2D arrays and append
-            results.raw_data['min'] = np.append(results.raw_data['min'], {'x': X[min_indices], 'f': np.min(all_output[:, i], axis=0)}) 
-            results.raw_data['max'] = np.append(results.raw_data['max'], {'x': X[max_indices], 'f': np.max(all_output[:, i], axis=0)})
-        
+            results.raw_data['min'] = np.append(results.raw_data['min'], {
+                                                'x': X[min_indices], 'f': np.min(all_output[:, i], axis=0)})
+            results.raw_data['max'] = np.append(results.raw_data['max'], {
+                                                'x': X[max_indices], 'f': np.max(all_output[:, i], axis=0)})
+
         results.raw_data['f'] = all_output
         results.raw_data['x'] = X
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results.add_raw_data(x= X)   # Store X in raw_data['x'] even if f is None
-    
+        # Store X in raw_data['x'] even if f is None
+        results.add_raw_data(x=X)
+
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 

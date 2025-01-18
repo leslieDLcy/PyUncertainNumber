@@ -115,3 +115,8 @@ website workshop:
 
 some questions for the workshop:
     ☐ levels of abstractions
+
+
+today:
+    ☐ `propagation_results` capitalisation for Class
+    ☐ what's difference between `monte_carlo` and `monte_carlo_endpoints`?

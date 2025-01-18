@@ -1,28 +1,31 @@
 import numpy as np
 from typing import Callable, Union
 import tqdm
-from PyUncertainNumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
-from PyUncertainNumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
-from PyUncertainNumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
-from PyUncertainNumber.propagation.utils import propagation_results, condense_bounds
+from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
+from pyuncertainnumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
+from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
+from pyuncertainnumber.propagation.utils import Propagation_results, condense_bounds
 
-#TODO add tail concentrating algorithms.
-#TODO add x valus for min and max
-def second_order_propagation_method(x: list, f:Callable = None,  
-                                    results: propagation_results = None, 
-                                    method = 'endpoints',
-                                    n_disc: Union[int, np.ndarray] = 10, 
-                                    condensation: Union[float, np.ndarray] = None, 
+# TODO add tail concentrating algorithms.
+# TODO add x valus for min and max
+
+
+def second_order_propagation_method(x: list, f: Callable = None,
+                                    results: Propagation_results = None,
+                                    method='endpoints',
+                                    n_disc: Union[int, np.ndarray] = 10,
+                                    condensation: Union[float,
+                                                        np.ndarray] = None,
                                     tOp: Union[float, np.ndarray] = 0.999,
                                     bOt: Union[float, np.ndarray] = 0.001,
-                                    save_raw_data= 'no')-> propagation_results:  # Specify return type
+                                    save_raw_data='no') -> Propagation_results:  # Specify return type
     """
     args:
         - x (list): A list of `UncertainNumber` objects representing the uncertain inputs.
         - f (Callable): The function to evaluate.
-        - results (propagation_results, optional): An object to store propagation results.
+        - results (Propagation_results, optional): An object to store propagation results.
                                     Defaults to None, in which case a new
-                                    `propagation_results` object is created.
+                                    `Propagation_results` object is created.
         - method (str, optional): The method used to estimate the bounds of each combination 
                             of focal elements. Can be either 'endpoints' or 'extremepoints'. 
                             Defaults to 'endpoints'.
@@ -43,10 +46,10 @@ def second_order_propagation_method(x: list, f:Callable = None,
                                     Defaults to 0.001.
         - save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). 
                                    Defaults to 'no'.
-    
+
     signature:
-        second_order_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results
-            
+        second_order_propagation_method(x: list, f: Callable, results: Propagation_results = None, ...) -> Propagation_results
+
     notes:
         - Performs second-order uncertainty propagation for mixed uncertain numbers.
         - The function handles different types of uncertain numbers (distributions, intervals, 
@@ -60,9 +63,9 @@ def second_order_propagation_method(x: list, f:Callable = None,
           from the function evaluations.
         - The `condensation` parameter can be used to reduce the number of intervals in the output 
           p-boxes. 
-    
+
     returns:
-        propagation_results:  A `propagation_results` object containing:
+        Propagation_results:  A `Propagation_results` object containing:
             - raw_data (dict): Dictionary containing raw data shared across output(s):
                     - x (np.ndarray): Input values.
                     - f (np.ndarray): Output values.
@@ -71,9 +74,9 @@ def second_order_propagation_method(x: list, f:Callable = None,
                     - max (np.ndarray): Array of dictionaries, one for each output,
                               containing 'f' for the maximum of that output.
                     - bounds (np.ndarray): 2D array of lower and upper bounds for each output.
-    
+
     example:
-        from PyUncertainNumber import UncertainNumber
+        from pyuncertainnumber import UncertainNumber
 
         def Fun(x):
 
@@ -82,10 +85,10 @@ def second_order_propagation_method(x: list, f:Callable = None,
             input3=x[2]
             input4=x[3]
             input5=x[4]
-        
+
             output1 = input1 + input2 + input3 + input4 + input5
             output2 = input1 * input2 * input3 * input4 * input5
-        
+
             return np.array([output1, output2])
 
         means = np.array([1, 2, 3, 4, 5])
@@ -99,21 +102,21 @@ def second_order_propagation_method(x: list, f:Callable = None,
             UncertainNumber(essence = 'interval', bounds= [means[3]-2* stds[3], means[3]+2* stds[3]]),
             UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
             ]
-    
+
         results = second_order_propagation_method(x=x, f=Fun, method = 'endpoints', n_disc= 5)
-    
+
     """
-    d = len(x) # dimension of uncertain numbers 
-    results = propagation_results()
-    bounds_x = []  
-    ranges = np.zeros((2,d))
+    d = len(x)  # dimension of uncertain numbers
+    results = Propagation_results()
+    bounds_x = []
+    ranges = np.zeros((2, d))
     u_list = []  # List to store 'u' for each uncertain number
-    
+
     for i, un in enumerate(x):
         print(f"Processing variable {i + 1} with essence: {un.essence}")
 
         if un.essence != "interval":
-            # perform outward directed discretisation 
+            # perform outward directed discretisation
             if isinstance(n_disc, int):
                 nd = n_disc + 1
             else:
@@ -143,23 +146,30 @@ def second_order_propagation_method(x: list, f:Callable = None,
         match un.essence:
             case "distribution":
                 # Calculate xl and xr for distributions (adjust as needed)
-                temp_xl = un.ppf(u_list[i][:-1])  # Assuming un.ppf(u) returns a list or array
-                temp_xr = un.ppf(u_list[i][1:])  # Adjust based on your distribution                
-                rang = np.array([temp_xl, temp_xr]).T  # Create a 2D array of bounds
+                # Assuming un.ppf(u) returns a list or array
+                temp_xl = un.ppf(u_list[i][:-1])
+                # Adjust based on your distribution
+                temp_xr = un.ppf(u_list[i][1:])
+                # Create a 2D array of bounds
+                rang = np.array([temp_xl, temp_xr]).T
                 bounds_x.append(rang)
                 ranges[:, i] = np.array([temp_xl[0], temp_xr[-1]])
 
             case "interval":
-                temp_xl = np.array([un.bounds[0]])  # Repeat lower bound for all quantiles
-                temp_xr = np.array([un.bounds[1]])  # Repeat upper bound for all quantiles               
-                rang = np.array([temp_xl, temp_xr]).T  # Create a 2D array of bounds
+                # Repeat lower bound for all quantiles
+                temp_xl = np.array([un.bounds[0]])
+                # Repeat upper bound for all quantiles
+                temp_xr = np.array([un.bounds[1]])
+                # Create a 2D array of bounds
+                rang = np.array([temp_xl, temp_xr]).T
                 bounds_x.append(rang)
-                ranges[:, i] = un.bounds #np.array([un.bounds])
+                ranges[:, i] = un.bounds  # np.array([un.bounds])
 
             case "pbox":
-                temp_xl = un.ppf(u_list[i][:-1])[0]  
-                temp_xr = un.ppf(u_list[i][1:])[1]           
-                rang = np.array([temp_xl, temp_xr]).T  # Create a 2D array of bounds
+                temp_xl = un.ppf(u_list[i][:-1])[0]
+                temp_xr = un.ppf(u_list[i][1:])[1]
+                # Create a 2D array of bounds
+                rang = np.array([temp_xl, temp_xr]).T
                 bounds_x.append(rang)
                 ranges[:, i] = np.array([temp_xl[0], temp_xr[-1]])
 
@@ -168,10 +178,10 @@ def second_order_propagation_method(x: list, f:Callable = None,
 
     # Automatically generate merged_array_index
     bounds_x_index = [np.arange(len(sub_array)) for sub_array in bounds_x]
-        
+
     # Calculate Cartesian product of indices using your cartesian function
     cartesian_product_indices = cartesian(*bounds_x_index)
-    
+
     # Generate the final array using the indices
     focal_elements_comb = []
     for indices in cartesian_product_indices:
@@ -186,29 +196,35 @@ def second_order_propagation_method(x: list, f:Callable = None,
     if f is not None:
         # Efficiency upgrade: store repeated evaluations
         inpsList = np.zeros((0, d))
-        evalsList = []  
+        evalsList = []
         numRun = 0
 
         match method:
             case "endpoints" | "second_order_endpoints":
-                x_combinations = np.empty(( focal_elements_comb.shape[0]*(2**d), d), dtype=float)  # Pre-allocate the array
+                # Pre-allocate the array
+                x_combinations = np.empty(
+                    (focal_elements_comb.shape[0]*(2**d), d), dtype=float)
                 current_index = 0  # Keep track of the current insertion index
 
                 for array in focal_elements_comb:
                     cartesian_product_x = cartesian(*array)
-                    num_combinations = cartesian_product_x.shape[0]  # Get the number of combinations from cartesian(*array)
-                    
+                    # Get the number of combinations from cartesian(*array)
+                    num_combinations = cartesian_product_x.shape[0]
+
                     # Assign the cartesian product to the appropriate slice of x_combinations
-                    x_combinations[current_index : current_index + num_combinations] = cartesian_product_x      
+                    x_combinations[current_index: current_index +
+                                   num_combinations] = cartesian_product_x
                     current_index += num_combinations  # Update the insertion index
 
                 # Initialize all_output as a list to store outputs initially
                 all_output_list = []
                 evalsList = []
                 numRun = 0
-                inpsList = np.empty((0, x_combinations.shape[1]))  # Initialize inpsList with the correct number of columns
+                # Initialize inpsList with the correct number of columns
+                inpsList = np.empty((0, x_combinations.shape[1]))
 
-                for case in tqdm.tqdm(x_combinations, desc="Evaluating focal points"):  # Wrap the loop with tqdmx_combinations
+                # Wrap the loop with tqdmx_combinations
+                for case in tqdm.tqdm(x_combinations, desc="Evaluating focal points"):
                     im = np.where((inpsList == case).all(axis=1))[0]
                     if not im.size:
                         output = f(case)
@@ -226,32 +242,33 @@ def second_order_propagation_method(x: list, f:Callable = None,
                     num_outputs = 1
 
                 # Convert all_output to a 2D NumPy array
-                all_output =  np.array(all_output_list).reshape(focal_elements_comb.shape[0], (2**d), num_outputs)
-                
-                # Calculate min and max for each sublist in all_output
-                min_values = np.min(all_output, axis=1) 
-                max_values = np.max(all_output, axis=1) 
+                all_output = np.array(all_output_list).reshape(
+                    focal_elements_comb.shape[0], (2**d), num_outputs)
 
-                lower_bound = np.zeros((num_outputs,len(min_values)))
-                upper_bound = np.zeros((num_outputs,len(max_values)))
-  
-                bounds = np.empty((num_outputs, 2, lower_bound.shape[1])) 
+                # Calculate min and max for each sublist in all_output
+                min_values = np.min(all_output, axis=1)
+                max_values = np.max(all_output, axis=1)
+
+                lower_bound = np.zeros((num_outputs, len(min_values)))
+                upper_bound = np.zeros((num_outputs, len(max_values)))
+
+                bounds = np.empty((num_outputs, 2, lower_bound.shape[1]))
 
                 for i in range(num_outputs):
-                    min_values[:,i] = np.sort(min_values[:,i])
-                    max_values[:,i]  = np.sort(max_values[:,i])
-                    lower_bound[i,:] = min_values[:, i]  # Extract each column
-                    upper_bound[i,:] = max_values[:, i]  
-                    
-                    bounds[i, 0, :] = lower_bound[i,:]
-                    bounds[i, 1, :] = upper_bound[i,:]
+                    min_values[:, i] = np.sort(min_values[:, i])
+                    max_values[:, i] = np.sort(max_values[:, i])
+                    lower_bound[i, :] = min_values[:, i]  # Extract each column
+                    upper_bound[i, :] = max_values[:, i]
 
-            case "extremepoints"| "second_order_extremepoints":
+                    bounds[i, 0, :] = lower_bound[i, :]
+                    bounds[i, 1, :] = upper_bound[i, :]
+
+            case "extremepoints" | "second_order_extremepoints":
                 # Determine the positive or negative signs for each input
 
                 res = extremepoints_method(ranges.T, f)
-                
-                 # Determine the number of outputs from the first evaluation
+
+                # Determine the number of outputs from the first evaluation
                 try:
                     num_outputs = res.raw_data['sign_x'].shape[0]
                 except TypeError:
@@ -259,21 +276,26 @@ def second_order_propagation_method(x: list, f:Callable = None,
 
                 inpsList = np.zeros((0, d))
                 evalsList = np.zeros((0, num_outputs))
-                all_output_list = []  
+                all_output_list = []
 
                 # Preallocate all_output_list with explicit loops
                 all_output_list = []
                 for _ in range(num_outputs):
                     output_for_current_output = []
-                    for _ in range(len(focal_elements_comb)):  # Changed to focal_elements_comb
+                    # Changed to focal_elements_comb
+                    for _ in range(len(focal_elements_comb)):
                         output_for_current_output.append([None, None])
                     all_output_list.append(output_for_current_output)
-                
-                for i, slice in tqdm.tqdm(enumerate(focal_elements_comb), desc="Evaluating focal points", total=len(focal_elements_comb)):  # Iterate over focal_elements_comb
-                    Xsings = np.empty((2, d))  # Changed to 2 for the two extreme points
-                    Xsings[:, :] = extreme_pointX(slice, res.raw_data['sign_x'])  # Use the entire sign_x array
 
-                    for k in range(Xsings.shape[0]):  # 
+                # Iterate over focal_elements_comb
+                for i, slice in tqdm.tqdm(enumerate(focal_elements_comb), desc="Evaluating focal points", total=len(focal_elements_comb)):
+                    # Changed to 2 for the two extreme points
+                    Xsings = np.empty((2, d))
+                    # Use the entire sign_x array
+                    Xsings[:, :] = extreme_pointX(
+                        slice, res.raw_data['sign_x'])
+
+                    for k in range(Xsings.shape[0]):  #
                         c = Xsings[k, :]
                         im = np.where((inpsList == c).all(axis=1))[0]
                         if not im.size:
@@ -281,7 +303,8 @@ def second_order_propagation_method(x: list, f:Callable = None,
 
                             # Store each output in a separate sublist
                             for out in range(num_outputs):
-                                all_output_list[out][i][k] = output[out]  # Changed indexing
+                                # Changed indexing
+                                all_output_list[out][i][k] = output[out]
 
                             inpsList = np.vstack([inpsList, c])
 
@@ -292,48 +315,52 @@ def second_order_propagation_method(x: list, f:Callable = None,
                             evalsList = np.vstack([evalsList, output])
                         else:
                             for out in range(num_outputs):
-                                all_output_list[out][i][k] = evalsList[im[0]][out]  # Changed indexing
- 
+                                # Changed indexing
+                                all_output_list[out][i][k] = evalsList[im[0]][out]
+
                 # Reshape all_output based on the actual number of elements per output
                 all_output = np.array(all_output_list, dtype=object)
-                all_output = np.reshape(all_output, (num_outputs, -1, 2))  # Reshape to 3D
-                
-                # Calculate min and max for each sublist in all_output
-                min_values = np.min(all_output, axis=2) 
-                max_values = np.max(all_output, axis=2) 
+                all_output = np.reshape(
+                    all_output, (num_outputs, -1, 2))  # Reshape to 3D
 
-                lower_bound = np.zeros((num_outputs,min_values.shape[1]))
-                upper_bound = np.zeros((num_outputs,max_values.shape[1]))
-  
-                bounds = np.empty((num_outputs, 2, lower_bound.shape[1])) 
+                # Calculate min and max for each sublist in all_output
+                min_values = np.min(all_output, axis=2)
+                max_values = np.max(all_output, axis=2)
+
+                lower_bound = np.zeros((num_outputs, min_values.shape[1]))
+                upper_bound = np.zeros((num_outputs, max_values.shape[1]))
+
+                bounds = np.empty((num_outputs, 2, lower_bound.shape[1]))
 
                 for i in range(num_outputs):
-                    lower_bound[i,:] = np.sort(min_values[i,:])  # Extract each column
-                    upper_bound[i,:] = np.sort(max_values[i,:])
-                    
-                    bounds[i, 0, :] = lower_bound[i,:]
-                    bounds[i, 1, :] = upper_bound[i,:]
-                
+                    lower_bound[i, :] = np.sort(
+                        min_values[i, :])  # Extract each column
+                    upper_bound[i, :] = np.sort(max_values[i, :])
+
+                    bounds[i, 0, :] = lower_bound[i, :]
+                    bounds[i, 1, :] = upper_bound[i, :]
+
             case _:
-                raise ValueError("Invalid UP method! endpoints_cauchy are under development.")
+                raise ValueError(
+                    "Invalid UP method! endpoints_cauchy are under development.")
 
         if condensation is not None:
-            bounds = condense_bounds(bounds, condensation) 
+            bounds = condense_bounds(bounds, condensation)
 
-        results.raw_data['bounds']  = bounds
-        results.raw_data['min'] = np.array([{'f': lower_bound[i, :]} for i in range(num_outputs)])  # Initialize as a NumPy array
-        results.raw_data['max'] = np.array([{'f': upper_bound[i, :]} for i in range(num_outputs)])  # Initialize as a NumPy array
+        results.raw_data['bounds'] = bounds
+        results.raw_data['min'] = np.array([{'f': lower_bound[i, :]} for i in range(
+            num_outputs)])  # Initialize as a NumPy array
+        results.raw_data['max'] = np.array([{'f': upper_bound[i, :]} for i in range(
+            num_outputs)])  # Initialize as a NumPy array
 
         if save_raw_data == 'yes':
             print('No raw data provided for this method!')
-            #results.add_raw_data(f= all_output, x= x_combinations)
+            # results.add_raw_data(f= all_output, x= x_combinations)
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results.add_raw_data(f= None, x= x_combinations)
-    
+        results.add_raw_data(f=None, x=x_combinations)
+
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
-       
-    return results 
 
-
+    return results

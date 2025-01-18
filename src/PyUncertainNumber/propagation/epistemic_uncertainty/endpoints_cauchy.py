@@ -2,12 +2,13 @@ import numpy as np
 import tqdm
 from typing import Callable
 from scipy.optimize import brentq
-from PyUncertainNumber.propagation.utils import propagation_results
+from pyuncertainnumber.propagation.utils import Propagation_results
 
-def cauchydeviates_method(x: np.ndarray, f: Callable, 
-                          results: propagation_results = None, 
-                          n_sam: int =500, 
-                          save_raw_data='no') -> propagation_results:  # Specify return type
+
+def cauchydeviates_method(x: np.ndarray, f: Callable,
+                          results: Propagation_results = None,
+                          n_sam: int = 500,
+                          save_raw_data='no') -> Propagation_results:  # Specify return type
     """
     args:
         x (np.ndarray): A 2D NumPy array representing the intervals for each input variable.
@@ -16,13 +17,13 @@ def cauchydeviates_method(x: np.ndarray, f: Callable,
                         and returns a single output value or an array of output values.
                         Can be None, in which case only the Cauchy deviates (x) and the 
                         maximum Cauchy deviate (K) are returned.
-        results_class: The class to use for storing results (defaults to propagation_results).
+        results_class: The class to use for storing results (defaults to Propagation_results).
         n_sam (int): The number of samples (Cauchy deviates) to generate for each input variable (defaults 500 samples).
         save_raw_data (str, optional): Whether to save raw data. Defaults to 'no'.
                                         Currently not supported by this method.
-    
+
     signature:
-        cauchydeviate_method(x: np.ndarray, f: Callable, results_class = propagation_results, 
+        cauchydeviate_method(x: np.ndarray, f: Callable, results_class = Propagation_results, 
                         n_sam: int, save_raw_data='no') -> dict
 
     note:
@@ -48,7 +49,7 @@ def cauchydeviates_method(x: np.ndarray, f: Callable,
         # Determine input parameters for function and method
         x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
         n=50
-        
+
         # Call the method
         y = cauchydeviates_method(x_bounds,f=f, n_sam=n, save_raw_data = 'yes')
 
@@ -56,12 +57,12 @@ def cauchydeviates_method(x: np.ndarray, f: Callable,
         y.print()
 
     """
-    print(f"Total number of input combinations for the endpoints Cauchy deviates method: {n_sam}")
-    
-    if results is None:
-        results = propagation_results()  # Create an instance of propagation_results
+    print(
+        f"Total number of input combinations for the endpoints Cauchy deviates method: {n_sam}")
 
-    
+    if results is None:
+        results = Propagation_results()  # Create an instance of Propagation_results
+
     x = np.atleast_2d(x)  # Ensure x is 2D
     lo, hi = x.T  # Unpack lower and upper bounds directly
 
@@ -81,14 +82,17 @@ def cauchydeviates_method(x: np.ndarray, f: Callable,
                 x_sample = xtilde - delta
                 deltaF[k] = (K * (ytilde - f(x_sample)))
 
-            Z = lambda Del: n_sam/2 - np.sum(1 / (1 + (deltaF / Del)**2))
-            zRoot = brentq(Z, 1e-6, max(deltaF)/2)  # Use a small value for the lower bound
+            def Z(Del): return n_sam/2 - np.sum(1 / (1 + (deltaF / Del)**2))
+            # Use a small value for the lower bound
+            zRoot = brentq(Z, 1e-6, max(deltaF)/2)
             min_candidate = np.array([ytilde - zRoot])
             max_candidate = np.array([ytilde + zRoot])
             bounds = np.array([min_candidate[0], max_candidate[0]])
 
-            results.raw_data['min'] = np.array([{'x': None, 'f': min_candidate}])
-            results.raw_data['max'] = np.array([{'x': None, 'f': max_candidate}])
+            results.raw_data['min'] = np.array(
+                [{'x': None, 'f': min_candidate}])
+            results.raw_data['max'] = np.array(
+                [{'x': None, 'f': max_candidate}])
             results.raw_data['bounds'] = bounds
 
         else:  # Handle array output
@@ -106,32 +110,38 @@ def cauchydeviates_method(x: np.ndarray, f: Callable,
                 result = f(x_sample)
                 for i in range(len_y):
                     deltaF[k, i] = K * (ytilde[i] - result[i])
-            
+
             bounds = np.zeros((len_y, 2))  # Initialize bounds array
             for i in range(len_y):
                 mask = np.isnan(deltaF[:, i])
                 filtered_deltaF_i = deltaF[:, i][~mask]
-                Z = lambda Del: n_sam/2 - np.sum(1 / (1 + (filtered_deltaF_i / Del)**2))
+
+                def Z(Del): return n_sam/2 - np.sum(1 /
+                                                    (1 + (filtered_deltaF_i / Del)**2))
                 try:  # Handle potential errors in brentq
-                    zRoot = brentq(Z, 1e-6, max(filtered_deltaF_i)/2)  # Use a small value for the lower bound
+                    # Use a small value for the lower bound
+                    zRoot = brentq(Z, 1e-6, max(filtered_deltaF_i)/2)
                 except ValueError:
-                    print(f"Warning: brentq failed for output {i}. Using 0 for zRoot.")
+                    print(
+                        f"Warning: brentq failed for output {i}. Using 0 for zRoot.")
                     zRoot = 0  # Or handle the error in another way
                 min_candidate[i] = ytilde[i] - zRoot
                 max_candidate[i] = ytilde[i] + zRoot
-                bounds[i] = [min_candidate[i], max_candidate[i]] 
-            
-            # Populate the results object        
-            results.raw_data['bounds'] = bounds
-            results.raw_data['min'] = np.append(results.raw_data['min'], [{'x': None, 'f': min_val} for min_val in min_candidate])
-            results.raw_data['max'] = np.append(results.raw_data['max'], [{'x': None, 'f': max_val} for max_val in max_candidate])
+                bounds[i] = [min_candidate[i], max_candidate[i]]
 
-        print("Input x for min max y are NOT available for the Cauchy method!")       
+            # Populate the results object
+            results.raw_data['bounds'] = bounds
+            results.raw_data['min'] = np.append(results.raw_data['min'], [
+                                                {'x': None, 'f': min_val} for min_val in min_candidate])
+            results.raw_data['max'] = np.append(results.raw_data['max'], [
+                                                {'x': None, 'f': max_val} for max_val in max_candidate])
+
+        print("Input x for min max y are NOT available for the Cauchy method!")
 
         if save_raw_data == 'yes':
             print("Input-Output raw data are NOT available for the Cauchy method!")
 
-    elif  save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes' 
+    elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
         x_samples = np.zeros((n_sam, x.shape[0]))
         K_values = np.zeros(n_sam)
         for k in tqdm.tqdm(range(n_sam), desc="Calculating Cauchy deviates"):
@@ -143,7 +153,7 @@ def cauchydeviates_method(x: np.ndarray, f: Callable,
             K_values[k] = K
 
         results.add_raw_data(x=x_samples, K=K_values)
-    
+
     else:
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
@@ -160,4 +170,3 @@ def cauchydeviates_method(x: np.ndarray, f: Callable,
 
 # # print the results
 # y.print()
- 
