@@ -383,7 +383,8 @@ class UncertainNumber:
 
     def __add__(self, other):
         """add two uncertain numbers"""
-        # TODO add a diciper constructor
+        if isinstance(other, float | int | np.number):
+            other = UncertainNumber.from_Interval(nInterval(other))
         a, b = self._construct, other._construct
         if (isinstance(a, nInterval) and isinstance(b, nInterval)):
             r = a + b
@@ -399,7 +400,11 @@ class UncertainNumber:
         return self.__add__(other)
 
     def __sub__(self, other):
+
+        if isinstance(other, float | int | np.number):
+            other = UncertainNumber.from_Interval(nInterval(other))
         a, b = self._construct, other._construct
+
         if (isinstance(a, nInterval) and isinstance(b, nInterval)):
             r = a - b
             return UncertainNumber.from_Interval(r)
@@ -410,6 +415,8 @@ class UncertainNumber:
     def __mul__(self, other):
         """multiply two uncertain numbers"""
 
+        if isinstance(other, float | int | np.number):
+            other = UncertainNumber.from_Interval(nInterval(other))
         a, b = self._construct, other._construct
         if (isinstance(a, nInterval) and isinstance(b, nInterval)):
             r = a * b
@@ -423,6 +430,9 @@ class UncertainNumber:
 
     def __truediv__(self, other):
         """divide two uncertain numbers"""
+
+        if isinstance(other, float | int | np.number):
+            other = UncertainNumber.from_Interval(nInterval(other))
 
         a, b = self._construct, other._construct
         if (isinstance(a, nInterval) and isinstance(b, nInterval)):
@@ -438,6 +448,8 @@ class UncertainNumber:
     def __pow__(self, other):
         """power of two uncertain numbers"""
 
+        if isinstance(other, float | int | np.number):
+            other = UncertainNumber.from_Interval(nInterval(other))
         a, b = self._construct, other._construct
         if (isinstance(a, nInterval) and isinstance(b, nInterval)):
             r = a ** b

@@ -22,6 +22,7 @@ def _get_bounds(dist_family, *args, steps=Params.steps):
         - dist_family: (str) the name of the distribution
     """
 
+    from .distributions import named_dists
     # TODO logically speaking, it can be (0,1) ergo support will be [-inf, inf] see it works with other part codes
     # define percentile range thus getting the support
     p = Params.p_values
@@ -37,8 +38,8 @@ def _get_bounds(dist_family, *args, steps=Params.steps):
     var_hi = 0
 
     for a in new_args:
-        bounds.append(dists[dist_family].ppf(p, *a))  # bounds as x support
-        bmean, bvar = dists[dist_family].stats(*a, moments="mv")
+        bounds.append(named_dists[dist_family].ppf(p, *a))  # bounds quantiles
+        bmean, bvar = named_dists[dist_family].stats(*a, moments="mv")
 
         if bmean < mean_lo:
             mean_lo = bmean

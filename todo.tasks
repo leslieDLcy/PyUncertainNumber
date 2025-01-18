@@ -120,3 +120,4 @@ some questions for the workshop:
 today:
     ☐ `propagation_results` capitalisation for Class
     ☐ what's difference between `monte_carlo` and `monte_carlo_endpoints`?
+    ☐ sqrt of UN not supported yet
