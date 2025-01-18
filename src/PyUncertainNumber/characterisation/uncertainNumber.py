@@ -15,10 +15,9 @@ from scipy.stats import norm
 from .check import DistributionSpecification
 from ..pba.pbox import named_pbox
 from typing import Sequence
-from ..pba.distributions import Distribution
+from ..pba.distributions import Distribution, named_dists
 from ..pba.operation import convert
 from ..pba.intervalOperators import parse_bounds
-import pyuncertainnumber.pba.distributions as dists
 
 """ Uncertain Number class """
 
@@ -568,7 +567,7 @@ class UncertainNumber:
                 return ValueError("Random sampling is only supported for distribution-type UncertainNumbers.")
             case "distribution":
                 which_dist = self.distribution_parameters[0]
-                return dists[which_dist].rvs(*self.distribution_parameters[1], size=size)
+                return named_dists[which_dist].rvs(*self.distribution_parameters[1], size=size)
             case "pbox":
                 return ValueError("Random sampling is only supported for distribution-type UncertainNumbers.")
 
@@ -580,7 +579,8 @@ class UncertainNumber:
             case "distribution":
                 which_dist = self.distribution_parameters[0]
                 # Define the distribution
-                dist = dists[which_dist](*self.distribution_parameters[1])
+                dist = named_dists[which_dist](
+                    *self.distribution_parameters[1])
                 return dist.ppf(q)
             case "pbox":
                 which_dist = self.distribution_parameters[0]
@@ -605,7 +605,7 @@ class UncertainNumber:
                 if isinstance(q, np.ndarray):
                     ppf_values = np.array([
                         [
-                            dists[which_dist](*params).ppf(qi)
+                            named_dists[which_dist](*params).ppf(qi)
                             for qi in q
                         ]
                         for params in param_combinations
@@ -615,7 +615,7 @@ class UncertainNumber:
                 else:  # If q is a single value
                     ppf_values = []
                     for params in param_combinations:
-                        dist = dists[which_dist](*params)
+                        dist = named_dists[which_dist](*params)
                         ppf_value = dist.ppf(q)
 
                         if isinstance(ppf_value, np.ndarray):

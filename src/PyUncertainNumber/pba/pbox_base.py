@@ -1,10 +1,7 @@
-from .operation import convert
 from decimal import DivisionByZero
 from typing import *
 from warnings import *
-
 import numpy as np
-import matplotlib as mpl
 from matplotlib import pyplot as plt
 from .interval import Interval as nInterval
 from .utils import find_nearest, check_increasing, NotIncreasingError, _interval_list_to_array
@@ -18,13 +15,6 @@ __all__ = [
     "imposition",
     "NotIncreasingError",
 ]
-
-""" Nick: It is usually better to define p-boxes using distributions or non-parametric methods (see ). 
-This constructor is provided for completeness and for the construction of p-boxes with precise inputs.
-
-Leslie: the above does not make sense. The Pbox class is the base constructor for p-boxes, which has been
-called by whatever other constructors currently exist. The above comment is not accurate.
-"""
 
 
 class Pbox:
@@ -361,6 +351,7 @@ class Pbox:
 
 # ---------------------unary operations---------------------#
     ##### the top-level functions for unary operations #####
+
 
     def _unary(self, *args, function=lambda x: x):
 
@@ -880,6 +871,7 @@ class Pbox:
 
 
 # * ---------------------other operations--------------------- *#
+
 
     def logicaland(self, other, method="f"):  # conjunction
         if method == "i":
