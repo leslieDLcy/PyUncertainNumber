@@ -2,9 +2,7 @@ from .operation import convert
 from decimal import DivisionByZero
 from typing import Self
 from warnings import *
-
 import numpy as np
-import matplotlib as mpl
 from matplotlib import pyplot as plt
 from .interval import Interval as nInterval
 from .utils import find_nearest, check_increasing, NotIncreasingError, _interval_list_to_array

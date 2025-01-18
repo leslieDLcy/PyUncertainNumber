@@ -56,7 +56,7 @@ class UncertainNumber:
     naked_value: float = field(default=None)
     p_flag: bool = field(default=True, repr=False)  # parameterised flag
 
-    # ---------------------auxlliary information---------------------#
+    # * ---------------------auxlliary information---------------------*#
     # some simple boiler plates
     # lat: float = field(default=0.0, metadata={'unit': 'degrees'})
     # ensemble: Type[Ensemble] = field(default=None)
@@ -79,8 +79,8 @@ class UncertainNumber:
     # class variable
     instances = []  # TODO named as registry later on
 
-    # --------------------- additional ---------------------#
-    _samples: np.ndarray | list = None
+    # * --------------------- additional ---------------------*#
+    _samples: np.ndarray | list = field(default=None, repr=False)
 
     # *  ---------------------more on initialisation---------------------*#
     def parameterised_pbox_specification(self):
@@ -123,7 +123,7 @@ class UncertainNumber:
                 self.naked_value = self._construct.midpoint()
             case "distribution":
                 if self._samples is not None:
-                    self._construct = Distribution(sample=self._samples)
+                    self._construct = Distribution(sample_data=self._samples)
                 elif self.distribution_parameters is not None:
                     p_ = DistributionSpecification(
                         dist_family=self.distribution_parameters[0],
@@ -267,7 +267,12 @@ class UncertainNumber:
 
         return self._construct.display(**kwargs)
 
-    # ---------------------other constructors---------------------#
+    # * ---------------------getters --------------------- *#
+    @property
+    def construct(self):
+        return self._construct
+
+    # * ---------------------other constructors--------------------- *#
 
     @classmethod
     def from_hedge(cls, hedged_language):
@@ -307,6 +312,7 @@ class UncertainNumber:
         """create an Uncertain Number from specification of distribution
 
         args:
+            - D: Distribution object
             dist_family: str
                 the distribution family
             dist_params: list, tuple or string
@@ -369,7 +375,7 @@ class UncertainNumber:
             - sps_dist: scipy.stats dist object
 
         note:
-            - sps_dist - -> UN.Distribution object
+            - sps_dist --> UN.Distribution object
         """
         pass
 
