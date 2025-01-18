@@ -5,8 +5,9 @@ import numpy as np
 
 
 class Propagation_results:
-    """
-    attributes:
+    """Stores the results of uncertainty propagation with multiple outputs, sharing raw_data x and f.
+
+    args:
         un (np.ndarray): np.array of UncertainNumber objects (one for each output).
         raw_data (dict): Dictionary containing raw data shared across outputs:
             x (np.ndarray): Input values.
@@ -16,10 +17,9 @@ class Propagation_results:
             max (np.ndarray): Array of dictionaries, one for each output,
                               containing 'x', 'f' for the maximum of that output.
             bounds (np.ndarray): 2D array of lower and upper bounds for each output.
+
     notes:
         - use `foo.un` to access the UncertainNumber objects.
-        - Stores the results of uncertainty propagation with multiple outputs,
-            sharing raw_data x and f.
     """
 
     def __init__(self, un: np.ndarray = None, raw_data: dict = None):
@@ -33,43 +33,44 @@ class Propagation_results:
             self.raw_data = raw_data
         else:
             self.raw_data = {
-                'x': None,
-                'f': None,
-                'min': np.array([]),
-                'max': np.array([]),
-                'bounds': np.array([])
+                "x": None,
+                "f": None,
+                "min": np.array([]),
+                "max": np.array([]),
+                "bounds": np.array([]),
             }
 
     def add_raw_data(self, x=None, f=None, K=None, sign_x: np.ndarray = None):
         """Adds raw data to the results."""
         if x is not None:
-            self.raw_data['x'] = x
+            self.raw_data["x"] = x
         if K is not None:
-            self.raw_data['K'] = K
+            self.raw_data["K"] = K
         if f is not None:
-            self.raw_data['f'] = f
+            self.raw_data["f"] = f
         if sign_x is not None:
-            if isinstance(sign_x, np.ndarray) and len(sign_x.shape) > 1:  # Multiple outputs
-                self.raw_data['sign_x'] = sign_x
+            if (
+                isinstance(sign_x, np.ndarray) and len(sign_x.shape) > 1
+            ):  # Multiple outputs
+                self.raw_data["sign_x"] = sign_x
             else:  # Single output
-                self.raw_data['sign_x'] = np.array(
-                    [sign_x])  # Wrap in an array
+                self.raw_data["sign_x"] = np.array([sign_x])  # Wrap in an array
 
-    def print(self):
+    def summary(self):
         """Prints the results in a formatted way, handling None values and multiple outputs."""
 
-        if self.raw_data['f'] is not None:  # Check if 'f' exists and is not None
-            if len(self.raw_data['f'].shape) == 1:  # 1D array, single output
+        if self.raw_data["f"] is not None:  # Check if 'f' exists and is not None
+            if len(self.raw_data["f"].shape) == 1:  # 1D array, single output
                 num_outputs = 1
             else:  # 2D array, multiple outputs
-                num_outputs = self.raw_data['f'].shape[1]  # Number of columns
+                num_outputs = self.raw_data["f"].shape[1]  # Number of columns
         # Check if 'bounds' exists and is not None (Corrected)
-        elif self.raw_data['bounds'] is not None and len(self.raw_data['bounds']) > 0:
-            if len(self.raw_data['bounds'].shape) == 3:  # 1D array, single output
+        elif self.raw_data["bounds"] is not None and len(self.raw_data["bounds"]) > 0:
+            if len(self.raw_data["bounds"].shape) == 3:  # 1D array, single output
                 num_outputs = 1
             else:  # 2D array, multiple outputs
                 # Number of rows (Corrected)
-                num_outputs = self.raw_data['bounds'].shape[0]
+                num_outputs = self.raw_data["bounds"].shape[0]
         else:
             num_outputs = 1  # Or handle the case where 'f' is None appropriately
 
@@ -86,74 +87,86 @@ class Propagation_results:
             else:
                 print("Uncertain Number: None")
 
-            if 'bounds' in self.raw_data and self.raw_data['bounds'] is not None and len(self.raw_data['bounds']) > 0:
+            if (
+                "bounds" in self.raw_data
+                and self.raw_data["bounds"] is not None
+                and len(self.raw_data["bounds"]) > 0
+            ):
                 print("-" * 30)
                 if num_outputs == 1:
-                    print("Bounds:", self.raw_data['bounds'])
+                    print("Bounds:", self.raw_data["bounds"])
                 else:
-                    print("Bounds:", self.raw_data['bounds'][i])
+                    print("Bounds:", self.raw_data["bounds"][i])
 
-            if 'min' in self.raw_data and self.raw_data['min'] is not None and len(self.raw_data['min']) > 0:
+            if (
+                "min" in self.raw_data
+                and self.raw_data["min"] is not None
+                and len(self.raw_data["min"]) > 0
+            ):
                 print("-" * 30)
                 print("Minimum:")
-                min_data = self.raw_data['min'][i]
-                if min_data.get('f') is not None:
-                    print("f:", min_data.get('f'))
-                    if min_data.get('x') is None:  # Handle the case where 'x' is None
+                min_data = self.raw_data["min"][i]
+                if min_data.get("f") is not None:
+                    print("f:", min_data.get("f"))
+                    if min_data.get("x") is None:  # Handle the case where 'x' is None
                         print("x: None")
                     else:
-                        print("x:", min_data.get('x'))
+                        print("x:", min_data.get("x"))
                     # Print additional results only for local_optimisation
-                    if 'final_simplex' in min_data:
-                        print("niterations:", min_data.get('niterations'))
-                        print("nfevaluations:", min_data.get('nfevaluations'))
-                        print("final_simplex:", min_data.get('final_simplex'))
-                        print("message:", min_data.get('message'))
-                    if 'ngenerations' in min_data:
-                        print("niterations:", min_data.get('niterations'))
-                        print("ngenerations", min_data.get('ngenerations'))
-                        print("message:", min_data.get('message'))
+                    if "final_simplex" in min_data:
+                        print("niterations:", min_data.get("niterations"))
+                        print("nfevaluations:", min_data.get("nfevaluations"))
+                        print("final_simplex:", min_data.get("final_simplex"))
+                        print("message:", min_data.get("message"))
+                    if "ngenerations" in min_data:
+                        print("niterations:", min_data.get("niterations"))
+                        print("ngenerations", min_data.get("ngenerations"))
+                        print("message:", min_data.get("message"))
 
-            if 'max' in self.raw_data and self.raw_data['max'] is not None and len(self.raw_data['max']) > 0:
+            if (
+                "max" in self.raw_data
+                and self.raw_data["max"] is not None
+                and len(self.raw_data["max"]) > 0
+            ):
                 print("-" * 30)
                 print("Maximum:")
-                max_data = self.raw_data['max'][i]
-                if max_data.get('f') is not None:
-                    print("f:", max_data.get('f'))
-                    if max_data.get('x') is None:  # Handle the case where 'x' is None
+                max_data = self.raw_data["max"][i]
+                if max_data.get("f") is not None:
+                    print("f:", max_data.get("f"))
+                    if max_data.get("x") is None:  # Handle the case where 'x' is None
                         print("x: None")
                     else:
-                        print("x:", max_data.get('x'))
-                    if 'final_simplex' in max_data:
-                        print("niterations:", max_data.get('niterations'))
-                        print("nfevaluations:", max_data.get('nfevaluations'))
-                        print("final_simplex:", max_data.get('final_simplex'))
-                        print("message:", max_data.get('message'))
-                    if 'ngenerations' in max_data:
-                        print("niterations:", max_data.get('niterations'))
-                        print("ngenerations:", max_data.get('ngenerations'))
-                        print("message:", max_data.get('message'))
+                        print("x:", max_data.get("x"))
+                    if "final_simplex" in max_data:
+                        print("niterations:", max_data.get("niterations"))
+                        print("nfevaluations:", max_data.get("nfevaluations"))
+                        print("final_simplex:", max_data.get("final_simplex"))
+                        print("message:", max_data.get("message"))
+                    if "ngenerations" in max_data:
+                        print("niterations:", max_data.get("niterations"))
+                        print("ngenerations:", max_data.get("ngenerations"))
+                        print("message:", max_data.get("message"))
 
-            if 'sign_x' in self.raw_data:
+            if "sign_x" in self.raw_data:
                 print("-" * 30)
-                print("sign_x:", self.raw_data['sign_x'][i])
+                print("sign_x:", self.raw_data["sign_x"][i])
 
         print("-" * 30)
         print("Input combinations and corresponding output(s):")
         # Check if 'x' is not None
-        if self.raw_data['x'] is not None and len(self.raw_data['x']) > 0:
-            print("x:", self.raw_data['x'])
+        if self.raw_data["x"] is not None and len(self.raw_data["x"]) > 0:
+            print("x:", self.raw_data["x"])
         else:
             print("x: None")
 
-        if 'K' in self.raw_data:  # Check if the keys exist
+        if "K" in self.raw_data:  # Check if the keys exist
             print("-" * 30)
-            print("K:", self.raw_data['K'])
+            print("K:", self.raw_data["K"])
         print("-" * 30)
 
         # Check if 'x' is not None
-        if self.raw_data['f'] is not None and len(self.raw_data['f']) > 0:
-            print("f:", self.raw_data['f'])  # Print directly if single output
+        if self.raw_data["f"] is not None and len(self.raw_data["f"]) > 0:
+            print("f:", self.raw_data["f"])  # Print directly if single output
         else:
             print("f: None")
         print("-" * 30)
@@ -181,8 +194,7 @@ def header_results(all_output, all_input, method=None):
 
     if method in "cauchy":
         m = all_input.shape[1] - 1  # Exclude 'K' from the count
-        header_x = ["x" + str(i) for i in range(m)] + \
-            ["K"]  # Add 'K' at the end
+        header_x = ["x" + str(i) for i in range(m)] + ["K"]  # Add 'K' at the end
     else:
         m = all_input.shape[1]
         header_x = ["x" + str(i) for i in range(m)]
@@ -191,24 +203,26 @@ def header_results(all_output, all_input, method=None):
     return header
 
 
-def post_processing(all_input: np.ndarray, all_output: np.ndarray = None, method=None, res_path=None):
+def post_processing(
+    all_input: np.ndarray, all_output: np.ndarray = None, method=None, res_path=None
+):
     """Post-processes the results of an uncertainty propagation (UP) method.
 
-    This function takes the input and output values from a UP method, combines them into a 
-    pandas DataFrame, and optionally saves the raw data to a CSV file. It also checks for 
+    This function takes the input and output values from a UP method, combines them into a
+    pandas DataFrame, and optionally saves the raw data to a CSV file. It also checks for
     NaN values in the output and logs them with their corresponding input values if found.
     If all_output is None, it creates a DataFrame with only the input data.
 
     Args:
         all_input (np.ndarray): A NumPy array containing the input values used in the UP method.
-        all_output (np.ndarray, optional): A NumPy array containing the corresponding output 
+        all_output (np.ndarray, optional): A NumPy array containing the corresponding output
                                             values from the UP method. Defaults to None.
-        res_path (str, optional): The path to the directory where the results will be saved. 
+        res_path (str, optional): The path to the directory where the results will be saved.
                                     Defaults to None.
 
     Returns:
-        pandas.DataFrame: A pandas DataFrame containing the combined output and input data 
-                        (if all_output is provided). If all_output is None, it returns a 
+        pandas.DataFrame: A pandas DataFrame containing the combined output and input data
+                        (if all_output is provided). If all_output is None, it returns a
                         DataFrame with only the input data.
     """
 
@@ -226,8 +240,7 @@ def post_processing(all_input: np.ndarray, all_output: np.ndarray = None, method
         # else:
         #     df_input = pd.DataFrame(all_input)
 
-        header = header_results(
-            all_output=None, all_input=all_input, method=method)
+        header = header_results(all_output=None, all_input=all_input, method=method)
         df_input.columns = header
         df_output_input = df_input
 
@@ -253,8 +266,7 @@ def post_processing(all_input: np.ndarray, all_output: np.ndarray = None, method
         if len(df_NA) != 0:
             # The input values are rounded to ensure equality
             df_NA = df_NA.apply(np.round, args=[4])
-            df_NA_unique = df_NA.drop_duplicates(
-                keep="first", ignore_index=True)
+            df_NA_unique = df_NA.drop_duplicates(keep="first", ignore_index=True)
 
             create_csv(res_path, "NAlog.csv", df_NA_unique)
         else:
@@ -275,7 +287,7 @@ def create_folder(base_path, method):
 
     note:
         - the augument `base_path` will specify the location of the created results folder.
-        - the argument `method` will provide the name for the results folder. 
+        - the argument `method` will provide the name for the results folder.
 
     return:
         -  A folder in a prespecified path
@@ -310,7 +322,7 @@ def create_csv(res_path, filename, data):
         - argument `data` will provide data in terms of pandas.dataframe.
 
     return:
-        -  A .csv file in a prespecified folder 
+        -  A .csv file in a prespecified folder
 
     example:
         base_path = "C:/Users/DAWS2_code/UP/vertex"
@@ -338,9 +350,10 @@ def create_csv(res_path, filename, data):
 def save_results(data, method, res_path, fun=None):
     if fun is None:
         Results = post_processing(
-            data['x'], all_output=None, method=method, res_path=res_path)
+            data["x"], all_output=None, method=method, res_path=res_path
+        )
     else:
-        Results = post_processing(data['x'], data.get('f'), method, res_path)
+        Results = post_processing(data["x"], data.get("f"), method, res_path)
 
     return Results
 
@@ -350,9 +363,9 @@ def condense_bounds(bounds, N):
     Condenses lower and upper bounds of a probability distribution to a specified size.
 
     Args:
-      bounds: A NumPy array of shape (num_outputs, 2, num_points) representing the lower 
+      bounds: A NumPy array of shape (num_outputs, 2, num_points) representing the lower
               and upper bounds of a probability distribution for potentially multiple outputs.
-              The first dimension corresponds to different outputs of the function, 
+              The first dimension corresponds to different outputs of the function,
               the second dimension corresponds to lower and upper bounds (0 for lower, 1 for upper),
               and the third dimension corresponds to the original discretization points.
       N: The desired size of the condensed arrays.
@@ -377,12 +390,17 @@ def condense_bounds(bounds, N):
         upper_bounds_sorted = np.sort(bounds[i, 1, :])
 
         condensed_lower = np.array(
-            [lower_bounds_sorted[j * interval_size + interval_size - 1] for j in range(N[i])])
+            [
+                lower_bounds_sorted[j * interval_size + interval_size - 1]
+                for j in range(N[i])
+            ]
+        )
         condensed_upper = np.array(
-            [upper_bounds_sorted[j * interval_size] for j in range(N[i])])
+            [upper_bounds_sorted[j * interval_size] for j in range(N[i])]
+        )
 
         # Assign to the correct slice
-        condensed_bounds[i, 0, :N[i]] = condensed_lower
-        condensed_bounds[i, 1, :N[i]] = condensed_upper
+        condensed_bounds[i, 0, : N[i]] = condensed_lower
+        condensed_bounds[i, 1, : N[i]] = condensed_upper
 
     return condensed_bounds
