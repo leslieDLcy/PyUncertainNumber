@@ -1,0 +1,49 @@
+cartesian_product
+=================
+
+.. py:module:: cartesian_product
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   cartesian_product.cartesian
+
+
+Module Contents
+---------------
+
+.. py:function:: cartesian(*arrays)
+
+   Computes the Cartesian product of multiple input arrays
+
+   :param - *arrays: Variable number of np.arrays representing the sets of values for each dimension.
+
+   signature:
+      - cartesian(*x:np.array)  -> np.ndarray
+
+   .. note:: - The data type of the output array is determined based on the input arrays to ensure compatibility.
+
+   :returns:
+
+             A NumPy array where each row represents one combination from the Cartesian product.
+                       The number of columns equals the number of input arrays.
+   :rtype: - darray
+
+   .. rubric:: Example
+
+   x = np.array([1, 2], [3, 4], [5, 6])
+   y = cartesian(*x)
+   # Output:
+   # array([[1, 3, 5],
+   #        [1, 3, 6],
+   #        [1, 4, 5],
+   #        [1, 4, 6],
+   #        [2, 3, 5],
+   #        [2, 3, 6],
+   #        [2, 4, 5],
+   #        [2, 4, 6]])
+
+

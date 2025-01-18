@@ -1,0 +1,73 @@
+endpoints_cauchy
+================
+
+.. py:module:: endpoints_cauchy
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   endpoints_cauchy.cauchydeviates_method
+
+
+Module Contents
+---------------
+
+.. py:function:: cauchydeviates_method(x: numpy.ndarray, f: Callable, results: pyuncertainnumber.propagation.utils.Propagation_results = None, n_sam: int = 500, save_raw_data='no') -> pyuncertainnumber.propagation.utils.Propagation_results
+
+   :param x: A 2D NumPy array representing the intervals for each input variable.
+             Each row should contain two elements: the lower and upper bounds of the interval.
+   :type x: np.ndarray
+   :param f: A callable function that takes a 1D NumPy array of input values
+             and returns a single output value or an array of output values.
+             Can be None, in which case only the Cauchy deviates (x) and the
+             maximum Cauchy deviate (K) are returned.
+   :type f: Callable
+   :param results_class: The class to use for storing results (defaults to Propagation_results).
+   :param n_sam: The number of samples (Cauchy deviates) to generate for each input variable (defaults 500 samples).
+   :type n_sam: int
+   :param save_raw_data: Whether to save raw data. Defaults to 'no'.
+                         Currently not supported by this method.
+   :type save_raw_data: str, optional
+
+   signature:
+       cauchydeviate_method(x: np.ndarray, f: Callable, results_class = Propagation_results,
+                       n_sam: int, save_raw_data='no') -> dict
+
+   .. note::
+
+      - This method propagates intervals through a balck box model with the endpoint Cauchy deviate method.
+      - It is an approximate method, so the user should expect non-identical results for different runs.
+
+   :returns:
+
+             A PropagationResult object containing the results.
+                 - 'raw_data': A dictionary containing raw data (if f is None):
+                     - 'x': Cauchy deviates (x).
+                     - 'K': Maximum Cauchy deviate (K).
+                     - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None).
+                     - 'min': A dictionary for lower bound results (if f is not None).
+                         - 'f': Minimum output value(s).
+                         - 'x': None (as input values corresponding to min/max are not tracked in this method).
+                     - 'max':  A dictionary for upper bound results (if f is not None).
+                         - 'f': Maximum output value(s).
+                         - 'x': None (as input values corresponding to min/max are not tracked in this method).
+
+   .. rubric:: Example
+
+   # Example usage with different parameters for minimization and maximization
+   f = lambda x: x[0] + x[1] + x[2]  # Example function
+
+   # Determine input parameters for function and method
+   x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+   n=50
+
+   # Call the method
+   y = cauchydeviates_method(x_bounds,f=f, n_sam=n, save_raw_data = 'yes')
+
+   # print the results
+   y.print()
+
+

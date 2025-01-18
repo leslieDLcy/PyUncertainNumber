@@ -1,0 +1,151 @@
+pyuncertainnumber.nlp.language_parsing
+======================================
+
+.. py:module:: pyuncertainnumber.nlp.language_parsing
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.nlp.language_parsing.hedge_interpret
+   pyuncertainnumber.nlp.language_parsing.parse_interval_expression
+   pyuncertainnumber.nlp.language_parsing.decipher_zrf
+   pyuncertainnumber.nlp.language_parsing.decipher_d
+   pyuncertainnumber.nlp.language_parsing.is_number
+   pyuncertainnumber.nlp.language_parsing.count_sigfigs
+   pyuncertainnumber.nlp.language_parsing.count_sig_digits_bias
+   pyuncertainnumber.nlp.language_parsing.findWholeWord
+   pyuncertainnumber.nlp.language_parsing.whole_word_detect
+
+
+Module Contents
+---------------
+
+.. py:function:: hedge_interpret(hedge: str, return_type='interval') -> pyuncertainnumber.pba.interval.Interval | pyuncertainnumber.pba.pbox_base.Pbox
+
+   interpret linguistic hedge words into UncertainNumber objects
+
+
+.. py:function:: parse_interval_expression(expression)
+
+   Parse the expression to interpret and return an Interval-type Uncertain Number object
+
+   :param expression: the flexible string desired by Scott to instantiate a Uncertain Number
+   :type expression: str
+
+   caveat:
+       the expression needs to have space between the values and the operators, such as '[15 +- 10%]'
+   :returns: an Interval object
+
+
+.. py:class:: ApproximatorRegCoefficients
+
+   .. py:attribute:: A
+      :type:  float
+
+
+   .. py:attribute:: B
+      :type:  float
+
+
+   .. py:attribute:: C
+      :type:  float
+
+
+   .. py:attribute:: D
+      :type:  float
+
+
+   .. py:attribute:: E
+      :type:  float
+
+
+   .. py:attribute:: F
+      :type:  float
+
+
+   .. py:attribute:: G
+      :type:  float
+
+
+   .. py:attribute:: H
+      :type:  float
+
+
+   .. py:attribute:: sigma
+      :type:  float
+
+
+   .. py:method:: lognormal(m, s)
+      :staticmethod:
+
+
+
+   .. py:method:: _cp(z, r, f)
+
+
+.. py:function:: decipher_zrf(num, d)
+
+   decipher the value of z, r, and f
+
+   :param num: a number parsed from the string
+   :type num: float | int
+   :param d: the decimal place of the last significant digit in the exemplar number
+   :type d: int
+
+   :returns: order of magnitude, defined to be the base-ten logoriathm of the exemplar number;
+             r: roundness, defined as the $-d$
+             f: if the last digit is 5 or 0. If the last digit is 5, $f=1$, otherwise $f=0$
+   :rtype: z
+
+   #TODO d can be inferred from the number itself
+
+
+.. py:function:: decipher_d(x)
+
+   parse the decimal place d from a number
+
+
+.. py:function:: is_number(n)
+
+   check if a string is a number
+   .. note::
+
+      - If string is not a valid `float`,
+      - it'll raise `ValueError` exception
+
+
+.. py:function:: count_sigfigs(numstr: str) -> int
+
+   Count the number of significant figures in a number string
+
+
+.. py:function:: count_sig_digits_bias(number)
+
+   to count the bias for the getting the significant digits after the decimal point
+
+   .. note:: to exclude the sig digits before the decimal point
+
+
+.. py:function:: findWholeWord(w)
+
+   Find a whole word in a string
+
+   .. note:: this returns the matched word, but not directly a boolean
+
+
+.. py:function:: whole_word_detect(word, string)
+
+   Detect if a whole word is in a string, return y or n
+
+

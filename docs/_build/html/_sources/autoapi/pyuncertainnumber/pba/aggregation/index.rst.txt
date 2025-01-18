@@ -1,0 +1,116 @@
+pyuncertainnumber.pba.aggregation
+=================================
+
+.. py:module:: pyuncertainnumber.pba.aggregation
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.aggregation.makeUN
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.aggregation.stochastic_mixture
+   pyuncertainnumber.pba.aggregation.stacking
+   pyuncertainnumber.pba.aggregation.mixture_pbox
+   pyuncertainnumber.pba.aggregation.mixture_ds
+   pyuncertainnumber.pba.aggregation.mixture_cdf
+   pyuncertainnumber.pba.aggregation.imposition
+   pyuncertainnumber.pba.aggregation.envelope
+
+
+Module Contents
+---------------
+
+.. py:data:: makeUN
+
+.. py:function:: stochastic_mixture(l_uns, weights=None, display=False, **kwargs)
+
+   it could work for either Pbox, distribution, DS structure or Intervals
+
+   :param - l_un: list of uncertain numbers
+   :type - l_un: list
+   :param - weights: list of weights
+   :type - weights: list
+   :param - display: boolean for plotting
+   :type - display: Boolean
+
+   # TODO mix types later
+   .. note:: - currently only accepts same type objects
+
+
+.. py:function:: stacking(vec_interval: pyuncertainnumber.pba.interval.nInterval | intervals.Interval, weights, display=False, return_type='pbox')
+
+   stochastic mixture operation of Intervals with probability masses
+
+   :param - l_un: list of uncertain numbers
+   :type - l_un: list
+   :param - weights: list of weights
+   :type - weights: list
+   :param - display: boolean for plotting
+   :type - display: Boolean
+   :param - return_type: {'pbox' or 'ds' or 'bounds'}
+   :type - return_type: str
+
+   :returns:
+
+             - the left and right bound F in `cdf_bundlebounds` by default
+             but can choose to return a p-box
+
+   .. note::
+
+      - together the interval and masses, it can be deemed that all the inputs
+      required is jointly a DS structure
+
+
+.. py:function:: mixture_pbox(l_pboxes, weights=None, display=False)
+
+.. py:function:: mixture_ds(l_ds, display=False)
+
+   mixture operation for DS structure
+
+
+.. py:function:: mixture_cdf()
+
+.. py:function:: imposition(*args: pyuncertainnumber.pba.pbox_base.Pbox | pyuncertainnumber.pba.interval.nInterval | float | int)
+
+   Returns the imposition/intersection of the p-boxes in *args
+
+   :param - UN objects to be mixed:
+
+   :returns:
+
+             - Pbox
+
+   .. note:: - #TODO verfication needed for the base function `p1.imp(p2)`
+
+
+.. py:function:: envelope(*args: pyuncertainnumber.pba.interval.nInterval | pyuncertainnumber.pba.pbox_base.Pbox | float) -> pyuncertainnumber.pba.interval.nInterval | pyuncertainnumber.pba.pbox_base.Pbox
+
+   .. _core.envelope:
+
+   Allows the envelope to be calculated for intervals and p-boxes.
+
+   The envelope is the smallest interval/pbox that contains all values within the arguments.
+
+   **Parameters**:
+       ``*args``: The arguments for which the envelope needs to be calculated. The arguments can be intervals, p-boxes, or floats.
+
+   **Returns**:
+       ``Pbox|Interval``: The envelope of the given arguments, which can be an interval or a p-box.
+
+   .. error::
+
+       ``ValueError``: If less than two arguments are given.
+
+       ``TypeError``: If none of the arguments are intervals or p-boxes.
+
+
+

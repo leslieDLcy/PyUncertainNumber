@@ -1,17 +1,16 @@
 # Uncertainty characterisation
-<!-- write something about uncertainty characterisation -->
 
 ### variability and incertitude
 
 Partial specification given information, bla bla ..
 
-````{tip}
+```{tip}
 It is suggested to use interval analysis for propagating ignorance and the methods of probability theory for propagating variability.
+```
 
 ```{seealso}
-propagation
+See also in the [propagation](./up.md)
 ```
-````
 
 ### bounding distributional parameters
 

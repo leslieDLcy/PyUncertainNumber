@@ -1,0 +1,79 @@
+pyuncertainnumber.propagation.performance_func
+==============================================
+
+.. py:module:: pyuncertainnumber.propagation.performance_func
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.propagation.performance_func.cb_func
+   pyuncertainnumber.propagation.performance_func.cb_deflection
+   pyuncertainnumber.propagation.performance_func.cb_deflection
+   pyuncertainnumber.propagation.performance_func.cb_stress
+
+
+Module Contents
+---------------
+
+.. py:function:: cb_func(x)
+
+   Calculates deflection and stress for a cantilever beam.
+
+   :param x: Array of input parameters:
+             x[0]: Distance from the neutral axis to the point of interest (m)
+             x[1]: Length of the beam (m)
+             x[2]: Second moment of area (mm^4)
+             x[3]: Applied force (N)
+             x[4]: Young's modulus (MPa)
+   :type x: np.array
+
+   :returns:
+
+             np.array([deflection (m), stress (MPa)])
+                    Returns np.array([np.nan, np.nan]) if calculation error occurs.
+
+
+.. py:function:: cb_deflection(x)
+
+   Calculates deflection and stress for a cantilever beam.
+
+   :param x: Array of input parameters:
+             x[0]: Length of the beam (m)
+             x[1]: Second moment of area (mm^4)
+             x[2]: Applied force (N)
+             x[3]: Young's modulus (MPa)
+   :type x: np.array
+
+   :returns:
+
+             deflection (m)
+                    Returns np.nan if calculation error occurs.
+   :rtype: float
+
+
+.. py:function:: cb_deflection(beam_length, I, F, E)
+
+   compute the deflection in the cantilever beam example
+
+   # TODO add typing for UncertainNumber
+   :param beam_length: Length of the beam (m)
+   :type beam_length: UncertainNumber
+   :param I: Second moment of area (mm^4)
+   :param F: Applied force (N)
+   :param E: Young's modulus (MPa)
+
+   :returns:
+
+             deflection (m)
+                    Returns np.nan if calculation error occurs.
+   :rtype: float
+
+
+.. py:function:: cb_stress(y, beam_length, I, F)
+
+   to compute bending stress in the cantilever beam example
+
+

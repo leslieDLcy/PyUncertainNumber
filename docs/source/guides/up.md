@@ -1,4 +1,3 @@
-<!-- write something about uncertainty propagation -->
 # Propagation
 
 Methods to efficiently propagate different types of uncertainty through computational models are of vital interests.

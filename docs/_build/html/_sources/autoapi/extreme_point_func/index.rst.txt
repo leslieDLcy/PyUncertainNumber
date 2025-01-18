@@ -1,0 +1,28 @@
+extreme_point_func
+==================
+
+.. py:module:: extreme_point_func
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   extreme_point_func.extreme_pointX
+
+
+Module Contents
+---------------
+
+.. py:function:: extreme_pointX(ranges, signX)
+
+   Calculates the extreme points of a set of ranges based on signs.
+
+   :param ranges: A NumPy array of shape (d, 2) representing the ranges
+                  (each row is a variable, each column is a bound).
+   :param signX: A NumPy array of shape (1, d) representing the signs.
+
+   :returns: A NumPy array of shape (2, d) representing the extreme points.
+
+

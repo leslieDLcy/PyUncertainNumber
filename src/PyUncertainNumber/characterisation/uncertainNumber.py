@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Type, Union, List
+
 # from .measurand import Measurand
 # from .variability import Variability
 from .uncertainty_types import Uncertainty_types
@@ -31,6 +32,9 @@ class UncertainNumber:
         - `distribution_parameters`: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
         - `pbox_initialisation`: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
         -  naked_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
+
+    Example:
+        >>> UncertainNumber(name="velocity", symbol="v", units="m/s", bounds=[1, 2])
     """
 
     # ---------------------Basic---------------------#
@@ -47,8 +51,7 @@ class UncertainNumber:
     masses: list[float] = field(default=None, repr=False)
     bounds: Union[List[float], str] = field(default=None)
     distribution_parameters: list[str, float | int] = field(default=None)
-    pbox_parameters: list[str, Sequence[nInterval]] = field(
-        default=None, repr=False)
+    pbox_parameters: list[str, Sequence[nInterval]] = field(default=None, repr=False)
     hedge: str = field(default=None, repr=False)
     _construct: Type[any] = field(default=None, repr=False)
     # this is the deterministic numeric representation of the
@@ -109,7 +112,7 @@ class UncertainNumber:
                 raise ValueError(
                     "The 'essence' of the Uncertain Number is not specified"
                 )
-            if ((self._construct is None) | (not self._construct)):
+            if (self._construct is None) | (not self._construct):
                 print("a vacuous interval is created")
                 self.essence = "interval"
                 self.bounds = [-np.inf, np.inf]
@@ -127,7 +130,8 @@ class UncertainNumber:
                 elif self.distribution_parameters is not None:
                     p_ = DistributionSpecification(
                         dist_family=self.distribution_parameters[0],
-                        dist_params=self.distribution_parameters[1],)
+                        dist_params=self.distribution_parameters[1],
+                    )
                     if p_.i_flag:
                         self.parameterised_pbox_specification()
                     else:
@@ -157,8 +161,9 @@ class UncertainNumber:
             - keyword: (str) the distribution keyword
             - parameters: (list) the parameters of the distribution
         """
-        obj = named_pbox.get(keyword,
-                             "You're lucky as the distribution is not supported")
+        obj = named_pbox.get(
+            keyword, "You're lucky as the distribution is not supported"
+        )
         if isinstance(obj, str):
             print(obj)  # print the error message
         return obj(*parameters)
@@ -182,10 +187,8 @@ class UncertainNumber:
             this has nothing to do with the logic of JSON serialisation
             ergo, do whatever you fancy;
         """
-        field_values = {k: v for k, v in self.__dict__.items()
-                        if v is not None}
-        field_str = ", ".join(f"{k}={repr(v)}" for k,
-                              v in field_values.items())
+        field_values = {k: v for k, v in self.__dict__.items() if v is not None}
+        field_str = ", ".join(f"{k}={repr(v)}" for k, v in field_values.items())
         return f"{self.__class__.__name__}({field_str})"
 
     def __repr__(self) -> str:
@@ -349,7 +352,7 @@ class UncertainNumber:
 
     @classmethod
     def from_pbox(cls, p):
-        """ genenal from  pbox """
+        """genenal from  pbox"""
         # passPboxParameters()
         return cls(essence="pbox", p_flag=False, _construct=p)
 
@@ -369,7 +372,7 @@ class UncertainNumber:
 
     @classmethod
     def from_sps(cls, sps_dist):
-        """ create an UN object from a parametric scipy.stats dist object
+        """create an UN object from a parametric scipy.stats dist object
         #! it seems that a function will suffice
         args:
             - sps_dist: scipy.stats dist object
@@ -381,12 +384,18 @@ class UncertainNumber:
 
     # * ---------------------arithmetic operations---------------------#
 
+    # * ---------------------unary operations---------------------#
+    def sqrt(self):
+        return self._construct.sqrt()
+
+    # * ---------------------binary operations---------------------#
+
     def __add__(self, other):
         """add two uncertain numbers"""
         if isinstance(other, float | int | np.number):
             other = UncertainNumber.from_Interval(nInterval(other))
         a, b = self._construct, other._construct
-        if (isinstance(a, nInterval) and isinstance(b, nInterval)):
+        if isinstance(a, nInterval) and isinstance(b, nInterval):
             r = a + b
             return UncertainNumber.from_Interval(r)
         else:
@@ -405,7 +414,7 @@ class UncertainNumber:
             other = UncertainNumber.from_Interval(nInterval(other))
         a, b = self._construct, other._construct
 
-        if (isinstance(a, nInterval) and isinstance(b, nInterval)):
+        if isinstance(a, nInterval) and isinstance(b, nInterval):
             r = a - b
             return UncertainNumber.from_Interval(r)
         else:
@@ -418,7 +427,7 @@ class UncertainNumber:
         if isinstance(other, float | int | np.number):
             other = UncertainNumber.from_Interval(nInterval(other))
         a, b = self._construct, other._construct
-        if (isinstance(a, nInterval) and isinstance(b, nInterval)):
+        if isinstance(a, nInterval) and isinstance(b, nInterval):
             r = a * b
             return UncertainNumber.from_Interval(r)
         else:
@@ -435,7 +444,7 @@ class UncertainNumber:
             other = UncertainNumber.from_Interval(nInterval(other))
 
         a, b = self._construct, other._construct
-        if (isinstance(a, nInterval) and isinstance(b, nInterval)):
+        if isinstance(a, nInterval) and isinstance(b, nInterval):
             r = a / b
             return UncertainNumber.from_Interval(r)
         else:
@@ -451,8 +460,8 @@ class UncertainNumber:
         if isinstance(other, float | int | np.number):
             other = UncertainNumber.from_Interval(nInterval(other))
         a, b = self._construct, other._construct
-        if (isinstance(a, nInterval) and isinstance(b, nInterval)):
-            r = a ** b
+        if isinstance(a, nInterval) and isinstance(b, nInterval):
+            r = a**b
             return UncertainNumber.from_Interval(r)
         else:
             r = convert(a) ** convert(b)
@@ -582,23 +591,30 @@ class UncertainNumber:
         """Generate random samples from the distribution."""
         match self.essence:
             case "interval":
-                return ValueError("Random sampling is only supported for distribution-type UncertainNumbers.")
+                return ValueError(
+                    "Random sampling is only supported for distribution-type UncertainNumbers."
+                )
             case "distribution":
                 which_dist = self.distribution_parameters[0]
-                return named_dists[which_dist].rvs(*self.distribution_parameters[1], size=size)
+                return named_dists[which_dist].rvs(
+                    *self.distribution_parameters[1], size=size
+                )
             case "pbox":
-                return ValueError("Random sampling is only supported for distribution-type UncertainNumbers.")
+                return ValueError(
+                    "Random sampling is only supported for distribution-type UncertainNumbers."
+                )
 
     def ppf(self, q=None):
-        """"Calculate the percent point function (inverse of CDF) at quantile q."""
+        """ "Calculate the percent point function (inverse of CDF) at quantile q."""
         match self.essence:
             case "interval":
-                return ValueError("PPF calculation is not supported for interval-type UncertainNumbers.")
+                return ValueError(
+                    "PPF calculation is not supported for interval-type UncertainNumbers."
+                )
             case "distribution":
                 which_dist = self.distribution_parameters[0]
                 # Define the distribution
-                dist = named_dists[which_dist](
-                    *self.distribution_parameters[1])
+                dist = named_dists[which_dist](*self.distribution_parameters[1])
                 return dist.ppf(q)
             case "pbox":
                 which_dist = self.distribution_parameters[0]
@@ -621,14 +637,15 @@ class UncertainNumber:
 
                 # Calculate the PPF for each combination (handling array q)
                 if isinstance(q, np.ndarray):
-                    ppf_values = np.array([
+                    ppf_values = np.array(
                         [
-                            named_dists[which_dist](*params).ppf(qi)
-                            for qi in q
+                            [named_dists[which_dist](*params).ppf(qi) for qi in q]
+                            for params in param_combinations
                         ]
-                        for params in param_combinations
-                    ])
-                    return np.array([np.min(ppf_values, axis=0), np.max(ppf_values, axis=0)])
+                    )
+                    return np.array(
+                        [np.min(ppf_values, axis=0), np.max(ppf_values, axis=0)]
+                    )
 
                 else:  # If q is a single value
                     ppf_values = []
@@ -643,11 +660,12 @@ class UncertainNumber:
 
                     return [min(ppf_values), max(ppf_values)]
 
+
 # * ---------------------parse inputs for UN only  --------------------- *#
 
 
 def _parse_interverl_inputs(vars):
-    """ Parse the input intervals
+    """Parse the input intervals
 
     note:
         - Ioanna's funcs typically take 2D NumPy arra
@@ -656,7 +674,8 @@ def _parse_interverl_inputs(vars):
     if isinstance(vars, np.ndarray):
         if vars.shape[1] != 2:
             raise ValueError(
-                "vars must be a 2D array with two columns per row (lower and upper bounds)")
+                "vars must be a 2D array with two columns per row (lower and upper bounds)"
+            )
         else:
             return vars
 

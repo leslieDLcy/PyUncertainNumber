@@ -5,7 +5,12 @@ from warnings import *
 import numpy as np
 from matplotlib import pyplot as plt
 from .interval import Interval as nInterval
-from .utils import find_nearest, check_increasing, NotIncreasingError, _interval_list_to_array
+from .utils import (
+    find_nearest,
+    check_increasing,
+    NotIncreasingError,
+    _interval_list_to_array,
+)
 from .params import Params
 import importlib
 
@@ -17,21 +22,8 @@ __all__ = [
 
 
 class Pbox:
-    """ the base constructor """
-
-    r"""
-    A probability distribution is a mathematical function that gives the probabilities of occurrence for diﬀerent possible values of a variable. Probability boxes (p-boxes) represent interval bounds on probability distributions. The simplest kind of p-box can be expressed mathematically as
-
-    .. math::
-
-        \mathcal{F}(x) = [\underline{F}(x),\overline{F}(x)], \ \underline{F}(x)\geq \overline{F}(x)\ \forall x \in \mathbb{R}
-
-
-    where :math:`\underline{F}(x)` is the function that defines the left bound of the p-box and :math:`\overline{F}(x)` defines the right bound of the p-box. In PBA the left and right bounds are each stored as a NumPy array containing the percent point function (the inverse of the cumulative distribution function) for `steps` evenly spaced values between 0 and 1. P-boxes can be defined using all the probability distributions that are available through SciPy's statistics library,
-
-    Naturally, precise probability distributions can be defined in PBA by defining a p-box with precise inputs. This means that within probability bounds analysis probability distributions are considered a special case of a p-box with zero width. Resultantly, all methodology that applies to p-boxes can also be applied to probability distributions.
-
-    Distribution-free p-boxes can also be generated when the underlying distribution is unknown but parameters such as the mean, variance or minimum/maximum bounds are known. Such p-boxes make no assumption about the shape of the distribution and instead return bounds expressing all possible distributions that are valid given the known information. Such p-boxes can be constructed making use of Chebyshev, Markov and Cantelli inequalities from probability theory.
+    """
+    A probability distribution is a mathematical function that gives the probabilities of occurrence for diﬀerent possible values of a variable. Probability boxes (p-boxes) represent interval bounds on probability distributions. The left and right quantiles are each stored as a NumPy array containing the percent point function (the inverse of the cumulative distribution function) for `steps` evenly spaced values between 0 and 1. P-boxes can be defined using all the probability distributions that are available through SciPy's statistics library. Naturally, precis probability distributions can be defined by defining a p-box with precise inputs. This means that within probability bounds analysis probability distributions are considered a special case of a p-box with zero width. Distribution-free p-boxes can also be generated when the underlying distribution is unknown but parameters such as the mean, variance or minimum/maximum bounds are known. Such p-boxes make no assumption about the shape of the distribution and instead return bounds expressing all possible distributions that are valid given the known information. Such p-boxes can be constructed making use of Chebyshev, Markov and Cantelli inequalities from probability theory.
     """
 
     def __init__(
@@ -56,12 +48,11 @@ class Pbox:
         self.shape = shape
 
         def init_check(left, right, steps):
-            """ initialisation logic """
+            """initialisation logic"""
 
             if isinstance(left, np.ndarray) and isinstance(right, np.ndarray):
                 if len(left) != len(right):
-                    raise Exception(
-                        "Left and right arrays must be the same length")
+                    raise Exception("Left and right arrays must be the same length")
                 else:
                     steps = len(left)
 
@@ -108,8 +99,7 @@ class Pbox:
                 )
 
             if not check_increasing(left) or not check_increasing(right):
-                raise NotIncreasingError(
-                    "Left and right arrays must be increasing")
+                raise NotIncreasingError("Left and right arrays must be increasing")
 
             l, r = zip(*[(min(i), max(i)) for i in zip(left, right)])
             self.left = np.array(l)
@@ -119,6 +109,7 @@ class Pbox:
             self.mean_right = np.inf
             self.var_left = 0
             self.var_right = np.inf
+
         init_check(left, right, steps)
 
         if mean_left is not None:
@@ -338,19 +329,19 @@ class Pbox:
     # * ---------------------dual interpretation ---------------------#
 
     def cutv(self, x):
-        """ get the bounds on the cumulative probability associated with any x-value """
+        """get the bounds on the cumulative probability associated with any x-value"""
         lo_ind = find_nearest(self.right, x)
         hi_ind = find_nearest(self.left, x)
         return nInterval(Params.p_values[lo_ind], Params.p_values[hi_ind])
 
     def cuth(self, p=0.5):
-        """ get the bounds on the quantile at any particular probability level"""
+        """get the bounds on the quantile at any particular probability level"""
         # TODO have a conservative cut.
         ind = find_nearest(Params.p_values, p)
         return nInterval(self.left[ind], self.right[ind])
 
     def outer_approximate(self, n=100):
-        """ outer approximation of a p-box
+        """outer approximation of a p-box
 
         note:
             - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
@@ -367,14 +358,13 @@ class Pbox:
         the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
         return p_values, the_interval_list
 
-# * ---------------------unary operations--------------------- *#
+    # * ---------------------unary operations--------------------- *#
     ##### the top-level functions for unary operations #####
 
     def _unary(self, *args, function=lambda x: x):
-        """ for monotonic unary functions only """
+        """for monotonic unary functions only"""
 
-        ints = [function(nInterval(l, r), *args)
-                for l, r in zip(self.left, self.right)]
+        ints = [function(nInterval(l, r), *args) for l, r in zip(self.left, self.right)]
         return Pbox(
             left=np.array([i.left for i in ints]),
             right=np.array([i.right for i in ints]),
@@ -391,14 +381,14 @@ class Pbox:
             left=1 / np.flip(self.right), right=1 / np.flip(self.left), steps=self.steps
         )
 
-# * ---------------------binary operations--------------------- *#
+    # * ---------------------binary operations--------------------- *#
     @staticmethod
     def check_dependency(method):
         if method not in ["f", "p", "o", "i"]:
             raise ArithmeticError("dependency not registered")
 
     def constant_shape_check(self):
-        """ a helper drop in for define binary ops """
+        """a helper drop in for define binary ops"""
         if self.shape in [
             "uniform",
             "normal",
@@ -413,11 +403,10 @@ class Pbox:
 
     def steps_check(self, other):
         if self.steps != other.steps:
-            raise ArithmeticError(
-                "Both Pboxes must have the same number of steps")
+            raise ArithmeticError("Both Pboxes must have the same number of steps")
 
     def add(self, other: Self | nInterval | float | int, method="f") -> Self:
-        """addtion of uncertain numbers with the defined dependency method """
+        """addtion of uncertain numbers with the defined dependency method"""
 
         self.check_dependency(method)
         if isinstance(other, (float, int)):
@@ -473,7 +462,7 @@ class Pbox:
             return Pbox(left=nleft, right=nright, steps=self.steps)
 
     def pow(self, other: Self | nInterval | float | int, method="f") -> Self:
-        """ Raises a p-box to the power of other using the defined dependency method """
+        """Raises a p-box to the power of other using the defined dependency method"""
 
         self.check_dependency(method)
         if isinstance(other, (float, int)):
@@ -545,7 +534,7 @@ class Pbox:
         return self.add(-other, method)
 
     def mul(self, other, method="f"):
-        """ Multiplication of uncertain numbers with the defined dependency method """
+        """Multiplication of uncertain numbers with the defined dependency method"""
 
         self.check_dependency(method)
         if isinstance(other, (float, int)):
@@ -636,7 +625,7 @@ class Pbox:
         return b.get_probability(0)
 
     def min(self, other, method="f"):
-        """ Returns a new Pbox object that represents the element-wise minimum of two Pboxes.
+        """Returns a new Pbox object that represents the element-wise minimum of two Pboxes.
 
         args:
             - other: Another Pbox object or a numeric value.
@@ -739,7 +728,7 @@ class Pbox:
         """
         return self.min(a, method=method).max(b, method=method)
 
-# * --------------------- aggregations--------------------- *#
+    # * --------------------- aggregations--------------------- *#
     def env(self, other):
         """
         .. _interval.env:
@@ -771,7 +760,7 @@ class Pbox:
         return Pbox(left=nleft, right=nright, steps=self.steps)
 
     def imp(self, other):
-        """ Returns the imposition of self with other pbox
+        """Returns the imposition of self with other pbox
 
         note:
             - binary imposition between two pboxes only
@@ -791,9 +780,7 @@ class Pbox:
 
         return Pbox(left=u, right=d)
 
-
-# * ---------------------other operations--------------------- *#
-
+    # * ---------------------other operations--------------------- *#
 
     def logicaland(self, other, method="f"):  # conjunction
         if method == "i":
@@ -809,7 +796,9 @@ class Pbox:
             # negative env(max(a + b – 1, 0), a * b)
             return self.min(other, method)
         else:
-            return self.env(max(0, self.add(other, method) - 1), self.min(other, method))
+            return self.env(
+                max(0, self.add(other, method) - 1), self.min(other, method)
+            )
 
     def logicalor(self, other, method="f"):  # disjunction
         if method == "i":
@@ -898,10 +887,8 @@ class Pbox:
 
     def get_x(self):
         """returns the x values for plotting"""
-        left = np.append(
-            np.insert(self.left, 0, min(self.left)), max(self.right))
-        right = np.append(
-            np.insert(self.right, 0, min(self.left)), max(self.right))
+        left = np.append(np.insert(self.left, 0, min(self.left)), max(self.right))
+        right = np.append(np.insert(self.right, 0, min(self.left)), max(self.right))
         return left, right
 
     def get_y(self):
@@ -942,7 +929,7 @@ class Pbox:
     # * ---------------------plotting stuff---------------------#
 
     def show(self, figax=None, now=True, title="", x_axis_label="x", **kwargs):
-        """ legacy plotting function """
+        """legacy plotting function"""
 
         if figax is None:
             fig, ax = plt.subplots()
@@ -965,8 +952,7 @@ class Pbox:
             / steps
         )
         jj = (
-            np.concatenate((np.array([0]), np.arange(
-                steps + 1), np.arange(1, steps)))
+            np.concatenate((np.array([0]), np.arange(steps + 1), np.arange(1, steps)))
             / steps
         )
 
@@ -996,8 +982,16 @@ class Pbox:
             return fig, ax
 
     # @ mpl.rc_context({"text.usetex": True})
-    def display(self, title="", ax=None, style="band", fill_color='lightgray', bound_colors=None, **kwargs):
-        """ default plotting function """
+    def display(
+        self,
+        title="",
+        ax=None,
+        style="band",
+        fill_color="lightgray",
+        bound_colors=None,
+        **kwargs,
+    ):
+        """default plotting function"""
 
         if ax is None:
             fig, ax = plt.subplots()
@@ -1006,13 +1000,13 @@ class Pbox:
         R = self.right
 
         # percentiles axis
-        p_axis = np.linspace(0, 1, self.steps+1)
+        p_axis = np.linspace(0, 1, self.steps + 1)
         LL_n = np.concatenate((L, np.array([R[-1]])))
         RR_n = np.concatenate((np.array([L[0]]), R))
 
         if bound_colors is None:
-            ax.plot(LL_n, p_axis, color='g')
-            ax.plot(RR_n, p_axis, color='b')
+            ax.plot(LL_n, p_axis, color="g")
+            ax.plot(RR_n, p_axis, color="b")
         else:
             ax.plot(LL_n, p_axis, color=bound_colors[0])
             ax.plot(RR_n, p_axis, color=bound_colors[1])
@@ -1047,14 +1041,18 @@ class Pbox:
         p_values = np.arange(0, discretisation) / discretisation
         interval_list = [self.cuth(p_v) for p_v in p_values]
         ds = importlib.import_module("DempsterShafer")
-        return ds.DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation))
+        return ds.DempsterShafer(
+            interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation)
+        )
 
     def to_ds(self, discretisation=Params.steps):
         """convert to ds object"""
 
         _, interval_list = self.outer_approximate(discretisation)
         ds = importlib.import_module("DempsterShafer")
-        return ds.DempsterShafer(interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation-1))
+        return ds.DempsterShafer(
+            interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation - 1)
+        )
 
 
 # * ---------------------module functions--------------------- *#

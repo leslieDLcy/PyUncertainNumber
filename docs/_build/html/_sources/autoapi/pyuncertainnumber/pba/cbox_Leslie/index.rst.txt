@@ -1,0 +1,77 @@
+pyuncertainnumber.pba.cbox_Leslie
+=================================
+
+.. py:module:: pyuncertainnumber.pba.cbox_Leslie
+
+.. autoapi-nested-parse::
+
+   a Cbox constructor by Leslie
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.cbox_Leslie.Cbox
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.cbox_Leslie.cbox_from_extredists
+   pyuncertainnumber.pba.cbox_Leslie.cbox_from_pseudosamples
+
+
+Module Contents
+---------------
+
+.. py:class:: Cbox(*args, extre_bound_params=None, **kwargs)
+
+   Bases: :py:obj:`pyuncertainnumber.pba.pbox_base.Pbox`
+
+
+   Confidence boxes (c-boxes) are imprecise generalisations of traditional confidence distributions
+
+   They have a different interpretation to p-boxes but rely on the same underlying mathematics.
+   As such in pba-for-python c-boxes inhert most of their methods from Pbox.
+
+   :param Pbox: _description_
+   :type Pbox: _type_
+
+
+   .. py:attribute:: extre_bound_params
+      :value: None
+
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: display(parameter_name=None, **kwargs)
+
+      default plotting function
+
+
+
+   .. py:method:: ci(c=0.95, alpha=None, beta=None, style='two-sided')
+
+      query the confidence interval at a given confidence level `c`
+
+
+
+.. py:function:: cbox_from_extredists(rvs, shape=None, extre_bound_params=None)
+
+   define cbox via parameterised extreme bouding distrbution functions
+
+   :param rvs: list of `scipy.stats.rv_continuous` objects
+   :type rvs: list
+   :param extre_bound_params: list of parameters for the extreme bounding c.d.f
+   :type extre_bound_params: list
+
+
+.. py:function:: cbox_from_pseudosamples(samples)
+
