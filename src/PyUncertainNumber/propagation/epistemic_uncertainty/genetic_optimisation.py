@@ -16,7 +16,8 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable,
                                 results: Propagation_results = None,
                                 pop_size=1000, n_gen=100, tol=1e-3,
                                 n_gen_last=10, algorithm_type="NSGA2") -> Propagation_results:  # Specify return type
-    """
+    """Performs both minimisation and maximisation using a genetic algorithm.
+
     args:
         x_bounds: Bounds for decision variables (NumPy array).
         f: Objective function to optimize.
@@ -33,8 +34,6 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable,
                                     pop_size=1000, n_gen=100, tol=1e-3,
                                     n_gen_last=10, algorithm_type="NSGA2") -> dict
 
-    note:
-        Performs both minimisation and maximisation using a genetic algorithm.
 
     returns:
         dict: A dictionary containing the optimisation results:
@@ -43,27 +42,21 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable,
             - 'max': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for maximisation results.
 
     example:
-        # Example usage with different parameters for minimisation and maximisation
-        f = lambda x: x[0] + x[1] + x[2] # Example function
-        x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-
-        # Different population sizes for min and max
-        pop_size = np.array([500, 1500])  
-
-        # Different number of generations
-        n_gen = np.array([50, 150])     
-
-        # Different tolerances
-        tol = np.array([1e-2, 1e-4])     
-
-        # Different algorithms
-        algorithm_type = np.array(["GA", "NSGA2"])  
-
-        y = genetic_optimisation_method(x_bounds, f, pop_size=pop_size, n_gen=n_gen,
-                                        tol=tol, n_gen_last=10, algorithm_type=algorithm_type)
-
-        # Print the results                                               
-        y.print()
+        >>> # Example usage with different parameters for minimisation and maximisation
+        >>> f = lambda x: x[0] + x[1] + x[2] # Example function
+        >>> x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> # Different population sizes for min and max
+        >>> pop_size = np.array([500, 1500])  
+        >>> # Different number of generations
+        >>> n_gen = np.array([50, 150])     
+        >>> # Different tolerances
+        >>> tol = np.array([1e-2, 1e-4])     
+        >>> # Different algorithms
+        >>> algorithm_type = np.array(["GA", "NSGA2"])  
+        >>> y = genetic_optimisation_method(x_bounds, f, pop_size=pop_size, n_gen=n_gen,
+        >>>                                 tol=tol, n_gen_last=10, algorithm_type=algorithm_type)
+        >>> # Print the results                                               
+        >>> y.print()
 
     """
 

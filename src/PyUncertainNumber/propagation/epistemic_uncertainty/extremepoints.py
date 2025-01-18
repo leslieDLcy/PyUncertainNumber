@@ -10,6 +10,11 @@ def extremepoints_method(x: np.ndarray, f: Callable,
                          results: Propagation_results = None,
                          save_raw_data='no') -> Propagation_results:  # Specify return type
     """ 
+        Performs uncertainty propagation using the Extreme Point Method for monotonic functions. 
+        This method estimates the bounds of a function's output by evaluating it at specific combinations of extreme values
+        (lower or upper bounds) of the input variables. It is efficient for monotonic functions but might not be accurate for non-monotonic functions. 
+        If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.
+
     args:
         - x: A 2D NumPy array where each row represents an input variable and 
           the two columns define its lower and upper bounds (interval).
@@ -25,12 +30,6 @@ def extremepoints_method(x: np.ndarray, f: Callable,
     signature:
         extremepoints_method(x:np.ndarray, f:Callable, results:dict, save_raw_data = 'no') -> dict
 
-    note:
-        - Performs uncertainty propagation using the Extreme Point Method for monotonic functions. 
-        - This method estimates the bounds of a function's output by evaluating it at specific
-          combinations of extreme values (lower or upper bounds) of the input variables. 
-        - It is efficient for monotonic functions but might not be accurate for non-monotonic functions.
-        - If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.
 
     return:
         - A Propagation_results object containing the results.
@@ -47,14 +46,15 @@ def extremepoints_method(x: np.ndarray, f: Callable,
             - 'x': All generated input samples.
             - 'f': Corresponding output values for each input sample.
 
-    # Example usage with different parameters for minimization and maximization
-        f = lambda x: x[0] + x[1] + x[2]  # Example function
-        # Determine input parameters for function and method
-        x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-        # Call the method
-        y = extremepoint_method(x_bounds, f)
-        # print results
-        y.print()
+    Example:
+        # Example usage with different parameters for minimization and maximization
+        >>> f = lambda x: x[0] + x[1] + x[2]  # Example function
+        >>> # Determine input parameters for function and method
+        >>> x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> # Call the method
+        >>> y = extremepoint_method(x_bounds, f)
+        >>> # print results
+        >>> y.print()
 
     """
     if results is None:

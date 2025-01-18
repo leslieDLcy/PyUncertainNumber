@@ -8,7 +8,12 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
                               results: Propagation_results = None,
                               tol_loc: np.ndarray = None, options_loc: dict = None,
                               *, method_loc='Nelder-Mead') -> Propagation_results:  # Specify return type
-    """
+    """  
+        Performs local optimization to find both the minimum and maximum values of a given function, within specified bounds.
+        This function utilizes the `scipy.optimize.minimize` function to perform local optimization. 
+        Refer to `scipy.optimize.minimize` documentation for available options
+
+
     args:
         x (np.ndarray): A 2D NumPy array where each row represents an input variable and 
                         the two columns define its lower and upper bounds (interval).
@@ -43,40 +48,30 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
                               *, x0:np.ndarray = None,  
                               tol_loc:np.ndarray = None, options_loc: dict = None, method_loc = 'Nelder-Mead') -> dict
 
-    note:
-        - Performs local optimization to find both the minimum and maximum values of a given function, within specified bounds.
-        - This function utilizes the `scipy.optimize.minimize` function to perform local optimization. 
-        - Refer to `scipy.optimize.minimize` documentation for available options
-
     returns:
         dict: A dictionary containing the optimization results:
             - 'bounds': An np.ndarray of the bounds for the output parameter (if f is not None). 
             - 'min': Results for minimization, including 'x', 'f', 'message', 'nit', 'nfev', 'final_simplex'.
             - 'max': Results for maximization, including 'x', 'f', 'message', 'nit', 'nfev', 'final_simplex'.
+
     example:
-        # Example function 
 
-        f = lambda x: x[0] + x[1] + x[2]  # Example function
-        x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-
-        # Initial guess (same for min and max)
-        x0 = np.array([1.5, 3.5, 5.5])  
-
-        # Different tolerances for min and max
-        tol_loc = np.array([1e-4, 1e-6])  
-
-        # Different options for min and max
-        options_loc = [
-            {'maxiter': 100},  # Options for minimization
-            {'maxiter': 1000}  # Options for maximization
-            ]
-
-        # Perform optimization
-        y = local_optimisation_method(x_bounds, f, x0=x0, tol_loc=tol_loc, 
-                                            options_loc=options_loc)
-
-        # Print the results
-        y.print()
+        >>> f = lambda x: x[0] + x[1] + x[2]  # Example function
+        >>> x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> # Initial guess (same for min and max)
+        >>> x0 = np.array([1.5, 3.5, 5.5])  
+        >>> # Different tolerances for min and max
+        >>> tol_loc = np.array([1e-4, 1e-6])  
+        >>> # Different options for min and max
+        >>> options_loc = [
+        >>>     {'maxiter': 100},  # Options for minimization
+        >>>     {'maxiter': 1000}  # Options for maximization
+        >>>     ]
+        >>> # Perform optimization
+        >>> y = local_optimisation_method(x_bounds, f, x0=x0, tol_loc=tol_loc, 
+        >>>                                     options_loc=options_loc)
+        >>> # Print the results
+        >>> y.print()
     """
 
     bounds = [(var[0], var[1]) for var in x]

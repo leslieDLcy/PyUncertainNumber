@@ -9,6 +9,10 @@ def endpoints_method(x: np.ndarray, f: Callable,
                      results: Propagation_results = None,
                      save_raw_data='no') -> Propagation_results:  # Specify return type
     """ 
+        Performs uncertainty propagation using the Endpoints Method. The function assumes that the intervals in `x` represent uncertainties 
+        and aims to provide conservative bounds on the output uncertainty. 
+        If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.
+
     args:
         - x: A 2D NumPy array where each row represents an input variable and 
           the two columns define its lower and upper bounds (interval).
@@ -25,10 +29,11 @@ def endpoints_method(x: np.ndarray, f: Callable,
         endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no') -> dict
 
     note:
-        - Performs uncertainty propagation using the Endpoints Method. 
-        - The function assumes that the intervals in `x` represent uncertainties and aims to provide conservative
-          bounds on the output uncertainty.
-        - If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.
+        # Example usage with different parameters for minimization and maximization
+        f = lambda x: x[0] + x[1] + x[2]  # Example function
+
+        # Determine input parameters for function and method
+        x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
 
     return:
         - dict: A dictionary containing the results:
@@ -43,17 +48,9 @@ def endpoints_method(x: np.ndarray, f: Callable,
             - 'x': All generated input samples.
             - 'f': Corresponding output values for each input sample.
 
-    # Example usage with different parameters for minimization and maximization
-    f = lambda x: x[0] + x[1] + x[2]  # Example function
 
-    # Determine input parameters for function and method
-    x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-
-    # Call the method
-    y = endpoints_method(x_bounds, f)
-    # print the results
-    y.print()
-
+    Example:
+        >>> y = endpoints_method(x_bounds, f)
     """
 
     if results is None:
@@ -114,16 +111,3 @@ def endpoints_method(x: np.ndarray, f: Callable,
         print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
     return results
-
-# # example
-
-# # Example usage with different parameters for minimization and maximization
-# f = lambda x: x[0] + x[1] + x[2]  # Example function
-
-# # Determine input parameters for function and method
-# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-
-# # Call the method
-# y = endpoints_method(x_bounds, f=None, save_raw_data = 'yes')
-
-# y.print()
