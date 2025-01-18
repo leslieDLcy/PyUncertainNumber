@@ -1,6 +1,0 @@
-pyuncertainnumber.characterisation.test
-=======================================
-
-.. py:module:: pyuncertainnumber.characterisation.test
-
-

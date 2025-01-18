@@ -181,7 +181,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -218,6 +218,9 @@
 <li class="toctree-l1"><a class="reference internal" href="pbox.html">Probability box</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cbox.html">Confidence box</a></li>
 <li class="toctree-l1"><a class="reference internal" href="interval_analysis.html">interval analysis</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API references</span></p>
+<ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="autoapi/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="autoapi/sampling/index.html">sampling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="autoapi/endpoints/index.html">endpoints</a></li>
@@ -317,17 +320,33 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="pyuncertainnumber">
+          <div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<section class="tex2jax_ignore mathjax_ignore" id="pyuncertainnumber">
 <h1>PyUncertainNumber<a class="headerlink" href="#pyuncertainnumber" title="Link to this heading">¶</a></h1>
 <br>
 <p><strong>Uncertain Number</strong> refers to a class of mathematical objects useful for risk analysis that generalize real numbers, <a class="reference external" href="https://en.wikipedia.org/wiki/Interval_arithmetic">intervals</a>, probability distributions, interval bounds on probability distributions (i.e. <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_box">probability boxes</a>), and <a class="reference external" href="https://en.wikipedia.org/wiki/Dempster%E2%80%93Shafer_theory#:~:text=Often%20used%20as%20a%20method,on%20independent%20items%20of%20evidence.">finite DempsterShafer structures</a>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> is a Python package for generic computational tasks focussing on rigourou uncertainty analysis, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation.</p>
+<section id="features">
+<h2>features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> is a Python package for generic computational tasks focussing on rigourou uncertainty analysis, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> also features great natural language support as such characterisatin of input uncertainty can be intuitively done by using natural language like <code class="docutils literal notranslate"><span class="pre">about</span> <span class="pre">7</span></code> or simple expression like <code class="docutils literal notranslate"><span class="pre">[15</span> <span class="pre">+-</span> <span class="pre">10%]</span></code>, without worrying about the elicitation.</p></li>
+<li><p>features the save and loading of UN objects</p></li>
+<li><p>yields much informative results such as the combination that leads to the maximum in vertex method.</p></li>
+</ul>
+</section>
 <section id="quick-start">
 <h2>quick start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> can be used to easily create a <code class="docutils literal notranslate"><span class="pre">PBox</span></code> or an <code class="docutils literal notranslate"><span class="pre">Interval</span></code> object:</p>
@@ -341,52 +360,31 @@
     <span class="n">distribution_parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">])])</span>
 </pre></div>
 </div>
-<!-- add some pbox plots herein -->
-<a class="bg-primary reference internal image-reference" href="_images/myAnimation.gif"><img alt="pbox dynamic visualisation" class="bg-primary align-center" src="_images/myAnimation.gif" style="width: 600px;" />
-</a>
-<p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> also features great natural language support as such characterisatin of input uncertainty can be intuitively done by using natural language like <code class="docutils literal notranslate"><span class="pre">about</span> <span class="pre">7</span></code> or simple expression like <code class="docutils literal notranslate"><span class="pre">[15</span> <span class="pre">+-</span> <span class="pre">10%]</span></code>, without worrying about the elicitation.</p>
-<section id="uq-multiverse">
-<h3>UQ multiverse<a class="headerlink" href="#uq-multiverse" title="Link to this heading">¶</a></h3>
-<p>UQ is a big world (like Marvel multiverse) consisting of abundant theories and software implementations on multiple platforms. Some notable examples include <a class="reference external" href="https://github.com/cossan-working-group/OpenCossan">OpenCossan</a>, <a class="reference external" href="https://www.uqlab.com/">UQlab</a> in Matlab and <a class="reference external" href="https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl">ProbabilityBoundsAnalysis.jl</a> in Julia, and many others of course. <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> builds upon on a few pioneering projects and will continue to be dedicated to support imprecise analysis in engineering using Python.</p>
-<!-- ## License
-
-`PyUncertainNumber` was created by Yu Chen (Leslie). It is licensed under the terms
-of the MIT license. -->
-<!-- ```{include} ../../README.md
-``` -->
-<!-- ## Features
-
-```{include} stubs/features-stub.md
-``` -->
-<!-- ## Quick Start
-
-```{include} stubs/quickstart-stub.md
-``` -->
-<!-- ## Parameters
-
-```{include} stubs/parameters-stub.md
-``` -->
-<!-- ## Learn More
-
-To learn more, checkout the sections below.
-
-```{eval-rst}
-.. container:: button
-
-   :doc:`Quick Start <quickstart>` :doc:`User Guide <user-guide>`
-   `Python Packages Book <https://py-pkgs.org/>`_ :doc:`Contributing Guidelines <contributing>`
+<!-- add some pbox plots herein
+```{image} ../../assets/myAnimation.gif
+:alt: pbox dynamic visualisation
+:class: bg-primary
+:width: 600px
+:align: center
 ``` -->
 </section>
+<section id="installation">
+<h2>installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<p>bla bla simple bla bla</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pyuncertainnumber
+</pre></div>
+</div>
+</section>
+<section id="uq-multiverse">
+<h2>UQ multiverse<a class="headerlink" href="#uq-multiverse" title="Link to this heading">¶</a></h2>
+<p>UQ is a big world (like Marvel multiverse) consisting of abundant theories and software implementations on multiple platforms. Some notable examples include <a class="reference external" href="https://github.com/cossan-working-group/OpenCossan">OpenCossan</a>, <a class="reference external" href="https://www.uqlab.com/">UQlab</a> in Matlab and <a class="reference external" href="https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl">ProbabilityBoundsAnalysis.jl</a> in Julia, and many others of course. <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> builds upon on a few pioneering projects and will continue to be dedicated to support imprecise analysis in engineering using Python.</p>
 </section>
 <section id="acknowledgements">
 <h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> was originally developed for use in the DAWS2 project. It has the capacity serve as a full-fleged UQ softwware to work beyond to fulfill general UQ challenges.</p>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
+</section>
+<section id="api-references">
+<h2>API references<a class="headerlink" href="#api-references" title="Link to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -423,33 +421,8 @@ To learn more, checkout the sections below.
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">PyUncertainNumber</a><ul>
-<li><a class="reference internal" href="#quick-start">quick start</a><ul>
-<li><a class="reference internal" href="#uq-multiverse">UQ multiverse</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#acknowledgements">Acknowledgements</a><ul>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

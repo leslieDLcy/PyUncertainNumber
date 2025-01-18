@@ -214,10 +214,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../guides/up.html">Propagation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">probability bounds analysis</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../pbox.html">Probability box</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../cbox.html">Confidence box</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../interval_analysis.html">interval analysis</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API references</span></p>
+<ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../../sampling/index.html">sampling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../endpoints/index.html">endpoints</a></li>
@@ -331,7 +334,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.propagation.utils.Propagation_results" title="pyuncertainnumber.propagation.utils.Propagation_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Propagation_results</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Stores the results of uncertainty propagation with multiple outputs, sharing raw_data x and f.</p></td>
 </tr>
 </tbody>
 </table>
@@ -369,21 +372,12 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyuncertainnumber.propagation.utils.Propagation_results">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.propagation.utils.</span></span><span class="sig-name descname"><span class="pre">Propagation_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">un</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.propagation.utils.Propagation_results" title="Link to this definition">¶</a></dt>
-<dd><dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.propagation.utils.Propagation_results.un">
-<span class="sig-name descname"><span class="pre">un</span></span><a class="headerlink" href="#pyuncertainnumber.propagation.utils.Propagation_results.un" title="Link to this definition">¶</a></dt>
-<dd><p>np.array of UncertainNumber objects (one for each output).</p>
+<dd><p>Stores the results of uncertainty propagation with multiple outputs, sharing raw_data x and f.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.propagation.utils.Propagation_results.raw_data">
-<span class="sig-name descname"><span class="pre">raw_data</span></span><a class="headerlink" href="#pyuncertainnumber.propagation.utils.Propagation_results.raw_data" title="Link to this definition">¶</a></dt>
-<dd><p>Dictionary containing raw data shared across outputs:
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>un</strong> (<em>np.ndarray</em>) – np.array of UncertainNumber objects (one for each output).</p></li>
+<li><p><strong>raw_data</strong> (<em>dict</em>) – <p>Dictionary containing raw data shared across outputs:
 x (np.ndarray): Input values.
 f (np.ndarray): Output values.
 min (np.ndarray): Array of dictionaries, one for each output,</p>
@@ -395,21 +389,13 @@ min (np.ndarray): Array of dictionaries, one for each output,</p>
 </dd>
 </dl>
 <p>bounds (np.ndarray): 2D array of lower and upper bounds for each output.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
+</p></li>
+</ul>
 </dd>
 </dl>
-</dd></dl>
-
 <p class="rubric">Notes</p>
 <ul class="simple">
 <li><p>use <cite>foo.un</cite> to access the UncertainNumber objects.</p></li>
-<li><dl class="simple">
-<dt>Stores the results of uncertainty propagation with multiple outputs,</dt><dd><p>sharing raw_data x and f.</p>
-</dd>
-</dl>
-</li>
 </ul>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyuncertainnumber.propagation.utils.Propagation_results.add_raw_data">
@@ -418,8 +404,8 @@ min (np.ndarray): Array of dictionaries, one for each output,</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyuncertainnumber.propagation.utils.Propagation_results.print">
-<span class="sig-name descname"><span class="pre">print</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.propagation.utils.Propagation_results.print" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyuncertainnumber.propagation.utils.Propagation_results.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.propagation.utils.Propagation_results.summary" title="Link to this definition">¶</a></dt>
 <dd><p>Prints the results in a formatted way, handling None values and multiple outputs.</p>
 </dd></dl>
 
@@ -655,10 +641,8 @@ and the third dimension corresponds to the original discretization points.</p></
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#pyuncertainnumber.propagation.utils.Propagation_results"><code class="docutils literal notranslate"><span class="pre">Propagation_results</span></code></a><ul>
-<li><a class="reference internal" href="#pyuncertainnumber.propagation.utils.Propagation_results.un"><code class="docutils literal notranslate"><span class="pre">Propagation_results.un</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.propagation.utils.Propagation_results.raw_data"><code class="docutils literal notranslate"><span class="pre">Propagation_results.raw_data</span></code></a></li>
 <li><a class="reference internal" href="#pyuncertainnumber.propagation.utils.Propagation_results.add_raw_data"><code class="docutils literal notranslate"><span class="pre">Propagation_results.add_raw_data()</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.propagation.utils.Propagation_results.print"><code class="docutils literal notranslate"><span class="pre">Propagation_results.print()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.propagation.utils.Propagation_results.summary"><code class="docutils literal notranslate"><span class="pre">Propagation_results.summary()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pyuncertainnumber.propagation.utils.header_results"><code class="docutils literal notranslate"><span class="pre">header_results()</span></code></a></li>

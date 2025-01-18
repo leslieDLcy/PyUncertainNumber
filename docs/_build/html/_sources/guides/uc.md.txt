@@ -55,7 +55,7 @@ Pbox arithmetic also extends the convolution of probability distributions which 
 ```{image} ../../../assets/addition_bound.png
 :alt: sum of two random variables without dependency specification
 :class: bg-primary
-:width: 600px
+:width: 400px
 :align: center
 
 The sum of two random variables of lognormal distribution without dependency specification
@@ -95,7 +95,7 @@ pun.hedge_interpret('about 200', return_type='pbox').display()
 ```{image} ../../../assets/about_200.png
 :alt: about 200
 :class: bg-primary
-:width: 600px
+:width: 400px
 :align: center
 
 hedged numerical expression "about 200"

@@ -56,3 +56,24 @@ myst_enable_extensions = [
     "dollarmath",
     "html_admonition",
 ]
+
+### LaTeX settings ###
+# f = open("latex-styling.tex", "r+")
+# PREAMBLE = f.read()
+
+# latex_elements = {
+#     # The paper size ('letterpaper' or 'a4paper').
+#     #'papersize': 'a4paper',
+#     # The font size ('10pt', '11pt' or '12pt').
+#     #'pointsize': '10pt',
+#     # Additional stuff for the LaTeX preamble.
+#     "preamble": PREAMBLE
+# }
+
+latex_elements = {
+    # Additional stuff for the LaTeX preamble.
+    # "preamble": r"\usepackage{etoc}",
+    "preamble": "\setcounter{tocdepth}{1}",
+    "fncychap": "\\usepackage[Conny]{fncychap}",
+    "extraclassoptions": "openany,oneside",
+}

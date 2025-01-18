@@ -30,30 +30,23 @@ Module Contents
 
 .. py:class:: Propagation_results(un: numpy.ndarray = None, raw_data: dict = None)
 
-   .. attribute:: un
+   Stores the results of uncertainty propagation with multiple outputs, sharing raw_data x and f.
 
-      np.array of UncertainNumber objects (one for each output).
-
-      :type: np.ndarray
-
-   .. attribute:: raw_data
-
-      Dictionary containing raw data shared across outputs:
-      x (np.ndarray): Input values.
-      f (np.ndarray): Output values.
-      min (np.ndarray): Array of dictionaries, one for each output,
-                        containing 'x', 'f' for the minimum of that output.
-      max (np.ndarray): Array of dictionaries, one for each output,
-                        containing 'x', 'f' for the maximum of that output.
-      bounds (np.ndarray): 2D array of lower and upper bounds for each output.
-
-      :type: dict
+   :param un: np.array of UncertainNumber objects (one for each output).
+   :type un: np.ndarray
+   :param raw_data: Dictionary containing raw data shared across outputs:
+                    x (np.ndarray): Input values.
+                    f (np.ndarray): Output values.
+                    min (np.ndarray): Array of dictionaries, one for each output,
+                                      containing 'x', 'f' for the minimum of that output.
+                    max (np.ndarray): Array of dictionaries, one for each output,
+                                      containing 'x', 'f' for the maximum of that output.
+                    bounds (np.ndarray): 2D array of lower and upper bounds for each output.
+   :type raw_data: dict
 
    .. rubric:: Notes
 
    - use `foo.un` to access the UncertainNumber objects.
-   - Stores the results of uncertainty propagation with multiple outputs,
-       sharing raw_data x and f.
 
 
    .. py:method:: add_raw_data(x=None, f=None, K=None, sign_x: numpy.ndarray = None)
@@ -62,7 +55,7 @@ Module Contents
 
 
 
-   .. py:method:: print()
+   .. py:method:: summary()
 
       Prints the results in a formatted way, handling None values and multiple outputs.
 
