@@ -234,7 +234,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/measurand/index.html">pyuncertainnumber.characterisation.measurand</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/multiple_UN/index.html">pyuncertainnumber.characterisation.multiple_UN</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/stats/index.html">pyuncertainnumber.characterisation.stats</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../characterisation/test/index.html">pyuncertainnumber.characterisation.test</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/uncertainNumber/index.html">pyuncertainnumber.characterisation.uncertainNumber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/uncertainty_types/index.html">pyuncertainnumber.characterisation.uncertainty_types</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/utils/index.html">pyuncertainnumber.characterisation.utils</a></li>
@@ -332,7 +331,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients" title="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients</span></code></a></p></td>
-<td><p></p></td>
+<td><p>A dataclass to store the regression coefficients of the approximator function</p></td>
 </tr>
 </tbody>
 </table>
@@ -380,6 +379,24 @@
 <dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.hedge_interpret">
 <span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">hedge_interpret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hedge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interval'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../pba/interval/index.html#pyuncertainnumber.pba.interval.Interval" title="pyuncertainnumber.pba.interval.Interval"><span class="pre">pyuncertainnumber.pba.interval.Interval</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../pba/pbox_base/index.html#pyuncertainnumber.pba.pbox_base.Pbox" title="pyuncertainnumber.pba.pbox_base.Pbox"><span class="pre">pyuncertainnumber.pba.pbox_base.Pbox</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.hedge_interpret" title="Link to this definition">¶</a></dt>
 <dd><p>interpret linguistic hedge words into UncertainNumber objects</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hedge</strong> (<em>str</em>) – the hedge numerical expression to be interpreted</p></li>
+<li><p><strong>return_type</strong> (<em>str</em>) – the type of object to be returned, either ‘interval’ or ‘pbox’</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>the return can either be an interval or a pbox object</p></li>
+</ul>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hedge_interpret</span><span class="p">(</span><span class="s2">&quot;about 200&quot;</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;pbox&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -405,7 +422,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">ApproximatorRegCoefficients</span></span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients" title="Link to this definition">¶</a></dt>
-<dd><dl class="py attribute">
+<dd><p>A dataclass to store the regression coefficients of the approximator function</p>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.A">
 <span class="sig-name descname"><span class="pre">A</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.A" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -566,7 +584,7 @@ f: if the last digit is 5 or 0. If the last digit is 5, $f=1$, otherwise $f=0$</
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2025, Yu Chen (Leslie)
+                Copyright &#169; 2025, (Leslie) Yu Chen
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

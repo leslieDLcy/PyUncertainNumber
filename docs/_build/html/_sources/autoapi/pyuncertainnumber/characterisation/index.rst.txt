@@ -16,7 +16,6 @@ Submodules
    /autoapi/pyuncertainnumber/characterisation/measurand/index
    /autoapi/pyuncertainnumber/characterisation/multiple_UN/index
    /autoapi/pyuncertainnumber/characterisation/stats/index
-   /autoapi/pyuncertainnumber/characterisation/test/index
    /autoapi/pyuncertainnumber/characterisation/uncertainNumber/index
    /autoapi/pyuncertainnumber/characterisation/uncertainty_types/index
    /autoapi/pyuncertainnumber/characterisation/utils/index

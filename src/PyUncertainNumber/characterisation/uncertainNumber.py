@@ -316,10 +316,8 @@ class UncertainNumber:
 
         args:
             - D: Distribution object
-            dist_family: str
-                the distribution family
-            dist_params: list, tuple or string
-                the distribution parameters
+            dist_family (str): the distribution family
+            dist_params (list, tuple or string): the distribution parameters
         """
         distSpec = DistributionSpecification(D.dist_family, D.dist_params)
 
@@ -359,16 +357,6 @@ class UncertainNumber:
     @classmethod
     def from_ds(cls, ds):
         cls.from_pbox(ds.to_pbox())
-
-    # @classmethod
-    # def from_ppbox(cls):
-    #     """ from parameterised pbox """
-    #     pass
-
-    # @classmethod
-    # def from_npbox(cls,):
-    #     """ from non-parametric pbox """
-    #     pass
 
     @classmethod
     def from_sps(cls, sps_dist):

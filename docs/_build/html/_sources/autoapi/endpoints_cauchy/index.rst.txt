@@ -17,6 +17,8 @@ Module Contents
 
 .. py:function:: cauchydeviates_method(x: numpy.ndarray, f: Callable, results: pyuncertainnumber.propagation.utils.Propagation_results = None, n_sam: int = 500, save_raw_data='no') -> pyuncertainnumber.propagation.utils.Propagation_results
 
+   This method propagates intervals through a balck box model with the endpoint Cauchy deviate method. It is an approximate method, so the user should expect non-identical results for different runs.
+
    :param x: A 2D NumPy array representing the intervals for each input variable.
              Each row should contain two elements: the lower and upper bounds of the interval.
    :type x: np.ndarray
@@ -26,6 +28,7 @@ Module Contents
              maximum Cauchy deviate (K) are returned.
    :type f: Callable
    :param results_class: The class to use for storing results (defaults to Propagation_results).
+   :type results_class: Propagation_results
    :param n_sam: The number of samples (Cauchy deviates) to generate for each input variable (defaults 500 samples).
    :type n_sam: int
    :param save_raw_data: Whether to save raw data. Defaults to 'no'.
@@ -35,11 +38,6 @@ Module Contents
    signature:
        cauchydeviate_method(x: np.ndarray, f: Callable, results_class = Propagation_results,
                        n_sam: int, save_raw_data='no') -> dict
-
-   .. note::
-
-      - This method propagates intervals through a balck box model with the endpoint Cauchy deviate method.
-      - It is an approximate method, so the user should expect non-identical results for different runs.
 
    :returns:
 
@@ -57,17 +55,8 @@ Module Contents
 
    .. rubric:: Example
 
-   # Example usage with different parameters for minimization and maximization
-   f = lambda x: x[0] + x[1] + x[2]  # Example function
-
-   # Determine input parameters for function and method
-   x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-   n=50
-
-   # Call the method
-   y = cauchydeviates_method(x_bounds,f=f, n_sam=n, save_raw_data = 'yes')
-
-   # print the results
-   y.print()
+   >>> f = lambda x: x[0] + x[1] + x[2]  # Example function
+   >>> x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+   >>> y = cauchydeviates_method(x_bounds,f=f, n_sam=50, save_raw_data = 'yes')
 
 

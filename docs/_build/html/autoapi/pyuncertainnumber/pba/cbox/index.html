@@ -234,7 +234,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/measurand/index.html">pyuncertainnumber.characterisation.measurand</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/multiple_UN/index.html">pyuncertainnumber.characterisation.multiple_UN</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/stats/index.html">pyuncertainnumber.characterisation.stats</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../characterisation/test/index.html">pyuncertainnumber.characterisation.test</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/uncertainNumber/index.html">pyuncertainnumber.characterisation.uncertainNumber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/uncertainty_types/index.html">pyuncertainnumber.characterisation.uncertainty_types</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../characterisation/utils/index.html">pyuncertainnumber.characterisation.utils</a></li>
@@ -326,8 +325,6 @@
         <article role="main" id="furo-main-content">
           <section id="module-pyuncertainnumber.pba.cbox">
 <span id="pyuncertainnumber-pba-cbox"></span><h1>pyuncertainnumber.pba.cbox<a class="headerlink" href="#module-pyuncertainnumber.pba.cbox" title="Link to this heading">¶</a></h1>
-<p>the mattered cbox modules
-Originally written by Scott in R and translated to Python also expanded functionality by Leslie</p>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
@@ -349,9 +346,9 @@ Originally written by Scott in R and translated to Python also expanded function
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.cbox.interval_measurements" title="pyuncertainnumber.pba.cbox.interval_measurements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interval_measurements</span></code></a>(func)</p></td>
-<td><p>not so simple</p></td>
+<td><p>decorator for incorporating interval valued data</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.cbox.infer_cbox" title="pyuncertainnumber.pba.cbox.infer_cbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_cbox</span></code></a>(family, data, **args)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.cbox.infer_cbox" title="pyuncertainnumber.pba.cbox.infer_cbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_cbox</span></code></a>(→ pyuncertainnumber.pba.cbox_Leslie.Cbox)</p></td>
 <td><p>top-level call signature to infer a c-box given data and family, plus rarely additional kwargs</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.cbox.infer_predictive_distribution" title="pyuncertainnumber.pba.cbox.infer_predictive_distribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_predictive_distribution</span></code></a>(family, data, **args)</p></td>
@@ -444,18 +441,22 @@ Originally written by Scott in R and translated to Python also expanded function
 <dl class="py function">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.cbox.interval_measurements">
 <span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.cbox.</span></span><span class="sig-name descname"><span class="pre">interval_measurements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.cbox.interval_measurements" title="Link to this definition">¶</a></dt>
-<dd><p>not so simple</p>
+<dd><p>decorator for incorporating interval valued data</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.cbox.infer_cbox">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.cbox.</span></span><span class="sig-name descname"><span class="pre">infer_cbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.cbox.infer_cbox" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.cbox.</span></span><span class="sig-name descname"><span class="pre">infer_cbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../cbox_Leslie/index.html#pyuncertainnumber.pba.cbox_Leslie.Cbox" title="pyuncertainnumber.pba.cbox_Leslie.Cbox"><span class="pre">pyuncertainnumber.pba.cbox_Leslie.Cbox</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.pba.cbox.infer_cbox" title="Link to this definition">¶</a></dt>
 <dd><p>top-level call signature to infer a c-box given data and family, plus rarely additional kwargs</p>
 <p class="rubric">Notes</p>
 <ul class="simple">
 <li><p>data (list): a list of data samples, e.g. [2]</p></li>
 <li><p>additina kwargs such as N for binomial family</p></li>
 </ul>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">infer_cbox</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="n">binomial</span><span class="s1">&#39;, data=[2], N=10)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -676,7 +677,7 @@ meaning the no of ppf in analytical style and the no of MC samples in samples st
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2025, Yu Chen (Leslie)
+                Copyright &#169; 2025, (Leslie) Yu Chen
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

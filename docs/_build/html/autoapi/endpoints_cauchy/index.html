@@ -234,7 +234,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/measurand/index.html">pyuncertainnumber.characterisation.measurand</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/multiple_UN/index.html">pyuncertainnumber.characterisation.multiple_UN</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/stats/index.html">pyuncertainnumber.characterisation.stats</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/test/index.html">pyuncertainnumber.characterisation.test</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/uncertainNumber/index.html">pyuncertainnumber.characterisation.uncertainNumber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/uncertainty_types/index.html">pyuncertainnumber.characterisation.uncertainty_types</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/utils/index.html">pyuncertainnumber.characterisation.utils</a></li>
@@ -332,7 +331,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#endpoints_cauchy.cauchydeviates_method" title="endpoints_cauchy.cauchydeviates_method"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cauchydeviates_method</span></code></a>(...)</p></td>
-<td><p></p></td>
+<td><p>This method propagates intervals through a balck box model with the endpoint Cauchy deviate method. It is an approximate method, so the user should expect non-identical results for different runs.</p></td>
 </tr>
 </tbody>
 </table>
@@ -343,7 +342,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="endpoints_cauchy.cauchydeviates_method">
 <span class="sig-prename descclassname"><span class="pre">endpoints_cauchy.</span></span><span class="sig-name descname"><span class="pre">cauchydeviates_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyuncertainnumber/propagation/utils/index.html#pyuncertainnumber.propagation.utils.Propagation_results" title="pyuncertainnumber.propagation.utils.Propagation_results"><span class="pre">pyuncertainnumber.propagation.utils.Propagation_results</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_raw_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'no'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../pyuncertainnumber/propagation/utils/index.html#pyuncertainnumber.propagation.utils.Propagation_results" title="pyuncertainnumber.propagation.utils.Propagation_results"><span class="pre">pyuncertainnumber.propagation.utils.Propagation_results</span></a></span></span><a class="headerlink" href="#endpoints_cauchy.cauchydeviates_method" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>This method propagates intervals through a balck box model with the endpoint Cauchy deviate method. It is an approximate method, so the user should expect non-identical results for different runs.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>np.ndarray</em>) – A 2D NumPy array representing the intervals for each input variable.
@@ -352,7 +352,7 @@ Each row should contain two elements: the lower and upper bounds of the interval
 and returns a single output value or an array of output values.
 Can be None, in which case only the Cauchy deviates (x) and the
 maximum Cauchy deviate (K) are returned.</p></li>
-<li><p><strong>results_class</strong> – The class to use for storing results (defaults to Propagation_results).</p></li>
+<li><p><strong>results_class</strong> (<a class="reference internal" href="../pyuncertainnumber/propagation/utils/index.html#pyuncertainnumber.propagation.utils.Propagation_results" title="pyuncertainnumber.propagation.utils.Propagation_results"><em>Propagation_results</em></a>) – The class to use for storing results (defaults to Propagation_results).</p></li>
 <li><p><strong>n_sam</strong> (<em>int</em>) – The number of samples (Cauchy deviates) to generate for each input variable (defaults 500 samples).</p></li>
 <li><p><strong>save_raw_data</strong> (<em>str</em><em>, </em><em>optional</em>) – Whether to save raw data. Defaults to ‘no’.
 Currently not supported by this method.</p></li>
@@ -366,13 +366,6 @@ Currently not supported by this method.</p></li>
 </dl>
 </dd>
 </dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<ul class="simple">
-<li><p>This method propagates intervals through a balck box model with the endpoint Cauchy deviate method.</p></li>
-<li><p>It is an approximate method, so the user should expect non-identical results for different runs.</p></li>
-</ul>
-</div>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><dl class="simple">
@@ -409,15 +402,11 @@ Currently not supported by this method.</p></li>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<p># Example usage with different parameters for minimization and maximization
-f = lambda x: x[0] + x[1] + x[2]  # Example function</p>
-<p># Determine input parameters for function and method
-x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-n=50</p>
-<p># Call the method
-y = cauchydeviates_method(x_bounds,f=f, n_sam=n, save_raw_data = ‘yes’)</p>
-<p># print the results
-y.print()</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># Example function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">cauchydeviates_method</span><span class="p">(</span><span class="n">x_bounds</span><span class="p">,</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">n_sam</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">save_raw_data</span> <span class="o">=</span> <span class="s1">&#39;yes&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -452,7 +441,7 @@ y.print()</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2025, Yu Chen (Leslie)
+                Copyright &#169; 2025, (Leslie) Yu Chen
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

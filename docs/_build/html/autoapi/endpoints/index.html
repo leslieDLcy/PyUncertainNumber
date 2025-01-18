@@ -234,7 +234,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/measurand/index.html">pyuncertainnumber.characterisation.measurand</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/multiple_UN/index.html">pyuncertainnumber.characterisation.multiple_UN</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/stats/index.html">pyuncertainnumber.characterisation.stats</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/test/index.html">pyuncertainnumber.characterisation.test</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/uncertainNumber/index.html">pyuncertainnumber.characterisation.uncertainNumber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/uncertainty_types/index.html">pyuncertainnumber.characterisation.uncertainty_types</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/utils/index.html">pyuncertainnumber.characterisation.utils</a></li>
@@ -345,8 +344,7 @@
 <span class="sig-prename descclassname"><span class="pre">endpoints.</span></span><span class="sig-name descname"><span class="pre">endpoints_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyuncertainnumber/propagation/utils/index.html#pyuncertainnumber.propagation.utils.Propagation_results" title="pyuncertainnumber.propagation.utils.Propagation_results"><span class="pre">pyuncertainnumber.propagation.utils.Propagation_results</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_raw_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'no'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../pyuncertainnumber/propagation/utils/index.html#pyuncertainnumber.propagation.utils.Propagation_results" title="pyuncertainnumber.propagation.utils.Propagation_results"><span class="pre">pyuncertainnumber.propagation.utils.Propagation_results</span></a></span></span><a class="headerlink" href="#endpoints.endpoints_method" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Performs uncertainty propagation using the Endpoints Method. The function assumes that the intervals in <cite>x</cite> represent uncertainties
-and aims to provide conservative bounds on the output uncertainty.
-If the <cite>f</cite> function returns multiple outputs, the <cite>bounds</cite> array will be 2-dimensional.</p>
+and aims to provide conservative bounds on the output uncertainty. If the <cite>f</cite> function returns multiple outputs, the <cite>bounds</cite> array will be 2-dimensional.</p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -446,7 +444,7 @@ x_bounds = np.array([[1, 2], [3, 4], [5, 6]])</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2025, Yu Chen (Leslie)
+                Copyright &#169; 2025, (Leslie) Yu Chen
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

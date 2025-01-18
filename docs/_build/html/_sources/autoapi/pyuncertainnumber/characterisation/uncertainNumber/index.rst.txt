@@ -299,10 +299,10 @@ Module Contents
       create an Uncertain Number from specification of distribution
 
       :param - D: Distribution object
-      :param dist_family: str
-                          the distribution family
-      :param dist_params: list, tuple or string
-                          the distribution parameters
+      :param dist_family: the distribution family
+      :type dist_family: str
+      :param dist_params: the distribution parameters
+      :type dist_params: list, tuple or string
 
 
 

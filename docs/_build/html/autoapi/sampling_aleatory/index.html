@@ -234,7 +234,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/measurand/index.html">pyuncertainnumber.characterisation.measurand</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/multiple_UN/index.html">pyuncertainnumber.characterisation.multiple_UN</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/stats/index.html">pyuncertainnumber.characterisation.stats</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/test/index.html">pyuncertainnumber.characterisation.test</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/uncertainNumber/index.html">pyuncertainnumber.characterisation.uncertainNumber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/uncertainty_types/index.html">pyuncertainnumber.characterisation.uncertainty_types</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyuncertainnumber/characterisation/utils/index.html">pyuncertainnumber.characterisation.utils</a></li>
@@ -332,7 +331,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#sampling_aleatory.sampling_aleatory_method" title="sampling_aleatory.sampling_aleatory_method"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sampling_aleatory_method</span></code></a>(...)</p></td>
-<td><p></p></td>
+<td><p>Performs uncertainty propagation using Monte Carlo or Latin Hypercube sampling,  similar to the <cite>sampling_method</cite>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -343,7 +342,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="sampling_aleatory.sampling_aleatory_method">
 <span class="sig-prename descclassname"><span class="pre">sampling_aleatory.</span></span><span class="sig-name descname"><span class="pre">sampling_aleatory_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyuncertainnumber/propagation/utils/index.html#pyuncertainnumber.propagation.utils.Propagation_results" title="pyuncertainnumber.propagation.utils.Propagation_results"><span class="pre">pyuncertainnumber.propagation.utils.Propagation_results</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'monte_carlo'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_raw_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'no'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../pyuncertainnumber/propagation/utils/index.html#pyuncertainnumber.propagation.utils.Propagation_results" title="pyuncertainnumber.propagation.utils.Propagation_results"><span class="pre">pyuncertainnumber.propagation.utils.Propagation_results</span></a></span></span><a class="headerlink" href="#sampling_aleatory.sampling_aleatory_method" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Performs uncertainty propagation using Monte Carlo or Latin Hypercube sampling,  similar to the <cite>sampling_method</cite>.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>-</em>) – A list of <cite>UncertainNumber</cite> objects, each representing an input
@@ -383,8 +383,6 @@ Defaults to ‘no’.</p></li>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
-<li><p>Performs uncertainty propagation using Monte Carlo or Latin Hypercube sampling,
-similar to the <cite>sampling_method</cite>.</p></li>
 <li><p>If the <cite>f</cite> function returns multiple outputs, the code can accomodate.</p></li>
 </ul>
 </div>
@@ -424,49 +422,9 @@ provided).</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<p>from PyUncertainNumber import UncertainNumber</p>
-<p>def Fun(x):</p>
-<blockquote>
-<div><p>input1= x[0]
-input2=x[1]
-input3=x[2]
-input4=x[3]
-input5=x[4]</p>
-<p>output1 = input1 + input2 + input3 + input4 + input5
-output2 = input1 * input2 * input3 * input4 * input5</p>
-<p>return np.array([output1, output2])</p>
-</div></blockquote>
-<p>means = np.array([1, 2, 3, 4, 5])
-stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])</p>
-<dl class="simple">
-<dt>x = [</dt><dd><p>UncertainNumber(essence = ‘distribution’, distribution_parameters= [“gaussian”,[means[0], stds[0]]]),</p>
-</dd>
-</dl>
-<p>from PyUncertainNumber import UncertainNumber</p>
-<p>def Fun(x):</p>
-<blockquote>
-<div><p>input1= x[0]
-input2=x[1]
-input3=x[2]
-input4=x[3]
-input5=x[4]</p>
-<p>output1 = input1 + input2 + input3 + input4 + input5
-output2 = input1 * input2 * input3 * input4 * input5</p>
-<p>return np.array([output1, output2])</p>
-</div></blockquote>
-<p>means = np.array([1, 2, 3, 4, 5])
-stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])</p>
-<dl>
-<dt>x = [</dt><dd><p>UncertainNumber(essence = ‘distribution’, distribution_parameters= [“gaussian”,[means[0], stds[0]]]),</p>
-<p>UncertainNumber(essence = ‘distribution’, distribution_parameters= [“gaussian”,[means[1], stds[1]]]),
-UncertainNumber(essence = ‘distribution’, distribution_parameters= [“gaussian”,[means[2], stds[2]]]),
-UncertainNumber(essence = ‘distribution’, distribution_parameters= [“gaussian”,[means[3], stds[3]]]),
-UncertainNumber(essence = ‘distribution’, distribution_parameters= [“gaussian”,[means[4], stds[4]]]),
-]</p>
-</dd>
-</dl>
-<p>results = sampling_aleatory_method(x=x, f=Fun, n_sam = 300, method = ‘monte_carlo’, save_raw_data = “no”)</p>
-<p>results.print()</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">sampling_aleatory_method</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">Fun</span><span class="p">,</span> <span class="n">n_sam</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;monte_carlo&#39;</span><span class="p">,</span> <span class="n">save_raw_data</span> <span class="o">=</span> <span class="s2">&quot;no&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -501,7 +459,7 @@ UncertainNumber(essence = ‘distribution’, distribution_parameters= [“gauss
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2025, Yu Chen (Leslie)
+                Copyright &#169; 2025, (Leslie) Yu Chen
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

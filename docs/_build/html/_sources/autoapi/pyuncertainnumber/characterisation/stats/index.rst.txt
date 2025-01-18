@@ -126,7 +126,7 @@ Module Contents
 
 .. py:function:: fit(method: str, family: str, data: numpy.ndarray)
 
-   top-level fit function
+   top-level fit from data
 
    :param - method: method of fitting, e.g., {'mle' or 'mom'} 'entropy', 'pert', 'fermi', 'bayesian'
    :type - method: str
@@ -139,7 +139,11 @@ Module Contents
 
    :returns:
 
-             - the return from the constructors below are `scipy.stats.dist` objects
+             - the return from the constructors below are `scipy.stats.dist` objects or `UN` objects depending on the decorator
+
+   .. rubric:: Example
+
+   >>> pun.fit('mle', 'norm', np.random.normal(0, 1, 100))
 
 
 .. py:function:: MMbernoulli(x)
@@ -226,7 +230,7 @@ Module Contents
 
 .. py:function:: MLbinomial(x)
 
-   # TODO
+   # TODO to check
    #! no fitting func for scipy discrete distributions
 
 
@@ -234,7 +238,7 @@ Module Contents
 
 .. py:function:: MLexponential(x)
 
-   a standalone caller for exponential distribution, not in use yet
+   a standalone caller for exponential distribution with interval data (not in use yet)
 
 
 .. py:function:: MLF(x)

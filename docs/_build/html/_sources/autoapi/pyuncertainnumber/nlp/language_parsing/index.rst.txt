@@ -35,6 +35,17 @@ Module Contents
 
    interpret linguistic hedge words into UncertainNumber objects
 
+   :param hedge: the hedge numerical expression to be interpreted
+   :type hedge: str
+   :param return_type: the type of object to be returned, either 'interval' or 'pbox'
+   :type return_type: str
+
+   .. note:: - the return can either be an interval or a pbox object
+
+   .. rubric:: Example
+
+   >>> hedge_interpret("about 200", return_type="pbox")
+
 
 .. py:function:: parse_interval_expression(expression)
 
@@ -49,6 +60,9 @@ Module Contents
 
 
 .. py:class:: ApproximatorRegCoefficients
+
+   A dataclass to store the regression coefficients of the approximator function
+
 
    .. py:attribute:: A
       :type:  float

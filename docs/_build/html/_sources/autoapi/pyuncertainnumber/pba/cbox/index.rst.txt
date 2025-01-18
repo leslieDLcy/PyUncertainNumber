@@ -3,12 +3,6 @@ pyuncertainnumber.pba.cbox
 
 .. py:module:: pyuncertainnumber.pba.cbox
 
-.. autoapi-nested-parse::
-
-   the mattered cbox modules
-   Originally written by Scott in R and translated to Python also expanded functionality by Leslie
-
-
 
 Attributes
 ----------
@@ -60,10 +54,10 @@ Module Contents
 
 .. py:function:: interval_measurements(func)
 
-   not so simple
+   decorator for incorporating interval valued data
 
 
-.. py:function:: infer_cbox(family: str, data, **args)
+.. py:function:: infer_cbox(family: str, data, **args) -> pyuncertainnumber.pba.cbox_Leslie.Cbox
 
    top-level call signature to infer a c-box given data and family, plus rarely additional kwargs
 
@@ -71,6 +65,10 @@ Module Contents
 
    - data (list): a list of data samples, e.g. [2]
    - additina kwargs such as N for binomial family
+
+   .. rubric:: Example
+
+   >>> infer_cbox(''binomial', data=[2], N=10)
 
 
 .. py:function:: infer_predictive_distribution(family: str, data, **args)
