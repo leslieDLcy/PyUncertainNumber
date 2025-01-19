@@ -278,6 +278,11 @@ class UncertainNumber:
     # * ---------------------other constructors--------------------- *#
 
     @classmethod
+    def I(cls, i: list[float | int]):
+        """create a shorcut an interval-type UN object"""
+        return cls(essence="interval", bounds=i)
+
+    @classmethod
     def from_hedge(cls, hedged_language):
         """create an Uncertain Number from hedged language
 
