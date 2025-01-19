@@ -1,0 +1,2315 @@
+pyuncertainnumber
+=================
+
+.. py:module:: pyuncertainnumber
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyuncertainnumber/UV/index
+   /autoapi/pyuncertainnumber/characterisation/index
+   /autoapi/pyuncertainnumber/nlp/index
+   /autoapi/pyuncertainnumber/pba/index
+   /autoapi/pyuncertainnumber/propagation/index
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyuncertainnumber.normal
+   pyuncertainnumber.N
+   pyuncertainnumber.gaussian
+   pyuncertainnumber.U
+   pyuncertainnumber.lognorm
+   pyuncertainnumber.named_pbox
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyuncertainnumber.UncertainNumber
+   pyuncertainnumber.nInterval
+   pyuncertainnumber.Pbox
+   pyuncertainnumber.Params
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.stochastic_mixture
+   pyuncertainnumber.known_constraints
+   pyuncertainnumber.min_max
+   pyuncertainnumber.min_max_mean
+   pyuncertainnumber.min_mean
+   pyuncertainnumber.min_max_mean_std
+   pyuncertainnumber.min_max_mean_var
+   pyuncertainnumber.min_max_mode
+   pyuncertainnumber.min_max_median
+   pyuncertainnumber.min_max_median_is_mode
+   pyuncertainnumber.mean_std
+   pyuncertainnumber.mean_var
+   pyuncertainnumber.pos_mean_std
+   pyuncertainnumber.symmetric_mean_std
+   pyuncertainnumber.from_percentiles
+   pyuncertainnumber.KS_bounds
+   pyuncertainnumber.fit
+   pyuncertainnumber.wc_interval
+   pyuncertainnumber._get_bounds
+   pyuncertainnumber._bound_pcdf
+   pyuncertainnumber.makePbox
+   pyuncertainnumber.norm
+   pyuncertainnumber.lognormal
+   pyuncertainnumber.alpha
+   pyuncertainnumber.anglit
+   pyuncertainnumber.argus
+   pyuncertainnumber.arcsine
+   pyuncertainnumber.beta
+   pyuncertainnumber.betaprime
+   pyuncertainnumber.bradford
+   pyuncertainnumber.burr
+   pyuncertainnumber.burr12
+   pyuncertainnumber.cauchy
+   pyuncertainnumber.chi
+   pyuncertainnumber.chi2
+   pyuncertainnumber.cosine
+   pyuncertainnumber.crystalball
+   pyuncertainnumber.dgamma
+   pyuncertainnumber.dweibull
+   pyuncertainnumber.erlang
+   pyuncertainnumber.expon
+   pyuncertainnumber.exponnorm
+   pyuncertainnumber.exponweib
+   pyuncertainnumber.exponpow
+   pyuncertainnumber.f
+   pyuncertainnumber.fatiguelife
+   pyuncertainnumber.fisk
+   pyuncertainnumber.foldcauchy
+   pyuncertainnumber.foldnorm
+   pyuncertainnumber.genlogistic
+   pyuncertainnumber.gennorm
+   pyuncertainnumber.genpareto
+   pyuncertainnumber.genexpon
+   pyuncertainnumber.genextreme
+   pyuncertainnumber.gausshyper
+   pyuncertainnumber.gamma
+   pyuncertainnumber.gengamma
+   pyuncertainnumber.genhalflogistic
+   pyuncertainnumber.geninvgauss
+   pyuncertainnumber.gompertz
+   pyuncertainnumber.gumbel_r
+   pyuncertainnumber.gumbel_l
+   pyuncertainnumber.halfcauchy
+   pyuncertainnumber.halflogistic
+   pyuncertainnumber.halfnorm
+   pyuncertainnumber.halfgennorm
+   pyuncertainnumber.hypsecant
+   pyuncertainnumber.invgamma
+   pyuncertainnumber.invgauss
+   pyuncertainnumber.invweibull
+   pyuncertainnumber.irwinhall
+   pyuncertainnumber.jf_skew_t
+   pyuncertainnumber.johnsonsb
+   pyuncertainnumber.johnsonsu
+   pyuncertainnumber.kappa4
+   pyuncertainnumber.kappa3
+   pyuncertainnumber.ksone
+   pyuncertainnumber.kstwo
+   pyuncertainnumber.kstwobign
+   pyuncertainnumber.laplace
+   pyuncertainnumber.laplace_asymmetric
+   pyuncertainnumber.levy
+   pyuncertainnumber.levy_l
+   pyuncertainnumber.levy_stable
+   pyuncertainnumber.logistic
+   pyuncertainnumber.loggamma
+   pyuncertainnumber.loglaplace
+   pyuncertainnumber.loguniform
+   pyuncertainnumber.lomax
+   pyuncertainnumber.maxwell
+   pyuncertainnumber.mielke
+   pyuncertainnumber.moyal
+   pyuncertainnumber.nakagami
+   pyuncertainnumber.ncx2
+   pyuncertainnumber.ncf
+   pyuncertainnumber.nct
+   pyuncertainnumber.norminvgauss
+   pyuncertainnumber.pareto
+   pyuncertainnumber.pearson3
+   pyuncertainnumber.powerlaw
+   pyuncertainnumber.powerlognorm
+   pyuncertainnumber.powernorm
+   pyuncertainnumber.rdist
+   pyuncertainnumber.rayleigh
+   pyuncertainnumber.rel_breitwigner
+   pyuncertainnumber.rice
+   pyuncertainnumber.recipinvgauss
+   pyuncertainnumber.semicircular
+   pyuncertainnumber.skewcauchy
+   pyuncertainnumber.skewnorm
+   pyuncertainnumber.studentized_range
+   pyuncertainnumber.t
+   pyuncertainnumber.trapezoid
+   pyuncertainnumber.triang
+   pyuncertainnumber.truncexpon
+   pyuncertainnumber.truncnorm
+   pyuncertainnumber.truncpareto
+   pyuncertainnumber.truncweibull_min
+   pyuncertainnumber.tukeylambda
+   pyuncertainnumber.uniform_sps
+   pyuncertainnumber.vonmises
+   pyuncertainnumber.vonmises_line
+   pyuncertainnumber.wald
+   pyuncertainnumber.weibull_min
+   pyuncertainnumber.weibull_max
+   pyuncertainnumber.wrapcauchy
+   pyuncertainnumber.trapz
+   pyuncertainnumber.uniform
+   pyuncertainnumber.weibull
+   pyuncertainnumber.KM
+   pyuncertainnumber.KN
+   pyuncertainnumber.bernoulli
+   pyuncertainnumber.betabinom
+   pyuncertainnumber.betanbinom
+   pyuncertainnumber.binom
+   pyuncertainnumber.boltzmann
+   pyuncertainnumber.dlaplace
+   pyuncertainnumber.geom
+   pyuncertainnumber.hypergeom
+   pyuncertainnumber.logser
+   pyuncertainnumber.nbinom
+   pyuncertainnumber.nchypergeom_fisher
+   pyuncertainnumber.nchypergeom_wallenius
+   pyuncertainnumber.nhypergeom
+   pyuncertainnumber.planck
+   pyuncertainnumber.poisson
+   pyuncertainnumber.randint
+   pyuncertainnumber.skellam
+   pyuncertainnumber.yulesimon
+   pyuncertainnumber.zipf
+   pyuncertainnumber.zipfian
+   pyuncertainnumber.hedge_interpret
+
+
+Package Contents
+----------------
+
+.. py:class:: UncertainNumber
+
+   Uncertain Number class
+
+   :param - `bounds`;:
+   :param - `distribution_parameters`: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
+   :param - `pbox_initialisation`: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
+   :param -  naked_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
+
+   .. rubric:: Example
+
+   >>> UncertainNumber(name="velocity", symbol="v", units="m/s", bounds=[1, 2])
+
+
+   .. py:attribute:: name
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: symbol
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: units
+      :type:  Type[any]
+      :value: None
+
+
+
+   .. py:attribute:: _Q
+      :type:  Type[any]
+      :value: None
+
+
+
+   .. py:attribute:: uncertainty_type
+      :type:  Type[pyuncertainnumber.characterisation.uncertainty_types.Uncertainty_types]
+      :value: None
+
+
+
+   .. py:attribute:: essence
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: masses
+      :type:  list[float]
+      :value: None
+
+
+
+   .. py:attribute:: bounds
+      :type:  Union[List[float], str]
+      :value: None
+
+
+
+   .. py:attribute:: distribution_parameters
+      :type:  list[str, float | int]
+      :value: None
+
+
+
+   .. py:attribute:: pbox_parameters
+      :type:  list[str, Sequence[pyuncertainnumber.pba.interval.Interval]]
+      :value: None
+
+
+
+   .. py:attribute:: hedge
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: _construct
+      :type:  Type[any]
+      :value: None
+
+
+
+   .. py:attribute:: naked_value
+      :type:  float
+      :value: None
+
+
+
+   .. py:attribute:: p_flag
+      :type:  bool
+      :value: True
+
+
+
+   .. py:attribute:: measurand
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: nature
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: provenence
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: justification
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: structure
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: security
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: ensemble
+      :type:  Type[pyuncertainnumber.characterisation.ensemble.Ensemble]
+      :value: None
+
+
+
+   .. py:attribute:: variability
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: dependence
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: uncertainty
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: instances
+      :value: []
+
+
+
+   .. py:attribute:: _samples
+      :type:  pyuncertainnumber.characterisation.utils.np.ndarray | list
+      :value: None
+
+
+
+   .. py:method:: parameterised_pbox_specification()
+
+
+   .. py:method:: __post_init__()
+
+      the de facto initialisation method for the core math objects of the UN class
+
+      caveat:
+          user needs to by themselves figure out the correct
+          shape of the 'distribution_parameters', such as ['uniform', [1,2]]
+
+
+
+   .. py:method:: match_pbox(keyword, parameters)
+      :staticmethod:
+
+
+      match the distribution keyword from the initialisation to create the underlying distribution object
+
+      :param - keyword: (str) the distribution keyword
+      :param - parameters: (list) the parameters of the distribution
+
+
+
+   .. py:method:: init_check()
+
+      check if the UN initialisation specification is correct
+
+      .. note::
+
+         a lot of things to double check. keep an growing list:
+         1. unit
+         2. hedge: user cannot speficy both 'hedge' and 'bounds'. 'bounds' takes precedence.
+
+
+
+   .. py:method:: __str__()
+
+      the verbose user-friendly string representation
+      .. note::
+
+         this has nothing to do with the logic of JSON serialisation
+         ergo, do whatever you fancy;
+
+
+
+   .. py:method:: __repr__() -> str
+
+      concise __repr__
+
+
+
+   .. py:method:: describe(type='verbose')
+
+      print out a verbose description of the uncertain number
+
+
+
+   .. py:method:: _get_concise_representation()
+
+      get a concise representation of the UN object
+
+
+
+   .. py:method:: ci()
+
+      get 95% range confidence interval
+
+
+
+   .. py:method:: display(**kwargs)
+
+      quick plot of the uncertain number object
+
+
+
+   .. py:property:: construct
+
+
+   .. py:method:: from_hedge(hedged_language)
+      :classmethod:
+
+
+      create an Uncertain Number from hedged language
+
+      .. note::
+
+         # if interval or pbox, to be implemented later on
+         #  currently only Interval is supported
+
+
+
+   .. py:method:: fromConstruct(construct)
+      :classmethod:
+
+
+      create an Uncertain Number from a construct object
+
+
+
+   .. py:method:: fromDistribution(D, **kwargs)
+      :classmethod:
+
+
+      create an Uncertain Number from specification of distribution
+
+      :param - D: Distribution object
+      :param dist_family: the distribution family
+      :type dist_family: str
+      :param dist_params: the distribution parameters
+      :type dist_params: list, tuple or string
+
+
+
+   .. py:method:: from_Interval(u)
+      :classmethod:
+
+
+
+   .. py:method:: from_pbox(p)
+      :classmethod:
+
+
+      genenal from  pbox
+
+
+
+   .. py:method:: from_ds(ds)
+      :classmethod:
+
+
+
+   .. py:method:: from_sps(sps_dist)
+      :classmethod:
+
+
+      create an UN object from a parametric scipy.stats dist object
+      #! it seems that a function will suffice
+      :param - sps_dist: scipy.stats dist object
+
+      .. note:: - sps_dist --> UN.Distribution object
+
+
+
+   .. py:method:: sqrt()
+
+
+   .. py:method:: __add__(other)
+
+      add two uncertain numbers
+
+
+
+   .. py:method:: __radd__(other)
+
+
+   .. py:method:: __sub__(other)
+
+
+   .. py:method:: __mul__(other)
+
+      multiply two uncertain numbers
+
+
+
+   .. py:method:: __rmul__(other)
+
+
+   .. py:method:: __truediv__(other)
+
+      divide two uncertain numbers
+
+
+
+   .. py:method:: __rtruediv__(other)
+
+
+   .. py:method:: __pow__(other)
+
+      power of two uncertain numbers
+
+
+
+   .. py:method:: _toIntervalBackend(vars=None) -> pyuncertainnumber.characterisation.utils.np.array
+      :classmethod:
+
+
+      transform any UN object to an `interval`
+      #! currently in use
+      # TODO think if use Marco's Interval Vector object
+
+      question:
+          - what is the `interval` representation: list, nd.array or Interval object?
+
+      :returns:
+
+                - 2D np.array representation for all the interval-typed UNs
+
+
+
+   .. py:method:: _IntervaltoCompBackend(vars)
+      :classmethod:
+
+
+      convert the interval-tupe UNs instantiated to the computational backend
+
+      .. note::
+
+         - it will automatically convert all the UN objects in array-like to the computational backend
+         - essentially vars shall be all interval-typed UNs by now
+
+      :returns:
+
+                - nd.array or Marco's Interval object
+
+      thoughts:
+          - if Marco's, then we'd use `intervalise` func to get all interval objects
+          and then to create another func to convert the interval objects to np.array to do endpoints method
+
+
+
+   .. py:method:: JSON_dump(filename='UN_data.json')
+
+      the JSON serialisation of the UN object into the filesystem
+
+
+
+   .. py:method:: random(size=None)
+
+      Generate random samples from the distribution.
+
+
+
+   .. py:method:: ppf(q=None)
+
+      "Calculate the percent point function (inverse of CDF) at quantile q.
+
+
+
+.. py:function:: stochastic_mixture(l_uns, weights=None, display=False, **kwargs)
+
+   it could work for either Pbox, distribution, DS structure or Intervals
+
+   :param - l_un: list of uncertain numbers
+   :type - l_un: list
+   :param - weights: list of weights
+   :type - weights: list
+   :param - display: boolean for plotting
+   :type - display: Boolean
+
+   # TODO mix types later
+   .. note:: - currently only accepts same type objects
+
+
+.. py:function:: known_constraints(minimum: Optional[Union[pyuncertainnumber.pba.interval.Interval, float, int]] = None, maximum: Optional[Union[pyuncertainnumber.pba.interval.Interval, float, int]] = None, mean: Optional[Union[pyuncertainnumber.pba.interval.Interval, float, int]] = None, median: Optional[Union[pyuncertainnumber.pba.interval.Interval, float, int]] = None, mode: Optional[Union[pyuncertainnumber.pba.interval.Interval, float, int]] = None, std: Optional[Union[pyuncertainnumber.pba.interval.Interval, float, int]] = None, var: Optional[Union[pyuncertainnumber.pba.interval.Interval, float, int]] = None, cv: Optional[Union[pyuncertainnumber.pba.interval.Interval, float, int]] = None, percentiles: Optional[dict[Union[pyuncertainnumber.pba.interval.Interval, float, int]]] = None, debug: bool = False, steps: int = Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution free p-box based upon the information given.
+   This function works by calculating every possible non-parametric p-box that can be generated using the information provided.
+   The returned p-box is the intersection of these p-boxes.
+
+   **Parameters**:
+
+       ``minimum``: Minimum value of the variable
+       ``maximum``: Maximum value of the variable
+       ``mean``: Mean value of the variable
+       ``median``: Median value of the variable
+       ``mode``: Mode value of the variable
+       ``std``: Standard deviation of the variable
+       ``var``: Variance of the variable
+       ``cv``: Coefficient of variation of the variable
+       ``percentiles``: Dictionary of percentiles and their values (e.g. {0.1: 1, 0.5: 2, 0.9: nInterval(3,4)})
+       ``steps``: Number of steps to use in the p-box
+
+   .. error::
+
+       ``ValueError``: If any of the arguments are not consistent with each other. (i.e. if ``std`` and ``var`` are both given, but ``std != sqrt(var)``)
+
+   **Returns**:
+
+       ``Pbox``: Imposition of possible p-boxes
+
+
+.. py:function:: min_max(a: Union[pyuncertainnumber.pba.interval.Interval, float, int], b: Union[pyuncertainnumber.pba.interval.Interval, float, int] = None, steps=Params.steps, shape='box') -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Returns a box shaped Pbox. This is equivalent to an nInterval expressed as a Pbox.
+
+   **Parameters**:
+
+       ``a`` : Left side of box
+       ``b``: Right side of box
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: min_max_mean(minimum: Union[pyuncertainnumber.pba.interval.Interval, float, int], maximum: Union[pyuncertainnumber.pba.interval.Interval, float, int], mean: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps: int = Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum and mean of the variable
+
+   **Parameters**:
+
+       ``minimum`` : minimum value of the variable
+
+       ``maximum`` : maximum value of the variable
+
+       ``mean`` : mean value of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+.. py:function:: min_mean(minimum: Union[pyuncertainnumber.pba.interval.Interval, float, int], mean: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps=Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution-free p-box based upon the minimum and mean of the variable
+
+   **Parameters**:
+
+       ``minimum`` : minimum value of the variable
+
+       ``mean`` : mean value of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+.. py:function:: min_max_mean_std(minimum: Union[pyuncertainnumber.pba.interval.Interval, float, int], maximum: Union[pyuncertainnumber.pba.interval.Interval, float, int], mean: Union[pyuncertainnumber.pba.interval.Interval, float, int], std: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps: int = Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
+
+   **Parameters**
+
+       ``minimum`` : minimum value of the variable
+       ``maximum`` : maximum value of the variable
+       ``mean`` : mean value of the variable
+       ``std`` :standard deviation of the variable
+
+   **Returns**
+
+       ``Pbox``
+
+   .. seealso::
+
+       :func:`min_max_mean_var`
+
+
+
+.. py:function:: min_max_mean_var(minimum: Union[pyuncertainnumber.pba.interval.Interval, float, int], maximum: Union[pyuncertainnumber.pba.interval.Interval, float, int], mean: Union[pyuncertainnumber.pba.interval.Interval, float, int], var: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps: int = Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
+
+   **Parameters**
+
+       ``minimum`` : minimum value of the variable
+       ``maximum`` : maximum value of the variable
+       ``mean`` : mean value of the variable
+       ``var`` :variance of the variable
+
+   **Returns**
+
+       ``Pbox``
+
+
+   .. admonition:: Implementation
+
+       Equivalent to ``min_max_mean_std(minimum,maximum,mean,np.sqrt(var))``
+
+   .. seealso::
+
+       :func:`min_max_mean_std`
+
+
+
+.. py:function:: min_max_mode(minimum: Union[pyuncertainnumber.pba.interval.Interval, float, int], maximum: Union[pyuncertainnumber.pba.interval.Interval, float, int], mode: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps: int = Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum, and mode of the variable
+
+   **Parameters**:
+
+       ``minimum`` : minimum value of the variable
+
+       ``maximum`` : maximum value of the variable
+
+       ``mode`` : mode value of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: min_max_median(minimum: Union[pyuncertainnumber.pba.interval.Interval, float, int], maximum: Union[pyuncertainnumber.pba.interval.Interval, float, int], median: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps: int = Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum and median of the variable
+
+   **Parameters**:
+
+       ``minimum`` : minimum value of the variable
+
+       ``maximum`` : maximum value of the variable
+
+       ``median`` : median value of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: min_max_median_is_mode(minimum: Union[pyuncertainnumber.pba.interval.Interval, float, int], maximum: Union[pyuncertainnumber.pba.interval.Interval, float, int], m: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps: int = Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution-free p-box based upon the minimum, maximum and median/mode of the variable when median = mode.
+
+   **Parameters**:
+
+       ``minimum`` : minimum value of the variable
+
+       ``maximum`` : maximum value of the variable
+
+       ``m`` : m = median = mode value of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: mean_std(mean: Union[pyuncertainnumber.pba.interval.Interval, float, int], std: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps=Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution-free p-box based upon the mean and standard deviation of the variable
+
+   **Parameters**:
+
+       ``mean`` : mean of the variable
+
+       ``std`` : standard deviation of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: mean_var(mean: Union[pyuncertainnumber.pba.interval.Interval, float, int], var: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps=Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution-free p-box based upon the mean and variance of the variable
+
+   Equivalent to `mean_std(mean,np.sqrt(var))`
+
+   **Parameters**:
+
+       ``mean`` : mean of the variable
+
+       ``var`` : variance of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: pos_mean_std(mean: Union[pyuncertainnumber.pba.interval.Interval, float, int], std: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps=Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a positive distribution-free p-box based upon the mean and standard deviation of the variable
+
+   **Parameters**:
+
+       ``mean`` : mean of the variable
+
+       ``std`` : standard deviation of the variable
+
+
+   **Returns**:
+
+       ``Pbox``
+
+
+
+.. py:function:: symmetric_mean_std(mean: Union[pyuncertainnumber.pba.interval.Interval, float, int], std: Union[pyuncertainnumber.pba.interval.Interval, float, int], steps: int = Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a symmetrix distribution-free p-box based upon the mean and standard deviation of the variable
+
+   **Parameters**:
+
+   ``mean`` :  mean value of the variable
+   ``std`` : standard deviation of the variable
+
+   **Returns**
+
+       ``Pbox``
+
+
+
+.. py:function:: from_percentiles(percentiles: dict, steps: int = Params.steps) -> pyuncertainnumber.pba.pbox_base.Pbox
+
+   Generates a distribution-free p-box based upon percentiles of the variable
+
+   **Parameters**
+
+       ``percentiles`` : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: nInterval(3,4), 1:5})
+
+       ``steps`` : number of steps to use in the p-box
+
+   .. important::
+
+       The percentiles dictionary is of the form {percentile: value}. Where value can either be a number or an nInterval. If value is a number, the percentile is assumed to be a point percentile. If value is an nInterval, the percentile is assumed to be an interval percentile.
+
+   .. warning::
+
+       If no keys for 0 and 1 are given, ``-np.inf`` and ``np.inf`` are used respectively. This will result in a p-box that is not bounded and raise a warning.
+
+       If the percentiles are not increasing, the percentiles will be intersected. This may not be desired behaviour.
+
+   .. error::
+
+       ``ValueError``: If any of the percentiles are not between 0 and 1.
+
+   **Returns**
+
+       ``Pbox``
+
+
+   **Example**:
+
+   .. code-block:: python
+
+       pba.from_percentiles(
+           {0: 0,
+           0.25: 0.5,
+           0.5: pba.I(1,2),
+           0.75: pba.I(1.5,2.5),
+           1: 3}
+       ).show()
+
+   .. image:: https://github.com/Institute-for-Risk-and-Uncertainty/pba-for-python/blob/master/docs/images/from_percentiles.png?raw=true
+       :scale: 35 %
+       :align: center
+       :alt: Pbox generated from percentiles
+
+
+
+.. py:function:: KS_bounds(s, alpha: float, display=True) -> Tuple[pyuncertainnumber.pba.utils.CDF_bundle, pyuncertainnumber.pba.utils.CDF_bundle]
+
+   construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
+
+   :param - s: sample data, precise and imprecise
+   :type - s: array-like
+   :param - dn: KS critical value at significance level lpha and sample size N;
+   :type - dn: scalar
+
+
+.. py:function:: fit(method: str, family: str, data: numpy.ndarray)
+
+   top-level fit from data
+
+   :param - method: method of fitting, e.g., {'mle' or 'mom'} 'entropy', 'pert', 'fermi', 'bayesian'
+   :type - method: str
+   :param - family: distribution family to be fitted
+   :type - family: str
+   :param - data: data to be fitted
+   :type - data: np.ndarray
+
+   .. note:: - supported family list can be found in xx.
+
+   :returns:
+
+             - the return from the constructors below are `scipy.stats.dist` objects or `UN` objects depending on the decorator
+
+   .. rubric:: Example
+
+   >>> pun.fit('mle', 'norm', np.random.normal(0, 1, 100))
+
+
+.. py:class:: nInterval(left=None, right=None)
+
+   An interval is an uncertain number for which only the endpoints are known, :math:`x=[a,b]`.
+   This is interpreted as :math:`x` being between :math:`a` and :math:`b` but with no more information about the value of :math:`x`.
+
+   Intervals embody epistemic uncertainty within PBA.
+
+   Creation
+   ________
+
+   Intervals can be created using either of the following:
+
+   .. code-block:: python
+
+       >>> pba.Interval(0,1)
+       Interval [0,1]
+       >>> pba.I(2,3)
+       Interval [2,3]
+
+   .. tip::
+
+       The shorthand ``I`` is an alias for ``Interval``
+
+   Intervals can also be created from a single value ± half-width:
+
+   >>> pba.PM(0,1)
+   Interval [-1,1]
+
+   By default intervals are displayed as ``Interval [a,b]`` where ``a`` and ``b`` are the left and right endpoints respectively. This can be changed using the `interval.pm_repr`_ and `interval.lr_repr`_ functions.
+
+   Arithmetic
+   __________
+
+   For two intervals [a,b] and [c,d] the following arithmetic operations are defined:
+
+   **Addition**
+
+   :math:`[a,b] + [c,d] = [a+c,b+d]`
+
+   **Subtraction**
+
+   :math:`[a,b] - [c,d] = [a-d,b-c]`
+
+   **Multiplication**
+
+   :math:`[a,b] * [c,d] = [\min(ac,ad,bc,bd),\max(ac,ad,bc,bd)]`
+
+   **Division**
+
+   :math:`[a,b] / [c,d] = [a,b] * \frac{1}{[c,d]} \equiv [\min(a/c,a/d,b/c,b/d),\max(a/c,a/d,b/c,b/d)]`
+
+   Alternative arithmetic methods are described in `interval.add`_, `interval.sub`_, `interval.mul`_, `interval.div`_.
+
+
+
+   .. py:attribute:: _left
+      :value: None
+
+
+
+   .. py:attribute:: _right
+      :value: None
+
+
+
+   .. py:property:: left
+
+
+   .. py:property:: right
+
+
+   .. py:method:: __repr__() -> str
+
+
+   .. py:method:: __str__() -> str
+
+
+   .. py:method:: __format__(format_spec: str) -> str
+
+
+   .. py:method:: __iter__()
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: __radd__(left)
+
+
+   .. py:method:: __sub__(other)
+
+
+   .. py:method:: __rsub__(other)
+
+
+   .. py:method:: __neg__()
+
+
+   .. py:method:: __mul__(other)
+
+
+   .. py:method:: __rmul__(other)
+
+
+   .. py:method:: __truediv__(other)
+
+
+   .. py:method:: __rtruediv__(other)
+
+
+   .. py:method:: __pow__(other)
+
+
+   .. py:method:: __rpow__(left)
+
+
+   .. py:method:: __lt__(other)
+
+
+   .. py:method:: __rgt__(other)
+
+
+   .. py:method:: __eq__(other)
+
+      ==
+
+
+
+   .. py:method:: __gt__(other)
+
+      >
+
+
+
+   .. py:method:: __rlt__(other)
+
+
+   .. py:method:: __ne__(other)
+
+      !=
+
+
+
+   .. py:method:: __le__(other)
+
+      <=
+
+
+
+   .. py:method:: __ge__(other)
+
+
+   .. py:method:: __bool__()
+
+
+   .. py:method:: __abs__()
+
+
+   .. py:method:: __contains__(other)
+
+
+   .. py:method:: add(other, method=None)
+
+      .. _interval.add:
+
+      Adds the interval and another object together.
+
+
+      **Args**:
+
+          ``other``: The interval or numeric value to be added. This value must be transformable into an Interval object.
+
+      **Methods**:
+
+          p - perfect arithmetic :math:`[a,b]+[c,d] = [a + c, b + d]`
+
+          o - opposite arithmetic :math:`[a,b]+[c,d] = [a + d, b + c]`
+
+          None, i, f - Standard interval arithmetic is used.
+
+      **Returns**:
+
+          ``Interval``
+
+
+
+
+   .. py:method:: __add__(other)
+
+
+   .. py:method:: padd(other)
+
+      .. warning::
+          This method is deprecated. Use add(other, method='p') instead.
+
+
+
+   .. py:method:: oadd(other)
+
+      .. warning::
+          This method is deprecated. Use add(other, method='o') instead.
+
+
+
+   .. py:method:: sub(other, method=None)
+
+      .. _interval.sub:
+
+      Subtracts other from self.
+
+      **Args**:
+
+          ``other``: The interval or numeric value to be subracted. This value must be transformable into an Interval object.
+
+      **Methods**:
+
+          ``p``: perfect arithmetic :math:`a+b = [a.left - b.left, a.right - b.right]`
+
+          ``o``: opposite arithmetic :math:`a+b = [a.left - b.right, a.right - b.left]`
+
+          None, i, f - Standard interval arithmetic is used.
+
+      **Returns**:
+
+          ``Interval``
+
+
+
+
+   .. py:method:: psub(other)
+
+      .. warning::
+          Depreciated use self.sub(other, method = 'p') instead
+
+
+
+   .. py:method:: osub(other)
+
+      .. warning::
+          Depreciated use self.sub(other, method = 'o') instead
+
+
+
+   .. py:method:: mul(other, method=None)
+
+      .. _interval.mul:
+
+      Multiplies self by other.
+
+      **Args**:
+
+          ``other``: The interval or numeric value to be multiplied. This value must be transformable into an Interval object.
+
+
+      **Methods**:
+          ``p``: perfect arithmetic :math:`[a,b],[c,d] = [a * c, b * d]`
+
+          ``o``: opposite arithmetic :math:`[a,b],[c,d] = [a * d, b * c]`
+
+          None, i, f - Standard interval arithmetic is used.
+
+      **Returns**:
+          Interval: The result of the multiplication.
+
+
+
+
+
+   .. py:method:: pmul(other)
+
+      .. warning::
+          Depreciated use self.mul(other, method = 'p') instead
+
+
+
+   .. py:method:: omul(other)
+
+      .. warning::
+          Depreciated use self.mul(other, method = 'o') instead
+
+
+
+   .. py:method:: div(other, method=None)
+
+      .. _interval.div:
+
+      Divides self by other
+
+
+      If :math:`0 \in other` it returns a division by zero error
+
+
+      **Args**:
+
+          ``other`` (Interval or numeric): The interval or numeric value to be multiplied. This value must be transformable into an Interval object.
+
+      **Methods**:
+
+          ``p``: perfect arithmetic :math:`[a,b],[c,d] = [a * 1/c, b * 1/d]`
+
+          ``o``: opposite arithmetic :math:`[a,b],[c,d] = [a * 1/d, b * 1/c]`
+
+          ``None``, ``i``, ``f`` - Standard interval arithmetic is used.
+
+      .. admonition:: Implementation
+
+          >>> self.add(1/other, method = method)
+
+      .. error::
+
+          If :math:`0 \in [a,b]` it returns a division by zero error
+
+
+
+
+   .. py:method:: pdiv(other)
+
+      .. warning::
+          Depreciated use self.div(other, method = 'p') instead
+
+
+
+   .. py:method:: odiv(other)
+
+      .. warning::
+          Depreciated use self.div(other, method = 'o') instead
+
+
+
+
+   .. py:method:: recip()
+
+      Calculates the reciprocle of the interval.
+
+      **Returns**:
+
+          ``Interval``: Equal to :math:`[1/b,1/a]`
+
+      **Example**:
+
+          >>> pba.Interval(2,4).recip()
+          Interval [0.25, 0.5]
+
+      .. error::
+          If :math:`0 \in [a,b]` it returns a division by zero error
+
+
+
+
+   .. py:method:: equiv(other: Interval) -> bool
+
+      Checks whether two intervals are equivalent.
+
+      **Parameters**:
+
+          ``other``: The interval to check against.
+
+      **Returns** ``True`` **if**:
+
+          ``self.left == other.right`` and ``self.right == other.right``
+
+          ``False`` otherwise.
+
+      .. error::
+
+          ``TypeError``: If ``other`` is not an instance of ``Interval``
+
+      .. seealso::
+          :func:`~logical.is_same_as`
+
+      **Examples**:
+
+          >>> a = Interval(0,1)
+          >>> b = Interval(0.5,1.5)
+          >>> c = I(0,1)
+          >>> a.equiv(b)
+          False
+          >>> a.equiv(c)
+          True
+
+
+
+
+   .. py:property:: lo
+
+      
+
+
+
+      **Returns**:
+          ``self.left``
+
+      .. tip::
+
+          This function is redundant but exists to match Pbox class for possible internal reasons.
+
+
+   .. py:property:: hi
+
+      
+
+
+
+      **Returns**:
+          ``self.right``
+
+      .. tip::
+
+          This function is redundant but exists to match Pbox class for possible internal reasons.
+
+
+   .. py:method:: width() -> float
+
+      **Returns**:
+
+          ``float``: The width of the interval, :math:`\mathrm{right} - \mathrm{left}`
+
+      **Example**:
+
+          >>> pba.Interval(0,3).width()
+          3
+
+
+
+
+   .. py:method:: halfwidth() -> float
+
+      **Returns**:
+
+          ``float``: The half-width of the interval, :math:`(\mathrm{right} - \mathrm{left})/2`
+
+      **Example**:
+
+          >>> pba.Interval(0,3).halfwidth()
+          1.5
+
+      .. admonition:: Implementation
+
+          >>> self.width()/2
+
+
+
+
+   .. py:method:: midpoint() -> float
+
+      Returns the midpoint of the interval
+
+      .. note:: - this serves as the deterministic value representation of the interval, a.k.a. the naked value for an interval
+
+      :returns: The midpoint of the interval, :math:`(\mathrm{right} + \mathrm{left})/2`
+      :rtype: ``float``
+
+      **Example**:
+              >>> pba.Interval(0,2).midpoint()
+              1.0
+
+
+
+   .. py:method:: to_logical()
+
+      Turns the interval into a logical interval, this is done by chacking the truth value of the ends of the interval
+
+      **Returns**:
+
+          ``Logical``: The logical interval
+
+      .. admonition:: Implementation
+
+          >>> left = self.left.__bool__()
+          >>> right = self.right.__bool__()
+          >>> Logical(left,right)
+
+
+
+
+
+   .. py:method:: env(other: Union[list, Interval]) -> Interval
+
+      Calculates the envelope between two intervals
+
+      **Parameters**:
+
+          ``other`` : Interval or list. The interval to envelope with self
+
+      .. hint::
+
+          If other is a list then the envelope is calculated between self and each element of the list. In this case the envelope is calculated recursively and pba.envelope() may be more efficient.
+
+      .. important::
+          If other is a Pbox then ``Pbox.env()`` is called
+
+      .. seealso::
+
+          `pba.core.envelope`_
+
+          `pba.pbox.Pbox.env`_
+
+      **Returns**:
+
+          ``Interval``: The envelope of self and other
+
+
+
+
+
+   .. py:method:: straddles(N: Union[int, float, Interval], endpoints: bool = True) -> bool
+
+      .. _interval.straddles:
+
+      **Parameters**:
+
+          ``N``: Number to check. If N is an interval checks whether the whole interval is within self.
+
+          ``endpoints``: Whether to include the endpoints within the check
+
+      **Returns** ``True`` **if**:
+
+          :math:`\mathrm{left} \leq N \leq \mathrm{right}` (Assuming ``endpoints=True``).
+
+          For interval values. :math:`\mathrm{left} \leq N.left \leq \mathrm{right}` and :math:`\mathrm{left} \leq N.right \leq \mathrm{right}` (Assuming ``endpoints=True``).
+
+          ``False`` otherwise.
+
+      .. tip::
+
+          ``N in self`` is equivalent to ``self.straddles(N)``
+
+
+
+
+   .. py:method:: straddles_zero(endpoints=True)
+
+      Checks whether :math:`0` is within the interval
+
+      .. admonition:: Implementation
+
+          Equivalent to ``self.straddles(0,endpoints)``
+
+      .. seealso::
+          interval.straddles_
+
+
+
+
+   .. py:method:: intersection(other: Union[Interval, list]) -> Interval
+
+      Calculates the intersection between intervals
+
+      **Parameters**:
+
+          ``other``: The interval to intersect with self. If an interval is not given will try to cast as an interval. If a list is given will calculate the intersection between self and each element of the list.
+
+      **Returns**:
+
+          ``Interval``: The intersection of self and other. If no intersection is found returns ``None``
+
+      **Example**:
+
+          >>> a = Interval(0,1)
+          >>> b = Interval(0.5,1.5)
+          >>> a.intersection(b)
+          Interval [0.5, 1]
+
+
+
+   .. py:method:: exp()
+
+
+   .. py:method:: log()
+
+
+   .. py:method:: sqrt()
+
+
+   .. py:method:: display(title='', ax=None, style='band', **kwargs)
+
+
+   .. py:method:: sample(seed=None, numpy_rng: numpy.random.Generator = None) -> float
+
+      Generate a random sample within the interval.
+
+      **Parameters**:
+
+          ``seed`` (int, optional): Seed value for random number generation. Defaults to None.
+
+          ``numpy_rng`` (numpy.random.Generator, optional): Numpy random number generator. Defaults to None.
+
+      **Returns**:
+
+          ``float``: Random sample within the interval.
+
+      .. admonition:: Implementation
+
+          If ``numpy_rng`` is given:
+
+              >>> numpy_rng.uniform(self.left, self.right)
+
+          Otherwise the following is used:
+
+          >>> import random
+          >>> random.seed(seed)
+          >>> self.left + random.random() * self.width()
+
+      **Examples**:
+
+          >>> pba.Interval(0,1).sample()
+          0.6160988752201705
+          >>> pba.I(0,1).sample(seed = 1)
+          0.13436424411240122
+
+      If a numpy random number generator is given then it is used instead of the default python random number generator. It has to be initialised first.
+
+          >>> import numpy as np
+          >>> rng = np.random.default_rng(seed = 0)
+          >>> pba.I(0,1).sample(numpy_rng = rng)
+          0.6369616873214543
+
+
+
+   .. py:method:: round()
+
+      outward rounding operation for an interval object
+
+
+
+   .. py:method:: from_midwith(midpoint: float, halfwidth: float) -> Interval
+      :classmethod:
+
+
+      Creates an Interval object from a midpoint and half-width.
+
+      :param - midpoint: The midpoint of the interval.
+      :type - midpoint: float
+      :param - halfwidth: The half-width of the interval.
+      :type - halfwidth: float
+
+      :returns: The interval with midpoint and half-width.
+      :rtype: - Interval
+
+      .. rubric:: Example
+
+      >>> pba.Interval.from_midwith(0,1)
+      Interval [-1, 1]
+
+
+
+.. py:class:: Pbox(left=None, right=None, steps=None, shape=None, mean_left=None, mean_right=None, var_left=None, var_right=None, interpolation='linear')
+
+   A probability distribution is a mathematical function that gives the probabilities of occurrence for diﬀerent possible values of a variable. Probability boxes (p-boxes) represent interval bounds on probability distributions. The left and right quantiles are each stored as a NumPy array containing the percent point function (the inverse of the cumulative distribution function) for `steps` evenly spaced values between 0 and 1. P-boxes can be defined using all the probability distributions that are available through SciPy's statistics library. Naturally, precis probability distributions can be defined by defining a p-box with precise inputs. This means that within probability bounds analysis probability distributions are considered a special case of a p-box with zero width. Distribution-free p-boxes can also be generated when the underlying distribution is unknown but parameters such as the mean, variance or minimum/maximum bounds are known. Such p-boxes make no assumption about the shape of the distribution and instead return bounds expressing all possible distributions that are valid given the known information. Such p-boxes can be constructed making use of Chebyshev, Markov and Cantelli inequalities from probability theory.
+
+
+   .. py:attribute:: shape
+      :value: None
+
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:attribute:: __str__
+
+
+   .. py:method:: __iter__()
+
+
+   .. py:method:: __neg__()
+
+
+   .. py:method:: __lt__(other)
+
+
+   .. py:method:: __rlt__(other)
+
+
+   .. py:method:: __le__(other)
+
+
+   .. py:method:: __rle__(other)
+
+
+   .. py:method:: __gt__(other)
+
+
+   .. py:method:: __rgt__(other)
+
+
+   .. py:method:: __ge__(other)
+
+
+   .. py:method:: __rge__(other)
+
+
+   .. py:method:: __and__(other)
+
+
+   .. py:method:: __rand__(other)
+
+
+   .. py:method:: __or__(other)
+
+
+   .. py:method:: __ror__(other)
+
+
+   .. py:method:: __add__(other)
+
+
+   .. py:method:: __radd__(other)
+
+
+   .. py:method:: __sub__(other)
+
+
+   .. py:method:: __rsub__(other)
+
+
+   .. py:method:: __mul__(other)
+
+
+   .. py:method:: __rmul__(other)
+
+
+   .. py:method:: __pow__(other)
+
+
+   .. py:method:: __rpow__(other)
+
+
+   .. py:method:: __truediv__(other)
+
+
+   .. py:method:: __rtruediv__(other)
+
+
+   .. py:property:: range
+
+      leslie defined range property
+
+
+   .. py:property:: lo
+
+      Returns the left-most value in the interval
+
+
+   .. py:property:: hi
+
+      Returns the right-most value in the interval
+
+
+   .. py:method:: get_range()
+
+      get the quantile range of either a pbox or a distribution
+
+
+
+   .. py:method:: _computemoments()
+
+
+   .. py:method:: _checkmoments()
+
+
+   .. py:method:: cutv(x)
+
+      get the bounds on the cumulative probability associated with any x-value
+
+
+
+   .. py:method:: cuth(p=0.5)
+
+      get the bounds on the quantile at any particular probability level
+
+
+
+   .. py:method:: outer_approximate(n=100)
+
+      outer approximation of a p-box
+
+      .. note:: - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
+
+
+
+   .. py:method:: _unary(*args, function=lambda x: x)
+
+      for monotonic unary functions only
+
+
+
+   .. py:method:: exp()
+
+
+   .. py:method:: sqrt()
+
+
+   .. py:method:: recip()
+
+
+   .. py:method:: check_dependency(method)
+      :staticmethod:
+
+
+
+   .. py:method:: constant_shape_check()
+
+      a helper drop in for define binary ops
+
+
+
+   .. py:method:: steps_check(other)
+
+
+   .. py:method:: add(other: Self | pyuncertainnumber.pba.interval.Interval | float | int, method='f') -> Self
+
+      addtion of uncertain numbers with the defined dependency method
+
+
+
+   .. py:method:: pow(other: Self | pyuncertainnumber.pba.interval.Interval | float | int, method='f') -> Self
+
+      Raises a p-box to the power of other using the defined dependency method
+
+
+
+   .. py:method:: sub(other, method='f')
+
+
+   .. py:method:: mul(other, method='f')
+
+      Multiplication of uncertain numbers with the defined dependency method
+
+
+
+   .. py:method:: div(other, method='f')
+
+
+   .. py:method:: lt(other, method='f')
+
+
+   .. py:method:: le(other, method='f')
+
+
+   .. py:method:: gt(other, method='f')
+
+
+   .. py:method:: ge(other, method='f')
+
+
+   .. py:method:: min(other, method='f')
+
+      Returns a new Pbox object that represents the element-wise minimum of two Pboxes.
+
+      :param - other: Another Pbox object or a numeric value.
+      :param - method: Calculation method to determine the minimum. Can be one of 'f', 'p', 'o', 'i'.
+
+      :returns: Pbox
+
+
+
+   .. py:method:: max(other, method='f')
+
+
+   .. py:method:: truncate(a, b, method='f')
+
+      Equivalent to self.min(a,method).max(b,method)
+
+
+
+   .. py:method:: env(other)
+
+      .. _interval.env:
+
+      Computes the envelope of two Pboxes.
+
+      Parameters:
+      - other: Pbox or numeric value
+          The other Pbox or numeric value to compute the envelope with.
+
+      Returns:
+      - Pbox
+          The envelope Pbox.
+
+      Raises:
+      - ArithmeticError: If both Pboxes have different number of steps.
+
+
+
+   .. py:method:: imp(other)
+
+      Returns the imposition of self with other pbox
+
+      .. note:: - binary imposition between two pboxes only
+
+
+
+   .. py:method:: logicaland(other, method='f')
+
+
+   .. py:method:: logicalor(other, method='f')
+
+
+   .. py:method:: get_interval(*args) -> pyuncertainnumber.pba.interval.Interval
+
+
+   .. py:method:: get_probability(val) -> pyuncertainnumber.pba.interval.Interval
+
+
+   .. py:method:: summary() -> str
+
+
+   .. py:method:: mean() -> pyuncertainnumber.pba.interval.Interval
+
+      Returns the mean of the pbox
+
+
+
+   .. py:method:: median() -> pyuncertainnumber.pba.interval.Interval
+
+      Returns the median of the distribution
+
+
+
+   .. py:method:: support() -> pyuncertainnumber.pba.interval.Interval
+
+
+   .. py:method:: get_x()
+
+      returns the x values for plotting
+
+
+
+   .. py:method:: get_y()
+
+      returns the y values for plotting
+
+
+
+   .. py:method:: straddles(N, endpoints=True) -> bool
+
+      :param N: Number to check
+      :type N: numeric
+      :param endpoints: Whether to include the endpoints within the check
+      :type endpoints: bool
+
+      :returns: * *True* -- If :math:`\mathrm{left} \leq N \leq \mathrm{right}` (Assuming `endpoints=True`)
+                * *False* -- Otherwise
+
+
+
+   .. py:method:: straddles_zero(endpoints=True) -> bool
+
+      Checks whether :math:`0` is within the p-box
+
+
+
+   .. py:method:: show(figax=None, now=True, title='', x_axis_label='x', **kwargs)
+
+      legacy plotting function
+
+
+
+   .. py:method:: display(title='', ax=None, style='band', fill_color='lightgray', bound_colors=None, **kwargs)
+
+      default plotting function
+
+
+
+   .. py:method:: to_ds_old(discretisation=Params.steps)
+
+      convert to ds object
+
+      .. note:: - without outer approximation
+
+
+
+   .. py:method:: to_ds(discretisation=Params.steps)
+
+      convert to ds object
+
+
+
+.. py:class:: Params
+
+   .. py:attribute:: hedge_cofficients
+
+
+   .. py:attribute:: steps
+      :value: 200
+
+
+
+   .. py:attribute:: many
+      :value: 2000
+
+
+
+   .. py:attribute:: p_values
+
+
+   .. py:attribute:: p_lboundary
+      :value: 0.0001
+
+
+
+   .. py:attribute:: p_hboundary
+      :value: 0.9999
+
+
+
+   .. py:attribute:: scott_hedged_interpretation
+
+
+   .. py:attribute:: user_hedged_interpretation
+
+
+   .. py:attribute:: result_path
+      :value: './results/'
+
+
+
+   .. py:attribute:: hw
+      :value: 0.5
+
+
+
+.. py:function:: wc_interval(bound)
+
+   wildcard scalar interval
+
+
+.. py:function:: _get_bounds(dist_family, *args, steps=Params.steps)
+
+   from distribution specification to define the lower and upper bounds of the p-box
+
+   :param - dist_family: (str) the name of the distribution
+
+
+.. py:function:: _bound_pcdf(dist_family, *args, steps=Params.steps)
+
+   bound the parametric CDF
+
+   .. note:: - only support fully bounded parameters
+
+
+.. py:function:: makePbox(func)
+
+.. py:function:: norm(*args)
+
+.. py:function:: lognormal(mean, var, steps=Params.steps)
+
+   Creates a p-box for the lognormal distribution
+
+   *Note: the parameters used are the mean and variance of the lognormal distribution
+   not the mean and variance of the underlying normal*
+   See:
+   `[1]<https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters>`
+   `[2]<https://stackoverflow.com/questions/51906063/distribution-mean-and-standard-deviation-using-scipy-stats>`
+
+
+   :param mean: mean of the lognormal distribution
+   :param var: variance of the lognormal distribution
+
+   :rtype: Pbox
+
+
+.. py:function:: alpha(*args)
+
+.. py:function:: anglit(*args)
+
+.. py:function:: argus(*args)
+
+.. py:function:: arcsine(*args)
+
+.. py:function:: beta(*args, steps=Params.steps)
+
+   Beta distribution
+
+
+.. py:function:: betaprime(*args)
+
+.. py:function:: bradford(*args)
+
+.. py:function:: burr(*args)
+
+.. py:function:: burr12(*args)
+
+.. py:function:: cauchy(*args)
+
+.. py:function:: chi(*args)
+
+.. py:function:: chi2(*args)
+
+.. py:function:: cosine(*args)
+
+.. py:function:: crystalball(*args)
+
+.. py:function:: dgamma(*args)
+
+.. py:function:: dweibull(*args)
+
+.. py:function:: erlang(*args)
+
+.. py:function:: expon(*args)
+
+.. py:function:: exponnorm(*args)
+
+.. py:function:: exponweib(*args)
+
+.. py:function:: exponpow(*args)
+
+.. py:function:: f(*args)
+
+.. py:function:: fatiguelife(*args)
+
+.. py:function:: fisk(*args)
+
+.. py:function:: foldcauchy(*args)
+
+.. py:function:: foldnorm(mu, s, steps=Params.steps)
+
+.. py:function:: genlogistic(*args)
+
+.. py:function:: gennorm(*args)
+
+.. py:function:: genpareto(*args)
+
+.. py:function:: genexpon(*args)
+
+.. py:function:: genextreme(*args)
+
+.. py:function:: gausshyper(*args)
+
+.. py:function:: gamma(*args)
+
+.. py:function:: gengamma(*args)
+
+.. py:function:: genhalflogistic(*args)
+
+.. py:function:: geninvgauss(*args)
+
+.. py:function:: gompertz(*args)
+
+.. py:function:: gumbel_r(*args)
+
+.. py:function:: gumbel_l(*args)
+
+.. py:function:: halfcauchy(*args)
+
+.. py:function:: halflogistic(*args)
+
+.. py:function:: halfnorm(*args)
+
+.. py:function:: halfgennorm(*args)
+
+.. py:function:: hypsecant(*args)
+
+.. py:function:: invgamma(*args)
+
+.. py:function:: invgauss(*args)
+
+.. py:function:: invweibull(*args)
+
+.. py:function:: irwinhall(*args)
+
+.. py:function:: jf_skew_t(*args)
+
+.. py:function:: johnsonsb(*args)
+
+.. py:function:: johnsonsu(*args)
+
+.. py:function:: kappa4(*args)
+
+.. py:function:: kappa3(*args)
+
+.. py:function:: ksone(*args)
+
+.. py:function:: kstwo(*args)
+
+.. py:function:: kstwobign(*args)
+
+.. py:function:: laplace(*args)
+
+.. py:function:: laplace_asymmetric(*args)
+
+.. py:function:: levy(*args)
+
+.. py:function:: levy_l(*args)
+
+.. py:function:: levy_stable(*args)
+
+.. py:function:: logistic(*args)
+
+.. py:function:: loggamma(*args)
+
+.. py:function:: loglaplace(*args)
+
+.. py:function:: loguniform(*args)
+
+.. py:function:: lomax(*args)
+
+.. py:function:: maxwell(*args)
+
+.. py:function:: mielke(*args)
+
+.. py:function:: moyal(*args)
+
+.. py:function:: nakagami(*args)
+
+.. py:function:: ncx2(*args)
+
+.. py:function:: ncf(*args)
+
+.. py:function:: nct(*args)
+
+.. py:function:: norminvgauss(*args)
+
+.. py:function:: pareto(*args)
+
+.. py:function:: pearson3(*args)
+
+.. py:function:: powerlaw(*args)
+
+.. py:function:: powerlognorm(*args)
+
+.. py:function:: powernorm(*args)
+
+.. py:function:: rdist(*args)
+
+.. py:function:: rayleigh(*args)
+
+.. py:function:: rel_breitwigner(*args)
+
+.. py:function:: rice(*args)
+
+.. py:function:: recipinvgauss(*args)
+
+.. py:function:: semicircular(*args)
+
+.. py:function:: skewcauchy(*args)
+
+.. py:function:: skewnorm(*args)
+
+.. py:function:: studentized_range(*args)
+
+.. py:function:: t(*args)
+
+.. py:function:: trapezoid(*args)
+
+.. py:function:: triang(*args)
+
+.. py:function:: truncexpon(*args)
+
+.. py:function:: truncnorm(left, right, mean=None, stddev=None, steps=Params.steps)
+
+.. py:function:: truncpareto(*args)
+
+.. py:function:: truncweibull_min(*args)
+
+.. py:function:: tukeylambda(*args)
+
+.. py:function:: uniform_sps(*args)
+
+.. py:function:: vonmises(*args)
+
+.. py:function:: vonmises_line(*args)
+
+.. py:function:: wald(*args)
+
+.. py:function:: weibull_min(*args)
+
+.. py:function:: weibull_max(*args)
+
+.. py:function:: wrapcauchy(*args)
+
+.. py:function:: trapz(a, b, c, d, steps=Params.steps)
+
+.. py:function:: uniform(a, b, steps=Params.steps)
+
+   special case of Uniform distribution as
+   Scipy has an unbelivably strange parameterisation than common sense
+
+   :param - a: (float) lower endpoint
+   :param - b: (float) upper endpoints
+
+
+.. py:function:: weibull(*args, steps=Params.steps)
+
+.. py:function:: KM(k, m, steps=Params.steps)
+
+.. py:function:: KN(k, n, steps=Params.steps)
+
+.. py:function:: bernoulli(*args)
+
+.. py:function:: betabinom(*args)
+
+.. py:function:: betanbinom(*args)
+
+.. py:function:: binom(*args)
+
+.. py:function:: boltzmann(*args)
+
+.. py:function:: dlaplace(*args)
+
+.. py:function:: geom(*args)
+
+.. py:function:: hypergeom(*args)
+
+.. py:function:: logser(*args)
+
+.. py:function:: nbinom(*args)
+
+.. py:function:: nchypergeom_fisher(*args)
+
+.. py:function:: nchypergeom_wallenius(*args)
+
+.. py:function:: nhypergeom(*args)
+
+.. py:function:: planck(*args)
+
+.. py:function:: poisson(*args)
+
+.. py:function:: randint(*args)
+
+.. py:function:: skellam(*args)
+
+.. py:function:: yulesimon(*args)
+
+.. py:function:: zipf(*args)
+
+.. py:function:: zipfian(*args)
+
+.. py:data:: normal
+
+.. py:data:: N
+
+.. py:data:: gaussian
+
+.. py:data:: U
+
+.. py:data:: lognorm
+
+.. py:data:: named_pbox
+
+.. py:function:: hedge_interpret(hedge: str, return_type='interval') -> pyuncertainnumber.pba.interval.Interval | pyuncertainnumber.pba.pbox_base.Pbox
+
+   interpret linguistic hedge words into UncertainNumber objects
+
+   :param hedge: the hedge numerical expression to be interpreted
+   :type hedge: str
+   :param return_type: the type of object to be returned, either 'interval' or 'pbox'
+   :type return_type: str
+
+   .. note:: - the return can either be an interval or a pbox object
+
+   .. rubric:: Example
+
+   >>> hedge_interpret("about 200", return_type="pbox")
+
+

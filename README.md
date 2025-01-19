@@ -14,15 +14,14 @@
 `PyUncertainNumber` can be used to easily create a `PBox` or an `Interval` object:
 
 ```python
-from PyUncertainNumber import UncertainNumber as UN
+from pyuncertainnumber import UncertainNumber as UN
 
-un = UN(
+e = UN(
     name='elas_modulus', 
     symbol='E', 
     units='Pa', 
     essence='pbox', 
-    distribution_parameters=['gaussian', [(0,12),(1,4)]])
-_ = un.display(style='band')
+    distribution_parameters=['gaussian', ([0,12],[1,4])])
 ```
 
 <!-- add some pbox plots herein -->

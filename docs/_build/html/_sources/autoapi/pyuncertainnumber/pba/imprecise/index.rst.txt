@@ -1,0 +1,27 @@
+pyuncertainnumber.pba.imprecise
+===============================
+
+.. py:module:: pyuncertainnumber.pba.imprecise
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.imprecise.imprecise_ecdf
+
+
+Module Contents
+---------------
+
+.. py:function:: imprecise_ecdf(s: intervals.Interval) -> tuple[pyuncertainnumber.pba.utils.CDF_bundle, pyuncertainnumber.pba.utils.CDF_bundle]
+
+   empirical cdf for interval valued data
+
+   :returns:
+
+             - left and right cdfs
+             - pbox
+
+

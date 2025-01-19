@@ -1,7 +1,7 @@
 from functools import singledispatch
 from intervals import Interval
 import numpy as np
-from PyUncertainNumber.pba.interval import Interval as nInterval
+from .interval import Interval as nInterval
 from intervals import intervalise
 from ..nlp.language_parsing import parse_interval_expression, hedge_interpret
 

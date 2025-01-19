@@ -1,0 +1,478 @@
+pyuncertainnumber.pba.pbox
+==========================
+
+.. py:module:: pyuncertainnumber.pba.pbox
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.pbox.normal
+   pyuncertainnumber.pba.pbox.N
+   pyuncertainnumber.pba.pbox.gaussian
+   pyuncertainnumber.pba.pbox.U
+   pyuncertainnumber.pba.pbox.lognorm
+   pyuncertainnumber.pba.pbox.named_pbox
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.pbox._get_bounds
+   pyuncertainnumber.pba.pbox._bound_pcdf
+   pyuncertainnumber.pba.pbox.makePbox
+   pyuncertainnumber.pba.pbox.norm
+   pyuncertainnumber.pba.pbox.lognormal
+   pyuncertainnumber.pba.pbox.alpha
+   pyuncertainnumber.pba.pbox.anglit
+   pyuncertainnumber.pba.pbox.argus
+   pyuncertainnumber.pba.pbox.arcsine
+   pyuncertainnumber.pba.pbox.beta
+   pyuncertainnumber.pba.pbox.betaprime
+   pyuncertainnumber.pba.pbox.bradford
+   pyuncertainnumber.pba.pbox.burr
+   pyuncertainnumber.pba.pbox.burr12
+   pyuncertainnumber.pba.pbox.cauchy
+   pyuncertainnumber.pba.pbox.chi
+   pyuncertainnumber.pba.pbox.chi2
+   pyuncertainnumber.pba.pbox.cosine
+   pyuncertainnumber.pba.pbox.crystalball
+   pyuncertainnumber.pba.pbox.dgamma
+   pyuncertainnumber.pba.pbox.dweibull
+   pyuncertainnumber.pba.pbox.erlang
+   pyuncertainnumber.pba.pbox.expon
+   pyuncertainnumber.pba.pbox.exponnorm
+   pyuncertainnumber.pba.pbox.exponweib
+   pyuncertainnumber.pba.pbox.exponpow
+   pyuncertainnumber.pba.pbox.f
+   pyuncertainnumber.pba.pbox.fatiguelife
+   pyuncertainnumber.pba.pbox.fisk
+   pyuncertainnumber.pba.pbox.foldcauchy
+   pyuncertainnumber.pba.pbox.foldnorm
+   pyuncertainnumber.pba.pbox.genlogistic
+   pyuncertainnumber.pba.pbox.gennorm
+   pyuncertainnumber.pba.pbox.genpareto
+   pyuncertainnumber.pba.pbox.genexpon
+   pyuncertainnumber.pba.pbox.genextreme
+   pyuncertainnumber.pba.pbox.gausshyper
+   pyuncertainnumber.pba.pbox.gamma
+   pyuncertainnumber.pba.pbox.gengamma
+   pyuncertainnumber.pba.pbox.genhalflogistic
+   pyuncertainnumber.pba.pbox.geninvgauss
+   pyuncertainnumber.pba.pbox.gompertz
+   pyuncertainnumber.pba.pbox.gumbel_r
+   pyuncertainnumber.pba.pbox.gumbel_l
+   pyuncertainnumber.pba.pbox.halfcauchy
+   pyuncertainnumber.pba.pbox.halflogistic
+   pyuncertainnumber.pba.pbox.halfnorm
+   pyuncertainnumber.pba.pbox.halfgennorm
+   pyuncertainnumber.pba.pbox.hypsecant
+   pyuncertainnumber.pba.pbox.invgamma
+   pyuncertainnumber.pba.pbox.invgauss
+   pyuncertainnumber.pba.pbox.invweibull
+   pyuncertainnumber.pba.pbox.irwinhall
+   pyuncertainnumber.pba.pbox.jf_skew_t
+   pyuncertainnumber.pba.pbox.johnsonsb
+   pyuncertainnumber.pba.pbox.johnsonsu
+   pyuncertainnumber.pba.pbox.kappa4
+   pyuncertainnumber.pba.pbox.kappa3
+   pyuncertainnumber.pba.pbox.ksone
+   pyuncertainnumber.pba.pbox.kstwo
+   pyuncertainnumber.pba.pbox.kstwobign
+   pyuncertainnumber.pba.pbox.laplace
+   pyuncertainnumber.pba.pbox.laplace_asymmetric
+   pyuncertainnumber.pba.pbox.levy
+   pyuncertainnumber.pba.pbox.levy_l
+   pyuncertainnumber.pba.pbox.levy_stable
+   pyuncertainnumber.pba.pbox.logistic
+   pyuncertainnumber.pba.pbox.loggamma
+   pyuncertainnumber.pba.pbox.loglaplace
+   pyuncertainnumber.pba.pbox.loguniform
+   pyuncertainnumber.pba.pbox.lomax
+   pyuncertainnumber.pba.pbox.maxwell
+   pyuncertainnumber.pba.pbox.mielke
+   pyuncertainnumber.pba.pbox.moyal
+   pyuncertainnumber.pba.pbox.nakagami
+   pyuncertainnumber.pba.pbox.ncx2
+   pyuncertainnumber.pba.pbox.ncf
+   pyuncertainnumber.pba.pbox.nct
+   pyuncertainnumber.pba.pbox.norminvgauss
+   pyuncertainnumber.pba.pbox.pareto
+   pyuncertainnumber.pba.pbox.pearson3
+   pyuncertainnumber.pba.pbox.powerlaw
+   pyuncertainnumber.pba.pbox.powerlognorm
+   pyuncertainnumber.pba.pbox.powernorm
+   pyuncertainnumber.pba.pbox.rdist
+   pyuncertainnumber.pba.pbox.rayleigh
+   pyuncertainnumber.pba.pbox.rel_breitwigner
+   pyuncertainnumber.pba.pbox.rice
+   pyuncertainnumber.pba.pbox.recipinvgauss
+   pyuncertainnumber.pba.pbox.semicircular
+   pyuncertainnumber.pba.pbox.skewcauchy
+   pyuncertainnumber.pba.pbox.skewnorm
+   pyuncertainnumber.pba.pbox.studentized_range
+   pyuncertainnumber.pba.pbox.t
+   pyuncertainnumber.pba.pbox.trapezoid
+   pyuncertainnumber.pba.pbox.triang
+   pyuncertainnumber.pba.pbox.truncexpon
+   pyuncertainnumber.pba.pbox.truncnorm
+   pyuncertainnumber.pba.pbox.truncpareto
+   pyuncertainnumber.pba.pbox.truncweibull_min
+   pyuncertainnumber.pba.pbox.tukeylambda
+   pyuncertainnumber.pba.pbox.uniform_sps
+   pyuncertainnumber.pba.pbox.vonmises
+   pyuncertainnumber.pba.pbox.vonmises_line
+   pyuncertainnumber.pba.pbox.wald
+   pyuncertainnumber.pba.pbox.weibull_min
+   pyuncertainnumber.pba.pbox.weibull_max
+   pyuncertainnumber.pba.pbox.wrapcauchy
+   pyuncertainnumber.pba.pbox.trapz
+   pyuncertainnumber.pba.pbox.truncnorm
+   pyuncertainnumber.pba.pbox.uniform
+   pyuncertainnumber.pba.pbox.weibull
+   pyuncertainnumber.pba.pbox.KM
+   pyuncertainnumber.pba.pbox.KN
+   pyuncertainnumber.pba.pbox.bernoulli
+   pyuncertainnumber.pba.pbox.betabinom
+   pyuncertainnumber.pba.pbox.betanbinom
+   pyuncertainnumber.pba.pbox.binom
+   pyuncertainnumber.pba.pbox.boltzmann
+   pyuncertainnumber.pba.pbox.dlaplace
+   pyuncertainnumber.pba.pbox.geom
+   pyuncertainnumber.pba.pbox.hypergeom
+   pyuncertainnumber.pba.pbox.logser
+   pyuncertainnumber.pba.pbox.nbinom
+   pyuncertainnumber.pba.pbox.nchypergeom_fisher
+   pyuncertainnumber.pba.pbox.nchypergeom_wallenius
+   pyuncertainnumber.pba.pbox.nhypergeom
+   pyuncertainnumber.pba.pbox.planck
+   pyuncertainnumber.pba.pbox.poisson
+   pyuncertainnumber.pba.pbox.randint
+   pyuncertainnumber.pba.pbox.skellam
+   pyuncertainnumber.pba.pbox.yulesimon
+   pyuncertainnumber.pba.pbox.zipf
+   pyuncertainnumber.pba.pbox.zipfian
+
+
+Module Contents
+---------------
+
+.. py:function:: _get_bounds(dist_family, *args, steps=Params.steps)
+
+   from distribution specification to define the lower and upper bounds of the p-box
+
+   :param - dist_family: (str) the name of the distribution
+
+
+.. py:function:: _bound_pcdf(dist_family, *args, steps=Params.steps)
+
+   bound the parametric CDF
+
+   .. note:: - only support fully bounded parameters
+
+
+.. py:function:: makePbox(func)
+
+.. py:function:: norm(*args)
+
+.. py:function:: lognormal(mean, var, steps=Params.steps)
+
+   Creates a p-box for the lognormal distribution
+
+   *Note: the parameters used are the mean and variance of the lognormal distribution
+   not the mean and variance of the underlying normal*
+   See:
+   `[1]<https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters>`
+   `[2]<https://stackoverflow.com/questions/51906063/distribution-mean-and-standard-deviation-using-scipy-stats>`
+
+
+   :param mean: mean of the lognormal distribution
+   :param var: variance of the lognormal distribution
+
+   :rtype: Pbox
+
+
+.. py:function:: alpha(*args)
+
+.. py:function:: anglit(*args)
+
+.. py:function:: argus(*args)
+
+.. py:function:: arcsine(*args)
+
+.. py:function:: beta(*args, steps=Params.steps)
+
+   Beta distribution
+
+
+.. py:function:: betaprime(*args)
+
+.. py:function:: bradford(*args)
+
+.. py:function:: burr(*args)
+
+.. py:function:: burr12(*args)
+
+.. py:function:: cauchy(*args)
+
+.. py:function:: chi(*args)
+
+.. py:function:: chi2(*args)
+
+.. py:function:: cosine(*args)
+
+.. py:function:: crystalball(*args)
+
+.. py:function:: dgamma(*args)
+
+.. py:function:: dweibull(*args)
+
+.. py:function:: erlang(*args)
+
+.. py:function:: expon(*args)
+
+.. py:function:: exponnorm(*args)
+
+.. py:function:: exponweib(*args)
+
+.. py:function:: exponpow(*args)
+
+.. py:function:: f(*args)
+
+.. py:function:: fatiguelife(*args)
+
+.. py:function:: fisk(*args)
+
+.. py:function:: foldcauchy(*args)
+
+.. py:function:: foldnorm(mu, s, steps=Params.steps)
+
+.. py:function:: genlogistic(*args)
+
+.. py:function:: gennorm(*args)
+
+.. py:function:: genpareto(*args)
+
+.. py:function:: genexpon(*args)
+
+.. py:function:: genextreme(*args)
+
+.. py:function:: gausshyper(*args)
+
+.. py:function:: gamma(*args)
+
+.. py:function:: gengamma(*args)
+
+.. py:function:: genhalflogistic(*args)
+
+.. py:function:: geninvgauss(*args)
+
+.. py:function:: gompertz(*args)
+
+.. py:function:: gumbel_r(*args)
+
+.. py:function:: gumbel_l(*args)
+
+.. py:function:: halfcauchy(*args)
+
+.. py:function:: halflogistic(*args)
+
+.. py:function:: halfnorm(*args)
+
+.. py:function:: halfgennorm(*args)
+
+.. py:function:: hypsecant(*args)
+
+.. py:function:: invgamma(*args)
+
+.. py:function:: invgauss(*args)
+
+.. py:function:: invweibull(*args)
+
+.. py:function:: irwinhall(*args)
+
+.. py:function:: jf_skew_t(*args)
+
+.. py:function:: johnsonsb(*args)
+
+.. py:function:: johnsonsu(*args)
+
+.. py:function:: kappa4(*args)
+
+.. py:function:: kappa3(*args)
+
+.. py:function:: ksone(*args)
+
+.. py:function:: kstwo(*args)
+
+.. py:function:: kstwobign(*args)
+
+.. py:function:: laplace(*args)
+
+.. py:function:: laplace_asymmetric(*args)
+
+.. py:function:: levy(*args)
+
+.. py:function:: levy_l(*args)
+
+.. py:function:: levy_stable(*args)
+
+.. py:function:: logistic(*args)
+
+.. py:function:: loggamma(*args)
+
+.. py:function:: loglaplace(*args)
+
+.. py:function:: loguniform(*args)
+
+.. py:function:: lomax(*args)
+
+.. py:function:: maxwell(*args)
+
+.. py:function:: mielke(*args)
+
+.. py:function:: moyal(*args)
+
+.. py:function:: nakagami(*args)
+
+.. py:function:: ncx2(*args)
+
+.. py:function:: ncf(*args)
+
+.. py:function:: nct(*args)
+
+.. py:function:: norminvgauss(*args)
+
+.. py:function:: pareto(*args)
+
+.. py:function:: pearson3(*args)
+
+.. py:function:: powerlaw(*args)
+
+.. py:function:: powerlognorm(*args)
+
+.. py:function:: powernorm(*args)
+
+.. py:function:: rdist(*args)
+
+.. py:function:: rayleigh(*args)
+
+.. py:function:: rel_breitwigner(*args)
+
+.. py:function:: rice(*args)
+
+.. py:function:: recipinvgauss(*args)
+
+.. py:function:: semicircular(*args)
+
+.. py:function:: skewcauchy(*args)
+
+.. py:function:: skewnorm(*args)
+
+.. py:function:: studentized_range(*args)
+
+.. py:function:: t(*args)
+
+.. py:function:: trapezoid(*args)
+
+.. py:function:: triang(*args)
+
+.. py:function:: truncexpon(*args)
+
+.. py:function:: truncnorm(*args)
+
+.. py:function:: truncpareto(*args)
+
+.. py:function:: truncweibull_min(*args)
+
+.. py:function:: tukeylambda(*args)
+
+.. py:function:: uniform_sps(*args)
+
+.. py:function:: vonmises(*args)
+
+.. py:function:: vonmises_line(*args)
+
+.. py:function:: wald(*args)
+
+.. py:function:: weibull_min(*args)
+
+.. py:function:: weibull_max(*args)
+
+.. py:function:: wrapcauchy(*args)
+
+.. py:function:: trapz(a, b, c, d, steps=Params.steps)
+
+.. py:function:: truncnorm(left, right, mean=None, stddev=None, steps=Params.steps)
+
+.. py:function:: uniform(a, b, steps=Params.steps)
+
+   special case of Uniform distribution as
+   Scipy has an unbelivably strange parameterisation than common sense
+
+   :param - a: (float) lower endpoint
+   :param - b: (float) upper endpoints
+
+
+.. py:function:: weibull(*args, steps=Params.steps)
+
+.. py:function:: KM(k, m, steps=Params.steps)
+
+.. py:function:: KN(k, n, steps=Params.steps)
+
+.. py:function:: bernoulli(*args)
+
+.. py:function:: betabinom(*args)
+
+.. py:function:: betanbinom(*args)
+
+.. py:function:: binom(*args)
+
+.. py:function:: boltzmann(*args)
+
+.. py:function:: dlaplace(*args)
+
+.. py:function:: geom(*args)
+
+.. py:function:: hypergeom(*args)
+
+.. py:function:: logser(*args)
+
+.. py:function:: nbinom(*args)
+
+.. py:function:: nchypergeom_fisher(*args)
+
+.. py:function:: nchypergeom_wallenius(*args)
+
+.. py:function:: nhypergeom(*args)
+
+.. py:function:: planck(*args)
+
+.. py:function:: poisson(*args)
+
+.. py:function:: randint(*args)
+
+.. py:function:: skellam(*args)
+
+.. py:function:: yulesimon(*args)
+
+.. py:function:: zipf(*args)
+
+.. py:function:: zipfian(*args)
+
+.. py:data:: normal
+
+.. py:data:: N
+
+.. py:data:: gaussian
+
+.. py:data:: U
+
+.. py:data:: lognorm
+
+.. py:data:: named_pbox
+

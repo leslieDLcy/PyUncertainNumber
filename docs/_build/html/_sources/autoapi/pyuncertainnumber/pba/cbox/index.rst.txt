@@ -1,0 +1,163 @@
+pyuncertainnumber.pba.cbox
+==========================
+
+.. py:module:: pyuncertainnumber.pba.cbox
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.cbox.named_cbox
+   pyuncertainnumber.pba.cbox.named_nextvalue
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.cbox.interval_measurements
+   pyuncertainnumber.pba.cbox.infer_cbox
+   pyuncertainnumber.pba.cbox.infer_predictive_distribution
+   pyuncertainnumber.pba.cbox.CBbernoulli_p
+   pyuncertainnumber.pba.cbox.CBbernoulli
+   pyuncertainnumber.pba.cbox.CBbinomial_p
+   pyuncertainnumber.pba.cbox.CBbinomial
+   pyuncertainnumber.pba.cbox.nextvalue_binomialnp
+   pyuncertainnumber.pba.cbox.parameter_binomialnp_n
+   pyuncertainnumber.pba.cbox.parameter_binomialnp_p
+   pyuncertainnumber.pba.cbox.CBpoisson_lambda
+   pyuncertainnumber.pba.cbox.CBpoisson
+   pyuncertainnumber.pba.cbox.CBexponential_lambda
+   pyuncertainnumber.pba.cbox.CBexponential
+   pyuncertainnumber.pba.cbox.cboxNormalMu_base
+   pyuncertainnumber.pba.cbox.CBnormal_mu
+   pyuncertainnumber.pba.cbox.CBnormal_sigma
+   pyuncertainnumber.pba.cbox.CBnormal
+   pyuncertainnumber.pba.cbox.CBlognormal
+   pyuncertainnumber.pba.cbox.CBlognormal_mu
+   pyuncertainnumber.pba.cbox.CBlognormal_sigma
+   pyuncertainnumber.pba.cbox.CBuniform_midpoint
+   pyuncertainnumber.pba.cbox.CBuniform_width
+   pyuncertainnumber.pba.cbox.CBuniform_minimum
+   pyuncertainnumber.pba.cbox.CBuniform_maximum
+   pyuncertainnumber.pba.cbox.CBuniform
+   pyuncertainnumber.pba.cbox.CBnonparametric
+   pyuncertainnumber.pba.cbox.CBnormal_meandifference
+   pyuncertainnumber.pba.cbox.CBnonparametric_deconvolution
+
+
+Module Contents
+---------------
+
+.. py:function:: interval_measurements(func)
+
+   decorator for incorporating interval valued data
+
+
+.. py:function:: infer_cbox(family: str, data, **args) -> pyuncertainnumber.pba.cbox_Leslie.Cbox
+
+   top-level call signature to infer a c-box given data and family, plus rarely additional kwargs
+
+   .. rubric:: Notes
+
+   - data (list): a list of data samples, e.g. [2]
+   - additina kwargs such as N for binomial family
+
+   .. rubric:: Example
+
+   >>> infer_cbox(''binomial', data=[2], N=10)
+
+
+.. py:function:: infer_predictive_distribution(family: str, data, **args)
+
+   top-level call for the next value predictive distribution
+
+
+.. py:function:: CBbernoulli_p(x)
+
+.. py:function:: CBbernoulli(x)
+
+.. py:function:: CBbinomial_p(x, N)
+
+   cbox for Bionomial parameter
+
+   :param x: sample data as in a list of success or number of success or
+             a single int as the number of success k
+   :type x: list or int
+   :param N: number of trials
+   :type N: int
+
+   .. note::
+
+      x[i] ~ binomial(N, p), for unknown p, x[i] is a nonnegative integer
+      but x is a int number, it suggests the number of success as `k`.
+
+   :returns: cbox object
+   :rtype: cbox
+
+
+.. py:function:: CBbinomial(x, N)
+
+.. py:function:: nextvalue_binomialnp(x)
+
+.. py:function:: parameter_binomialnp_n(x)
+
+.. py:function:: parameter_binomialnp_p(x)
+
+.. py:function:: CBpoisson_lambda(x)
+
+.. py:function:: CBpoisson(x)
+
+.. py:function:: CBexponential_lambda(x)
+
+.. py:function:: CBexponential(x)
+
+.. py:function:: cboxNormalMu_base(x)
+
+   base function for precise sample x
+
+
+.. py:function:: CBnormal_mu(x, style='analytical')
+
+   :param x: (array-like) the sample data
+   :param style: (str) the style of the output CDF, either 'analytical' or 'samples'
+   :param size: (int) the discritisation size.
+                meaning the no of ppf in analytical style and the no of MC samples in samples style
+
+   :returns: (array-like) the CDF of the normal distribution
+   :rtype: CDF
+
+
+.. py:function:: CBnormal_sigma(x)
+
+.. py:function:: CBnormal(x)
+
+.. py:function:: CBlognormal(x)
+
+.. py:function:: CBlognormal_mu(x)
+
+.. py:function:: CBlognormal_sigma(x)
+
+.. py:function:: CBuniform_midpoint(x)
+
+.. py:function:: CBuniform_width(x)
+
+.. py:function:: CBuniform_minimum(x)
+
+.. py:function:: CBuniform_maximum(x)
+
+.. py:function:: CBuniform(x)
+
+.. py:function:: CBnonparametric(x)
+
+.. py:function:: CBnormal_meandifference(x1, x2)
+
+.. py:function:: CBnonparametric_deconvolution(x, error)
+
+.. py:data:: named_cbox
+
+.. py:data:: named_nextvalue
+

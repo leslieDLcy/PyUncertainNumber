@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PyUncertainNumber.characterisation.utils import initial_list_checking
+from .utils import initial_list_checking
 from ..pba.interval import Interval as nInterval
 from intervals import Interval
 

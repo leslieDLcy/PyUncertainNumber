@@ -1,0 +1,931 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="pyuncertainnumber.characterisation.uncertainty_types" href="../uncertainty_types/index.html" /><link rel="prev" title="pyuncertainnumber.characterisation.stats" href="../stats/index.html" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>pyuncertainnumber.characterisation.uncertainNumber - </title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../../index.html"><div class="brand"> </div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../../../_static/UNlogo3.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text"> </span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guides/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guides/uc.html">Uncertainty characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guides/up.html">Propagation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">probability bounds analysis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pbox.html">Probability box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cbox.html">Confidence box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../interval_analysis.html">interval analysis</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API references</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../sampling/index.html">sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../endpoints/index.html">endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../subinterval/index.html">subinterval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../extremepoints/index.html">extremepoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Taylor_series/index.html">Taylor_series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../endpoints_cauchy/index.html">endpoints_cauchy</a></li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../../index.html">pyuncertainnumber</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of pyuncertainnumber</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../UV/index.html">pyuncertainnumber.UV</a></li>
+<li class="toctree-l3 current has-children"><a class="reference internal" href="../index.html">pyuncertainnumber.characterisation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.characterisation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../check/index.html">pyuncertainnumber.characterisation.check</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../core/index.html">pyuncertainnumber.characterisation.core</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ensemble/index.html">pyuncertainnumber.characterisation.ensemble</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../measurand/index.html">pyuncertainnumber.characterisation.measurand</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../multiple_UN/index.html">pyuncertainnumber.characterisation.multiple_UN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../stats/index.html">pyuncertainnumber.characterisation.stats</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pyuncertainnumber.characterisation.uncertainNumber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../uncertainty_types/index.html">pyuncertainnumber.characterisation.uncertainty_types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/index.html">pyuncertainnumber.characterisation.utils</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../variability/index.html">pyuncertainnumber.characterisation.variability</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../nlp/index.html">pyuncertainnumber.nlp</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.nlp</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../nlp/language_parsing/index.html">pyuncertainnumber.nlp.language_parsing</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../pba/index.html">pyuncertainnumber.pba</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.pba</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/aggregation/index.html">pyuncertainnumber.pba.aggregation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/cbox/index.html">pyuncertainnumber.pba.cbox</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/cbox_Leslie/index.html">pyuncertainnumber.pba.cbox_Leslie</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/constructors/index.html">pyuncertainnumber.pba.constructors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/copula/index.html">pyuncertainnumber.pba.copula</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/core/index.html">pyuncertainnumber.pba.core</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/distributions/index.html">pyuncertainnumber.pba.distributions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/ds/index.html">pyuncertainnumber.pba.ds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/imprecise/index.html">pyuncertainnumber.pba.imprecise</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/interval/index.html">pyuncertainnumber.pba.interval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/intervalOperators/index.html">pyuncertainnumber.pba.intervalOperators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/logical/index.html">pyuncertainnumber.pba.logical</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/operation/index.html">pyuncertainnumber.pba.operation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/params/index.html">pyuncertainnumber.pba.params</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/pbox/index.html">pyuncertainnumber.pba.pbox</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/pbox_base/index.html">pyuncertainnumber.pba.pbox_base</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/pbox_nonparam/index.html">pyuncertainnumber.pba.pbox_nonparam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../pba/utils/index.html">pyuncertainnumber.pba.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../propagation/index.html">pyuncertainnumber.propagation</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.propagation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../propagation/performance_func/index.html">pyuncertainnumber.propagation.performance_func</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../propagation/uncertaintyPropagation/index.html">pyuncertainnumber.propagation.uncertaintyPropagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../propagation/utils/index.html">pyuncertainnumber.propagation.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../cartesian_product/index.html">cartesian_product</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sampling_aleatory/index.html">sampling_aleatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../extreme_point_func/index.html">extreme_point_func</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../local_optimisation/index.html">local_optimisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../figures_distr_pbox/index.html">figures_distr_pbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../genetic_optimisation/index.html">genetic_optimisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../first_order_propagation/index.html">first_order_propagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../second_order_propagation/index.html">second_order_propagation</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../../../_sources/autoapi/pyuncertainnumber/characterisation/uncertainNumber/index.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-pyuncertainnumber.characterisation.uncertainNumber">
+<span id="pyuncertainnumber-characterisation-uncertainnumber"></span><h1>pyuncertainnumber.characterisation.uncertainNumber<a class="headerlink" href="#module-pyuncertainnumber.characterisation.uncertainNumber" title="Link to this heading">¶</a></h1>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber" title="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UncertainNumber</span></code></a></p></td>
+<td><p>Uncertain Number class</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber._parse_interverl_inputs" title="pyuncertainnumber.characterisation.uncertainNumber._parse_interverl_inputs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_parse_interverl_inputs</span></code></a>(vars)</p></td>
+<td><p>Parse the input intervals</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.characterisation.uncertainNumber.</span></span><span class="sig-name descname"><span class="pre">UncertainNumber</span></span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber" title="Link to this definition">¶</a></dt>
+<dd><p>Uncertain Number class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bounds;</strong> (<em>-</em>)</p></li>
+<li><p><strong>distribution_parameters</strong> (<em>-</em>) – a list of the distribution family and its parameters; e.g. [‘norm’, [0, 1]];</p></li>
+<li><p><strong>pbox_initialisation</strong> (<em>-</em>) – a list of the distribution family and its parameters; e.g. [‘norm’, ([0,1], [3,4])];</p></li>
+<li><p><strong>naked_value</strong> (<em>-</em>) – the deterministic numeric representation of the UN object, which shall be linked with the ‘pba’ or <cite>Intervals</cite> package</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">UncertainNumber</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;velocity&quot;</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;m/s&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.symbol">
+<span class="sig-name descname"><span class="pre">symbol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.symbol" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.units">
+<span class="sig-name descname"><span class="pre">units</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.units" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._Q">
+<span class="sig-name descname"><span class="pre">_Q</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._Q" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.uncertainty_type">
+<span class="sig-name descname"><span class="pre">uncertainty_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../uncertainty_types/index.html#pyuncertainnumber.characterisation.uncertainty_types.Uncertainty_types" title="pyuncertainnumber.characterisation.uncertainty_types.Uncertainty_types"><span class="pre">pyuncertainnumber.characterisation.uncertainty_types.Uncertainty_types</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.uncertainty_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.essence">
+<span class="sig-name descname"><span class="pre">essence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.essence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.masses">
+<span class="sig-name descname"><span class="pre">masses</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.masses" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.bounds">
+<span class="sig-name descname"><span class="pre">bounds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.bounds" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.distribution_parameters">
+<span class="sig-name descname"><span class="pre">distribution_parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.distribution_parameters" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.pbox_parameters">
+<span class="sig-name descname"><span class="pre">pbox_parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../pba/interval/index.html#pyuncertainnumber.pba.interval.Interval" title="pyuncertainnumber.pba.interval.Interval"><span class="pre">pyuncertainnumber.pba.interval.Interval</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.pbox_parameters" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.hedge">
+<span class="sig-name descname"><span class="pre">hedge</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.hedge" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._construct">
+<span class="sig-name descname"><span class="pre">_construct</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._construct" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.naked_value">
+<span class="sig-name descname"><span class="pre">naked_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.naked_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.p_flag">
+<span class="sig-name descname"><span class="pre">p_flag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.p_flag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.measurand">
+<span class="sig-name descname"><span class="pre">measurand</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.measurand" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.nature">
+<span class="sig-name descname"><span class="pre">nature</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.nature" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.provenence">
+<span class="sig-name descname"><span class="pre">provenence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.provenence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.justification">
+<span class="sig-name descname"><span class="pre">justification</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.justification" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.structure">
+<span class="sig-name descname"><span class="pre">structure</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.structure" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.security">
+<span class="sig-name descname"><span class="pre">security</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.security" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.ensemble">
+<span class="sig-name descname"><span class="pre">ensemble</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../ensemble/index.html#pyuncertainnumber.characterisation.ensemble.Ensemble" title="pyuncertainnumber.characterisation.ensemble.Ensemble"><span class="pre">pyuncertainnumber.characterisation.ensemble.Ensemble</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.ensemble" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.variability">
+<span class="sig-name descname"><span class="pre">variability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.variability" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.dependence">
+<span class="sig-name descname"><span class="pre">dependence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.dependence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.uncertainty">
+<span class="sig-name descname"><span class="pre">uncertainty</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.uncertainty" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.instances">
+<span class="sig-name descname"><span class="pre">instances</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.instances" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._samples">
+<span class="sig-name descname"><span class="pre">_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">pyuncertainnumber.characterisation.utils.np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._samples" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.parameterised_pbox_specification">
+<span class="sig-name descname"><span class="pre">parameterised_pbox_specification</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.parameterised_pbox_specification" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__post_init__">
+<span class="sig-name descname"><span class="pre">__post_init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__post_init__" title="Link to this definition">¶</a></dt>
+<dd><p>the de facto initialisation method for the core math objects of the UN class</p>
+<dl class="simple">
+<dt>caveat:</dt><dd><p>user needs to by themselves figure out the correct
+shape of the ‘distribution_parameters’, such as [‘uniform’, [1,2]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.match_pbox">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">match_pbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.match_pbox" title="Link to this definition">¶</a></dt>
+<dd><p>match the distribution keyword from the initialisation to create the underlying distribution object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keyword</strong> (<em>-</em>) – (str) the distribution keyword</p></li>
+<li><p><strong>parameters</strong> (<em>-</em>) – (list) the parameters of the distribution</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.init_check">
+<span class="sig-name descname"><span class="pre">init_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.init_check" title="Link to this definition">¶</a></dt>
+<dd><p>check if the UN initialisation specification is correct</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>a lot of things to double check. keep an growing list:
+1. unit
+2. hedge: user cannot speficy both ‘hedge’ and ‘bounds’. ‘bounds’ takes precedence.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__str__" title="Link to this definition">¶</a></dt>
+<dd><p>the verbose user-friendly string representation
+.. note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">this</span> <span class="n">has</span> <span class="n">nothing</span> <span class="n">to</span> <span class="n">do</span> <span class="k">with</span> <span class="n">the</span> <span class="n">logic</span> <span class="n">of</span> <span class="n">JSON</span> <span class="n">serialisation</span>
+<span class="n">ergo</span><span class="p">,</span> <span class="n">do</span> <span class="n">whatever</span> <span class="n">you</span> <span class="n">fancy</span><span class="p">;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__repr__" title="Link to this definition">¶</a></dt>
+<dd><p>concise __repr__</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'verbose'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.describe" title="Link to this definition">¶</a></dt>
+<dd><p>print out a verbose description of the uncertain number</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._get_concise_representation">
+<span class="sig-name descname"><span class="pre">_get_concise_representation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._get_concise_representation" title="Link to this definition">¶</a></dt>
+<dd><p>get a concise representation of the UN object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.ci">
+<span class="sig-name descname"><span class="pre">ci</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.ci" title="Link to this definition">¶</a></dt>
+<dd><p>get 95% range confidence interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.display">
+<span class="sig-name descname"><span class="pre">display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.display" title="Link to this definition">¶</a></dt>
+<dd><p>quick plot of the uncertain number object</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.construct">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">construct</span></span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.construct" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_hedge">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_hedge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hedged_language</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_hedge" title="Link to this definition">¶</a></dt>
+<dd><p>create an Uncertain Number from hedged language</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p># if interval or pbox, to be implemented later on
+#  currently only Interval is supported</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.fromConstruct">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fromConstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">construct</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.fromConstruct" title="Link to this definition">¶</a></dt>
+<dd><p>create an Uncertain Number from a construct object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.fromDistribution">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fromDistribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.fromDistribution" title="Link to this definition">¶</a></dt>
+<dd><p>create an Uncertain Number from specification of distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>D</strong> (<em>-</em>) – Distribution object</p></li>
+<li><p><strong>dist_family</strong> (<em>str</em>) – the distribution family</p></li>
+<li><p><strong>dist_params</strong> (<em>list</em><em>, </em><em>tuple</em><em> or </em><em>string</em>) – the distribution parameters</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_Interval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_Interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_Interval" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_pbox">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_pbox" title="Link to this definition">¶</a></dt>
+<dd><p>genenal from  pbox</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_ds">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_ds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_ds" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_sps">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_sps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sps_dist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_sps" title="Link to this definition">¶</a></dt>
+<dd><p>create an UN object from a parametric scipy.stats dist object
+#! it seems that a function will suffice
+:param - sps_dist: scipy.stats dist object</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>sps_dist –&gt; UN.Distribution object</p></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.sqrt">
+<span class="sig-name descname"><span class="pre">sqrt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.sqrt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__add__">
+<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__add__" title="Link to this definition">¶</a></dt>
+<dd><p>add two uncertain numbers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__radd__">
+<span class="sig-name descname"><span class="pre">__radd__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__radd__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__sub__">
+<span class="sig-name descname"><span class="pre">__sub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__sub__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__mul__">
+<span class="sig-name descname"><span class="pre">__mul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__mul__" title="Link to this definition">¶</a></dt>
+<dd><p>multiply two uncertain numbers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__rmul__">
+<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__rmul__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__truediv__">
+<span class="sig-name descname"><span class="pre">__truediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__truediv__" title="Link to this definition">¶</a></dt>
+<dd><p>divide two uncertain numbers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__rtruediv__">
+<span class="sig-name descname"><span class="pre">__rtruediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__rtruediv__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__pow__">
+<span class="sig-name descname"><span class="pre">__pow__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__pow__" title="Link to this definition">¶</a></dt>
+<dd><p>power of two uncertain numbers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._toIntervalBackend">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_toIntervalBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyuncertainnumber.characterisation.utils.np.array</span></span></span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._toIntervalBackend" title="Link to this definition">¶</a></dt>
+<dd><p>transform any UN object to an <cite>interval</cite>
+#! currently in use
+# TODO think if use Marco’s Interval Vector object</p>
+<dl class="simple">
+<dt>question:</dt><dd><ul class="simple">
+<li><p>what is the <cite>interval</cite> representation: list, nd.array or Interval object?</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>2D np.array representation for all the interval-typed UNs</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._IntervaltoCompBackend">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_IntervaltoCompBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._IntervaltoCompBackend" title="Link to this definition">¶</a></dt>
+<dd><p>convert the interval-tupe UNs instantiated to the computational backend</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>it will automatically convert all the UN objects in array-like to the computational backend</p></li>
+<li><p>essentially vars shall be all interval-typed UNs by now</p></li>
+</ul>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>nd.array or Marco’s Interval object</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<dl>
+<dt>thoughts:</dt><dd><ul class="simple">
+<li><p>if Marco’s, then we’d use <cite>intervalise</cite> func to get all interval objects</p></li>
+</ul>
+<p>and then to create another func to convert the interval objects to np.array to do endpoints method</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.JSON_dump">
+<span class="sig-name descname"><span class="pre">JSON_dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'UN_data.json'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.JSON_dump" title="Link to this definition">¶</a></dt>
+<dd><p>the JSON serialisation of the UN object into the filesystem</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.random">
+<span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.random" title="Link to this definition">¶</a></dt>
+<dd><p>Generate random samples from the distribution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.ppf">
+<span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.ppf" title="Link to this definition">¶</a></dt>
+<dd><p>“Calculate the percent point function (inverse of CDF) at quantile q.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.characterisation.uncertainNumber._parse_interverl_inputs">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.characterisation.uncertainNumber.</span></span><span class="sig-name descname"><span class="pre">_parse_interverl_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.characterisation.uncertainNumber._parse_interverl_inputs" title="Link to this definition">¶</a></dt>
+<dd><p>Parse the input intervals</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Ioanna’s funcs typically take 2D NumPy arra</p></li>
+</ul>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../uncertainty_types/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">pyuncertainnumber.characterisation.uncertainty_types</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../stats/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">pyuncertainnumber.characterisation.stats</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, (Leslie) Yu Chen
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pyuncertainnumber.characterisation.uncertainNumber</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber"><code class="docutils literal notranslate"><span class="pre">UncertainNumber</span></code></a><ul>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.name"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.name</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.symbol"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.symbol</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.units"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.units</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._Q"><code class="docutils literal notranslate"><span class="pre">UncertainNumber._Q</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.uncertainty_type"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.uncertainty_type</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.essence"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.essence</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.masses"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.masses</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.bounds"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.bounds</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.distribution_parameters"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.distribution_parameters</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.pbox_parameters"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.pbox_parameters</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.hedge"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.hedge</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._construct"><code class="docutils literal notranslate"><span class="pre">UncertainNumber._construct</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.naked_value"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.naked_value</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.p_flag"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.p_flag</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.measurand"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.measurand</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.nature"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.nature</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.provenence"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.provenence</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.justification"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.justification</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.structure"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.structure</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.security"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.security</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.ensemble"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.ensemble</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.variability"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.variability</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.dependence"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.dependence</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.uncertainty"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.uncertainty</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.instances"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.instances</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._samples"><code class="docutils literal notranslate"><span class="pre">UncertainNumber._samples</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.parameterised_pbox_specification"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.parameterised_pbox_specification()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__post_init__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__post_init__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.match_pbox"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.match_pbox()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.init_check"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.init_check()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__str__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__str__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__repr__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__repr__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.describe"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.describe()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._get_concise_representation"><code class="docutils literal notranslate"><span class="pre">UncertainNumber._get_concise_representation()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.ci"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.ci()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.display"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.display()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.construct"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.construct</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_hedge"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.from_hedge()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.fromConstruct"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.fromConstruct()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.fromDistribution"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.fromDistribution()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_Interval"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.from_Interval()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_pbox"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.from_pbox()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_ds"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.from_ds()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.from_sps"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.from_sps()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.sqrt"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.sqrt()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__add__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__add__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__radd__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__radd__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__sub__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__sub__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__mul__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__mul__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__rmul__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__rmul__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__truediv__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__truediv__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__rtruediv__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__rtruediv__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.__pow__"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.__pow__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._toIntervalBackend"><code class="docutils literal notranslate"><span class="pre">UncertainNumber._toIntervalBackend()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber._IntervaltoCompBackend"><code class="docutils literal notranslate"><span class="pre">UncertainNumber._IntervaltoCompBackend()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.JSON_dump"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.JSON_dump()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.random"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.random()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber.UncertainNumber.ppf"><code class="docutils literal notranslate"><span class="pre">UncertainNumber.ppf()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pyuncertainnumber.characterisation.uncertainNumber._parse_interverl_inputs"><code class="docutils literal notranslate"><span class="pre">_parse_interverl_inputs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

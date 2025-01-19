@@ -1,1 +1,1 @@
-backend : TkAgg
+"text.usetex": True
