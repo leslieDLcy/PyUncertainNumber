@@ -4,6 +4,7 @@
 # Mac OS-specific storage files
 .DS_Store
 .vscode
+matplotlibrc.txt
 # vim
 *.swp
 *.swo

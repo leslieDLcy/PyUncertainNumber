@@ -25,6 +25,7 @@ interval_analysis
 ```{toctree}
 :caption: API references
 :hidden:
+autoapi/index
 ```
 
 # PyUncertainNumber
