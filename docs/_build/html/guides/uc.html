@@ -397,8 +397,22 @@
 <a class="bg-primary reference internal image-reference" href="../_images/about_200.png"><img alt="about 200" class="bg-primary align-center" src="../_images/about_200.png" style="width: 400px;" />
 </a>
 </section>
-<section id="interval-measurements">
-<h2>interval measurements<a class="headerlink" href="#interval-measurements" title="Link to this heading">¶</a></h2>
+<section id="data-uncertainty">
+<h2>data uncertainty<a class="headerlink" href="#data-uncertainty" title="Link to this heading">¶</a></h2>
+<p>Measurement uncertainty is another main source uncertainty of data uncertainty besides sampling uncertainty. Point estimates from samples vary from one to another. We will typically use confidence intervals (as interval estimators) to account for the sampling uncertainty. As an example, <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> provides support for Kolmogorov–Smirnov (KS) confidence limits to infer the confidence limits for empirical cumulative distribution function.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>See also the <a class="reference internal" href="../cbox.html"><span class="std std-doc">confidence box</span></a> for a distributional estimator.</p>
+</div>
+<p>As to measurement uncertainty, <code class="docutils literal notranslate"><span class="pre">Intervals</span></code> turn out to be a natural means of mathematical construct for imprecise data due to the common understanding of margin of error, which leads to the midpoint notation of an interval object. <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> provides an extension of the Kolmogorov–Smirnov confidence limits for interval-valued data as well. <a class="reference internal" href="#KS-bounds-imprecise"><code class="xref myst docutils literal notranslate"><span class="pre">KS-bounds-imprecise</span></code></a> shows such confidence limits for the skinny data.</p>
+<figure class="align-center">
+<a class="bg-primary reference internal image-reference" href="../_images/ks_precise.png"><img alt="Kolmogorov–Smirnov bounds for precise data" class="bg-primary" src="../_images/ks_precise.png" style="width: 400px;" />
+</a>
+</figure>
+<figure class="align-center">
+<a class="bg-primary reference internal image-reference" href="../_images/ks_imprecise.png"><img alt="Kolmogorov–Smirnov bounds for imprecise data" class="bg-primary" src="../_images/ks_imprecise.png" style="width: 400px;" />
+</a>
+</figure>
 </section>
 </section>
 
@@ -463,7 +477,7 @@
 <li><a class="reference internal" href="#aggregation-of-multiple-sources-of-information">aggregation of multiple sources of information</a></li>
 <li><a class="reference internal" href="#known-statistical-properties">known statistical properties</a></li>
 <li><a class="reference internal" href="#hedged-numerical-expression">hedged numerical expression</a></li>
-<li><a class="reference internal" href="#interval-measurements">interval measurements</a></li>
+<li><a class="reference internal" href="#data-uncertainty">data uncertainty</a></li>
 </ul>
 </li>
 </ul>

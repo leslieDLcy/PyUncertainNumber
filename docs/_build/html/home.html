@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Installation" href="guides/installation.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title></title>
+        <title>&lt;no title&gt; - </title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
@@ -169,7 +169,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand"> </div></a>
+      <a href="index.html"><div class="brand"> </div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -190,7 +190,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="_static/UNlogo3.png" alt="Logo"/>
@@ -204,8 +204,8 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Home</a></li>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User Guides</span></p>
 <ul>
@@ -306,7 +306,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/index.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/home.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -326,79 +326,13 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
-<section class="tex2jax_ignore mathjax_ignore" id="pyuncertainnumber">
-<h1>PyUncertainNumber<a class="headerlink" href="#pyuncertainnumber" title="Link to this heading">¶</a></h1>
-<br>
-<p><strong>Uncertain Number</strong> refers to a class of mathematical objects useful for risk analysis that generalize real numbers, <a class="reference external" href="https://en.wikipedia.org/wiki/Interval_arithmetic">intervals</a>, probability distributions, interval bounds on probability distributions (i.e. <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_box">probability boxes</a>), and <a class="reference external" href="https://en.wikipedia.org/wiki/Dempster%E2%80%93Shafer_theory#:~:text=Often%20used%20as%20a%20method,on%20independent%20items%20of%20evidence.">finite DempsterShafer structures</a>.</p>
-<section id="features">
-<h2>features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> is a Python package for generic computational tasks focussing on rigourou uncertainty analysis, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> also features great natural language support as such characterisatin of input uncertainty can be intuitively done by using natural language like <code class="docutils literal notranslate"><span class="pre">about</span> <span class="pre">7</span></code> or simple expression like <code class="docutils literal notranslate"><span class="pre">[15</span> <span class="pre">+-</span> <span class="pre">10%]</span></code>, without worrying about the elicitation.</p></li>
-<li><p>features the save and loading of UN objects</p></li>
-<li><p>yields much informative results such as the combination that leads to the maximum in vertex method.</p></li>
-</ul>
-</section>
-<section id="quick-start">
-<h2>quick start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> can be used to easily create a <code class="docutils literal notranslate"><span class="pre">PBox</span></code> or an <code class="docutils literal notranslate"><span class="pre">Interval</span></code> object:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyuncertainnumber</span> <span class="kn">import</span> <span class="n">UncertainNumber</span> <span class="k">as</span> <span class="n">UN</span>
-
-<span class="n">e</span> <span class="o">=</span> <span class="n">UN</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;elas_modulus&#39;</span><span class="p">,</span> 
-    <span class="n">symbol</span><span class="o">=</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> 
-    <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Pa&#39;</span><span class="p">,</span> 
-    <span class="n">essence</span><span class="o">=</span><span class="s1">&#39;pbox&#39;</span><span class="p">,</span> 
-    <span class="n">distribution_parameters</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">])])</span>
-</pre></div>
-</div>
-<!-- add some pbox plots herein
-```{image} ../../assets/myAnimation.gif
-:alt: pbox dynamic visualisation
-:class: bg-primary
-:width: 600px
-:align: center
-``` -->
-</section>
-<section id="installation">
-<h2>installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
-<p>bla bla simple bla bla</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pyuncertainnumber
-</pre></div>
-</div>
-</section>
-<section id="uq-multiverse">
-<h2>UQ multiverse<a class="headerlink" href="#uq-multiverse" title="Link to this heading">¶</a></h2>
-<p>UQ is a big world (like Marvel multiverse) consisting of abundant theories and software implementations on multiple platforms. Some notable examples include <a class="reference external" href="https://github.com/cossan-working-group/OpenCossan">OpenCossan</a>, <a class="reference external" href="https://www.uqlab.com/">UQlab</a> in Matlab and <a class="reference external" href="https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl">ProbabilityBoundsAnalysis.jl</a> in Julia, and many others of course. <code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> builds upon on a few pioneering projects and will continue to be dedicated to support imprecise analysis in engineering using Python.</p>
-</section>
-<section id="acknowledgements">
-<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">PyUncertainNumber</span></code> was originally developed for use in the DAWS2 project. It has the capacity serve as a full-fleged UQ softwware to work beyond to fulfill general UQ challenges.</p>
-</section>
-</section>
-
+          
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="guides/installation.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Installation</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
+          
           
         </div>
         <div class="bottom-of-page">
@@ -431,7 +365,5 @@
     <script src="_static/tabs.js?v=3ee01567"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>
