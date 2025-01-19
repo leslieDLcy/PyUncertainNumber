@@ -754,7 +754,7 @@ class Pbox:
         # else:
         #     other = Pbox(other, steps=self.steps)
 
-        self.steps_check()
+        self.steps_check(other)
         nleft = np.minimum(self.left, other.left)
         nright = np.maximum(self.right, other.right)
         return Pbox(left=nleft, right=nright, steps=self.steps)
