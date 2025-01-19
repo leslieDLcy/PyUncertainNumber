@@ -981,7 +981,6 @@ class Pbox:
         else:
             return fig, ax
 
-    # @ mpl.rc_context({"text.usetex": True})
     def display(
         self,
         title="",
