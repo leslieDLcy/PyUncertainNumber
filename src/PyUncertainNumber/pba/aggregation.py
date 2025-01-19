@@ -8,7 +8,7 @@ from .utils import weighted_ecdf, CDF_bundle, reweighting
 import matplotlib.pyplot as plt
 from .constructors import pbox_fromeF
 from typing import TYPE_CHECKING
-from intervals import Interval
+from .intervals import Interval
 import importlib
 
 

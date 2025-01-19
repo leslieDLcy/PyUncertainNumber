@@ -5,7 +5,7 @@ import numpy as np
 from pyuncertainnumber import pba
 from scipy.stats import beta, t, gamma, betabinom, nbinom
 from .params import Params
-from intervals import Interval
+from .intervals import Interval
 import scipy
 from .cbox_Leslie import cbox_from_extredists, cbox_from_pseudosamples
 from .pbox_base import pbox_from_extredists, pbox_from_pseudosamples
