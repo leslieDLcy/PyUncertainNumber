@@ -1,5 +1,3 @@
-
-
 import functools
 from .interval import Interval as nInterval
 from .pbox_base import Pbox
@@ -16,13 +14,14 @@ from .intervalOperators import wc_interval
 
 
 def _get_bounds(dist_family, *args, steps=Params.steps):
-    """ from distribution specification to define the lower and upper bounds of the p-box
+    """from distribution specification to define the lower and upper bounds of the p-box
 
     args:
         - dist_family: (str) the name of the distribution
     """
 
     from .distributions import named_dists
+
     # TODO logically speaking, it can be (0,1) ergo support will be [-inf, inf] see it works with other part codes
     # define percentile range thus getting the support
     p = Params.p_values
@@ -60,7 +59,7 @@ def _get_bounds(dist_family, *args, steps=Params.steps):
 
 
 def _bound_pcdf(dist_family, *args, steps=Params.steps):
-    """ bound the parametric CDF 
+    """bound the parametric CDF
 
     note:
         - only support fully bounded parameters
@@ -85,6 +84,7 @@ def makePbox(func):
         i_args = [wc_interval(arg) for arg in args]
         shape_value = func(*args, **kwargs)
         return _bound_pcdf(shape_value, *i_args)
+
     return wrapper_decorator
 
 
@@ -93,7 +93,7 @@ def makePbox(func):
 
 @makePbox
 def norm(*args):
-    return 'norm'
+    return "norm"
 
 
 def lognormal(
@@ -145,10 +145,8 @@ def lognormal(
     bound2 = __lognorm(mean.left, var.right).ppf(x)
     bound3 = __lognorm(mean.right, var.right).ppf(x)
 
-    Left = [min(bound0[i], bound1[i], bound2[i], bound3[i])
-            for i in range(steps)]
-    Right = [max(bound0[i], bound1[i], bound2[i], bound3[i])
-             for i in range(steps)]
+    Left = [min(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
+    Right = [max(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
 
     Left = np.array(Left)
     Right = np.array(Right)
@@ -175,31 +173,9 @@ def arcsine(*args):
     return "arcsine"
 
 
-def beta(*args, steps=Params.steps):
-    """
-    Beta distribution
-    """
-    args = list(args)
-    for i in range(0, len(args)):
-        if args[i].__class__.__name__ != "nInterval":
-            args[i] = nInterval(args[i])
-        if args[i].left == 0:
-            args[i].left = 1e-5
-        if args[i].right == 0:
-            args[i].right = 1e-5
-
-    Left, Right, mean, var = _get_bounds("beta", steps, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="beta",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
+@makePbox
+def beta(*args):
+    return "beta"
 
 
 @makePbox
@@ -480,310 +456,337 @@ def halfnorm(*args):
 
 @makePbox
 def halfgennorm(*args):
-    return 'halfgennorm'
+    return "halfgennorm"
 
 
 @makePbox
 def hypsecant(*args):
-    return 'hypsecant'
+    return "hypsecant"
 
 
 @makePbox
 def invgamma(*args):
-    return 'invgamma'
+    return "invgamma"
 
 
 @makePbox
 def invgauss(*args):
-    return 'invgauss'
+    return "invgauss"
 
 
 @makePbox
 def invweibull(*args):
-    return 'invweibull'
+    return "invweibull"
 
 
 @makePbox
 def irwinhall(*args):
-    return 'irwinhall'
+    return "irwinhall"
 
 
 @makePbox
 def jf_skew_t(*args):
-    return 'jf_skew_t'
+    return "jf_skew_t"
 
 
 @makePbox
 def johnsonsb(*args):
-    return 'johnsonsb'
+    return "johnsonsb"
 
 
 @makePbox
 def johnsonsu(*args):
-    return 'johnsonsu'
+    return "johnsonsu"
 
 
 @makePbox
 def kappa4(*args):
-    return 'kappa4'
+    return "kappa4"
 
 
 @makePbox
 def kappa3(*args):
-    return 'kappa3'
+    return "kappa3"
 
 
 @makePbox
 def ksone(*args):
-    return 'ksone'
+    return "ksone"
 
 
 @makePbox
 def kstwo(*args):
-    return 'kstwo'
+    return "kstwo"
 
 
 @makePbox
 def kstwobign(*args):
-    return 'kstwobign'
+    return "kstwobign"
 
 
 @makePbox
 def laplace(*args):
 
-    return 'laplace'
+    return "laplace"
 
 
 @makePbox
 def laplace_asymmetric(*args):
-    return 'laplace_asymmetric'
+    return "laplace_asymmetric"
 
 
 @makePbox
 def levy(*args):
-    return 'levy'
+    return "levy"
 
 
 @makePbox
 def levy_l(*args):
-    return 'levy_l'
+    return "levy_l"
 
 
 @makePbox
 def levy_stable(*args):
-    return 'levy_stable'
+    return "levy_stable"
 
 
 @makePbox
 def logistic(*args):
-    return 'logistic'
+    return "logistic"
 
 
 @makePbox
 def loggamma(*args):
-    return 'loggamma'
+    return "loggamma"
 
 
 @makePbox
 def loglaplace(*args):
-    return 'loglaplace'
+    return "loglaplace"
 
 
 @makePbox
 def loguniform(*args):
-    return 'loguniform'
+    return "loguniform"
 
 
 @makePbox
 def lomax(*args):
-    return 'lomax'
+    return "lomax"
 
 
 @makePbox
 def maxwell(*args):
-    return 'maxwell'
+    return "maxwell"
 
 
 @makePbox
 def mielke(*args):
-    return 'mielke'
+    return "mielke"
 
 
 @makePbox
 def moyal(*args):
-    return 'moyal'
+    return "moyal"
 
 
 @makePbox
 def nakagami(*args):
-    return 'nakagami'
+    return "nakagami"
 
 
 @makePbox
 def ncx2(*args):
-    return 'ncx2'
+    return "ncx2"
 
 
 @makePbox
 def ncf(*args):
-    return 'ncf'
+    return "ncf"
 
 
 @makePbox
 def nct(*args):
-    return 'nct'
+    return "nct"
 
 
 @makePbox
 def norminvgauss(*args):
-    return 'norminvgauss'
+    return "norminvgauss"
 
 
 @makePbox
 def pareto(*args):
-    return 'pareto'
+    return "pareto"
 
 
 @makePbox
 def pearson3(*args):
-    return 'pearson3'
+    return "pearson3"
 
 
 @makePbox
 def powerlaw(*args):
-    return 'powerlaw'
+    return "powerlaw"
 
 
 @makePbox
 def powerlognorm(*args):
-    return 'powerlognorm'
+    return "powerlognorm"
 
 
 @makePbox
 def powernorm(*args):
-    return 'powernorm'
+    return "powernorm"
 
 
 @makePbox
 def rdist(*args):
-    return 'rdist'
+    return "rdist"
 
 
 @makePbox
 def rayleigh(*args):
-    return 'rayleigh'
+    return "rayleigh"
 
 
 @makePbox
 def rel_breitwigner(*args):
-    return 'rel_breitwigner'
+    return "rel_breitwigner"
 
 
 @makePbox
 def rice(*args):
-    return 'rice'
+    return "rice"
 
 
 @makePbox
 def recipinvgauss(*args):
-    return 'recipinvgauss'
+    return "recipinvgauss"
 
 
 @makePbox
 def semicircular(*args):
-    return 'semicircular'
+    return "semicircular"
 
 
 @makePbox
 def skewcauchy(*args):
-    return 'skewcauchy'
+    return "skewcauchy"
 
 
 @makePbox
 def skewnorm(*args):
-    return 'skewnorm'
+    return "skewnorm"
 
 
 @makePbox
 def studentized_range(*args):
-    return 'studentized_range'
+    return "studentized_range"
 
 
 @makePbox
 def t(*args):
-    return 't'
+    return "t"
 
 
 @makePbox
 def trapezoid(*args):
-    return 'trapezoid'
+    return "trapezoid"
 
 
 @makePbox
 def triang(*args):
-    return 'triang'
+    return "triang"
 
 
 @makePbox
 def truncexpon(*args):
-    return 'truncexpon'
+    return "truncexpon"
 
 
 @makePbox
 def truncnorm(*args):
-    return 'truncnorm'
+    return "truncnorm"
 
 
 @makePbox
 def truncpareto(*args):
-    return 'truncpareto'
+    return "truncpareto"
 
 
 @makePbox
 def truncweibull_min(*args):
-    return 'truncweibull_min'
+    return "truncweibull_min"
 
 
 @makePbox
 def tukeylambda(*args):
-    return 'tukeylambda'
+    return "tukeylambda"
 
 
 def uniform_sps(*args):
-    return 'uniform'
+    return "uniform"
 
 
 @makePbox
 def vonmises(*args):
-    return 'vonmises'
+    return "vonmises"
 
 
 @makePbox
 def vonmises_line(*args):
-    return 'vonmises_line'
+    return "vonmises_line"
 
 
 @makePbox
 def wald(*args):
-    return 'wald'
+    return "wald"
 
 
 @makePbox
 def weibull_min(*args):
-    return 'weibull_min'
+    return "weibull_min"
 
 
 @makePbox
 def weibull_max(*args):
-    return 'weibull_max'
+    return "weibull_max"
 
 
 @makePbox
 def wrapcauchy(*args):
-    return 'wrapcauchy'
+    return "wrapcauchy"
 
 
 # *---------------------some special ones ---------------------*#
+
+# * not sure why it is still here.
+# def beta(*args, steps=Params.steps):
+#     """
+#     Beta distribution
+#     """
+#     args = list(args)
+#     for i in range(0, len(args)):
+#         if args[i].__class__.__name__ != "nInterval":
+#             args[i] = nInterval(args[i])
+#         if args[i].left == 0:
+#             args[i].left = 1e-5
+#         if args[i].right == 0:
+#             args[i].right = 1e-5
+
+#     Left, Right, mean, var = _get_bounds("beta", steps, *args)
+
+#     return Pbox(
+#         Left,
+#         Right,
+#         steps=steps,
+#         shape="beta",
+#         mean_left=mean.left,
+#         mean_right=mean.right,
+#         var_left=var.left,
+#         var_right=var.right,
+#     )
 
 
 def trapz(a, b, c, d, steps=Params.steps):
@@ -820,8 +823,7 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
     a, b = (left - mean) / stddev, (right - mean) / stddev
 
-    Left, Right, mean, var = _get_bounds(
-        "truncnorm", steps, a, b, mean, stddev)
+    Left, Right, mean, var = _get_bounds("truncnorm", steps, a, b, mean, stddev)
 
     return Pbox(
         Left,
@@ -836,7 +838,7 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
 
 def uniform(a, b, steps=Params.steps):
-    """ special case of Uniform distribution as 
+    """special case of Uniform distribution as
     Scipy has an unbelivably strange parameterisation than common sense
 
     args:
@@ -847,8 +849,7 @@ def uniform(a, b, steps=Params.steps):
     # loc, scale = uniform_reparameterisation(a,  b)
     # return uniform_sps(loc, scale)
 
-    a, b = [nInterval(arg)
-            for arg in [a, b] if arg is not isinstance(arg, nInterval)]
+    a, b = [nInterval(arg) for arg in [a, b] if arg is not isinstance(arg, nInterval)]
 
     Left = np.linspace(a.left, b.left, steps)
     Right = np.linspace(a.right, b.right, steps)
@@ -882,104 +883,105 @@ def KN(k, n, steps=Params.steps):
 
 # *---------------------discrete distributions---------------------*#
 
+
 @makePbox
 def bernoulli(*args):
-    return 'bernoulli'
+    return "bernoulli"
 
 
 @makePbox
 def betabinom(*args):
-    return 'betabinom'
+    return "betabinom"
 
 
 @makePbox
 def betanbinom(*args):
-    return 'betanbinom'
+    return "betanbinom"
 
 
 @makePbox
 def binom(*args):
-    return 'binom'
+    return "binom"
 
 
 @makePbox
 def boltzmann(*args):
-    return 'boltzmann'
+    return "boltzmann"
 
 
 @makePbox
 def dlaplace(*args):
-    return 'dlaplace'
+    return "dlaplace"
 
 
 @makePbox
 def geom(*args):
-    return 'geom'
+    return "geom"
 
 
 @makePbox
 def hypergeom(*args):
-    return 'hypergeom'
+    return "hypergeom"
 
 
 @makePbox
 def logser(*args):
-    return 'logser'
+    return "logser"
 
 
 @makePbox
 def nbinom(*args):
-    return 'nbinom'
+    return "nbinom"
 
 
 @makePbox
 def nchypergeom_fisher(*args):
-    return 'nchypergeom_fisher'
+    return "nchypergeom_fisher"
 
 
 @makePbox
 def nchypergeom_wallenius(*args):
-    return 'nchypergeom_wallenius'
+    return "nchypergeom_wallenius"
 
 
 @makePbox
 def nhypergeom(*args):
-    return 'nhypergeom'
+    return "nhypergeom"
 
 
 @makePbox
 def planck(*args):
-    return 'planck'
+    return "planck"
 
 
 @makePbox
 def poisson(*args):
-    return 'poisson'
+    return "poisson"
 
 
 @makePbox
 def randint(*args):
-    return 'randint'
+    return "randint"
 
 
 @makePbox
 def skellam(*args):
-    return 'skellam'
+    return "skellam"
 
 
 @makePbox
 def yulesimon(*args):
-    return 'yulesimon'
+    return "yulesimon"
 
 
 @makePbox
 def zipf(*args):
-    return 'zipf'
+    return "zipf"
 
 
 @makePbox
 def zipfian(*args):
-    return 'zipfian'
+    return "zipfian"
 
 
 # *---------------------aliases---------------------*#
