@@ -25,6 +25,7 @@ interval_analysis
 ```{toctree}
 :caption: API references
 :hidden:
+autoapi/index
 ```
 
 # PyUncertainNumber
@@ -78,5 +79,3 @@ UQ is a big world (like Marvel multiverse) consisting of abundant theories and s
 ## Acknowledgements
 
 `PyUncertainNumber` was originally developed for use in the DAWS2 project. It has the capacity serve as a full-fleged UQ softwware to work beyond to fulfill general UQ challenges.
-
-## API references

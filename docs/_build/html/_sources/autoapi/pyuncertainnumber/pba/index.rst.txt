@@ -41,6 +41,7 @@ Attributes
    pyuncertainnumber.pba.U
    pyuncertainnumber.pba.lognorm
    pyuncertainnumber.pba.named_pbox
+   pyuncertainnumber.pba.I
 
 
 Classes
@@ -51,6 +52,7 @@ Classes
    pyuncertainnumber.pba.nInterval
    pyuncertainnumber.pba.Pbox
    pyuncertainnumber.pba.Params
+   pyuncertainnumber.pba.Interval
 
 
 Functions
@@ -192,6 +194,7 @@ Functions
    pyuncertainnumber.pba.yulesimon
    pyuncertainnumber.pba.zipf
    pyuncertainnumber.pba.zipfian
+   pyuncertainnumber.pba.PM
 
 
 Package Contents
@@ -1268,10 +1271,7 @@ Package Contents
 
 .. py:function:: arcsine(*args)
 
-.. py:function:: beta(*args, steps=Params.steps)
-
-   Beta distribution
-
+.. py:function:: beta(*args)
 
 .. py:function:: betaprime(*args)
 
@@ -1537,4 +1537,679 @@ Package Contents
 .. py:data:: lognorm
 
 .. py:data:: named_pbox
+
+.. py:class:: Interval(left=None, right=None)
+
+   An interval is an uncertain number for which only the endpoints are known, :math:`x=[a,b]`.
+   This is interpreted as :math:`x` being between :math:`a` and :math:`b` but with no more information about the value of :math:`x`.
+
+   Intervals embody epistemic uncertainty within PBA.
+
+   Creation
+   ________
+
+   Intervals can be created using either of the following:
+
+   .. code-block:: python
+
+       >>> pba.Interval(0,1)
+       Interval [0,1]
+       >>> pba.I(2,3)
+       Interval [2,3]
+
+   .. tip::
+
+       The shorthand ``I`` is an alias for ``Interval``
+
+   Intervals can also be created from a single value ± half-width:
+
+   >>> pba.PM(0,1)
+   Interval [-1,1]
+
+   By default intervals are displayed as ``Interval [a,b]`` where ``a`` and ``b`` are the left and right endpoints respectively. This can be changed using the `interval.pm_repr`_ and `interval.lr_repr`_ functions.
+
+   Arithmetic
+   __________
+
+   For two intervals [a,b] and [c,d] the following arithmetic operations are defined:
+
+   **Addition**
+
+   :math:`[a,b] + [c,d] = [a+c,b+d]`
+
+   **Subtraction**
+
+   :math:`[a,b] - [c,d] = [a-d,b-c]`
+
+   **Multiplication**
+
+   :math:`[a,b] * [c,d] = [\min(ac,ad,bc,bd),\max(ac,ad,bc,bd)]`
+
+   **Division**
+
+   :math:`[a,b] / [c,d] = [a,b] * \frac{1}{[c,d]} \equiv [\min(a/c,a/d,b/c,b/d),\max(a/c,a/d,b/c,b/d)]`
+
+   Alternative arithmetic methods are described in `interval.add`_, `interval.sub`_, `interval.mul`_, `interval.div`_.
+
+
+
+   .. py:attribute:: _left
+      :value: None
+
+
+
+   .. py:attribute:: _right
+      :value: None
+
+
+
+   .. py:property:: left
+
+
+   .. py:property:: right
+
+
+   .. py:method:: __repr__() -> str
+
+
+   .. py:method:: __str__() -> str
+
+
+   .. py:method:: __format__(format_spec: str) -> str
+
+
+   .. py:method:: __iter__()
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: __radd__(left)
+
+
+   .. py:method:: __sub__(other)
+
+
+   .. py:method:: __rsub__(other)
+
+
+   .. py:method:: __neg__()
+
+
+   .. py:method:: __mul__(other)
+
+
+   .. py:method:: __rmul__(other)
+
+
+   .. py:method:: __truediv__(other)
+
+
+   .. py:method:: __rtruediv__(other)
+
+
+   .. py:method:: __pow__(other)
+
+
+   .. py:method:: __rpow__(left)
+
+
+   .. py:method:: __lt__(other)
+
+
+   .. py:method:: __rgt__(other)
+
+
+   .. py:method:: __eq__(other)
+
+      ==
+
+
+
+   .. py:method:: __gt__(other)
+
+      >
+
+
+
+   .. py:method:: __rlt__(other)
+
+
+   .. py:method:: __ne__(other)
+
+      !=
+
+
+
+   .. py:method:: __le__(other)
+
+      <=
+
+
+
+   .. py:method:: __ge__(other)
+
+
+   .. py:method:: __bool__()
+
+
+   .. py:method:: __abs__()
+
+
+   .. py:method:: __contains__(other)
+
+
+   .. py:method:: add(other, method=None)
+
+      .. _interval.add:
+
+      Adds the interval and another object together.
+
+
+      **Args**:
+
+          ``other``: The interval or numeric value to be added. This value must be transformable into an Interval object.
+
+      **Methods**:
+
+          p - perfect arithmetic :math:`[a,b]+[c,d] = [a + c, b + d]`
+
+          o - opposite arithmetic :math:`[a,b]+[c,d] = [a + d, b + c]`
+
+          None, i, f - Standard interval arithmetic is used.
+
+      **Returns**:
+
+          ``Interval``
+
+
+
+
+   .. py:method:: __add__(other)
+
+
+   .. py:method:: padd(other)
+
+      .. warning::
+          This method is deprecated. Use add(other, method='p') instead.
+
+
+
+   .. py:method:: oadd(other)
+
+      .. warning::
+          This method is deprecated. Use add(other, method='o') instead.
+
+
+
+   .. py:method:: sub(other, method=None)
+
+      .. _interval.sub:
+
+      Subtracts other from self.
+
+      **Args**:
+
+          ``other``: The interval or numeric value to be subracted. This value must be transformable into an Interval object.
+
+      **Methods**:
+
+          ``p``: perfect arithmetic :math:`a+b = [a.left - b.left, a.right - b.right]`
+
+          ``o``: opposite arithmetic :math:`a+b = [a.left - b.right, a.right - b.left]`
+
+          None, i, f - Standard interval arithmetic is used.
+
+      **Returns**:
+
+          ``Interval``
+
+
+
+
+   .. py:method:: psub(other)
+
+      .. warning::
+          Depreciated use self.sub(other, method = 'p') instead
+
+
+
+   .. py:method:: osub(other)
+
+      .. warning::
+          Depreciated use self.sub(other, method = 'o') instead
+
+
+
+   .. py:method:: mul(other, method=None)
+
+      .. _interval.mul:
+
+      Multiplies self by other.
+
+      **Args**:
+
+          ``other``: The interval or numeric value to be multiplied. This value must be transformable into an Interval object.
+
+
+      **Methods**:
+          ``p``: perfect arithmetic :math:`[a,b],[c,d] = [a * c, b * d]`
+
+          ``o``: opposite arithmetic :math:`[a,b],[c,d] = [a * d, b * c]`
+
+          None, i, f - Standard interval arithmetic is used.
+
+      **Returns**:
+          Interval: The result of the multiplication.
+
+
+
+
+
+   .. py:method:: pmul(other)
+
+      .. warning::
+          Depreciated use self.mul(other, method = 'p') instead
+
+
+
+   .. py:method:: omul(other)
+
+      .. warning::
+          Depreciated use self.mul(other, method = 'o') instead
+
+
+
+   .. py:method:: div(other, method=None)
+
+      .. _interval.div:
+
+      Divides self by other
+
+
+      If :math:`0 \in other` it returns a division by zero error
+
+
+      **Args**:
+
+          ``other`` (Interval or numeric): The interval or numeric value to be multiplied. This value must be transformable into an Interval object.
+
+      **Methods**:
+
+          ``p``: perfect arithmetic :math:`[a,b],[c,d] = [a * 1/c, b * 1/d]`
+
+          ``o``: opposite arithmetic :math:`[a,b],[c,d] = [a * 1/d, b * 1/c]`
+
+          ``None``, ``i``, ``f`` - Standard interval arithmetic is used.
+
+      .. admonition:: Implementation
+
+          >>> self.add(1/other, method = method)
+
+      .. error::
+
+          If :math:`0 \in [a,b]` it returns a division by zero error
+
+
+
+
+   .. py:method:: pdiv(other)
+
+      .. warning::
+          Depreciated use self.div(other, method = 'p') instead
+
+
+
+   .. py:method:: odiv(other)
+
+      .. warning::
+          Depreciated use self.div(other, method = 'o') instead
+
+
+
+
+   .. py:method:: recip()
+
+      Calculates the reciprocle of the interval.
+
+      **Returns**:
+
+          ``Interval``: Equal to :math:`[1/b,1/a]`
+
+      **Example**:
+
+          >>> pba.Interval(2,4).recip()
+          Interval [0.25, 0.5]
+
+      .. error::
+          If :math:`0 \in [a,b]` it returns a division by zero error
+
+
+
+
+   .. py:method:: equiv(other: Interval) -> bool
+
+      Checks whether two intervals are equivalent.
+
+      **Parameters**:
+
+          ``other``: The interval to check against.
+
+      **Returns** ``True`` **if**:
+
+          ``self.left == other.right`` and ``self.right == other.right``
+
+          ``False`` otherwise.
+
+      .. error::
+
+          ``TypeError``: If ``other`` is not an instance of ``Interval``
+
+      .. seealso::
+          :func:`~logical.is_same_as`
+
+      **Examples**:
+
+          >>> a = Interval(0,1)
+          >>> b = Interval(0.5,1.5)
+          >>> c = I(0,1)
+          >>> a.equiv(b)
+          False
+          >>> a.equiv(c)
+          True
+
+
+
+
+   .. py:property:: lo
+
+      
+
+
+
+      **Returns**:
+          ``self.left``
+
+      .. tip::
+
+          This function is redundant but exists to match Pbox class for possible internal reasons.
+
+
+   .. py:property:: hi
+
+      
+
+
+
+      **Returns**:
+          ``self.right``
+
+      .. tip::
+
+          This function is redundant but exists to match Pbox class for possible internal reasons.
+
+
+   .. py:method:: width() -> float
+
+      **Returns**:
+
+          ``float``: The width of the interval, :math:`\mathrm{right} - \mathrm{left}`
+
+      **Example**:
+
+          >>> pba.Interval(0,3).width()
+          3
+
+
+
+
+   .. py:method:: halfwidth() -> float
+
+      **Returns**:
+
+          ``float``: The half-width of the interval, :math:`(\mathrm{right} - \mathrm{left})/2`
+
+      **Example**:
+
+          >>> pba.Interval(0,3).halfwidth()
+          1.5
+
+      .. admonition:: Implementation
+
+          >>> self.width()/2
+
+
+
+
+   .. py:method:: midpoint() -> float
+
+      Returns the midpoint of the interval
+
+      .. note:: - this serves as the deterministic value representation of the interval, a.k.a. the naked value for an interval
+
+      :returns: The midpoint of the interval, :math:`(\mathrm{right} + \mathrm{left})/2`
+      :rtype: ``float``
+
+      **Example**:
+              >>> pba.Interval(0,2).midpoint()
+              1.0
+
+
+
+   .. py:method:: to_logical()
+
+      Turns the interval into a logical interval, this is done by chacking the truth value of the ends of the interval
+
+      **Returns**:
+
+          ``Logical``: The logical interval
+
+      .. admonition:: Implementation
+
+          >>> left = self.left.__bool__()
+          >>> right = self.right.__bool__()
+          >>> Logical(left,right)
+
+
+
+
+
+   .. py:method:: env(other: Union[list, Interval]) -> Interval
+
+      Calculates the envelope between two intervals
+
+      **Parameters**:
+
+          ``other`` : Interval or list. The interval to envelope with self
+
+      .. hint::
+
+          If other is a list then the envelope is calculated between self and each element of the list. In this case the envelope is calculated recursively and pba.envelope() may be more efficient.
+
+      .. important::
+          If other is a Pbox then ``Pbox.env()`` is called
+
+      .. seealso::
+
+          `pba.core.envelope`_
+
+          `pba.pbox.Pbox.env`_
+
+      **Returns**:
+
+          ``Interval``: The envelope of self and other
+
+
+
+
+
+   .. py:method:: straddles(N: Union[int, float, Interval], endpoints: bool = True) -> bool
+
+      .. _interval.straddles:
+
+      **Parameters**:
+
+          ``N``: Number to check. If N is an interval checks whether the whole interval is within self.
+
+          ``endpoints``: Whether to include the endpoints within the check
+
+      **Returns** ``True`` **if**:
+
+          :math:`\mathrm{left} \leq N \leq \mathrm{right}` (Assuming ``endpoints=True``).
+
+          For interval values. :math:`\mathrm{left} \leq N.left \leq \mathrm{right}` and :math:`\mathrm{left} \leq N.right \leq \mathrm{right}` (Assuming ``endpoints=True``).
+
+          ``False`` otherwise.
+
+      .. tip::
+
+          ``N in self`` is equivalent to ``self.straddles(N)``
+
+
+
+
+   .. py:method:: straddles_zero(endpoints=True)
+
+      Checks whether :math:`0` is within the interval
+
+      .. admonition:: Implementation
+
+          Equivalent to ``self.straddles(0,endpoints)``
+
+      .. seealso::
+          interval.straddles_
+
+
+
+
+   .. py:method:: intersection(other: Union[Interval, list]) -> Interval
+
+      Calculates the intersection between intervals
+
+      **Parameters**:
+
+          ``other``: The interval to intersect with self. If an interval is not given will try to cast as an interval. If a list is given will calculate the intersection between self and each element of the list.
+
+      **Returns**:
+
+          ``Interval``: The intersection of self and other. If no intersection is found returns ``None``
+
+      **Example**:
+
+          >>> a = Interval(0,1)
+          >>> b = Interval(0.5,1.5)
+          >>> a.intersection(b)
+          Interval [0.5, 1]
+
+
+
+   .. py:method:: exp()
+
+
+   .. py:method:: log()
+
+
+   .. py:method:: sqrt()
+
+
+   .. py:method:: display(title='', ax=None, style='band', **kwargs)
+
+
+   .. py:method:: sample(seed=None, numpy_rng: numpy.random.Generator = None) -> float
+
+      Generate a random sample within the interval.
+
+      **Parameters**:
+
+          ``seed`` (int, optional): Seed value for random number generation. Defaults to None.
+
+          ``numpy_rng`` (numpy.random.Generator, optional): Numpy random number generator. Defaults to None.
+
+      **Returns**:
+
+          ``float``: Random sample within the interval.
+
+      .. admonition:: Implementation
+
+          If ``numpy_rng`` is given:
+
+              >>> numpy_rng.uniform(self.left, self.right)
+
+          Otherwise the following is used:
+
+          >>> import random
+          >>> random.seed(seed)
+          >>> self.left + random.random() * self.width()
+
+      **Examples**:
+
+          >>> pba.Interval(0,1).sample()
+          0.6160988752201705
+          >>> pba.I(0,1).sample(seed = 1)
+          0.13436424411240122
+
+      If a numpy random number generator is given then it is used instead of the default python random number generator. It has to be initialised first.
+
+          >>> import numpy as np
+          >>> rng = np.random.default_rng(seed = 0)
+          >>> pba.I(0,1).sample(numpy_rng = rng)
+          0.6369616873214543
+
+
+
+   .. py:method:: round()
+
+      outward rounding operation for an interval object
+
+
+
+   .. py:method:: from_midwith(midpoint: float, halfwidth: float) -> Interval
+      :classmethod:
+
+
+      Creates an Interval object from a midpoint and half-width.
+
+      :param - midpoint: The midpoint of the interval.
+      :type - midpoint: float
+      :param - halfwidth: The half-width of the interval.
+      :type - halfwidth: float
+
+      :returns: The interval with midpoint and half-width.
+      :rtype: - Interval
+
+      .. rubric:: Example
+
+      >>> pba.Interval.from_midwith(0,1)
+      Interval [-1, 1]
+
+
+
+.. py:data:: I
+
+.. py:function:: PM(x, hw)
+
+   Create an interval centered around x with a half-width of hw.
+
+   # TODO: a constructor for creating an interval from a midpoint and half-width
+   # ! this func is weird and I keep it only for not breaking the code in other places.
+
+   **Parameters**:
+
+       ``x`` (float): The center value of the interval.
+
+       ``hw`` (float): The half-width of the interval.
+
+   **Returns**:
+
+       ``Interval``: An interval object with lower bound x-hw and upper bound x+hw.
+
+   .. error::
+
+       ``ValueError``: If hw is less than 0.
+
+   .. rubric:: Example
+
+   >>> pba.PM(0, 1)
+   Interval [-1, 1]
+
 

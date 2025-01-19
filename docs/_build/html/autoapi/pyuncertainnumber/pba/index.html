@@ -376,6 +376,9 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.named_pbox" title="pyuncertainnumber.pba.named_pbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">named_pbox</span></code></a></p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.I" title="pyuncertainnumber.pba.I"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I</span></code></a></p></td>
+<td><p></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -393,6 +396,9 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.Params" title="pyuncertainnumber.pba.Params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Params</span></code></a></p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Interval</span></code></a></p></td>
+<td><p>An interval is an uncertain number for which only the endpoints are known, <span class="math notranslate nohighlight">\(x=[a,b]\)</span>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -433,8 +439,8 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.arcsine" title="pyuncertainnumber.pba.arcsine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">arcsine</span></code></a>(*args)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.beta" title="pyuncertainnumber.pba.beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beta</span></code></a>(*args[, steps])</p></td>
-<td><p>Beta distribution</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.beta" title="pyuncertainnumber.pba.beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beta</span></code></a>(*args)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.betaprime" title="pyuncertainnumber.pba.betaprime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">betaprime</span></code></a>(*args)</p></td>
 <td><p></p></td>
@@ -805,6 +811,9 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.zipfian" title="pyuncertainnumber.pba.zipfian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zipfian</span></code></a>(*args)</p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.PM" title="pyuncertainnumber.pba.PM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PM</span></code></a>(x, hw)</p></td>
+<td><p>Create an interval centered around x with a half-width of hw.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -835,7 +844,7 @@ This is interpreted as <span class="math notranslate nohighlight">\(x\)</span> b
 <span class="go">Interval [-1,1]</span>
 </pre></div>
 </div>
-<p>By default intervals are displayed as <code class="docutils literal notranslate"><span class="pre">Interval</span> <span class="pre">[a,b]</span></code> where <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> are the left and right endpoints respectively. This can be changed using the <a href="#id1"><span class="problematic" id="id2">`interval.pm_repr`_</span></a> and <a href="#id3"><span class="problematic" id="id4">`interval.lr_repr`_</span></a> functions.</p>
+<p>By default intervals are displayed as <code class="docutils literal notranslate"><span class="pre">Interval</span> <span class="pre">[a,b]</span></code> where <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> are the left and right endpoints respectively. This can be changed using the <a href="#id8"><span class="problematic" id="id9">`interval.pm_repr`_</span></a> and <a href="#id10"><span class="problematic" id="id11">`interval.lr_repr`_</span></a> functions.</p>
 </section>
 <section id="arithmetic">
 <h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Link to this heading">¶</a></h3>
@@ -848,7 +857,7 @@ This is interpreted as <span class="math notranslate nohighlight">\(x\)</span> b
 <p><span class="math notranslate nohighlight">\([a,b] * [c,d] = [\min(ac,ad,bc,bd),\max(ac,ad,bc,bd)]\)</span></p>
 <p><strong>Division</strong></p>
 <p><span class="math notranslate nohighlight">\([a,b] / [c,d] = [a,b] * \frac{1}{[c,d]} \equiv [\min(a/c,a/d,b/c,b/d),\max(a/c,a/d,b/c,b/d)]\)</span></p>
-<p>Alternative arithmetic methods are described in <a class="reference internal" href="#interval-add">interval.add</a>, <a class="reference internal" href="#interval-sub">interval.sub</a>, <a class="reference internal" href="#interval-mul">interval.mul</a>, <a class="reference internal" href="#interval-div">interval.div</a>.</p>
+<p>Alternative arithmetic methods are described in <a href="#id12"><span class="problematic" id="id13">`interval.add`_</span></a>, <a href="#id14"><span class="problematic" id="id15">`interval.sub`_</span></a>, <a href="#id16"><span class="problematic" id="id17">`interval.mul`_</span></a>, <a href="#id18"><span class="problematic" id="id19">`interval.div`_</span></a>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.nInterval._left">
 <span class="sig-name descname"><span class="pre">_left</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.pba.nInterval._left" title="Link to this definition">¶</a></dt>
@@ -1186,7 +1195,7 @@ This is interpreted as <span class="math notranslate nohighlight">\(x\)</span> b
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.nInterval.equiv">
-<span class="sig-name descname"><span class="pre">equiv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="interval/index.html#pyuncertainnumber.pba.interval.Interval" title="pyuncertainnumber.pba.interval.Interval"><span class="pre">Interval</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.nInterval.equiv" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">equiv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.nInterval.equiv" title="Link to this definition">¶</a></dt>
 <dd><p>Checks whether two intervals are equivalent.</p>
 <p><strong>Parameters</strong>:</p>
 <blockquote>
@@ -1324,7 +1333,7 @@ This is interpreted as <span class="math notranslate nohighlight">\(x\)</span> b
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.nInterval.env">
-<span class="sig-name descname"><span class="pre">env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="interval/index.html#pyuncertainnumber.pba.interval.Interval" title="pyuncertainnumber.pba.interval.Interval"><span class="pre">Interval</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="interval/index.html#pyuncertainnumber.pba.interval.Interval" title="pyuncertainnumber.pba.interval.Interval"><span class="pre">Interval</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.pba.nInterval.env" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.pba.nInterval.env" title="Link to this definition">¶</a></dt>
 <dd><p>Calculates the envelope between two intervals</p>
 <p><strong>Parameters</strong>:</p>
 <blockquote>
@@ -1340,8 +1349,8 @@ This is interpreted as <span class="math notranslate nohighlight">\(x\)</span> b
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a href="#id5"><span class="problematic" id="id6">`pba.core.envelope`_</span></a></p>
-<p><a href="#id7"><span class="problematic" id="id8">`pba.pbox.Pbox.env`_</span></a></p>
+<p><a href="#id20"><span class="problematic" id="id21">`pba.core.envelope`_</span></a></p>
+<p><a href="#id22"><span class="problematic" id="id23">`pba.pbox.Pbox.env`_</span></a></p>
 </div>
 <p><strong>Returns</strong>:</p>
 <blockquote>
@@ -1351,7 +1360,7 @@ This is interpreted as <span class="math notranslate nohighlight">\(x\)</span> b
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.nInterval.straddles">
-<span class="sig-name descname"><span class="pre">straddles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="interval/index.html#pyuncertainnumber.pba.interval.Interval" title="pyuncertainnumber.pba.interval.Interval"><span class="pre">Interval</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.nInterval.straddles" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">straddles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.nInterval.straddles" title="Link to this definition">¶</a></dt>
 <dd><p id="interval-straddles"><strong>Parameters</strong>:</p>
 <blockquote>
 <div><p><code class="docutils literal notranslate"><span class="pre">N</span></code>: Number to check. If N is an interval checks whether the whole interval is within self.</p>
@@ -1379,13 +1388,13 @@ This is interpreted as <span class="math notranslate nohighlight">\(x\)</span> b
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#interval-straddles">interval.straddles</a></p>
+<p><a href="#id24"><span class="problematic" id="id25">interval.straddles_</span></a></p>
 </div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.nInterval.intersection">
-<span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="interval/index.html#pyuncertainnumber.pba.interval.Interval" title="pyuncertainnumber.pba.interval.Interval"><span class="pre">Interval</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="interval/index.html#pyuncertainnumber.pba.interval.Interval" title="pyuncertainnumber.pba.interval.Interval"><span class="pre">Interval</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.pba.nInterval.intersection" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.pba.nInterval.intersection" title="Link to this definition">¶</a></dt>
 <dd><p>Calculates the intersection between intervals</p>
 <p><strong>Parameters</strong>:</p>
 <blockquote>
@@ -1474,7 +1483,7 @@ This is interpreted as <span class="math notranslate nohighlight">\(x\)</span> b
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.nInterval.from_midwith">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_midwith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">midpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">halfwidth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="interval/index.html#pyuncertainnumber.pba.interval.Interval" title="pyuncertainnumber.pba.interval.Interval"><span class="pre">Interval</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.pba.nInterval.from_midwith" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_midwith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">midpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">halfwidth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.pba.nInterval.from_midwith" title="Link to this definition">¶</a></dt>
 <dd><p>Creates an Interval object from a midpoint and half-width.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2093,9 +2102,8 @@ See:
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.beta">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.</span></span><span class="sig-name descname"><span class="pre">beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.beta" title="Link to this definition">¶</a></dt>
-<dd><p>Beta distribution</p>
-</dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.</span></span><span class="sig-name descname"><span class="pre">beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.beta" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.betaprime">
@@ -2752,6 +2760,729 @@ Scipy has an unbelivably strange parameterisation than common sense</p>
 <span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.</span></span><span class="sig-name descname"><span class="pre">named_pbox</span></span><a class="headerlink" href="#pyuncertainnumber.pba.named_pbox" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.</span></span><span class="sig-name descname"><span class="pre">Interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval" title="Link to this definition">¶</a></dt>
+<dd><p>An interval is an uncertain number for which only the endpoints are known, <span class="math notranslate nohighlight">\(x=[a,b]\)</span>.
+This is interpreted as <span class="math notranslate nohighlight">\(x\)</span> being between <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span> but with no more information about the value of <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<p>Intervals embody epistemic uncertainty within PBA.</p>
+<section id="id1">
+<h3>Creation<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p>Intervals can be created using either of the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">Interval [0,1]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">I</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">Interval [2,3]</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The shorthand <code class="docutils literal notranslate"><span class="pre">I</span></code> is an alias for <code class="docutils literal notranslate"><span class="pre">Interval</span></code></p>
+</div>
+<p>Intervals can also be created from a single value ± half-width:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">PM</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">Interval [-1,1]</span>
+</pre></div>
+</div>
+<p>By default intervals are displayed as <code class="docutils literal notranslate"><span class="pre">Interval</span> <span class="pre">[a,b]</span></code> where <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> are the left and right endpoints respectively. This can be changed using the <a href="#id26"><span class="problematic" id="id27">`interval.pm_repr`_</span></a> and <a href="#id28"><span class="problematic" id="id29">`interval.lr_repr`_</span></a> functions.</p>
+</section>
+<section id="id2">
+<h3>Arithmetic<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<p>For two intervals [a,b] and [c,d] the following arithmetic operations are defined:</p>
+<p><strong>Addition</strong></p>
+<p><span class="math notranslate nohighlight">\([a,b] + [c,d] = [a+c,b+d]\)</span></p>
+<p><strong>Subtraction</strong></p>
+<p><span class="math notranslate nohighlight">\([a,b] - [c,d] = [a-d,b-c]\)</span></p>
+<p><strong>Multiplication</strong></p>
+<p><span class="math notranslate nohighlight">\([a,b] * [c,d] = [\min(ac,ad,bc,bd),\max(ac,ad,bc,bd)]\)</span></p>
+<p><strong>Division</strong></p>
+<p><span class="math notranslate nohighlight">\([a,b] / [c,d] = [a,b] * \frac{1}{[c,d]} \equiv [\min(a/c,a/d,b/c,b/d),\max(a/c,a/d,b/c,b/d)]\)</span></p>
+<p>Alternative arithmetic methods are described in <a href="#id30"><span class="problematic" id="id31">`interval.add`_</span></a>, <a href="#id32"><span class="problematic" id="id33">`interval.sub`_</span></a>, <a href="#id34"><span class="problematic" id="id35">`interval.mul`_</span></a>, <a href="#id36"><span class="problematic" id="id37">`interval.div`_</span></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval._left">
+<span class="sig-name descname"><span class="pre">_left</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.pba.Interval._left" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval._right">
+<span class="sig-name descname"><span class="pre">_right</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyuncertainnumber.pba.Interval._right" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.left">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">left</span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.left" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.right">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">right</span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.right" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__repr__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__str__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__format__">
+<span class="sig-name descname"><span class="pre">__format__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__format__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__iter__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__len__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__radd__">
+<span class="sig-name descname"><span class="pre">__radd__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__radd__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__sub__">
+<span class="sig-name descname"><span class="pre">__sub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__sub__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__rsub__">
+<span class="sig-name descname"><span class="pre">__rsub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__rsub__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__neg__">
+<span class="sig-name descname"><span class="pre">__neg__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__neg__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__mul__">
+<span class="sig-name descname"><span class="pre">__mul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__mul__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__rmul__">
+<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__rmul__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__truediv__">
+<span class="sig-name descname"><span class="pre">__truediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__truediv__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__rtruediv__">
+<span class="sig-name descname"><span class="pre">__rtruediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__rtruediv__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__pow__">
+<span class="sig-name descname"><span class="pre">__pow__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__pow__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__rpow__">
+<span class="sig-name descname"><span class="pre">__rpow__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__rpow__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__lt__">
+<span class="sig-name descname"><span class="pre">__lt__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__lt__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__rgt__">
+<span class="sig-name descname"><span class="pre">__rgt__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__rgt__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__eq__" title="Link to this definition">¶</a></dt>
+<dd><p>==</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__gt__">
+<span class="sig-name descname"><span class="pre">__gt__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__gt__" title="Link to this definition">¶</a></dt>
+<dd><p>&gt;</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__rlt__">
+<span class="sig-name descname"><span class="pre">__rlt__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__rlt__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__ne__">
+<span class="sig-name descname"><span class="pre">__ne__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__ne__" title="Link to this definition">¶</a></dt>
+<dd><p>!=</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__le__">
+<span class="sig-name descname"><span class="pre">__le__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__le__" title="Link to this definition">¶</a></dt>
+<dd><p>&lt;=</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__ge__">
+<span class="sig-name descname"><span class="pre">__ge__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__ge__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__bool__">
+<span class="sig-name descname"><span class="pre">__bool__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__bool__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__abs__">
+<span class="sig-name descname"><span class="pre">__abs__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__abs__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__contains__">
+<span class="sig-name descname"><span class="pre">__contains__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__contains__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.add" title="Link to this definition">¶</a></dt>
+<dd><p id="id3">Adds the interval and another object together.</p>
+<p><strong>Args</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">other</span></code>: The interval or numeric value to be added. This value must be transformable into an Interval object.</p>
+</div></blockquote>
+<p><strong>Methods</strong>:</p>
+<blockquote>
+<div><p>p - perfect arithmetic <span class="math notranslate nohighlight">\([a,b]+[c,d] = [a + c, b + d]\)</span></p>
+<p>o - opposite arithmetic <span class="math notranslate nohighlight">\([a,b]+[c,d] = [a + d, b + c]\)</span></p>
+<p>None, i, f - Standard interval arithmetic is used.</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Interval</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.__add__">
+<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.__add__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.padd">
+<span class="sig-name descname"><span class="pre">padd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.padd" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method is deprecated. Use add(other, method=’p’) instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.oadd">
+<span class="sig-name descname"><span class="pre">oadd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.oadd" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method is deprecated. Use add(other, method=’o’) instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.sub">
+<span class="sig-name descname"><span class="pre">sub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.sub" title="Link to this definition">¶</a></dt>
+<dd><p id="id4">Subtracts other from self.</p>
+<p><strong>Args</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">other</span></code>: The interval or numeric value to be subracted. This value must be transformable into an Interval object.</p>
+</div></blockquote>
+<p><strong>Methods</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">p</span></code>: perfect arithmetic <span class="math notranslate nohighlight">\(a+b = [a.left - b.left, a.right - b.right]\)</span></p>
+<p><code class="docutils literal notranslate"><span class="pre">o</span></code>: opposite arithmetic <span class="math notranslate nohighlight">\(a+b = [a.left - b.right, a.right - b.left]\)</span></p>
+<p>None, i, f - Standard interval arithmetic is used.</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Interval</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.psub">
+<span class="sig-name descname"><span class="pre">psub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.psub" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Depreciated use self.sub(other, method = ‘p’) instead</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.osub">
+<span class="sig-name descname"><span class="pre">osub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.osub" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Depreciated use self.sub(other, method = ‘o’) instead</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.mul">
+<span class="sig-name descname"><span class="pre">mul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.mul" title="Link to this definition">¶</a></dt>
+<dd><p id="id5">Multiplies self by other.</p>
+<p><strong>Args</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">other</span></code>: The interval or numeric value to be multiplied. This value must be transformable into an Interval object.</p>
+</div></blockquote>
+<dl>
+<dt><strong>Methods</strong>:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">p</span></code>: perfect arithmetic <span class="math notranslate nohighlight">\([a,b],[c,d] = [a * c, b * d]\)</span></p>
+<p><code class="docutils literal notranslate"><span class="pre">o</span></code>: opposite arithmetic <span class="math notranslate nohighlight">\([a,b],[c,d] = [a * d, b * c]\)</span></p>
+<p>None, i, f - Standard interval arithmetic is used.</p>
+</dd>
+<dt><strong>Returns</strong>:</dt><dd><p>Interval: The result of the multiplication.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.pmul">
+<span class="sig-name descname"><span class="pre">pmul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.pmul" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Depreciated use self.mul(other, method = ‘p’) instead</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.omul">
+<span class="sig-name descname"><span class="pre">omul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.omul" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Depreciated use self.mul(other, method = ‘o’) instead</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.div">
+<span class="sig-name descname"><span class="pre">div</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.div" title="Link to this definition">¶</a></dt>
+<dd><p id="id6">Divides self by other</p>
+<p>If <span class="math notranslate nohighlight">\(0 \in other\)</span> it returns a division by zero error</p>
+<p><strong>Args</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">other</span></code> (Interval or numeric): The interval or numeric value to be multiplied. This value must be transformable into an Interval object.</p>
+</div></blockquote>
+<p><strong>Methods</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">p</span></code>: perfect arithmetic <span class="math notranslate nohighlight">\([a,b],[c,d] = [a * 1/c, b * 1/d]\)</span></p>
+<p><code class="docutils literal notranslate"><span class="pre">o</span></code>: opposite arithmetic <span class="math notranslate nohighlight">\([a,b],[c,d] = [a * 1/d, b * 1/c]\)</span></p>
+<p><code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">i</span></code>, <code class="docutils literal notranslate"><span class="pre">f</span></code> - Standard interval arithmetic is used.</p>
+</div></blockquote>
+<div class="admonition-implementation admonition">
+<p class="admonition-title">Implementation</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">other</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">method</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>If <span class="math notranslate nohighlight">\(0 \in [a,b]\)</span> it returns a division by zero error</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.pdiv">
+<span class="sig-name descname"><span class="pre">pdiv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.pdiv" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Depreciated use self.div(other, method = ‘p’) instead</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.odiv">
+<span class="sig-name descname"><span class="pre">odiv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.odiv" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Depreciated use self.div(other, method = ‘o’) instead</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.recip">
+<span class="sig-name descname"><span class="pre">recip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.recip" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the reciprocle of the interval.</p>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Interval</span></code>: Equal to <span class="math notranslate nohighlight">\([1/b,1/a]\)</span></p>
+</div></blockquote>
+<p><strong>Example</strong>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">recip</span><span class="p">()</span>
+<span class="go">Interval [0.25, 0.5]</span>
+</pre></div>
+</div>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>If <span class="math notranslate nohighlight">\(0 \in [a,b]\)</span> it returns a division by zero error</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.equiv">
+<span class="sig-name descname"><span class="pre">equiv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.equiv" title="Link to this definition">¶</a></dt>
+<dd><p>Checks whether two intervals are equivalent.</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">other</span></code>: The interval to check against.</p>
+</div></blockquote>
+<p><strong>Returns</strong> <code class="docutils literal notranslate"><span class="pre">True</span></code> <strong>if</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">self.left</span> <span class="pre">==</span> <span class="pre">other.right</span></code> and <code class="docutils literal notranslate"><span class="pre">self.right</span> <span class="pre">==</span> <span class="pre">other.right</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</div></blockquote>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p><code class="docutils literal notranslate"><span class="pre">TypeError</span></code>: If <code class="docutils literal notranslate"><span class="pre">other</span></code> is not an instance of <code class="docutils literal notranslate"><span class="pre">Interval</span></code></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="logical/index.html#pyuncertainnumber.pba.logical.is_same_as" title="pyuncertainnumber.pba.logical.is_same_as"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_same_as()</span></code></a></p>
+</div>
+<p><strong>Examples</strong>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">I</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">equiv</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">equiv</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.lo">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lo</span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.lo" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Returns</strong>:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">self.left</span></code></p>
+</dd>
+</dl>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>This function is redundant but exists to match Pbox class for possible internal reasons.</p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.hi">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hi</span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.hi" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt><strong>Returns</strong>:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">self.right</span></code></p>
+</dd>
+</dl>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>This function is redundant but exists to match Pbox class for possible internal reasons.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.width">
+<span class="sig-name descname"><span class="pre">width</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.width" title="Link to this definition">¶</a></dt>
+<dd><p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">float</span></code>: The width of the interval, <span class="math notranslate nohighlight">\(\mathrm{right} - \mathrm{left}\)</span></p>
+</div></blockquote>
+<p><strong>Example</strong>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.halfwidth">
+<span class="sig-name descname"><span class="pre">halfwidth</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.halfwidth" title="Link to this definition">¶</a></dt>
+<dd><p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">float</span></code>: The half-width of the interval, <span class="math notranslate nohighlight">\((\mathrm{right} - \mathrm{left})/2\)</span></p>
+</div></blockquote>
+<p><strong>Example</strong>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">halfwidth</span><span class="p">()</span>
+<span class="go">1.5</span>
+</pre></div>
+</div>
+<div class="admonition-implementation admonition">
+<p class="admonition-title">Implementation</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.midpoint">
+<span class="sig-name descname"><span class="pre">midpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.midpoint" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the midpoint of the interval</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>this serves as the deterministic value representation of the interval, a.k.a. the naked value for an interval</p></li>
+</ul>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The midpoint of the interval, <span class="math notranslate nohighlight">\((\mathrm{right} + \mathrm{left})/2\)</span></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+<dl>
+<dt><strong>Example</strong>:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">midpoint</span><span class="p">()</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.to_logical">
+<span class="sig-name descname"><span class="pre">to_logical</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.to_logical" title="Link to this definition">¶</a></dt>
+<dd><p>Turns the interval into a logical interval, this is done by chacking the truth value of the ends of the interval</p>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Logical</span></code>: The logical interval</p>
+</div></blockquote>
+<div class="admonition-implementation admonition">
+<p class="admonition-title">Implementation</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="fm">__bool__</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="fm">__bool__</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Logical</span><span class="p">(</span><span class="n">left</span><span class="p">,</span><span class="n">right</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.env">
+<span class="sig-name descname"><span class="pre">env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.env" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the envelope between two intervals</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">other</span></code> : Interval or list. The interval to envelope with self</p>
+</div></blockquote>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>If other is a list then the envelope is calculated between self and each element of the list. In this case the envelope is calculated recursively and pba.envelope() may be more efficient.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If other is a Pbox then <code class="docutils literal notranslate"><span class="pre">Pbox.env()</span></code> is called</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a href="#id38"><span class="problematic" id="id39">`pba.core.envelope`_</span></a></p>
+<p><a href="#id40"><span class="problematic" id="id41">`pba.pbox.Pbox.env`_</span></a></p>
+</div>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Interval</span></code>: The envelope of self and other</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.straddles">
+<span class="sig-name descname"><span class="pre">straddles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.straddles" title="Link to this definition">¶</a></dt>
+<dd><p id="id7"><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">N</span></code>: Number to check. If N is an interval checks whether the whole interval is within self.</p>
+<p><code class="docutils literal notranslate"><span class="pre">endpoints</span></code>: Whether to include the endpoints within the check</p>
+</div></blockquote>
+<p><strong>Returns</strong> <code class="docutils literal notranslate"><span class="pre">True</span></code> <strong>if</strong>:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\mathrm{left} \leq N \leq \mathrm{right}\)</span> (Assuming <code class="docutils literal notranslate"><span class="pre">endpoints=True</span></code>).</p>
+<p>For interval values. <span class="math notranslate nohighlight">\(\mathrm{left} \leq N.left \leq \mathrm{right}\)</span> and <span class="math notranslate nohighlight">\(\mathrm{left} \leq N.right \leq \mathrm{right}\)</span> (Assuming <code class="docutils literal notranslate"><span class="pre">endpoints=True</span></code>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</div></blockquote>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">in</span> <span class="pre">self</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">self.straddles(N)</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.straddles_zero">
+<span class="sig-name descname"><span class="pre">straddles_zero</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.straddles_zero" title="Link to this definition">¶</a></dt>
+<dd><p>Checks whether <span class="math notranslate nohighlight">\(0\)</span> is within the interval</p>
+<div class="admonition-implementation admonition">
+<p class="admonition-title">Implementation</p>
+<p>Equivalent to <code class="docutils literal notranslate"><span class="pre">self.straddles(0,endpoints)</span></code></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a href="#id42"><span class="problematic" id="id43">interval.straddles_</span></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.intersection">
+<span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.intersection" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the intersection between intervals</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">other</span></code>: The interval to intersect with self. If an interval is not given will try to cast as an interval. If a list is given will calculate the intersection between self and each element of the list.</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Interval</span></code>: The intersection of self and other. If no intersection is found returns <code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</div></blockquote>
+<p><strong>Example</strong>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">Interval [0.5, 1]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.exp">
+<span class="sig-name descname"><span class="pre">exp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.exp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.log">
+<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.sqrt">
+<span class="sig-name descname"><span class="pre">sqrt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.sqrt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.display">
+<span class="sig-name descname"><span class="pre">display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'band'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.display" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numpy_rng</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.random.Generator</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.sample" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a random sample within the interval.</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">seed</span></code> (int, optional): Seed value for random number generation. Defaults to None.</p>
+<p><code class="docutils literal notranslate"><span class="pre">numpy_rng</span></code> (numpy.random.Generator, optional): Numpy random number generator. Defaults to None.</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">float</span></code>: Random sample within the interval.</p>
+</div></blockquote>
+<div class="admonition-implementation admonition">
+<p class="admonition-title">Implementation</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">numpy_rng</span></code> is given:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">numpy_rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Otherwise the following is used:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">random</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p><strong>Examples</strong>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
+<span class="go">0.6160988752201705</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">I</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">seed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">0.13436424411240122</span>
+</pre></div>
+</div>
+<p>If a numpy random number generator is given then it is used instead of the default python random number generator. It has to be initialised first.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">I</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">numpy_rng</span> <span class="o">=</span> <span class="n">rng</span><span class="p">)</span>
+<span class="go">0.6369616873214543</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.round">
+<span class="sig-name descname"><span class="pre">round</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.round" title="Link to this definition">¶</a></dt>
+<dd><p>outward rounding operation for an interval object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.Interval.from_midwith">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_midwith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">midpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">halfwidth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyuncertainnumber.pba.Interval" title="pyuncertainnumber.pba.Interval"><span class="pre">Interval</span></a></span></span><a class="headerlink" href="#pyuncertainnumber.pba.Interval.from_midwith" title="Link to this definition">¶</a></dt>
+<dd><p>Creates an Interval object from a midpoint and half-width.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>midpoint</strong> (<em>-</em>) – The midpoint of the interval.</p></li>
+<li><p><strong>halfwidth</strong> (<em>-</em>) – The half-width of the interval.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The interval with midpoint and half-width.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>Interval</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">Interval</span><span class="o">.</span><span class="n">from_midwith</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">Interval [-1, 1]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.I">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.</span></span><span class="sig-name descname"><span class="pre">I</span></span><a class="headerlink" href="#pyuncertainnumber.pba.I" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.PM">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.</span></span><span class="sig-name descname"><span class="pre">PM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.PM" title="Link to this definition">¶</a></dt>
+<dd><p>Create an interval centered around x with a half-width of hw.</p>
+<p># TODO: a constructor for creating an interval from a midpoint and half-width
+# ! this func is weird and I keep it only for not breaking the code in other places.</p>
+<p><strong>Parameters</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">x</span></code> (float): The center value of the interval.</p>
+<p><code class="docutils literal notranslate"><span class="pre">hw</span></code> (float): The half-width of the interval.</p>
+</div></blockquote>
+<p><strong>Returns</strong>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">Interval</span></code>: An interval object with lower bound x-hw and upper bound x+hw.</p>
+</div></blockquote>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p><code class="docutils literal notranslate"><span class="pre">ValueError</span></code>: If hw is less than 0.</p>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pba</span><span class="o">.</span><span class="n">PM</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">Interval [-1, 1]</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </section>
 </section>
 
@@ -3110,6 +3841,73 @@ Scipy has an unbelivably strange parameterisation than common sense</p>
 <li><a class="reference internal" href="#pyuncertainnumber.pba.U"><code class="docutils literal notranslate"><span class="pre">U</span></code></a></li>
 <li><a class="reference internal" href="#pyuncertainnumber.pba.lognorm"><code class="docutils literal notranslate"><span class="pre">lognorm</span></code></a></li>
 <li><a class="reference internal" href="#pyuncertainnumber.pba.named_pbox"><code class="docutils literal notranslate"><span class="pre">named_pbox</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval"><code class="docutils literal notranslate"><span class="pre">Interval</span></code></a><ul>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval._left"><code class="docutils literal notranslate"><span class="pre">Interval._left</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval._right"><code class="docutils literal notranslate"><span class="pre">Interval._right</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.left"><code class="docutils literal notranslate"><span class="pre">Interval.left</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.right"><code class="docutils literal notranslate"><span class="pre">Interval.right</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__repr__"><code class="docutils literal notranslate"><span class="pre">Interval.__repr__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__str__"><code class="docutils literal notranslate"><span class="pre">Interval.__str__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__format__"><code class="docutils literal notranslate"><span class="pre">Interval.__format__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__iter__"><code class="docutils literal notranslate"><span class="pre">Interval.__iter__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__len__"><code class="docutils literal notranslate"><span class="pre">Interval.__len__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__radd__"><code class="docutils literal notranslate"><span class="pre">Interval.__radd__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__sub__"><code class="docutils literal notranslate"><span class="pre">Interval.__sub__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__rsub__"><code class="docutils literal notranslate"><span class="pre">Interval.__rsub__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__neg__"><code class="docutils literal notranslate"><span class="pre">Interval.__neg__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__mul__"><code class="docutils literal notranslate"><span class="pre">Interval.__mul__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__rmul__"><code class="docutils literal notranslate"><span class="pre">Interval.__rmul__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__truediv__"><code class="docutils literal notranslate"><span class="pre">Interval.__truediv__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__rtruediv__"><code class="docutils literal notranslate"><span class="pre">Interval.__rtruediv__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__pow__"><code class="docutils literal notranslate"><span class="pre">Interval.__pow__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__rpow__"><code class="docutils literal notranslate"><span class="pre">Interval.__rpow__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__lt__"><code class="docutils literal notranslate"><span class="pre">Interval.__lt__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__rgt__"><code class="docutils literal notranslate"><span class="pre">Interval.__rgt__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__eq__"><code class="docutils literal notranslate"><span class="pre">Interval.__eq__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__gt__"><code class="docutils literal notranslate"><span class="pre">Interval.__gt__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__rlt__"><code class="docutils literal notranslate"><span class="pre">Interval.__rlt__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__ne__"><code class="docutils literal notranslate"><span class="pre">Interval.__ne__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__le__"><code class="docutils literal notranslate"><span class="pre">Interval.__le__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__ge__"><code class="docutils literal notranslate"><span class="pre">Interval.__ge__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__bool__"><code class="docutils literal notranslate"><span class="pre">Interval.__bool__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__abs__"><code class="docutils literal notranslate"><span class="pre">Interval.__abs__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__contains__"><code class="docutils literal notranslate"><span class="pre">Interval.__contains__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.add"><code class="docutils literal notranslate"><span class="pre">Interval.add()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.__add__"><code class="docutils literal notranslate"><span class="pre">Interval.__add__()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.padd"><code class="docutils literal notranslate"><span class="pre">Interval.padd()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.oadd"><code class="docutils literal notranslate"><span class="pre">Interval.oadd()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.sub"><code class="docutils literal notranslate"><span class="pre">Interval.sub()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.psub"><code class="docutils literal notranslate"><span class="pre">Interval.psub()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.osub"><code class="docutils literal notranslate"><span class="pre">Interval.osub()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.mul"><code class="docutils literal notranslate"><span class="pre">Interval.mul()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.pmul"><code class="docutils literal notranslate"><span class="pre">Interval.pmul()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.omul"><code class="docutils literal notranslate"><span class="pre">Interval.omul()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.div"><code class="docutils literal notranslate"><span class="pre">Interval.div()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.pdiv"><code class="docutils literal notranslate"><span class="pre">Interval.pdiv()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.odiv"><code class="docutils literal notranslate"><span class="pre">Interval.odiv()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.recip"><code class="docutils literal notranslate"><span class="pre">Interval.recip()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.equiv"><code class="docutils literal notranslate"><span class="pre">Interval.equiv()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.lo"><code class="docutils literal notranslate"><span class="pre">Interval.lo</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.hi"><code class="docutils literal notranslate"><span class="pre">Interval.hi</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.width"><code class="docutils literal notranslate"><span class="pre">Interval.width()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.halfwidth"><code class="docutils literal notranslate"><span class="pre">Interval.halfwidth()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.midpoint"><code class="docutils literal notranslate"><span class="pre">Interval.midpoint()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.to_logical"><code class="docutils literal notranslate"><span class="pre">Interval.to_logical()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.env"><code class="docutils literal notranslate"><span class="pre">Interval.env()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.straddles"><code class="docutils literal notranslate"><span class="pre">Interval.straddles()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.straddles_zero"><code class="docutils literal notranslate"><span class="pre">Interval.straddles_zero()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.intersection"><code class="docutils literal notranslate"><span class="pre">Interval.intersection()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.exp"><code class="docutils literal notranslate"><span class="pre">Interval.exp()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.log"><code class="docutils literal notranslate"><span class="pre">Interval.log()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.sqrt"><code class="docutils literal notranslate"><span class="pre">Interval.sqrt()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.display"><code class="docutils literal notranslate"><span class="pre">Interval.display()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.sample"><code class="docutils literal notranslate"><span class="pre">Interval.sample()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.round"><code class="docutils literal notranslate"><span class="pre">Interval.round()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.Interval.from_midwith"><code class="docutils literal notranslate"><span class="pre">Interval.from_midwith()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.I"><code class="docutils literal notranslate"><span class="pre">I</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.PM"><code class="docutils literal notranslate"><span class="pre">PM()</span></code></a></li>
 </ul>
 </li>
 </ul>

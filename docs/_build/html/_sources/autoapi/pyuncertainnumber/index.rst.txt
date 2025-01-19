@@ -2027,10 +2027,7 @@ Package Contents
 
 .. py:function:: arcsine(*args)
 
-.. py:function:: beta(*args, steps=Params.steps)
-
-   Beta distribution
-
+.. py:function:: beta(*args)
 
 .. py:function:: betaprime(*args)
 

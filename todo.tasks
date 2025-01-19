@@ -21,7 +21,8 @@ other:
 
 interval stuff:
     ☐ add the plotting functions to Marco's package
-    add language parsing funcs to Marco's package
+    ☐ add language parsing funcs to Marco's package
+    make interval creation consistent throught the package, such as UN.I() should also take hedges
 
 
 

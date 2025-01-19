@@ -101,4 +101,26 @@ pun.hedge_interpret('about 200', return_type='pbox').display()
 hedged numerical expression "about 200"
 ```
 
-### interval measurements
+### data uncertainty
+
+Measurement uncertainty is another main source uncertainty of data uncertainty besides sampling uncertainty. Point estimates from samples vary from one to another. We will typically use confidence intervals (as interval estimators) to account for the sampling uncertainty. As an example, `PyUncertainNumber` provides support for Kolmogorov–Smirnov (KS) confidence limits to infer the confidence limits for empirical cumulative distribution function.
+
+```{seealso}
+See also the [confidence box](../cbox.md) for a distributional estimator.
+```
+
+As to measurement uncertainty, `Intervals` turn out to be a natural means of mathematical construct for imprecise data due to the common understanding of margin of error, which leads to the midpoint notation of an interval object. `PyUncertainNumber` provides an extension of the Kolmogorov–Smirnov confidence limits for interval-valued data as well. [](#KS-bounds-imprecise) shows such confidence limits for the skinny data.
+
+```{figure} ../../../assets/ks_precise.png
+:alt: Kolmogorov–Smirnov bounds for precise data
+:class: bg-primary
+:align: center
+:width: 400px
+```
+
+```{figure} ../../../assets/ks_imprecise.png
+:alt: Kolmogorov–Smirnov bounds for imprecise data
+:class: bg-primary
+:align: center
+:width: 400px
+```
