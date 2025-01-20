@@ -5,6 +5,8 @@ import numpy as np
 from pyuncertainnumber import pba
 
 # *  ---------------------construction---------------------*#
+
+### pba level
 fig, axs = plt.subplots(nrows=2, ncols=4, figsize=(12, 7), layout="constrained")
 
 # first row
@@ -38,11 +40,18 @@ print("the result of the mixture operation")
 print(pbox_mix)
 
 # *  ---------------------arithmetic---------------------*#
-# an interval
-a = pba.I([2, 3])
+
+### pba level ###
+a = pba.I([2, 3])  # an interval
 # _ = a.display(style="band", title="Interval [2,3]")
-# a precise distribution
-b = pun.norm(0, 1)
+b = pun.norm(0, 1)  # a precise distribution
 # _ = b.display(title="$N(0, 1)$")
+t = a + b
+print(t)
+
+
+### UN level ###
+a = pun.norm(0, 1)
+b = pun.norm(2, 3)
 t = a + b
 print(t)

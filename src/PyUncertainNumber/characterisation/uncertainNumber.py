@@ -397,7 +397,6 @@ class UncertainNumber:
         # TODO unit handling for arithmetic operations not implemented
         # TODO due to the stupid multi Registry error
         # newQ = self._Q + other._Q
-        print("at UN level")
         return UncertainNumber.from_pbox(r)
 
     def __radd__(self, other):
