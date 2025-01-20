@@ -1,8 +1,7 @@
 from functools import singledispatch
-from intervals import Interval
 import numpy as np
 from .interval import Interval as nInterval
-from .intervals import intervalise
+from .intervals import intervalise, Interval
 from ..nlp.language_parsing import parse_interval_expression, hedge_interpret
 
 """ operations for generic Interval objects """

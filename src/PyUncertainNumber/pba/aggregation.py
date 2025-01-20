@@ -36,7 +36,7 @@ def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
     from .pbox_base import Pbox
     from .interval import Interval as nInterval
     from .ds import DempsterShafer
-    from intervals import Interval
+    from .intervals import Interval
 
     if isinstance(l_uns[0], nInterval | Interval | list):
         return stacking(l_uns, weights, display=display, **kwargs)

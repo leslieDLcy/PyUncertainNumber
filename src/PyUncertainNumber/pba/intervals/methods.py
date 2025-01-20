@@ -24,15 +24,16 @@ This method turns an array of compatible dimension into an interval (array).
 Subintervalisation methods, IR -> IR^n.
 
 """
+
 from __future__ import annotations
-from typing import (Sequence, Sized, Iterable, Optional, Any, Tuple, Union)
+from typing import Sequence, Sized, Iterable, Optional, Any, Tuple, Union
 
 from itertools import product
 
 import numpy
-from numpy import (ndarray, asarray, vstack, linspace, zeros, argmax)
+from numpy import ndarray, asarray, vstack, linspace, zeros, argmax
 
-from intervals.number import (Interval, MACHINE_EPS)
+from .number import Interval, MACHINE_EPS
 
 numpy_min = numpy.min
 numpy_max = numpy.max
@@ -88,7 +89,7 @@ def width(x: Interval) -> Union[float, ndarray]:
 
     """
     if is_Interval(x):
-        return hi(x)-lo(x)
+        return hi(x) - lo(x)
     return x
 
 
@@ -100,7 +101,7 @@ def rad(x: Interval) -> Union[float, ndarray]:
 
     """
     if is_Interval(x):
-        return (hi(x)-lo(x))/2
+        return (hi(x) - lo(x)) / 2
     return x
 
 
@@ -112,12 +113,17 @@ def mid(x: Interval) -> Union[float, ndarray]:
 
     """
     if is_Interval(x):
-        return (hi(x)+lo(x))/2
+        return (hi(x) + lo(x)) / 2
     return x
 
 
-def mig(x): return numpy_max(numpy_abs(x.lo), numpy_abs(x.hi))  # mignitude
-def mag(x): return numpy_min(numpy_abs(x.lo), numpy_abs(x.hi))  # magnitude
+def mig(x):
+    return numpy_max(numpy_abs(x.lo), numpy_abs(x.hi))  # mignitude
+
+
+def mag(x):
+    return numpy_min(numpy_abs(x.lo), numpy_abs(x.hi))  # magnitude
+
 
 #####################################################################################
 # unary.py
@@ -170,6 +176,7 @@ def exp(x: Interval):
         return numpy_exp(x)
     return Interval(numpy_exp(lo(x)), numpy_exp(hi(x)))
 
+
 #####################################################################################
 # binary.py
 #####################################################################################
@@ -192,13 +199,14 @@ def min(x: Interval, y: Interval):
     b = numpy.min((hi(x), hi(y)), axis=0)
     return Interval(a, b)
 
+
 #####################################################################################
 # trig.py
 #####################################################################################
 
 
 def sin(x: Interval):
-    '''
+    """
     Implementation of Interval Arithmetic in CORA 2016
 
     Matthias Althoff and Dmitry Grebenyuk
@@ -206,22 +214,22 @@ def sin(x: Interval):
     EPiC Series in Computing Volume 43, 2017, Pages 91-105
 
     ARCH16. 3rd International Workshop on Applied Verification for Continuous and Hybrid Systems
-    '''
+    """
     if not (is_Interval(x)):
         return numpy_sin(x)  # int, float, ndarray
 
     if not (x.scalar):
         return sin_vector(x)
 
-    twopi = 2*numpy_pi
-    pihalf = numpy_pi/2
+    twopi = 2 * numpy_pi
+    pihalf = numpy_pi / 2
 
     if width(x) >= twopi:
         return Interval(-1, 1)
 
     domain1 = Interval(0, pihalf)
-    domain2 = Interval(pihalf, 3*pihalf)
-    domain3 = Interval(3*pihalf, twopi)
+    domain2 = Interval(pihalf, 3 * pihalf)
+    domain3 = Interval(3 * pihalf, twopi)
 
     yl = x.lo % twopi
     yh = x.hi % twopi
@@ -273,14 +281,14 @@ def sin_vector(x: Interval):  # vectorised version of sin().
     if x.unsized:
         return sin(x)
 
-    twopi = 2*numpy_pi
-    pihalf = numpy_pi/2
+    twopi = 2 * numpy_pi
+    pihalf = numpy_pi / 2
 
     mask1a = width(x) >= twopi
 
     domain1 = Interval(0, pihalf)
-    domain2 = Interval(pihalf, 3*pihalf)
-    domain3 = Interval(3*pihalf, twopi)
+    domain2 = Interval(pihalf, 3 * pihalf)
+    domain3 = Interval(3 * pihalf, twopi)
 
     yl = x.lo % twopi
     yh = x.hi % twopi
@@ -304,8 +312,11 @@ def sin_vector(x: Interval):  # vectorised version of sin().
     if all(case1):
         return Interval(lo=a, hi=b)
     # [h,l]
-    mask2b = contain(domain2, yl[~case1]) & contain(domain2, yh[~case1]) & (
-        yl[~case1] <= yh[~case1])  # return Interval(sin_h,sin_l)
+    mask2b = (
+        contain(domain2, yl[~case1])
+        & contain(domain2, yh[~case1])
+        & (yl[~case1] <= yh[~case1])
+    )  # return Interval(sin_h,sin_l)
     case2 = mask2b
     a[case2] = sin_h[case2]
     b[case2] = sin_l[case2]
@@ -325,7 +336,7 @@ def sin_vector(x: Interval):  # vectorised version of sin().
 
 
 def cos(x: Interval):
-    '''
+    """
     Implementation of Interval Arithmetic in CORA 2016
 
     Matthias Althoff and Dmitry Grebenyuk
@@ -333,21 +344,21 @@ def cos(x: Interval):
     EPiC Series in Computing Volume 43, 2017, Pages 91-105
 
     ARCH16. 3rd International Workshop on Applied Verification for Continuous and Hybrid Systems
-    '''
+    """
     if not (is_Interval(x)):
         return numpy_cos(x)  # int, float, ndarray
 
     if not (x.scalar):
         return cos_vector(x)
 
-    twopi = 2*numpy_pi
+    twopi = 2 * numpy_pi
 
     # [-1,1] aka case 0
     if width(x) >= twopi:
         return Interval(-1, 1)
 
     domain1 = Interval(0, numpy_pi)
-    domain2 = Interval(numpy_pi, 2*numpy_pi)
+    domain2 = Interval(numpy_pi, 2 * numpy_pi)
 
     yl = x.lo % twopi
     yh = x.hi % twopi
@@ -384,12 +395,12 @@ def cos_vector(x: Interval):  # vectorised version of cos()
     if x.unsized:
         return sin(x)
 
-    twopi = 2*numpy_pi
+    twopi = 2 * numpy_pi
 
     case0 = width(x) >= twopi
 
     domain1 = Interval(0, numpy_pi)
-    domain2 = Interval(numpy_pi, 2*numpy_pi)
+    domain2 = Interval(numpy_pi, 2 * numpy_pi)
 
     yl = x.lo % twopi
     yh = x.hi % twopi
@@ -426,7 +437,7 @@ def cos_vector(x: Interval):  # vectorised version of cos()
 
 
 def tan(x: Interval):
-    '''
+    """
     Implementation of Interval Arithmetic in CORA 2016
 
     Matthias Althoff and Dmitry Grebenyuk
@@ -434,7 +445,7 @@ def tan(x: Interval):
     EPiC Series in Computing Volume 43, 2017, Pages 91-105
 
     ARCH16. 3rd International Workshop on Applied Verification for Continuous and Hybrid Systems
-    '''
+    """
 
     if not (is_Interval(x)):
         return numpy_tan(x)  # int, float, ndarray
@@ -442,7 +453,7 @@ def tan(x: Interval):
     if not (x.scalar):
         return tan_vector(x)
 
-    pihalf = numpy_pi/2
+    pihalf = numpy_pi / 2
 
     domain1 = Interval(0, pihalf)
     domain2 = Interval(pihalf, numpy_pi)
@@ -472,7 +483,7 @@ def tan_vector(x: Interval):  # Vectorised version of tan().
     if x.unsized:
         return tan(x)
 
-    pihalf = numpy_pi/2
+    pihalf = numpy_pi / 2
 
     domain1 = Interval(0, pihalf)
     domain2 = Interval(pihalf, numpy_pi)
@@ -510,6 +521,7 @@ def tan_vector(x: Interval):  # Vectorised version of tan().
 # def difference():
 # def set_difference(x:Interval,y:Interval):
 
+
 #####################################################################################
 # set.py
 #####################################################################################
@@ -522,28 +534,32 @@ def straddle_zero(x: Interval) -> bool:
         return any((lo(x).flatten() <= 0) & (hi(x).flatten() >= 0))
 
 
-def intersect(x: Interval, y: Interval): return ~(
-    (x < y) | (y < x))  # commutative
+def intersect(x: Interval, y: Interval):
+    return ~((x < y) | (y < x))  # commutative
 
 
-def contain(x: Interval, y: Interval): return (
-    lo(x) <= lo(y)) & (hi(x) >= hi(y))  # x contain y
+def contain(x: Interval, y: Interval):
+    return (lo(x) <= lo(y)) & (hi(x) >= hi(y))  # x contain y
 
 
-def almost_contain(x: Interval, y: Interval, tol=1e-9): return (lo(y) -
-                                                                # x contain y
-                                                                lo(x) > -tol) & (hi(x)-hi(y) > -tol)
+def almost_contain(x: Interval, y: Interval, tol=1e-9):
+    return (
+        lo(y) -
+        # x contain y
+        lo(x)
+        > -tol
+    ) & (hi(x) - hi(y) > -tol)
 
 
 def intersect_vector(x_: Interval, y_: Interval):
-    '''
+    """
     This function checks if the focal elements x, intersect the subpaving y.
 
     x: A n-list of d-boxes or d-intervals, e.g. a subpaving. x.shape=(r,d)
     y: A m-list of d-boxes or d-intervals, e.g. a focal element. y.shape=(p,d)
 
     out: A (rp)-list of d-arrays of booleans
-    '''
+    """
     x = intervalise(x_)
     y = intervalise(y_)
     # n,d = x.shape
@@ -553,8 +569,11 @@ def intersect_vector(x_: Interval, y_: Interval):
     where_intersect = numpy.zeros((m,), dtype=bool)  # inter = []
     for i, yi in enumerate(tolist(y)):  #  a focal elem
         where_intersect[i] = any(
-            numpy.all(~((x_hi < lo(yi)) | (hi(yi) < x_lo)), axis=1))
+            numpy.all(~((x_hi < lo(yi)) | (hi(yi) < x_lo)), axis=1)
+        )
     return where_intersect
+
+
 #####################################################################################
 # parser.py
 #####################################################################################
@@ -563,7 +582,7 @@ def intersect_vector(x_: Interval, y_: Interval):
 
 def intervalise(x_: Any, interval_index=-1) -> Union[Interval, Any]:
     """
-    This function casts an array-like structure into an Interval structure. 
+    This function casts an array-like structure into an Interval structure.
     All array-like structures will be first coerced into an ndarray of floats.
     If the coercion is unsuccessful the following error is thrown: `ValueError: setting an array element with a sequence.`
 
@@ -579,7 +598,7 @@ def intervalise(x_: Any, interval_index=-1) -> Union[Interval, Any]:
     (*) an ndarray of shape (2,3,7,2) will be cast as an Interval of shape (2,3,7) if interval_index is set to -1.
 
     If an ndarray has shape with multiple dimensions having size 2, then the last dimension is intervalised.
-    So, an ndarray of shape (7,2,2) will be cast as an Interval of shape (7,2) with the last dimension intervalised. 
+    So, an ndarray of shape (7,2,2) will be cast as an Interval of shape (7,2) with the last dimension intervalised.
     When the ndarray has shape (2,2) again is the last dimension that gets intervalised.
 
     In case of ambiguity, e.g. (2,5,2), now the first dimension can be forced to be intervalised, selecting index=0, default is -1.
@@ -590,10 +609,11 @@ def intervalise(x_: Any, interval_index=-1) -> Union[Interval, Any]:
     TODO: Parse a list of mixed numbers: interval and ndarrays.
 
     """
+
     def treat_list(xx):
         xi_lo, xi_hi = [], []
         for xi in xx:  # if each element in the list is an interval of homogeneus shape
-            if xi.__class__.__name__ == 'Interval':
+            if xi.__class__.__name__ == "Interval":
                 xi_lo.append(xi.lo)
                 xi_hi.append(xi.hi)
             else:
@@ -603,15 +623,16 @@ def intervalise(x_: Any, interval_index=-1) -> Union[Interval, Any]:
         try:
             return Interval(lo=xi_lo, hi=xi_hi)
         except:
-            print('!! Parsing an interval from list failed.')
+            print("!! Parsing an interval from list failed.")
             return x_
-    if x_.__class__.__name__ == 'Interval':
+
+    if x_.__class__.__name__ == "Interval":
         return x_
     try:
         x = asarray(x_, dtype=float)
     # ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (...) + inhomogeneous part.
     except ValueError:
-        if x_.__class__.__name__ == 'list':
+        if x_.__class__.__name__ == "list":
             # attempt to turn a n-list of intervals into a (n,...)-interval
             return treat_list(x_)
     s = x.shape
@@ -634,16 +655,18 @@ def intervalise(x_: Any, interval_index=-1) -> Union[Interval, Any]:
             elif interval_index == -1:
                 return Interval(lo=x[..., 0], hi=x[..., 1])
             # if (sum(two)==1) & (two[0]): return Interval(lo=x[0],hi=x[1])# there is only one dimension of size 2 and is the first one
-        print('Array-like structure must have the last (or first) dimension of size 2, for it to be coerced to Interval.')
+        print(
+            "Array-like structure must have the last (or first) dimension of size 2, for it to be coerced to Interval."
+        )
         return Interval(lo=x)
     else:
         return Interval(lo=x)
 
 
 def sizeit(x: Interval) -> Interval:
-    '''
+    """
     Takes an unsized scalar interval and turns it in to a sized one.
-    '''
+    """
     if is_Interval(x):
         if x.scalar & x.unsized:
             return Interval(lo=[x.lo], hi=[x.hi])
@@ -651,10 +674,10 @@ def sizeit(x: Interval) -> Interval:
 
 
 def unsizeit(x: Interval) -> Interval:
-    '''
+    """
     Takes a sized scalar interval and turns it in to a unsized one.
 
-    '''
+    """
     if is_Interval(x):
         if x.scalar & x.unsized == False:
             return Interval(lo=x.lo[0], hi=x.hi[0])
@@ -672,6 +695,8 @@ def tolist(x: Interval):
         return [Interval(lo=x.lo[i, :], hi=x.hi[i, :]) for i in range(m)]
     if dim > 2:
         return x  # not implemented yet
+
+
 #####################################################################################
 # subint.py
 #####################################################################################
@@ -685,20 +710,22 @@ def subintervalise(x_: Interval, n: Union[int, tuple] = 0):
     elif n == 1:
         return x  # should return a subtiling (sized interval)
     if x.scalar:  # or x.scalar == True
-        xx = linspace(x.lo, x.hi, num=n+1)
+        xx = linspace(x.lo, x.hi, num=n + 1)
         return intervalise(vstack([xx[:-1], xx[1:]]))
     elif d == 1:  # x.shape = (m,)
         m = x.shape[0]  # size of 1d array
         if type(n) == int:
-            n = m*[n]  # differential split number
+            n = m * [n]  # differential split number
         X_sub = []
         for i, xi in enumerate(x):
             xxi = subintervalise(xi, n=n[i])  # recursion
             X_sub.append(sizeit(xxi).val)
         return intervalise(asarray(list(product(*X_sub)), dtype=float))
-#     elif len(x.shape)>1: pass # TODO: implement space-product subintervalization with arrays of dimension greater than 2.
+    #     elif len(x.shape)>1: pass # TODO: implement space-product subintervalization with arrays of dimension greater than 2.
     else:
-        print('!! Subtiling not yet supported for interval arrays of dimension 2 or larger. Input will be returned.')
+        print(
+            "!! Subtiling not yet supported for interval arrays of dimension 2 or larger. Input will be returned."
+        )
     return x
 
 
@@ -707,16 +734,17 @@ def split_interval(x: Interval, y: float = None):
         return Interval(lo(x), mid(x)), Interval(mid(x), hi(x))
 
     x1, x2 = Interval(lo(x), hi(x)), Interval(
-        lo(x), hi(x))  # TODO: implement copy method
+        lo(x), hi(x)
+    )  # TODO: implement copy method
     y_in_x = contain(x, y)  # x contain y
     if x.unsized:
         if ~y_in_x:
             return x1, x2
-        return Interval(lo=lo(x), hi=y),  Interval(lo=y, hi=hi(x))
+        return Interval(lo=lo(x), hi=y), Interval(lo=y, hi=hi(x))
     else:
         pass
         # x1[y_in_x] = Interval(lo(x)[y_in_x],hi=y)
-       # x2[y_in_x] = Interval(y,hi=hi(x)[y_in_x])
+    # x2[y_in_x] = Interval(y,hi=hi(x)[y_in_x])
     return x1, x2
 
 
@@ -729,12 +757,13 @@ def reconstitute(x_: Interval):
         return Interval(lo=numpy.min(x.lo, axis=1), hi=numpy.max(x.hi, axis=1))
     else:
         print(
-            '!! Subtiling not yet supported for interval arrays of dimension 2 or larger.')
+            "!! Subtiling not yet supported for interval arrays of dimension 2 or larger."
+        )
     return x
 
 
-def space_product(x_: Union[ndarray, Interval], y_: Union[ndarray,
-                  Interval]): return asarray(tuple(product(x_, y_)))
+def space_product(x_: Union[ndarray, Interval], y_: Union[ndarray, Interval]):
+    return asarray(tuple(product(x_, y_)))
 
 
 def bisect(x_: Interval, i: int = None):
@@ -753,11 +782,12 @@ def bisect(x_: Interval, i: int = None):
         w = width(x)
         split_index = argmax(w)
     d = x.shape[0]
-    n = [0]*d
+    n = [0] * d
     # ex: (0,0,2,0,0,0) if interval of dim 6 has third dimension bisected
     n[split_index] = 2
     x_bisect = subintervalise(x, n=tuple(n))
     return x_bisect[0], x_bisect[1]
+
 
 #####################################################################################
 # types.py
@@ -765,23 +795,29 @@ def bisect(x_: Interval, i: int = None):
 # Interval to bool methods, Unary.
 
 
-def is_Interval(x: Any) -> bool: return x.__class__.__name__ == 'Interval'
-def is_not_Interval(x: Any) -> bool: return x.__class__.__name__ != 'Interval'
+def is_Interval(x: Any) -> bool:
+    return x.__class__.__name__ == "Interval"
+
+
+def is_not_Interval(x: Any) -> bool:
+    return x.__class__.__name__ != "Interval"
+
 
 #####################################################################################
 ################################# neural_networks.py ################################
 #####################################################################################
 
 
-def dot(x: Interval, y: Interval): return sum(x*y)
+def dot(x: Interval, y: Interval):
+    return sum(x * y)
 
 
 def rowcol_old(W, x):
-    '''
+    """
     (m,n) x (n,1) -> (m,1)
     (m,n) x (n,p) -> (m,p)
     (1,n) x (n,1) -> (1,1)
-    '''
+    """
     s = W.shape
     x_shape = x.shape
     if x_shape[0] == 1:  # x is row and must be either squeezed or transposed
@@ -797,7 +833,7 @@ def rowcol_old(W, x):
 
 
 def rowcol_W_x(W, x):
-    '''
+    """
     Row by column multiplication between a matrix W and a column vector x.
 
     (m,n) x (n,1) -> (m,1)
@@ -805,13 +841,14 @@ def rowcol_W_x(W, x):
     The following cases are also accepted even though mathematically impossible
     (m,n) x (n,) -> (m,1)
     (1,n) x (n,1) -> (1,1)
-    (1,n) x (1,n) -> (1,1) 
-    '''
+    (1,n) x (1,n) -> (1,1)
+    """
     m, n = W.shape
     x_shape = x.shape
     if not ((n == x_shape[0]) | (n == x_shape[1])):
         raise ValueError(
-            f"Incompatible shapes [{m}, {n}] x({x_shape[0]}, 1) -> (?, ?). Inner sizes must be same, {x_shape[1]} is different from {n}.")
+            f"Incompatible shapes [{m}, {n}] x({x_shape[0]}, 1) -> (?, ?). Inner sizes must be same, {x_shape[1]} is different from {n}."
+        )
     if x_shape[0] == 1:  # x is row and must be either squeezed or transposed
         x_ = x[0, :]
     if x_shape[1] == 1:  # this is the correct shape
@@ -829,19 +866,20 @@ def rowcol_W_x(W, x):
 
 
 def rowcol_xT_WT(x, W):
-    '''
+    """
     Row by column multiplication between the row vector xT and the matrix transpose WT.
     (1,n) x (n,m) -> (1,m)
     (1,n) x (n,1) -> (1,1)
     The following cases are also accepted even though mathematically impossible
     (,n) x (n,m) -> (1,m)
     (n,1) x (n,m) -> (1,1)
-    '''
+    """
     n, m = W.shape
     x_shape = x.shape
     if not ((n == x_shape[0]) | (n == x_shape[1])):
         raise ValueError(
-            f"Incompatible shapes(1, {x_shape[1]}) x({n}, {m}) -> (?, ?). Inner sizes must be same, {x_shape[1]} is different from {n}.")
+            f"Incompatible shapes(1, {x_shape[1]}) x({n}, {m}) -> (?, ?). Inner sizes must be same, {x_shape[1]} is different from {n}."
+        )
     if x_shape[0] == 1:  # this is the correct shape
         x_ = x[0, :]
     if x_shape[1] == 1:  # x is row and must be either squeezed or transposed
@@ -859,15 +897,16 @@ def rowcol_xT_WT(x, W):
 
 
 def matmul(A, B):
-    '''
-    (m,n) x (n,p) -> (m,p) 
+    """
+    (m,n) x (n,p) -> (m,p)
     (1,n) x (n,1) -> (1,1)
-    '''
+    """
     m, na = A.shape
     nb, p = B.shape
     if na != nb:
         raise ValueError(
-            f"Incompatible shapes({m}, {na}) x({nb}, {p}) -> (?, ?). Inner sizes must be same, {na} is different from {nb}.")
+            f"Incompatible shapes({m}, {na}) x({nb}, {p}) -> (?, ?). Inner sizes must be same, {na} is different from {nb}."
+        )
     C = numpy.empty((m, p, 2))
     for i in range(m):
         for j in range(p):
@@ -878,14 +917,15 @@ def matmul(A, B):
 
 
 def transpose(x: Interval):  # not efficient it creates a new object in memory
-    '''
+    """
     Input an interval of shape (m,n) returns an interval of shape (n,m).
-    '''
+    """
     return Interval(x.val[..., 0], x.val[..., 1])
 
 
 def squeeze(x: Interval):  # not efficient it creates a new object in memory
     return Interval(numpy.squeeze(x.lo), numpy.squeeze(x.hi))
+
 
 ################################ activation_functions.py #############################
 
@@ -934,13 +974,19 @@ def relu_deriv_interval(x: Interval):
     return d_relu_x
 
 
-def sigmoid(x): return 1/(1+exp(-x))
-def sigmoid_deriv(x): return sigmoid(x)*(1-sigmoid(x))
+def sigmoid(x):
+    return 1 / (1 + exp(-x))
+
+
+def sigmoid_deriv(x):
+    return sigmoid(x) * (1 - sigmoid(x))
+
 
 # def tanh_(x): return np.tanh(x)
 
 
-def tanh(x: Interval): return (exp(2*x)-1)/(exp(2*x)+1)
+def tanh(x: Interval):
+    return (exp(2 * x) - 1) / (exp(2 * x) + 1)
 
 
 def tanh(x: Interval):
@@ -948,8 +994,14 @@ def tanh(x: Interval):
     s = 1
     u = 1
     t = 1
-    return s/u - (s*t/u**2 - r/u)/(t/u + exp(2*x))
+    return s / u - (s * t / u**2 - r / u) / (t / u + exp(2 * x))
+
+
 # def cot(x): return 1/np.tan(x)
 # def tanh(x): return -(1/(cot(np.arctan(x)/2)**2))
-def cosh(x: Interval): return (1+exp(-2*x))/(2*exp(-x))
-def tanh_deriv(x: Interval): return (1/cosh(x))**2
+def cosh(x: Interval):
+    return (1 + exp(-2 * x)) / (2 * exp(-x))
+
+
+def tanh_deriv(x: Interval):
+    return (1 / cosh(x)) ** 2
