@@ -22,29 +22,30 @@ other:
 interval stuff:
     ☐ add the plotting functions to Marco's package
     ☐ add language parsing funcs to Marco's package
-    make interval creation consistent throught the package, such as UN.I() should also take hedges
+    ☐ make interval creation consistent throught the package, such as UN.I() should also take hedges
 
 
 
 DS structure:
     ✔ create a class for that @done (08/12/2024, 16:04:08)
     ✔ stochastic mixture of DS structure not finished @done (08/12/2024, 16:04:09)
-    ☐ color of both bounds seem to be reversed as in (stacking())
+    ✔ color of both bounds seem to be reversed as in (stacking()) @done (20/01/2025, 09:14:02)
 
 
 pbox:
-    ☐ construct pbox(either distributional or nonparametric) from dataset 
+    ✔ construct pbox(either distributional or nonparametric) from dataset @done (20/01/2025, 09:13:10)
     ☐ drawing samples from pbox
     ☐ propagating with pbox
     ✔ construct pbox from data or from partial knowledge on the distribution property (i.e. min, max, mean, variance, etc.)? @done (04/11/2024, 11:46:39)
     ☐ pbox arithmetic with various dependecy NOT finsihed
-    ☐ pbox aggregation from multiple sources
+    ✔ pbox aggregation from multiple sources @done (20/01/2025, 09:13:52)
     ☐ unary functions are still lacking for e.g. sin(), cos(), etc..
+    ☐ bug in `checkinreasingerror` if pun.norm([2,3], [0,1])
 
 
 
 cbox:
-    ☐ ci function with arguments
+    ✔ ci function with arguments @done (20/01/2025, 09:13:45)
     ✔ print out the bounds parameters when instantiating the cbox @done (03/12/2024, 14:24:46)
     ☐ interval statistics
 

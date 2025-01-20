@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Type, Union, List
+import functools
 
 # from .measurand import Measurand
 # from .variability import Variability
@@ -277,10 +278,10 @@ class UncertainNumber:
 
     # * ---------------------other constructors--------------------- *#
 
-    @classmethod
-    def I(cls, i: list[float | int]):
-        """create a shorcut an interval-type UN object"""
-        return cls(essence="interval", bounds=i)
+    # @classmethod
+    # def I(cls, i: list[float | int]):
+    #     """create a shorcut an interval-type UN object"""
+    #     return cls(essence="interval", bounds=i)
 
     @classmethod
     def from_hedge(cls, hedged_language):
@@ -652,6 +653,42 @@ class UncertainNumber:
                             ppf_values.append(ppf_value)
 
                     return [min(ppf_values), max(ppf_values)]
+
+
+# * ---------------------shortcuts --------------------- *#
+def makeUNPbox(func):
+
+    from ..pba.pbox import _bound_pcdf
+    from ..pba.intervalOperators import wc_interval
+
+    @functools.wraps(func)
+    def wrapper_decorator(*args, **kwargs):
+        i_args = [wc_interval(arg) for arg in args]
+        shape_value = func(*args, **kwargs)
+        p = _bound_pcdf(shape_value, *i_args)
+        return UncertainNumber.fromConstruct(p)
+
+    return wrapper_decorator
+
+
+def I(i: str | list[float | int]) -> UncertainNumber:
+    """a shortcut for the interval-type UN object"""
+    return UncertainNumber.fromConstruct(parse_bounds(i))
+
+
+@makeUNPbox
+def norm(*args):
+    return "norm"
+
+
+@makeUNPbox
+def expon(*args):
+    return "expon"
+
+
+@makeUNPbox
+def gamma(*args):
+    return "gamma"
 
 
 # * ---------------------parse inputs for UN only  --------------------- *#

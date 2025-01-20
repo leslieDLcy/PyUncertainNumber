@@ -96,63 +96,6 @@ def norm(*args):
     return "norm"
 
 
-def lognormal(
-    mean,
-    var,
-    steps=Params.steps,
-):
-    """
-    Creates a p-box for the lognormal distribution
-
-    *Note: the parameters used are the mean and variance of the lognormal distribution
-    not the mean and variance of the underlying normal*
-    See:
-    `[1]<https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters>`
-    `[2]<https://stackoverflow.com/questions/51906063/distribution-mean-and-standard-deviation-using-scipy-stats>`
-
-
-    Parameters
-    ----------
-    mean :
-        mean of the lognormal distribution
-    var :
-        variance of the lognormal distribution
-
-    Returns
-    ----------
-    Pbox
-
-    """
-    if steps > 1000:
-        x = np.linspace(1 / steps, 1 - 1 / steps, steps)
-    else:
-        x = np.linspace(0.001, 0.999, Params.steps)
-
-    if mean.__class__.__name__ != "nInterval":
-        mean = nInterval(mean, mean)
-    if var.__class__.__name__ != "nInterval":
-        var = nInterval(var, var)
-
-    def __lognorm(mean, var):
-
-        sigma = np.sqrt(np.log1p(var / mean**2))
-        mu = np.log(mean) - 0.5 * sigma * sigma
-
-        return sps.lognorm(sigma, loc=0, scale=np.exp(mu))
-
-    bound0 = __lognorm(mean.left, var.left).ppf(x)
-    bound1 = __lognorm(mean.right, var.left).ppf(x)
-    bound2 = __lognorm(mean.left, var.right).ppf(x)
-    bound3 = __lognorm(mean.right, var.right).ppf(x)
-
-    Left = [min(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
-    Right = [max(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
-
-    Left = np.array(Left)
-    Right = np.array(Right)
-    return Pbox(Left, Right, steps=steps, shape="lognormal")
-
-
 @makePbox
 def alpha(*args):
     return "alpha"
@@ -333,45 +276,6 @@ def foldnorm(mu, s, steps=Params.steps):
         var_left=var.left,
         var_right=var.right,
     )
-
-
-# def frechet_r(*args, steps = Params.steps):
-#     args = list(args)
-#     for i in range(0,len(args)):
-#         if args[i].__class__.__name__ != 'nInterval':
-#             args[i] = nInterval(args[i])
-
-#     Left, Right, mean, var = _get_bounds('frechet_r',steps,*args)
-
-#     return Pbox(
-#           Left,
-#           Right,
-#           steps      = steps,
-#           shape      = 'frechet_r',
-#           mean_left  = mean.left,
-#           mean_right = mean.right,
-#           var_left   = var.left,
-#           var_right  = var.right
-#           )
-
-# def frechet_l(*args, steps = Params.steps):
-#     args = list(args)
-#     for i in range(0,len(args)):
-#         if args[i].__class__.__name__ != 'nInterval':
-#             args[i] = nInterval(args[i])
-
-#     Left, Right, mean, var = _get_bounds('frechet_l',steps,*args)
-
-#     return Pbox(
-#           Left,
-#           Right,
-#           steps      = steps,
-#           shape      = 'frechet_l',
-#           mean_left  = mean.left,
-#           mean_right = mean.right,
-#           var_left   = var.left,
-#           var_right  = var.right
-#           )
 
 
 @makePbox
@@ -787,6 +691,102 @@ def wrapcauchy(*args):
 #         var_left=var.left,
 #         var_right=var.right,
 #     )
+
+
+def lognormal(
+    mean,
+    var,
+    steps=Params.steps,
+):
+    """
+    Creates a p-box for the lognormal distribution
+
+    *Note: the parameters used are the mean and variance of the lognormal distribution
+    not the mean and variance of the underlying normal*
+    See:
+    `[1]<https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters>`
+    `[2]<https://stackoverflow.com/questions/51906063/distribution-mean-and-standard-deviation-using-scipy-stats>`
+
+
+    Parameters
+    ----------
+    mean :
+        mean of the lognormal distribution
+    var :
+        variance of the lognormal distribution
+
+    Returns
+    ----------
+    Pbox
+
+    """
+    if steps > 1000:
+        x = np.linspace(1 / steps, 1 - 1 / steps, steps)
+    else:
+        x = np.linspace(0.001, 0.999, Params.steps)
+
+    if mean.__class__.__name__ != "nInterval":
+        mean = nInterval(mean, mean)
+    if var.__class__.__name__ != "nInterval":
+        var = nInterval(var, var)
+
+    def __lognorm(mean, var):
+
+        sigma = np.sqrt(np.log1p(var / mean**2))
+        mu = np.log(mean) - 0.5 * sigma * sigma
+
+        return sps.lognorm(sigma, loc=0, scale=np.exp(mu))
+
+    bound0 = __lognorm(mean.left, var.left).ppf(x)
+    bound1 = __lognorm(mean.right, var.left).ppf(x)
+    bound2 = __lognorm(mean.left, var.right).ppf(x)
+    bound3 = __lognorm(mean.right, var.right).ppf(x)
+
+    Left = [min(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
+    Right = [max(bound0[i], bound1[i], bound2[i], bound3[i]) for i in range(steps)]
+
+    Left = np.array(Left)
+    Right = np.array(Right)
+    return Pbox(Left, Right, steps=steps, shape="lognormal")
+
+
+# def frechet_r(*args, steps = Params.steps):
+#     args = list(args)
+#     for i in range(0,len(args)):
+#         if args[i].__class__.__name__ != 'nInterval':
+#             args[i] = nInterval(args[i])
+
+#     Left, Right, mean, var = _get_bounds('frechet_r',steps,*args)
+
+#     return Pbox(
+#           Left,
+#           Right,
+#           steps      = steps,
+#           shape      = 'frechet_r',
+#           mean_left  = mean.left,
+#           mean_right = mean.right,
+#           var_left   = var.left,
+#           var_right  = var.right
+#           )
+
+# def frechet_l(*args, steps = Params.steps):
+#     args = list(args)
+#     for i in range(0,len(args)):
+#         if args[i].__class__.__name__ != 'nInterval':
+#             args[i] = nInterval(args[i])
+
+#     Left, Right, mean, var = _get_bounds('frechet_l',steps,*args)
+
+#     return Pbox(
+#           Left,
+#           Right,
+#           steps      = steps,
+#           shape      = 'frechet_l',
+#           mean_left  = mean.left,
+#           mean_right = mean.right,
+#           var_left   = var.left,
+#           var_right  = var.right
+#           )
 
 
 def trapz(a, b, c, d, steps=Params.steps):
