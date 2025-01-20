@@ -17,6 +17,11 @@ Functions
 
 .. autoapisummary::
 
+   pyuncertainnumber.characterisation.uncertainNumber.makeUNPbox
+   pyuncertainnumber.characterisation.uncertainNumber.I
+   pyuncertainnumber.characterisation.uncertainNumber.norm
+   pyuncertainnumber.characterisation.uncertainNumber.expon
+   pyuncertainnumber.characterisation.uncertainNumber.gamma
    pyuncertainnumber.characterisation.uncertainNumber._parse_interverl_inputs
 
 
@@ -430,6 +435,19 @@ Module Contents
       "Calculate the percent point function (inverse of CDF) at quantile q.
 
 
+
+.. py:function:: makeUNPbox(func)
+
+.. py:function:: I(i: str | list[float | int]) -> UncertainNumber
+
+   a shortcut for the interval-type UN object
+
+
+.. py:function:: norm(*args)
+
+.. py:function:: expon(*args)
+
+.. py:function:: gamma(*args)
 
 .. py:function:: _parse_interverl_inputs(vars)
 

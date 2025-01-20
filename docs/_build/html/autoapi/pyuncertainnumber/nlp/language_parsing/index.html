@@ -259,6 +259,17 @@
 <li class="toctree-l4"><a class="reference internal" href="../../pba/imprecise/index.html">pyuncertainnumber.pba.imprecise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../pba/interval/index.html">pyuncertainnumber.pba.interval</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../pba/intervalOperators/index.html">pyuncertainnumber.pba.intervalOperators</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../pba/intervals/index.html">pyuncertainnumber.pba.intervals</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.pba.intervals</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../pba/intervals/activation/index.html">pyuncertainnumber.pba.intervals.activation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../pba/intervals/arithmetic/index.html">pyuncertainnumber.pba.intervals.arithmetic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../pba/intervals/complex/index.html">pyuncertainnumber.pba.intervals.complex</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../pba/intervals/mat_features/index.html">pyuncertainnumber.pba.intervals.mat_features</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../pba/intervals/methods/index.html">pyuncertainnumber.pba.intervals.methods</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../pba/intervals/number/index.html">pyuncertainnumber.pba.intervals.number</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../pba/intervals/plotting/index.html">pyuncertainnumber.pba.intervals.plotting</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../pba/intervals/random/index.html">pyuncertainnumber.pba.intervals.random</a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="../../pba/logical/index.html">pyuncertainnumber.pba.logical</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../pba/operation/index.html">pyuncertainnumber.pba.operation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../pba/params/index.html">pyuncertainnumber.pba.params</a></li>
@@ -268,7 +279,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../pba/utils/index.html">pyuncertainnumber.pba.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../propagation/index.html">pyuncertainnumber.propagation</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.propagation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../propagation/index.html">pyuncertainnumber.propagation</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.propagation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../propagation/performance_func/index.html">pyuncertainnumber.propagation.performance_func</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../propagation/uncertaintyPropagation/index.html">pyuncertainnumber.propagation.uncertaintyPropagation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../propagation/utils/index.html">pyuncertainnumber.propagation.utils</a></li>
@@ -328,18 +339,6 @@
         <article role="main" id="furo-main-content">
           <section id="module-pyuncertainnumber.nlp.language_parsing">
 <span id="pyuncertainnumber-nlp-language-parsing"></span><h1>pyuncertainnumber.nlp.language_parsing<a class="headerlink" href="#module-pyuncertainnumber.nlp.language_parsing" title="Link to this heading">¶</a></h1>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients" title="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients</span></code></a></p></td>
-<td><p>A dataclass to store the regression coefficients of the approximator function</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
@@ -347,30 +346,6 @@
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.hedge_interpret" title="pyuncertainnumber.nlp.language_parsing.hedge_interpret"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hedge_interpret</span></code></a>(...)</p></td>
 <td><p>interpret linguistic hedge words into UncertainNumber objects</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.parse_interval_expression" title="pyuncertainnumber.nlp.language_parsing.parse_interval_expression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_interval_expression</span></code></a>(expression)</p></td>
-<td><p>Parse the expression to interpret and return an Interval-type Uncertain Number object</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.decipher_zrf" title="pyuncertainnumber.nlp.language_parsing.decipher_zrf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decipher_zrf</span></code></a>(num, d)</p></td>
-<td><p>decipher the value of z, r, and f</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.decipher_d" title="pyuncertainnumber.nlp.language_parsing.decipher_d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decipher_d</span></code></a>(x)</p></td>
-<td><p>parse the decimal place d from a number</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.is_number" title="pyuncertainnumber.nlp.language_parsing.is_number"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_number</span></code></a>(n)</p></td>
-<td><p>check if a string is a number</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.count_sigfigs" title="pyuncertainnumber.nlp.language_parsing.count_sigfigs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_sigfigs</span></code></a>(→ int)</p></td>
-<td><p>Count the number of significant figures in a number string</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.count_sig_digits_bias" title="pyuncertainnumber.nlp.language_parsing.count_sig_digits_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_sig_digits_bias</span></code></a>(number)</p></td>
-<td><p>to count the bias for the getting the significant digits after the decimal point</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.findWholeWord" title="pyuncertainnumber.nlp.language_parsing.findWholeWord"><code class="xref py py-obj docutils literal notranslate"><span class="pre">findWholeWord</span></code></a>(w)</p></td>
-<td><p>Find a whole word in a string</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.whole_word_detect" title="pyuncertainnumber.nlp.language_parsing.whole_word_detect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">whole_word_detect</span></code></a>(word, string)</p></td>
-<td><p>Detect if a whole word is in a string, return y or n</p></td>
 </tr>
 </tbody>
 </table>
@@ -400,159 +375,6 @@
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hedge_interpret</span><span class="p">(</span><span class="s2">&quot;about 200&quot;</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;pbox&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.parse_interval_expression">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">parse_interval_expression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expression</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.parse_interval_expression" title="Link to this definition">¶</a></dt>
-<dd><p>Parse the expression to interpret and return an Interval-type Uncertain Number object</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>expression</strong> (<em>str</em>) – the flexible string desired by Scott to instantiate a Uncertain Number</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>caveat:</dt><dd><p>the expression needs to have space between the values and the operators, such as ‘[15 +- 10%]’</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>an Interval object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">ApproximatorRegCoefficients</span></span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients" title="Link to this definition">¶</a></dt>
-<dd><p>A dataclass to store the regression coefficients of the approximator function</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.A">
-<span class="sig-name descname"><span class="pre">A</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.A" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.B">
-<span class="sig-name descname"><span class="pre">B</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.B" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.C">
-<span class="sig-name descname"><span class="pre">C</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.C" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.D">
-<span class="sig-name descname"><span class="pre">D</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.D" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.E">
-<span class="sig-name descname"><span class="pre">E</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.E" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.F">
-<span class="sig-name descname"><span class="pre">F</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.F" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.G">
-<span class="sig-name descname"><span class="pre">G</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.G" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.H">
-<span class="sig-name descname"><span class="pre">H</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.H" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.sigma">
-<span class="sig-name descname"><span class="pre">sigma</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.sigma" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.lognormal">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lognormal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.lognormal" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients._cp">
-<span class="sig-name descname"><span class="pre">_cp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients._cp" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.decipher_zrf">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">decipher_zrf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.decipher_zrf" title="Link to this definition">¶</a></dt>
-<dd><p>decipher the value of z, r, and f</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num</strong> (<em>float</em><em> | </em><em>int</em>) – a number parsed from the string</p></li>
-<li><p><strong>d</strong> (<em>int</em>) – the decimal place of the last significant digit in the exemplar number</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>order of magnitude, defined to be the base-ten logoriathm of the exemplar number;
-r: roundness, defined as the $-d$
-f: if the last digit is 5 or 0. If the last digit is 5, $f=1$, otherwise $f=0$</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>z</p>
-</dd>
-</dl>
-<p>#TODO d can be inferred from the number itself</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.decipher_d">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">decipher_d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.decipher_d" title="Link to this definition">¶</a></dt>
-<dd><p>parse the decimal place d from a number</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.is_number">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">is_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.is_number" title="Link to this definition">¶</a></dt>
-<dd><p>check if a string is a number
-.. note:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>- If string is not a valid `float`,
-- it&#39;ll raise `ValueError` exception
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.count_sigfigs">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">count_sigfigs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numstr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.count_sigfigs" title="Link to this definition">¶</a></dt>
-<dd><p>Count the number of significant figures in a number string</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.count_sig_digits_bias">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">count_sig_digits_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.count_sig_digits_bias" title="Link to this definition">¶</a></dt>
-<dd><p>to count the bias for the getting the significant digits after the decimal point</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>to exclude the sig digits before the decimal point</p>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.findWholeWord">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">findWholeWord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.findWholeWord" title="Link to this definition">¶</a></dt>
-<dd><p>Find a whole word in a string</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>this returns the matched word, but not directly a boolean</p>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyuncertainnumber.nlp.language_parsing.whole_word_detect">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.nlp.language_parsing.</span></span><span class="sig-name descname"><span class="pre">whole_word_detect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.nlp.language_parsing.whole_word_detect" title="Link to this definition">¶</a></dt>
-<dd><p>Detect if a whole word is in a string, return y or n</p>
 </dd></dl>
 
 </section>
@@ -614,32 +436,9 @@ f: if the last digit is 5 or 0. If the last digit is 5, $f=1$, otherwise $f=0$</
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">pyuncertainnumber.nlp.language_parsing</a><ul>
-<li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.hedge_interpret"><code class="docutils literal notranslate"><span class="pre">hedge_interpret()</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.parse_interval_expression"><code class="docutils literal notranslate"><span class="pre">parse_interval_expression()</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients</span></code></a><ul>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.A"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients.A</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.B"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients.B</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.C"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients.C</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.D"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients.D</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.E"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients.E</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.F"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients.F</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.G"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients.G</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.H"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients.H</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.sigma"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients.sigma</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients.lognormal"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients.lognormal()</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.ApproximatorRegCoefficients._cp"><code class="docutils literal notranslate"><span class="pre">ApproximatorRegCoefficients._cp()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.decipher_zrf"><code class="docutils literal notranslate"><span class="pre">decipher_zrf()</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.decipher_d"><code class="docutils literal notranslate"><span class="pre">decipher_d()</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.is_number"><code class="docutils literal notranslate"><span class="pre">is_number()</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.count_sigfigs"><code class="docutils literal notranslate"><span class="pre">count_sigfigs()</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.count_sig_digits_bias"><code class="docutils literal notranslate"><span class="pre">count_sig_digits_bias()</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.findWholeWord"><code class="docutils literal notranslate"><span class="pre">findWholeWord()</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.nlp.language_parsing.whole_word_detect"><code class="docutils literal notranslate"><span class="pre">whole_word_detect()</span></code></a></li>
 </ul>
 </li>
 </ul>

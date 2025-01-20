@@ -1,0 +1,487 @@
+pyuncertainnumber.pba.intervals.complex
+=======================================
+
+.. py:module:: pyuncertainnumber.pba.intervals.complex
+
+.. autoapi-nested-parse::
+
+   Created Tue Dec 26 2017
+   University of Liverpool
+   github.com/marcodeangelis
+   MIT License
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.intervals.complex.INTERVAL_TYPES
+   pyuncertainnumber.pba.intervals.complex.NUMERIC_TYPES
+   pyuncertainnumber.pba.intervals.complex.machine_eps
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.intervals.complex.ComplexInterval
+   pyuncertainnumber.pba.intervals.complex.Interval
+   pyuncertainnumber.pba.intervals.complex.I
+   pyuncertainnumber.pba.intervals.complex.interval
+   pyuncertainnumber.pba.intervals.complex.IntervalArray
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.intervals.complex.BRUTEFORCE
+   pyuncertainnumber.pba.intervals.complex.SUBINTERVALIZE
+
+
+Module Contents
+---------------
+
+.. py:data:: INTERVAL_TYPES
+
+.. py:data:: NUMERIC_TYPES
+
+.. py:data:: machine_eps
+   :value: 2.220446049250313e-16
+
+
+.. py:class:: ComplexInterval(*args)
+
+   ∞ --------------------------- ∞
+   Created Mon Jul 13 2020
+   University of Liverpool
+   github.com/marcodeangelis
+   MIT License
+   ∞ --------------------------- ∞
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: __str__()
+
+
+   .. py:attribute:: name
+      :value: ''
+
+
+
+   .. py:attribute:: __subint
+      :value: 30
+
+
+
+   .. py:attribute:: __subi_div
+      :value: False
+
+
+
+   .. py:attribute:: __subi_mul
+      :value: False
+
+
+
+   .. py:attribute:: __lo
+      :value: (-1-1j)
+
+
+
+   .. py:attribute:: __hi
+      :value: (1+1j)
+
+
+
+   .. py:attribute:: __m
+      :value: 0j
+
+
+
+   .. py:attribute:: __r
+      :value: (1+1j)
+
+
+
+   .. py:attribute:: __w
+      :value: (2+2j)
+
+
+
+   .. py:attribute:: __iszeroin
+      :value: [False, False]
+
+
+
+   .. py:method:: value()
+
+
+   .. py:method:: inf()
+
+
+   .. py:method:: sup()
+
+
+   .. py:method:: lo()
+
+
+   .. py:method:: hi()
+
+
+   .. py:method:: mid()
+
+
+   .. py:method:: rad()
+
+
+   .. py:method:: width()
+
+
+   .. py:method:: stradzero()
+
+
+   .. py:method:: slider(p)
+
+
+   .. py:method:: N_subi()
+
+
+   .. py:method:: real()
+
+
+   .. py:method:: imag()
+
+
+   .. py:method:: conjugate()
+
+
+   .. py:method:: absolute()
+
+
+   .. py:method:: set_N_subi(N)
+
+
+   .. py:method:: set_subistate(state)
+
+
+   .. py:method:: subintervalize(*args)
+
+
+   .. py:method:: pop(A)
+
+
+   .. py:method:: pop2(C)
+
+
+   .. py:method:: __add__(other)
+
+
+   .. py:method:: __radd__(left)
+
+
+   .. py:method:: __sub__(other)
+
+
+   .. py:method:: __rsub__(left)
+
+
+   .. py:method:: __mul__(other)
+
+
+   .. py:method:: __rmul__(left)
+
+
+   .. py:method:: __truediv__(other)
+
+
+   .. py:method:: __rtruediv__(left)
+
+
+.. py:class:: Interval(*args)
+
+   ∞ --------------------------- ∞
+   Tue Dec 26 2017
+   github.com/marcodeangelis
+   University of Liverpool
+   MIT License
+   ∞ --------------------------- ∞
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: __str__()
+
+
+   .. py:method:: __hash__()
+
+
+   .. py:method:: value()
+
+
+   .. py:method:: lo()
+
+
+   .. py:method:: hi()
+
+
+   .. py:method:: mid()
+
+
+   .. py:method:: rad()
+
+
+   .. py:method:: halfwidth()
+
+
+   .. py:method:: width()
+
+
+   .. py:method:: diam()
+
+
+   .. py:method:: inf()
+
+
+   .. py:method:: sup()
+
+
+   .. py:method:: mig()
+
+
+   .. py:method:: mag()
+
+
+   .. py:method:: abs()
+
+
+   .. py:method:: abs2()
+
+
+   .. py:method:: distance(other)
+
+
+   .. py:method:: stradzero()
+
+
+   .. py:method:: contains(other)
+
+
+   .. py:method:: encloses(other)
+
+
+   .. py:method:: inside(other)
+
+
+   .. py:method:: inside_strict(other)
+
+
+   .. py:method:: intersect(other)
+
+
+   .. py:method:: union(other)
+
+
+   .. py:method:: intersection(other)
+
+
+   .. py:method:: thinit(gamma=1, N=1)
+
+
+   .. py:method:: slider(p)
+
+
+   .. py:method:: linspace(N=30)
+
+
+   .. py:method:: subintervalize(N=30)
+
+
+   .. py:method:: pop(A)
+
+
+   .. py:method:: __neg__()
+
+
+   .. py:method:: __pos__()
+
+
+   .. py:method:: __add__(other)
+
+
+   .. py:method:: __radd__(left)
+
+
+   .. py:method:: __sub__(other)
+
+
+   .. py:method:: __rsub__(left)
+
+
+   .. py:method:: __mul__(other)
+
+
+   .. py:method:: __rmul__(left)
+
+
+   .. py:method:: __truediv__(other)
+
+
+   .. py:method:: __rtruediv__(left)
+
+
+   .. py:method:: __pow__(other)
+
+
+   .. py:method:: __rpow__(left)
+
+
+   .. py:method:: __lt__(other)
+
+
+   .. py:method:: __rlt__(left)
+
+
+   .. py:method:: __gt__(other)
+
+
+   .. py:method:: __rgt__(left)
+
+
+   .. py:method:: __le__(other)
+
+
+   .. py:method:: __rle__(left)
+
+
+   .. py:method:: __ge__(other)
+
+
+   .. py:method:: __rge__(left)
+
+
+   .. py:method:: __eq__(other)
+
+
+   .. py:method:: __ne__(other)
+
+
+.. py:function:: BRUTEFORCE(N=100)
+
+.. py:function:: SUBINTERVALIZE(N=20)
+
+.. py:class:: I(*args)
+
+   Bases: :py:obj:`Interval`
+
+
+   ∞ --------------------------- ∞
+   Tue Dec 26 2017
+   github.com/marcodeangelis
+   University of Liverpool
+   MIT License
+   ∞ --------------------------- ∞
+
+
+   .. py:attribute:: name
+      :value: ''
+
+
+
+   .. py:method:: superclass()
+
+
+.. py:class:: interval(*args)
+
+   Bases: :py:obj:`Interval`
+
+
+   ∞ --------------------------- ∞
+   Tue Dec 26 2017
+   github.com/marcodeangelis
+   University of Liverpool
+   MIT License
+   ∞ --------------------------- ∞
+
+
+   .. py:attribute:: name
+      :value: ''
+
+
+
+   .. py:method:: superclass()
+
+
+.. py:class:: IntervalArray(*args, notation='infsup', axis=0, name='')
+
+   ∞ --------------------------- ∞
+   Created Mon Jul 24 2020
+   University of Liverpool
+   github.com/marcodeangelis
+   MIT License
+   ∞ --------------------------- ∞
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: __str__()
+
+
+   .. py:method:: __len__()
+
+
+   .. py:attribute:: name
+      :value: ''
+
+
+
+   .. py:method:: __iter__()
+
+
+   .. py:method:: __getitem__(index)
+
+
+   .. py:method:: inf()
+
+
+   .. py:method:: lo()
+
+
+   .. py:method:: sup()
+
+
+   .. py:method:: hi()
+
+
+   .. py:method:: tolist()
+
+
+   .. py:method:: toarray(order='F')
+
+
+   .. py:method:: slider(p=0.5)
+
+
+   .. py:method:: __add__(other)
+
+
+   .. py:method:: __sub__(other)
+
+
+   .. py:method:: __mul__(other)
+
+
+   .. py:method:: __truediv__(other)
+
+
+   .. py:method:: plot(marker='_', size=20, xlabel='x', ylabel='y', title='', save=None)
+
+

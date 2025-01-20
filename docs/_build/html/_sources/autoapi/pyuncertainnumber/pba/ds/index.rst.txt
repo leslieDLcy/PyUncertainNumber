@@ -89,7 +89,7 @@ Module Contents
 
 
 
-.. py:function:: plot_DS_structure(vec_interval: list[pyuncertainnumber.pba.interval.Interval | intervals.Interval], weights=None, offset=0.3, ax=None, **kwargs)
+.. py:function:: plot_DS_structure(vec_interval: list[pyuncertainnumber.pba.interval.Interval | pyuncertainnumber.pba.intervals.Interval], weights=None, offset=0.3, ax=None, **kwargs)
 
    plot the intervals in a vectorised form
 

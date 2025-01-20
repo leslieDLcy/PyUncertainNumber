@@ -105,7 +105,7 @@ Module Contents
    find the index of the nearest value in the array to the given value
 
 
-.. py:function:: plot_intervals(vec_interval: list[pyuncertainnumber.pba.interval.Interval | pyuncertainnumber.pba.interval.Interval], ax=None, **kwargs)
+.. py:function:: plot_intervals(vec_interval: list[pyuncertainnumber.pba.interval.Interval | pyuncertainnumber.pba.intervals.Interval], ax=None, **kwargs)
 
    plot the intervals in a vectorised form
    :param vec_interval: vectorised interval objects

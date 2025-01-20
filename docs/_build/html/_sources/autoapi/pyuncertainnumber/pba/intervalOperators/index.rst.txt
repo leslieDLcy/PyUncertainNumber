@@ -41,7 +41,7 @@ Module Contents
 
 .. py:function:: _arraylike(bound: list)
 
-.. py:function:: _marco_interval_like(bound: intervals.Interval)
+.. py:function:: _marco_interval_like(bound: pyuncertainnumber.pba.intervals.Interval)
 
 .. py:function:: _nick_interval_like(bound: pyuncertainnumber.pba.interval.Interval)
 

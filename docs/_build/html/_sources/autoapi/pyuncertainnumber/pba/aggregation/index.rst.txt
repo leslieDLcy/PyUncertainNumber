@@ -4,14 +4,6 @@ pyuncertainnumber.pba.aggregation
 .. py:module:: pyuncertainnumber.pba.aggregation
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyuncertainnumber.pba.aggregation.makeUN
-
-
 Functions
 ---------
 
@@ -19,17 +11,12 @@ Functions
 
    pyuncertainnumber.pba.aggregation.stochastic_mixture
    pyuncertainnumber.pba.aggregation.stacking
-   pyuncertainnumber.pba.aggregation.mixture_pbox
-   pyuncertainnumber.pba.aggregation.mixture_ds
-   pyuncertainnumber.pba.aggregation.mixture_cdf
    pyuncertainnumber.pba.aggregation.imposition
    pyuncertainnumber.pba.aggregation.envelope
 
 
 Module Contents
 ---------------
-
-.. py:data:: makeUN
 
 .. py:function:: stochastic_mixture(l_uns, weights=None, display=False, **kwargs)
 
@@ -46,7 +33,7 @@ Module Contents
    .. note:: - currently only accepts same type objects
 
 
-.. py:function:: stacking(vec_interval: pyuncertainnumber.pba.interval.nInterval | intervals.Interval, weights, display=False, return_type='pbox')
+.. py:function:: stacking(vec_interval: pyuncertainnumber.pba.interval.nInterval | pyuncertainnumber.pba.intervals.Interval, weights, display=False, return_type='pbox')
 
    stochastic mixture operation of Intervals with probability masses
 
@@ -69,15 +56,6 @@ Module Contents
       - together the interval and masses, it can be deemed that all the inputs
       required is jointly a DS structure
 
-
-.. py:function:: mixture_pbox(l_pboxes, weights=None, display=False)
-
-.. py:function:: mixture_ds(l_ds, display=False)
-
-   mixture operation for DS structure
-
-
-.. py:function:: mixture_cdf()
 
 .. py:function:: imposition(*args: pyuncertainnumber.pba.pbox_base.Pbox | pyuncertainnumber.pba.interval.nInterval | float | int)
 

@@ -21,6 +21,7 @@ Submodules
    /autoapi/pyuncertainnumber/pba/imprecise/index
    /autoapi/pyuncertainnumber/pba/interval/index
    /autoapi/pyuncertainnumber/pba/intervalOperators/index
+   /autoapi/pyuncertainnumber/pba/intervals/index
    /autoapi/pyuncertainnumber/pba/logical/index
    /autoapi/pyuncertainnumber/pba/operation/index
    /autoapi/pyuncertainnumber/pba/params/index
@@ -65,7 +66,6 @@ Functions
    pyuncertainnumber.pba._bound_pcdf
    pyuncertainnumber.pba.makePbox
    pyuncertainnumber.pba.norm
-   pyuncertainnumber.pba.lognormal
    pyuncertainnumber.pba.alpha
    pyuncertainnumber.pba.anglit
    pyuncertainnumber.pba.argus
@@ -169,6 +169,7 @@ Functions
    pyuncertainnumber.pba.weibull_min
    pyuncertainnumber.pba.weibull_max
    pyuncertainnumber.pba.wrapcauchy
+   pyuncertainnumber.pba.lognormal
    pyuncertainnumber.pba.trapz
    pyuncertainnumber.pba.uniform
    pyuncertainnumber.pba.weibull
@@ -1246,23 +1247,6 @@ Package Contents
 
 .. py:function:: norm(*args)
 
-.. py:function:: lognormal(mean, var, steps=Params.steps)
-
-   Creates a p-box for the lognormal distribution
-
-   *Note: the parameters used are the mean and variance of the lognormal distribution
-   not the mean and variance of the underlying normal*
-   See:
-   `[1]<https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters>`
-   `[2]<https://stackoverflow.com/questions/51906063/distribution-mean-and-standard-deviation-using-scipy-stats>`
-
-
-   :param mean: mean of the lognormal distribution
-   :param var: variance of the lognormal distribution
-
-   :rtype: Pbox
-
-
 .. py:function:: alpha(*args)
 
 .. py:function:: anglit(*args)
@@ -1468,6 +1452,23 @@ Package Contents
 .. py:function:: weibull_max(*args)
 
 .. py:function:: wrapcauchy(*args)
+
+.. py:function:: lognormal(mean, var, steps=Params.steps)
+
+   Creates a p-box for the lognormal distribution
+
+   *Note: the parameters used are the mean and variance of the lognormal distribution
+   not the mean and variance of the underlying normal*
+   See:
+   `[1]<https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters>`
+   `[2]<https://stackoverflow.com/questions/51906063/distribution-mean-and-standard-deviation-using-scipy-stats>`
+
+
+   :param mean: mean of the lognormal distribution
+   :param var: variance of the lognormal distribution
+
+   :rtype: Pbox
+
 
 .. py:function:: trapz(a, b, c, d, steps=Params.steps)
 
