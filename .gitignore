@@ -5,6 +5,7 @@
 .DS_Store
 .vscode
 matplotlibrc.txt
+.matplotlibrc.txt
 # vim
 *.swp
 *.swo
