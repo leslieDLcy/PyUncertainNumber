@@ -39,7 +39,6 @@ print(pbox_mix)
 
 # *  ---------------------arithmetic---------------------*#
 # an interval
-# an interval
 a = pba.I([2, 3])
 # _ = a.display(style="band", title="Interval [2,3]")
 # a precise distribution
