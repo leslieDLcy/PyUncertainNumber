@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 
 makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
 
+__all__ = ["stochastic_mixture", "envelope", "imposition", "stacking"]
+
 
 @makeUN
 def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):

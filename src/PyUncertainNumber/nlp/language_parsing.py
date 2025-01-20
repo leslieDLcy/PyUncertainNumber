@@ -22,6 +22,8 @@ from ..pba.params import Params
 if TYPE_CHECKING:
     from ..pba.pbox_base import Pbox
 
+__all__ = ["hedge_interpret"]
+
 
 def hedge_interpret(hedge: str, return_type="interval") -> I | Pbox:
     """interpret linguistic hedge words into UncertainNumber objects

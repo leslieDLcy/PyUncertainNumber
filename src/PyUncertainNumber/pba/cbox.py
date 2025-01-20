@@ -8,7 +8,7 @@ from .params import Params
 from .intervals import Interval
 import scipy
 from .cbox_Leslie import cbox_from_extredists, cbox_from_pseudosamples
-from .pbox_base import pbox_from_extredists, pbox_from_pseudosamples
+from .constructors import pbox_from_extredists, pbox_from_pseudosamples
 import pyuncertainnumber.pba.distributions as d
 
 if TYPE_CHECKING:
@@ -49,7 +49,7 @@ def infer_cbox(family: str, data, **args) -> Cbox:
         - additina kwargs such as N for binomial family
 
     example:
-        >>> infer_cbox(''binomial', data=[2], N=10)
+        >>> infer_cbox('binomial', data=[2], N=10)
     """
     if isinstance(named_cbox.get(family), dict):
         return {k: v(data, **args) for (k, v) in named_cbox.get(family).items()}
