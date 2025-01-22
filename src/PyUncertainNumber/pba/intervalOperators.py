@@ -1,8 +1,7 @@
 from functools import singledispatch
-from intervals import Interval
 import numpy as np
-from PyUncertainNumber.pba.interval import Interval as nInterval
-from intervals import intervalise
+from .interval import Interval as nInterval
+from .intervals import intervalise, Interval
 from ..nlp.language_parsing import parse_interval_expression, hedge_interpret
 
 """ operations for generic Interval objects """
@@ -12,7 +11,7 @@ from ..nlp.language_parsing import parse_interval_expression, hedge_interpret
 
 @singledispatch
 def parse_bounds(bounds):
-    """ parse the self.bounds argument """
+    """parse the self.bounds argument"""
     return wc_interval(bounds)
 
 
@@ -35,7 +34,7 @@ def _str(bounds: str):
 
 @singledispatch
 def wc_interval(bound):
-    """ wildcard scalar interval """
+    """wildcard scalar interval"""
     return nInterval(bound)
 
 
@@ -46,20 +45,19 @@ def _arraylike(bound: list):
 
 @wc_interval.register(Interval)
 def _marco_interval_like(bound: Interval):
-    return nInterval(
-        np.ndarray.item(bound.lo), np.ndarray.item(bound.hi)
-    )
+    return nInterval(np.ndarray.item(bound.lo), np.ndarray.item(bound.hi))
 
 
 @wc_interval.register(nInterval)
 def _nick_interval_like(bound: nInterval):
     return bound
 
+
 # * ---------------------make vector interval object --------------------- *#
 
 
 def make_vec_interval(vec):
-    """  vector interval implementation tmp """
+    """vector interval implementation tmp"""
     assert len(vec) > 1, "Interval must have more than one element"
 
     if isinstance(vec, Interval):
@@ -95,6 +93,7 @@ def _arraylike(x):
 def _intervallike(x):
     return sum(x) / len(x)
 
+
 # * ---------------------std func --------------------- *#
 
 
@@ -111,5 +110,5 @@ def var():
 
 # * ---------------------round func --------------------- *#
 def roundInt():
-    """ outward rounding to integer"""
+    """outward rounding to integer"""
     pass

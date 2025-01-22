@@ -1,0 +1,33 @@
+pyuncertainnumber.nlp.language_parsing
+======================================
+
+.. py:module:: pyuncertainnumber.nlp.language_parsing
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.nlp.language_parsing.hedge_interpret
+
+
+Module Contents
+---------------
+
+.. py:function:: hedge_interpret(hedge: str, return_type='interval') -> pyuncertainnumber.pba.interval.Interval | pyuncertainnumber.pba.pbox_base.Pbox
+
+   interpret linguistic hedge words into UncertainNumber objects
+
+   :param hedge: the hedge numerical expression to be interpreted
+   :type hedge: str
+   :param return_type: the type of object to be returned, either 'interval' or 'pbox'
+   :type return_type: str
+
+   .. note:: - the return can either be an interval or a pbox object
+
+   .. rubric:: Example
+
+   >>> hedge_interpret("about 200", return_type="pbox")
+
+

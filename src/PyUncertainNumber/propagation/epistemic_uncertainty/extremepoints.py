@@ -3,80 +3,82 @@ import tqdm
 from typing import Callable
 from PyUncertainNumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
 from PyUncertainNumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
-from PyUncertainNumber.propagation.utils import propagation_results
+from PyUncertainNumber.propagation.utils import Propagation_results
 
-def extremepoints_method(x:np.ndarray, f:Callable, 
-                                   results: propagation_results =None, 
-                                   save_raw_data = 'no')-> propagation_results:  # Specify return type
 
-    """
-    description: 
-        - This method calculates the extreme points of a set of ranges based on signs 
-          of the partial derivatives, and results in fewer combinations than the 'endpoints' method.
-        - Efficiently propagates the intervals of a monotonic function but might not be accurate 
-          for non-monotonic functions.
-        
+def extremepoints_method(x: np.ndarray, f: Callable,
+                         results: Propagation_results = None,
+                         save_raw_data='no') -> Propagation_results:  # Specify return type
+    """ 
+        Performs uncertainty propagation using the Extreme Point Method for monotonic functions. 
+        This method estimates the bounds of a function's output by evaluating it at specific combinations of extreme values
+        (lower or upper bounds) of the input variables. It is efficient for monotonic functions but might not be 
+        accurate for non-monotonic functions.    
+
     args:
-        - x: A 2D NumPy array where each row represents an input variable and 
+        x (np.ndarray): A 2D NumPy array where each row represents an input variable and
           the two columns define its lower and upper bounds (interval).
-        - f: A callable function that takes a 1D NumPy array of input values and 
+        f (Callable): A callable function that takes a 1D NumPy array of input values and
           returns the corresponding output(s).
-        - save_raw_data: Controls the amount of data returned.
-          - 'no': Returns only the minimum and maximum output values along with the 
-                  corresponding input values.
-          - 'yes': Returns the above, plus the full arrays of unique input combinations 
-                  (`all_input`) and their corresponding output values (`all_output`).
-
+        results (Propagation_results): The class to use for storing results (defaults to Propagation_results).
+        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw input data 
+            when a function (f) 
+            is not provided.
+            - 'no': Returns an error that no function is provided.
+            - 'yes': Returns the full arrays of unique input combinations.
 
     signature:
-        extremepoints_method(x:np.ndarray, f:Callable, ..., save_raw_data = 'no') -> propagation_results
+        extremepoints_method(x:np.ndarray, f:Callable, results:dict, save_raw_data = 'no') -> dict
+
+    raises:
+        ValueError if no function is provided and save_raw_data is 'no'.
 
     return:
-        - A propagation_results object containing the results.
-          - 'raw_data': A dictionary containing raw data (if `save_raw_data` is 'yes'):
-            - 'x': All generated input samples.
-            - 'f': Corresponding output values for each input sample.
-            - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None). 
-            - 'part_deriv_sign': A NumPy array of shape (num_outputs, d) containing the signs 
-                   (i.e., positive, negative) used to determine the partial derivative for each output.
-            - 'min': A dictionary for lower bound results (if f is not None):
-                - 'x': Input values that produced the minimum output value(s).
-                - 'f': Minimum output value(s).
-            - 'max': A dictionary for upper bound results (if f is not None):
-                - 'x': Input values that produced the maximum output value(s).
-                - 'f': Maximum output value(s).
+        Returns `Propagation_results` object(s) containing:
+            - 'un': UncertainNumber object(s) to characterise the interval(s) of the output(s).
+            - 'raw_data' (dict): Dictionary containing raw data shared across output(s):
+                    - 'x' (np.ndarray): Input values.
+                    - 'f' (np.ndarray): Output values.
+                    - 'min' (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'f' for the minimum of that output.
+                    - 'max' (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'f' for the maximum of that output.
+                    - 'bounds' (np.ndarray): 2D array of lower and upper bounds for each output.
 
-    # Example usage with different parameters for minimization and maximization
-        f = lambda x: x[0] + x[1] + x[2]  # Example function
-        # Determine input parameters for function and method
-        x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-        # Call the method
-        y = extremepoint_method(x_bounds, f)
-        # print results
-        y.print()
-    
+    Example:
+        # Example usage with different parameters for minimization and maximization
+        >>> f = lambda x: x[0] + x[1] + x[2]  # Example function
+        >>> # Determine input parameters for function and method
+        >>> x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> # Call the method
+        >>> y = extremepoint_method(x_bounds, f)
+        >>> # print results
+        >>> y.print()
+
     """
     if results is None:
-        results = propagation_results()  # Create an instance of propagation_results
+        results = Propagation_results()  # Create an instance of Propagation_results
 
-    # create an array with the unique combinations of all intervals 
-    X = cartesian(*x) 
+    # create an array with the unique combinations of all intervals
+    X = cartesian(*x)
 
     d = X.shape[1]  # Number of dimensions
     inds = np.array([1] + [2**i + 1 for i in range(d)])  # Generate indices
-    Xeval = X[inds - 1]  # Select rows based on indices (adjusting for 0-based indexing)
+    # Select rows based on indices (adjusting for 0-based indexing)
+    Xeval = X[inds - 1]
 
-    print(f"Total number of input combinations for the endpoints extreme points method: {d + 3}") 
-    
-    # propagates the epistemic uncertainty through subinterval reconstitution   
+    print(
+        f"Total number of input combinations for the endpoints extreme points method: {d + 3}")
+
+    # propagates the epistemic uncertainty through subinterval reconstitution
     if f is not None:
 
         # Simulate function for the selected subset
-        all_output = []  
+        all_output = []
         for c in tqdm.tqdm(Xeval, desc="Evaluating samples"):
-            output = f(c) 
+            output = f(c)
             all_output.append(output)
-        
+
         # Determine the number of outputs from the first evaluation
         try:
             num_outputs = len(all_output[0])
@@ -84,7 +86,7 @@ def extremepoints_method(x:np.ndarray, f:Callable,
             num_outputs = 1  # If f returns a single value
 
         # Convert all_output to a NumPy array with the correct shape
-        all_output = np.array(all_output).reshape(-1, num_outputs)  
+        all_output = np.array(all_output).reshape(-1, num_outputs)
 
         # Calculate signs
         part_deriv_sign = np.zeros((num_outputs, d))
@@ -102,22 +104,25 @@ def extremepoints_method(x:np.ndarray, f:Callable,
         if num_outputs == 1:
             lower_bound[0] = f(Xsign[2*i, :])
             upper_bound[0] = f(Xsign[2*i + 1, :])
-        else:        
+        else:
             for i in range(num_outputs):
                 lower_bound[i] = f(Xsign[2*i, :])[i]
                 upper_bound[i] = f(Xsign[2*i + 1, :])[i]
 
-        min_indices = np.zeros((d,num_outputs))
-        max_indices = np.zeros((d,num_outputs))
+        min_indices = np.zeros((d, num_outputs))
+        max_indices = np.zeros((d, num_outputs))
         for i in range(num_outputs):  # Iterate over outputs
-            min_indices[:,i] = Xsign[2*i, :]
-            max_indices[:,i] = Xsign[2*i+1, :]
-            
+            min_indices[:, i] = Xsign[2*i, :]
+            max_indices[:, i] = Xsign[2*i+1, :]
+
         # Convert to 2D arrays (if necessary) and append
         for i in range(num_outputs):
-            results.raw_data['min'] = np.append(results.raw_data['min'], {'x': min_indices[:, i], 'f': lower_bound[i]})
-            results.raw_data['max'] = np.append(results.raw_data['max'], {'x': max_indices[:, i], 'f': upper_bound[i]})
-            results.raw_data['bounds'] = np.vstack([results.raw_data['bounds'], np.array([lower_bound[i], upper_bound[i]])]) if results.raw_data['bounds'].size else np.array([lower_bound[i], upper_bound[i]])
+            results.raw_data['min'] = np.append(
+                results.raw_data['min'], {'x': min_indices[:, i], 'f': lower_bound[i]})
+            results.raw_data['max'] = np.append(
+                results.raw_data['max'], {'x': max_indices[:, i], 'f': upper_bound[i]})
+            results.raw_data['bounds'] = np.vstack([results.raw_data['bounds'], np.array(
+                [lower_bound[i], upper_bound[i]])]) if results.raw_data['bounds'].size else np.array([lower_bound[i], upper_bound[i]])
 
         results.add_raw_data(part_deriv_sign= part_deriv_sign)
         results.raw_data['x']= Xeval
@@ -125,10 +130,13 @@ def extremepoints_method(x:np.ndarray, f:Callable,
     
 
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results.add_raw_data(x = Xeval)  # Store Xeval in raw_data['x'] even if f is None
-    
+        # Store Xeval in raw_data['x'] even if f is None
+        results.add_raw_data(x=Xeval)
+
     else:
-        print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
+        raise ValueError(
+            "No function is provided. Select save_raw_data = 'yes' to save the input combinations"
+        )
 
     return results
 

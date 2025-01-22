@@ -12,7 +12,7 @@ $$
 \underline{F} \le F(x) \le \overline{F}
 $$
 
-p-box collectively reflects the variability (aleatoric uncertainty) and incertitude (epistemic uncertainty) in one structure for the uncertain quantity of interest.
+p-box collectively reflects the variability (aleatoric uncertainty) and incertitude (epistemic uncertainty) in one structure for the uncertain quantity of interest. The horizontal span of the probabilty bounds are a function of the variability and the vertical breadth of the bounds is a function of ignorance.
 
 <!-- a plot -->
 ```{image} ../../assets/pbox_illustration.png

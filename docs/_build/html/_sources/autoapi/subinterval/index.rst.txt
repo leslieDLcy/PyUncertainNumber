@@ -1,0 +1,79 @@
+subinterval
+===========
+
+.. py:module:: subinterval
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   subinterval.subinterval_method
+
+
+Module Contents
+---------------
+
+.. py:function:: subinterval_method(x: numpy.ndarray, f: Callable, results: pyuncertainnumber.propagation.utils.Propagation_results = None, n_sub: numpy.array = 3, save_raw_data='no') -> pyuncertainnumber.propagation.utils.Propagation_results
+
+   subinterval reconstitution method
+
+   :param - x: A 2D NumPy array where each row represents an input variable and the two columns
+               define its lower and upper bounds (interval).
+   :type - x: nd.array
+   :param - f: A callable function that takes a 1D NumPy array of input values and returns the
+               corresponding output(s).
+   :type - f: callable
+   :param - n_sub: A scalar (integer) or a 1D NumPy array specifying the number of subintervals for
+                   each input variable.
+                    - If a scalar, all input variables are divided into the same number of subintervals (defaults 3 divisions).
+                    - If an array, each element specifies the number of subintervals for the
+                      corresponding input variable.
+   :type - n_sub: nd.array
+   :param - save_raw_data: Controls the amount of data returned:
+                           - 'no': Returns only the minimum and maximum output values along with the
+                                  corresponding input values.
+                           - 'yes': Returns the above, plus the full arrays of unique input combinations
+                                    (`all_input`) and their corresponding output values (`all_output`).
+   :type - save_raw_data: boolean
+
+   signature:
+       subinterval_method(x:np.ndarray, f:Callable, n:np.array, results:dict = None, save_raw_data = 'no') -> dict
+
+   .. note::
+
+      - The function assumes that the intervals in `x` represent uncertainties and aims to provide conservative
+         bounds on the output uncertainty.
+      - The computational cost increases exponentially with the number of input variables
+         and the number of subintervals per variable.
+      - If the `f` function returns multiple outputs, the `all_output` array will be 2-dimensional.
+
+   :returns:
+
+             A dictionary containing the results:
+               - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None).
+   :rtype: - dict
+
+       - 'min': A dictionary for lower bound results (if f is not None):
+            - 'x': Input values that produced the minimum output value(s).
+            - 'f': Minimum output value(s).
+       - 'max': A dictionary for upper bound results (if f is not None):
+            - 'x': Input values that produced the maximum output value(s).
+            - 'f': Maximum output value(s).
+       - 'raw_data': A dictionary containing raw data (if `save_raw_data` is 'yes'):
+            - 'x': All generated input samples.
+            - 'f': Corresponding output values for each input sample.
+
+   .. rubric:: Example
+
+   >>> #Define input intervals
+   >>> x = np.array([[1, 2], [3, 4], [5, 6]])
+   >>> # Define the function
+   >>> f = lambda x: x[0] + x[1] + x[2]
+   >>> # Run sampling method with n = 2
+   >>> y = subinterval_method(x, f, n_sub, save_raw_data = 'yes')
+   >>> # Print the results
+   >>> y.print()
+
+

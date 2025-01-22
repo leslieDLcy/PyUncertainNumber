@@ -48,7 +48,7 @@ c = infer_cbox('binomial', data=[2], N=10)
 ```{image} ../../assets/cbox_illustration.png
 :alt: confidence box example with Binomial distribution
 :class: bg-primary
-:width: 600px
+:width: 400px
 :align: center
 ```
 

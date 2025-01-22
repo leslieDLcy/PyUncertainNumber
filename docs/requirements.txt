@@ -1,4 +1,8 @@
+furo
 myst-parser
 # sphinx-rtd-theme
 sphinx-prompt
 sphinx-copybutton
+sphinx-autoapi
+sphinx_inline_tabs
+sphinx_design

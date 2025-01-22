@@ -1,0 +1,268 @@
+pyuncertainnumber.pba.intervals
+===============================
+
+.. py:module:: pyuncertainnumber.pba.intervals
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyuncertainnumber/pba/intervals/activation/index
+   /autoapi/pyuncertainnumber/pba/intervals/arithmetic/index
+   /autoapi/pyuncertainnumber/pba/intervals/complex/index
+   /autoapi/pyuncertainnumber/pba/intervals/mat_features/index
+   /autoapi/pyuncertainnumber/pba/intervals/methods/index
+   /autoapi/pyuncertainnumber/pba/intervals/number/index
+   /autoapi/pyuncertainnumber/pba/intervals/plotting/index
+   /autoapi/pyuncertainnumber/pba/intervals/random/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.intervals.Interval
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.intervals.lo
+   pyuncertainnumber.pba.intervals.hi
+   pyuncertainnumber.pba.intervals.mid
+   pyuncertainnumber.pba.intervals.rad
+   pyuncertainnumber.pba.intervals.width
+   pyuncertainnumber.pba.intervals.contain
+   pyuncertainnumber.pba.intervals.intersect
+   pyuncertainnumber.pba.intervals.straddle_zero
+   pyuncertainnumber.pba.intervals.split_interval
+   pyuncertainnumber.pba.intervals.subintervalise
+   pyuncertainnumber.pba.intervals.intervalise
+   pyuncertainnumber.pba.intervals.sizeit
+   pyuncertainnumber.pba.intervals.uniform_endpoints
+
+
+Package Contents
+----------------
+
+.. py:class:: Interval(lo: Union[float, numpy.ndarray], hi: Optional[Union[float, numpy.ndarray]] = None)
+
+   --------------------------
+   Created Feb 2022
+   github.com/marcodeangelis
+   MIT License
+   --------------------------
+
+   Interval is the main class.
+
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: __str__()
+
+
+   .. py:attribute:: __lo
+
+
+   .. py:attribute:: __hi
+
+
+   .. py:attribute:: __shape
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: __iter__()
+
+
+   .. py:method:: __next__()
+
+
+   .. py:method:: __getitem__(i: Union[int, slice])
+
+
+   .. py:property:: lo
+      :type: Union[numpy.ndarray, float]
+
+
+
+   .. py:property:: hi
+      :type: Union[numpy.ndarray, float]
+
+
+
+   .. py:property:: unsized
+
+
+   .. py:property:: val
+
+
+   .. py:property:: scalar
+
+
+   .. py:property:: shape
+
+
+   .. py:method:: __neg__()
+
+
+   .. py:method:: __pos__()
+
+
+   .. py:method:: __add__(other)
+
+
+   .. py:method:: __radd__(left)
+
+
+   .. py:method:: __sub__(other)
+
+
+   .. py:method:: __rsub__(left)
+
+
+   .. py:method:: __mul__(other)
+
+
+   .. py:method:: __rmul__(left)
+
+
+   .. py:method:: __truediv__(other)
+
+
+   .. py:method:: __rtruediv__(left)
+
+
+   .. py:method:: __pow__(other)
+
+
+   .. py:method:: __lt__(other)
+
+
+   .. py:method:: __rlt__(left)
+
+
+   .. py:method:: __gt__(other)
+
+
+   .. py:method:: __rgt__(left)
+
+
+   .. py:method:: __le__(other)
+
+
+   .. py:method:: __rle__(left)
+
+
+   .. py:method:: __ge__(other)
+
+
+   .. py:method:: __rge__(left)
+
+
+   .. py:method:: __eq__(other)
+
+
+   .. py:method:: __ne__(other)
+
+
+.. py:function:: lo(x: pyuncertainnumber.pba.intervals.number.Interval) -> Union[float, numpy.ndarray]
+
+   Return the left endpoint of an Interval object.
+
+   If x is not of class Interval, input is returned.
+
+
+
+.. py:function:: hi(x: pyuncertainnumber.pba.intervals.number.Interval) -> Union[float, numpy.ndarray]
+
+   Return the right endpoint of an Interval object.
+
+   If x is not of class Interval, input is returned.
+
+
+
+.. py:function:: mid(x: pyuncertainnumber.pba.intervals.number.Interval) -> Union[float, numpy.ndarray]
+
+   Return the midpoint of an Interval.
+
+   If x is not of class Interval, input is returned.
+
+
+
+.. py:function:: rad(x: pyuncertainnumber.pba.intervals.number.Interval) -> Union[float, numpy.ndarray]
+
+   Return the radius of an Interval object.
+
+   If x is not of class Interval, input is returned.
+
+
+
+.. py:function:: width(x: pyuncertainnumber.pba.intervals.number.Interval) -> Union[float, numpy.ndarray]
+
+   Return the width of an Interval object.
+
+   If x is not of class Interval, input is returned.
+
+
+
+.. py:function:: contain(x: pyuncertainnumber.pba.intervals.number.Interval, y: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: intersect(x: pyuncertainnumber.pba.intervals.number.Interval, y: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: straddle_zero(x: pyuncertainnumber.pba.intervals.number.Interval) -> bool
+
+.. py:function:: split_interval(x: pyuncertainnumber.pba.intervals.number.Interval, y: float = None)
+
+.. py:function:: subintervalise(x_: pyuncertainnumber.pba.intervals.number.Interval, n: Union[int, tuple] = 0)
+
+.. py:function:: intervalise(x_: Any, interval_index=-1) -> Union[pyuncertainnumber.pba.intervals.number.Interval, Any]
+
+   This function casts an array-like structure into an Interval structure.
+   All array-like structures will be first coerced into an ndarray of floats.
+   If the coercion is unsuccessful the following error is thrown: `ValueError: setting an array element with a sequence.`
+
+   For example this is the expected behaviour:
+   (*) an ndarray of shape (4,2) will be cast as an Interval of shape (4,).
+
+   (*) an ndarray of shape (7,3,2) will be cast as an Interval of shape (7,3).
+
+   (*) an ndarray of shape (3,2,7) will be cast as a degenerate Interval of shape (3,2,7).
+
+   (*) an ndarray of shape (2,3,7) will be cast as an Interval of shape (3,7).
+
+   (*) an ndarray of shape (2,3,7,2) will be cast as an Interval of shape (2,3,7) if interval_index is set to -1.
+
+   If an ndarray has shape with multiple dimensions having size 2, then the last dimension is intervalised.
+   So, an ndarray of shape (7,2,2) will be cast as an Interval of shape (7,2) with the last dimension intervalised.
+   When the ndarray has shape (2,2) again is the last dimension that gets intervalised.
+
+   In case of ambiguity, e.g. (2,5,2), now the first dimension can be forced to be intervalised, selecting index=0, default is -1.
+
+   It returns an interval only if the input is an array-like structure, otherwise it returns the following numpy error:
+   `ValueError: setting an array element with a sequence.`
+
+   TODO: Parse a list of mixed numbers: interval and ndarrays.
+
+
+
+.. py:function:: sizeit(x: pyuncertainnumber.pba.intervals.number.Interval) -> pyuncertainnumber.pba.intervals.number.Interval
+
+   Takes an unsized scalar interval and turns it in to a sized one.
+
+
+.. py:function:: uniform_endpoints(n: int = 2, left_bound: float = None, right_bound: float = None, kind: type = float, shape: tuple = None)
+
+   Draws endpoints from a uniform distribution.
+   It was created as an interval random generator.
+
+

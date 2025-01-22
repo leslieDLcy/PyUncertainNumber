@@ -1,0 +1,1745 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="pyuncertainnumber.pba.pbox_base" href="../pbox_base/index.html" /><link rel="prev" title="pyuncertainnumber.pba.params" href="../params/index.html" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>pyuncertainnumber.pba.pbox - </title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../../index.html"><div class="brand"> </div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../../../_static/UNlogo3.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text"> </span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guides/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guides/uc.html">Uncertainty characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guides/up.html">Propagation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">probability bounds analysis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pbox.html">Probability box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cbox.html">Confidence box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../interval_analysis.html">interval analysis</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API references</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../sampling/index.html">sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../endpoints/index.html">endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../subinterval/index.html">subinterval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../extremepoints/index.html">extremepoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../Taylor_series/index.html">Taylor_series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../endpoints_cauchy/index.html">endpoints_cauchy</a></li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../../index.html">pyuncertainnumber</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of pyuncertainnumber</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../UV/index.html">pyuncertainnumber.UV</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../characterisation/index.html">pyuncertainnumber.characterisation</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.characterisation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../characterisation/check/index.html">pyuncertainnumber.characterisation.check</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../characterisation/core/index.html">pyuncertainnumber.characterisation.core</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../characterisation/ensemble/index.html">pyuncertainnumber.characterisation.ensemble</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../characterisation/measurand/index.html">pyuncertainnumber.characterisation.measurand</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../characterisation/multiple_UN/index.html">pyuncertainnumber.characterisation.multiple_UN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../characterisation/stats/index.html">pyuncertainnumber.characterisation.stats</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../characterisation/uncertainNumber/index.html">pyuncertainnumber.characterisation.uncertainNumber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../characterisation/uncertainty_types/index.html">pyuncertainnumber.characterisation.uncertainty_types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../characterisation/utils/index.html">pyuncertainnumber.characterisation.utils</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../characterisation/variability/index.html">pyuncertainnumber.characterisation.variability</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../nlp/index.html">pyuncertainnumber.nlp</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.nlp</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../nlp/language_parsing/index.html">pyuncertainnumber.nlp.language_parsing</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current has-children"><a class="reference internal" href="../index.html">pyuncertainnumber.pba</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.pba</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../aggregation/index.html">pyuncertainnumber.pba.aggregation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cbox/index.html">pyuncertainnumber.pba.cbox</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cbox_Leslie/index.html">pyuncertainnumber.pba.cbox_Leslie</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../constructors/index.html">pyuncertainnumber.pba.constructors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../copula/index.html">pyuncertainnumber.pba.copula</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../core/index.html">pyuncertainnumber.pba.core</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../distributions/index.html">pyuncertainnumber.pba.distributions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ds/index.html">pyuncertainnumber.pba.ds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../imprecise/index.html">pyuncertainnumber.pba.imprecise</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../interval/index.html">pyuncertainnumber.pba.interval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../intervalOperators/index.html">pyuncertainnumber.pba.intervalOperators</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../intervals/index.html">pyuncertainnumber.pba.intervals</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.pba.intervals</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../intervals/activation/index.html">pyuncertainnumber.pba.intervals.activation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../intervals/arithmetic/index.html">pyuncertainnumber.pba.intervals.arithmetic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../intervals/complex/index.html">pyuncertainnumber.pba.intervals.complex</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../intervals/mat_features/index.html">pyuncertainnumber.pba.intervals.mat_features</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../intervals/methods/index.html">pyuncertainnumber.pba.intervals.methods</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../intervals/number/index.html">pyuncertainnumber.pba.intervals.number</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../intervals/plotting/index.html">pyuncertainnumber.pba.intervals.plotting</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../intervals/random/index.html">pyuncertainnumber.pba.intervals.random</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../logical/index.html">pyuncertainnumber.pba.logical</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../operation/index.html">pyuncertainnumber.pba.operation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../params/index.html">pyuncertainnumber.pba.params</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pyuncertainnumber.pba.pbox</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pbox_base/index.html">pyuncertainnumber.pba.pbox_base</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pbox_nonparam/index.html">pyuncertainnumber.pba.pbox_nonparam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/index.html">pyuncertainnumber.pba.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../propagation/index.html">pyuncertainnumber.propagation</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of pyuncertainnumber.propagation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../propagation/performance_func/index.html">pyuncertainnumber.propagation.performance_func</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../propagation/uncertaintyPropagation/index.html">pyuncertainnumber.propagation.uncertaintyPropagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../propagation/utils/index.html">pyuncertainnumber.propagation.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../cartesian_product/index.html">cartesian_product</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sampling_aleatory/index.html">sampling_aleatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../extreme_point_func/index.html">extreme_point_func</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../local_optimisation/index.html">local_optimisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../figures_distr_pbox/index.html">figures_distr_pbox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../genetic_optimisation/index.html">genetic_optimisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../first_order_propagation/index.html">first_order_propagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../second_order_propagation/index.html">second_order_propagation</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../../../_sources/autoapi/pyuncertainnumber/pba/pbox/index.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-pyuncertainnumber.pba.pbox">
+<span id="pyuncertainnumber-pba-pbox"></span><h1>pyuncertainnumber.pba.pbox<a class="headerlink" href="#module-pyuncertainnumber.pba.pbox" title="Link to this heading">¶</a></h1>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.normal" title="pyuncertainnumber.pba.pbox.normal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.N" title="pyuncertainnumber.pba.pbox.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gaussian" title="pyuncertainnumber.pba.pbox.gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.U" title="pyuncertainnumber.pba.pbox.U"><code class="xref py py-obj docutils literal notranslate"><span class="pre">U</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.lognorm" title="pyuncertainnumber.pba.pbox.lognorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lognorm</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.named_pbox" title="pyuncertainnumber.pba.pbox.named_pbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">named_pbox</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox._get_bounds" title="pyuncertainnumber.pba.pbox._get_bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_bounds</span></code></a>(dist_family, *args[, steps])</p></td>
+<td><p>from distribution specification to define the lower and upper bounds of the p-box</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox._bound_pcdf" title="pyuncertainnumber.pba.pbox._bound_pcdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_bound_pcdf</span></code></a>(dist_family, *args[, steps])</p></td>
+<td><p>bound the parametric CDF</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.makePbox" title="pyuncertainnumber.pba.pbox.makePbox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">makePbox</span></code></a>(func)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.norm" title="pyuncertainnumber.pba.pbox.norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">norm</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.alpha" title="pyuncertainnumber.pba.pbox.alpha"><code class="xref py py-obj docutils literal notranslate"><span class="pre">alpha</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.anglit" title="pyuncertainnumber.pba.pbox.anglit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anglit</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.argus" title="pyuncertainnumber.pba.pbox.argus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">argus</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.arcsine" title="pyuncertainnumber.pba.pbox.arcsine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">arcsine</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.beta" title="pyuncertainnumber.pba.pbox.beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beta</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.betaprime" title="pyuncertainnumber.pba.pbox.betaprime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">betaprime</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.bradford" title="pyuncertainnumber.pba.pbox.bradford"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bradford</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.burr" title="pyuncertainnumber.pba.pbox.burr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">burr</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.burr12" title="pyuncertainnumber.pba.pbox.burr12"><code class="xref py py-obj docutils literal notranslate"><span class="pre">burr12</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.cauchy" title="pyuncertainnumber.pba.pbox.cauchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cauchy</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.chi" title="pyuncertainnumber.pba.pbox.chi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chi</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.chi2" title="pyuncertainnumber.pba.pbox.chi2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chi2</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.cosine" title="pyuncertainnumber.pba.pbox.cosine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cosine</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.crystalball" title="pyuncertainnumber.pba.pbox.crystalball"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crystalball</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.dgamma" title="pyuncertainnumber.pba.pbox.dgamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dgamma</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.dweibull" title="pyuncertainnumber.pba.pbox.dweibull"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dweibull</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.erlang" title="pyuncertainnumber.pba.pbox.erlang"><code class="xref py py-obj docutils literal notranslate"><span class="pre">erlang</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.expon" title="pyuncertainnumber.pba.pbox.expon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expon</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.exponnorm" title="pyuncertainnumber.pba.pbox.exponnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exponnorm</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.exponweib" title="pyuncertainnumber.pba.pbox.exponweib"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exponweib</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.exponpow" title="pyuncertainnumber.pba.pbox.exponpow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exponpow</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.f" title="pyuncertainnumber.pba.pbox.f"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.fatiguelife" title="pyuncertainnumber.pba.pbox.fatiguelife"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fatiguelife</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.fisk" title="pyuncertainnumber.pba.pbox.fisk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fisk</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.foldcauchy" title="pyuncertainnumber.pba.pbox.foldcauchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foldcauchy</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.foldnorm" title="pyuncertainnumber.pba.pbox.foldnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foldnorm</span></code></a>(mu, s[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.genlogistic" title="pyuncertainnumber.pba.pbox.genlogistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genlogistic</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gennorm" title="pyuncertainnumber.pba.pbox.gennorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gennorm</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.genpareto" title="pyuncertainnumber.pba.pbox.genpareto"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genpareto</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.genexpon" title="pyuncertainnumber.pba.pbox.genexpon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genexpon</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.genextreme" title="pyuncertainnumber.pba.pbox.genextreme"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genextreme</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gausshyper" title="pyuncertainnumber.pba.pbox.gausshyper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gausshyper</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gamma" title="pyuncertainnumber.pba.pbox.gamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gamma</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gengamma" title="pyuncertainnumber.pba.pbox.gengamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gengamma</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.genhalflogistic" title="pyuncertainnumber.pba.pbox.genhalflogistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genhalflogistic</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.geninvgauss" title="pyuncertainnumber.pba.pbox.geninvgauss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geninvgauss</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gompertz" title="pyuncertainnumber.pba.pbox.gompertz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gompertz</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gumbel_r" title="pyuncertainnumber.pba.pbox.gumbel_r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gumbel_r</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gumbel_l" title="pyuncertainnumber.pba.pbox.gumbel_l"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gumbel_l</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.halfcauchy" title="pyuncertainnumber.pba.pbox.halfcauchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">halfcauchy</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.halflogistic" title="pyuncertainnumber.pba.pbox.halflogistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">halflogistic</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.halfnorm" title="pyuncertainnumber.pba.pbox.halfnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">halfnorm</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.halfgennorm" title="pyuncertainnumber.pba.pbox.halfgennorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">halfgennorm</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.hypsecant" title="pyuncertainnumber.pba.pbox.hypsecant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hypsecant</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.invgamma" title="pyuncertainnumber.pba.pbox.invgamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invgamma</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.invgauss" title="pyuncertainnumber.pba.pbox.invgauss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invgauss</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.invweibull" title="pyuncertainnumber.pba.pbox.invweibull"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invweibull</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.irwinhall" title="pyuncertainnumber.pba.pbox.irwinhall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">irwinhall</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.jf_skew_t" title="pyuncertainnumber.pba.pbox.jf_skew_t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jf_skew_t</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.johnsonsb" title="pyuncertainnumber.pba.pbox.johnsonsb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">johnsonsb</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.johnsonsu" title="pyuncertainnumber.pba.pbox.johnsonsu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">johnsonsu</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.kappa4" title="pyuncertainnumber.pba.pbox.kappa4"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kappa4</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.kappa3" title="pyuncertainnumber.pba.pbox.kappa3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kappa3</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.ksone" title="pyuncertainnumber.pba.pbox.ksone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ksone</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.kstwo" title="pyuncertainnumber.pba.pbox.kstwo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kstwo</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.kstwobign" title="pyuncertainnumber.pba.pbox.kstwobign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kstwobign</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.laplace" title="pyuncertainnumber.pba.pbox.laplace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">laplace</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.laplace_asymmetric" title="pyuncertainnumber.pba.pbox.laplace_asymmetric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">laplace_asymmetric</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.levy" title="pyuncertainnumber.pba.pbox.levy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">levy</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.levy_l" title="pyuncertainnumber.pba.pbox.levy_l"><code class="xref py py-obj docutils literal notranslate"><span class="pre">levy_l</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.levy_stable" title="pyuncertainnumber.pba.pbox.levy_stable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">levy_stable</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.logistic" title="pyuncertainnumber.pba.pbox.logistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logistic</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.loggamma" title="pyuncertainnumber.pba.pbox.loggamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggamma</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.loglaplace" title="pyuncertainnumber.pba.pbox.loglaplace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loglaplace</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.loguniform" title="pyuncertainnumber.pba.pbox.loguniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loguniform</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.lomax" title="pyuncertainnumber.pba.pbox.lomax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lomax</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.maxwell" title="pyuncertainnumber.pba.pbox.maxwell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maxwell</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.mielke" title="pyuncertainnumber.pba.pbox.mielke"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mielke</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.moyal" title="pyuncertainnumber.pba.pbox.moyal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moyal</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nakagami" title="pyuncertainnumber.pba.pbox.nakagami"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nakagami</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.ncx2" title="pyuncertainnumber.pba.pbox.ncx2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ncx2</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.ncf" title="pyuncertainnumber.pba.pbox.ncf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ncf</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nct" title="pyuncertainnumber.pba.pbox.nct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nct</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.norminvgauss" title="pyuncertainnumber.pba.pbox.norminvgauss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">norminvgauss</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.pareto" title="pyuncertainnumber.pba.pbox.pareto"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pareto</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.pearson3" title="pyuncertainnumber.pba.pbox.pearson3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pearson3</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.powerlaw" title="pyuncertainnumber.pba.pbox.powerlaw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">powerlaw</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.powerlognorm" title="pyuncertainnumber.pba.pbox.powerlognorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">powerlognorm</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.powernorm" title="pyuncertainnumber.pba.pbox.powernorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">powernorm</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.rdist" title="pyuncertainnumber.pba.pbox.rdist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rdist</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.rayleigh" title="pyuncertainnumber.pba.pbox.rayleigh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rayleigh</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.rel_breitwigner" title="pyuncertainnumber.pba.pbox.rel_breitwigner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rel_breitwigner</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.rice" title="pyuncertainnumber.pba.pbox.rice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rice</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.recipinvgauss" title="pyuncertainnumber.pba.pbox.recipinvgauss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recipinvgauss</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.semicircular" title="pyuncertainnumber.pba.pbox.semicircular"><code class="xref py py-obj docutils literal notranslate"><span class="pre">semicircular</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.skewcauchy" title="pyuncertainnumber.pba.pbox.skewcauchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skewcauchy</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.skewnorm" title="pyuncertainnumber.pba.pbox.skewnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skewnorm</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.studentized_range" title="pyuncertainnumber.pba.pbox.studentized_range"><code class="xref py py-obj docutils literal notranslate"><span class="pre">studentized_range</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.t" title="pyuncertainnumber.pba.pbox.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.trapezoid" title="pyuncertainnumber.pba.pbox.trapezoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trapezoid</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.triang" title="pyuncertainnumber.pba.pbox.triang"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triang</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.truncexpon" title="pyuncertainnumber.pba.pbox.truncexpon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncexpon</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="pyuncertainnumber.pba.pbox.truncnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncnorm</span></code></a>(left, right[, mean, stddev, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.truncpareto" title="pyuncertainnumber.pba.pbox.truncpareto"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncpareto</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.truncweibull_min" title="pyuncertainnumber.pba.pbox.truncweibull_min"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncweibull_min</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.tukeylambda" title="pyuncertainnumber.pba.pbox.tukeylambda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tukeylambda</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.uniform_sps" title="pyuncertainnumber.pba.pbox.uniform_sps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform_sps</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.vonmises" title="pyuncertainnumber.pba.pbox.vonmises"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vonmises</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.vonmises_line" title="pyuncertainnumber.pba.pbox.vonmises_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vonmises_line</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.wald" title="pyuncertainnumber.pba.pbox.wald"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wald</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.weibull_min" title="pyuncertainnumber.pba.pbox.weibull_min"><code class="xref py py-obj docutils literal notranslate"><span class="pre">weibull_min</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.weibull_max" title="pyuncertainnumber.pba.pbox.weibull_max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">weibull_max</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.wrapcauchy" title="pyuncertainnumber.pba.pbox.wrapcauchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wrapcauchy</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.lognormal" title="pyuncertainnumber.pba.pbox.lognormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lognormal</span></code></a>(mean, var[, steps])</p></td>
+<td><p>Creates a p-box for the lognormal distribution</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.trapz" title="pyuncertainnumber.pba.pbox.trapz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trapz</span></code></a>(a, b, c, d[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#id0" title="pyuncertainnumber.pba.pbox.truncnorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncnorm</span></code></a>(left, right[, mean, stddev, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.uniform" title="pyuncertainnumber.pba.pbox.uniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform</span></code></a>(a, b[, steps])</p></td>
+<td><p>special case of Uniform distribution as</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.weibull" title="pyuncertainnumber.pba.pbox.weibull"><code class="xref py py-obj docutils literal notranslate"><span class="pre">weibull</span></code></a>(*args[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.KM" title="pyuncertainnumber.pba.pbox.KM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KM</span></code></a>(k, m[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.KN" title="pyuncertainnumber.pba.pbox.KN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KN</span></code></a>(k, n[, steps])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.bernoulli" title="pyuncertainnumber.pba.pbox.bernoulli"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bernoulli</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.betabinom" title="pyuncertainnumber.pba.pbox.betabinom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">betabinom</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.betanbinom" title="pyuncertainnumber.pba.pbox.betanbinom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">betanbinom</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.binom" title="pyuncertainnumber.pba.pbox.binom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binom</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.boltzmann" title="pyuncertainnumber.pba.pbox.boltzmann"><code class="xref py py-obj docutils literal notranslate"><span class="pre">boltzmann</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.dlaplace" title="pyuncertainnumber.pba.pbox.dlaplace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dlaplace</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.geom" title="pyuncertainnumber.pba.pbox.geom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geom</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.hypergeom" title="pyuncertainnumber.pba.pbox.hypergeom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hypergeom</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.logser" title="pyuncertainnumber.pba.pbox.logser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logser</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nbinom" title="pyuncertainnumber.pba.pbox.nbinom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nbinom</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nchypergeom_fisher" title="pyuncertainnumber.pba.pbox.nchypergeom_fisher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nchypergeom_fisher</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nchypergeom_wallenius" title="pyuncertainnumber.pba.pbox.nchypergeom_wallenius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nchypergeom_wallenius</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nhypergeom" title="pyuncertainnumber.pba.pbox.nhypergeom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nhypergeom</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.planck" title="pyuncertainnumber.pba.pbox.planck"><code class="xref py py-obj docutils literal notranslate"><span class="pre">planck</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.poisson" title="pyuncertainnumber.pba.pbox.poisson"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poisson</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.randint" title="pyuncertainnumber.pba.pbox.randint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randint</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.skellam" title="pyuncertainnumber.pba.pbox.skellam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skellam</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.yulesimon" title="pyuncertainnumber.pba.pbox.yulesimon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">yulesimon</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.zipf" title="pyuncertainnumber.pba.pbox.zipf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zipf</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.pbox.zipfian" title="pyuncertainnumber.pba.pbox.zipfian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zipfian</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox._get_bounds">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">_get_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist_family</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox._get_bounds" title="Link to this definition">¶</a></dt>
+<dd><p>from distribution specification to define the lower and upper bounds of the p-box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dist_family</strong> (<em>-</em>) – (str) the name of the distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox._bound_pcdf">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">_bound_pcdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist_family</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox._bound_pcdf" title="Link to this definition">¶</a></dt>
+<dd><p>bound the parametric CDF</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>only support fully bounded parameters</p></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.makePbox">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">makePbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.makePbox" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.norm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.norm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.alpha">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.alpha" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.anglit">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">anglit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.anglit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.argus">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">argus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.argus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.arcsine">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">arcsine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.arcsine" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.beta">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.beta" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.betaprime">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">betaprime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.betaprime" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.bradford">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">bradford</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.bradford" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.burr">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">burr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.burr" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.burr12">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">burr12</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.burr12" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.cauchy">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">cauchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.cauchy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.chi">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">chi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.chi" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.chi2">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">chi2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.chi2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.cosine">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.cosine" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.crystalball">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">crystalball</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.crystalball" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.dgamma">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">dgamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.dgamma" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.dweibull">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">dweibull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.dweibull" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.erlang">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">erlang</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.erlang" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.expon">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">expon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.expon" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.exponnorm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">exponnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.exponnorm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.exponweib">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">exponweib</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.exponweib" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.exponpow">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">exponpow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.exponpow" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.f">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.f" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.fatiguelife">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">fatiguelife</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.fatiguelife" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.fisk">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">fisk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.fisk" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.foldcauchy">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">foldcauchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.foldcauchy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.foldnorm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">foldnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.foldnorm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.genlogistic">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">genlogistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.genlogistic" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.gennorm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">gennorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.gennorm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.genpareto">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">genpareto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.genpareto" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.genexpon">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">genexpon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.genexpon" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.genextreme">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">genextreme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.genextreme" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.gausshyper">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">gausshyper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.gausshyper" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.gamma">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.gamma" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.gengamma">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">gengamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.gengamma" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.genhalflogistic">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">genhalflogistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.genhalflogistic" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.geninvgauss">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">geninvgauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.geninvgauss" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.gompertz">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">gompertz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.gompertz" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.gumbel_r">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">gumbel_r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.gumbel_r" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.gumbel_l">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">gumbel_l</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.gumbel_l" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.halfcauchy">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">halfcauchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.halfcauchy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.halflogistic">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">halflogistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.halflogistic" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.halfnorm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">halfnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.halfnorm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.halfgennorm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">halfgennorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.halfgennorm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.hypsecant">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">hypsecant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.hypsecant" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.invgamma">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">invgamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.invgamma" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.invgauss">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">invgauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.invgauss" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.invweibull">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">invweibull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.invweibull" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.irwinhall">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">irwinhall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.irwinhall" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.jf_skew_t">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">jf_skew_t</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.jf_skew_t" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.johnsonsb">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">johnsonsb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.johnsonsb" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.johnsonsu">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">johnsonsu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.johnsonsu" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.kappa4">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">kappa4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.kappa4" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.kappa3">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">kappa3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.kappa3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.ksone">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">ksone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.ksone" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.kstwo">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">kstwo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.kstwo" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.kstwobign">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">kstwobign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.kstwobign" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.laplace">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">laplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.laplace" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.laplace_asymmetric">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">laplace_asymmetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.laplace_asymmetric" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.levy">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">levy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.levy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.levy_l">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">levy_l</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.levy_l" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.levy_stable">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">levy_stable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.levy_stable" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.logistic">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">logistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.logistic" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.loggamma">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">loggamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.loggamma" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.loglaplace">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">loglaplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.loglaplace" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.loguniform">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">loguniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.loguniform" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.lomax">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">lomax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.lomax" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.maxwell">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">maxwell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.maxwell" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.mielke">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">mielke</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.mielke" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.moyal">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">moyal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.moyal" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.nakagami">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">nakagami</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.nakagami" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.ncx2">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">ncx2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.ncx2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.ncf">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">ncf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.ncf" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.nct">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">nct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.nct" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.norminvgauss">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">norminvgauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.norminvgauss" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.pareto">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">pareto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.pareto" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.pearson3">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">pearson3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.pearson3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.powerlaw">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">powerlaw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.powerlaw" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.powerlognorm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">powerlognorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.powerlognorm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.powernorm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">powernorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.powernorm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.rdist">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">rdist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.rdist" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.rayleigh">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">rayleigh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.rayleigh" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.rel_breitwigner">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">rel_breitwigner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.rel_breitwigner" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.rice">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">rice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.rice" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.recipinvgauss">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">recipinvgauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.recipinvgauss" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.semicircular">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">semicircular</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.semicircular" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.skewcauchy">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">skewcauchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.skewcauchy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.skewnorm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">skewnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.skewnorm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.studentized_range">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">studentized_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.studentized_range" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.t">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">t</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.t" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.trapezoid">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">trapezoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.trapezoid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.triang">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">triang</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.triang" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.truncexpon">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">truncexpon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.truncexpon" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.truncnorm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">truncnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.truncnorm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.truncpareto">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">truncpareto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.truncpareto" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.truncweibull_min">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">truncweibull_min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.truncweibull_min" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.tukeylambda">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">tukeylambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.tukeylambda" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.uniform_sps">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">uniform_sps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.uniform_sps" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.vonmises">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">vonmises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.vonmises" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.vonmises_line">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">vonmises_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.vonmises_line" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.wald">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">wald</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.wald" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.weibull_min">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">weibull_min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.weibull_min" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.weibull_max">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">weibull_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.weibull_max" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.wrapcauchy">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">wrapcauchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.wrapcauchy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.lognormal">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">lognormal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.lognormal" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a p-box for the lognormal distribution</p>
+<p><em>Note: the parameters used are the mean and variance of the lognormal distribution
+not the mean and variance of the underlying normal</em>
+See:
+<cite>[1]&lt;https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters&gt;</cite>
+<cite>[2]&lt;https://stackoverflow.com/questions/51906063/distribution-mean-and-standard-deviation-using-scipy-stats&gt;</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mean</strong> – mean of the lognormal distribution</p></li>
+<li><p><strong>var</strong> – variance of the lognormal distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../index.html#pyuncertainnumber.pba.Pbox" title="pyuncertainnumber.pba.Pbox">Pbox</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.trapz">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">trapz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.trapz" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">truncnorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.uniform">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">uniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.uniform" title="Link to this definition">¶</a></dt>
+<dd><p>special case of Uniform distribution as
+Scipy has an unbelivably strange parameterisation than common sense</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>-</em>) – (float) lower endpoint</p></li>
+<li><p><strong>b</strong> (<em>-</em>) – (float) upper endpoints</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.weibull">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">weibull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.weibull" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.KM">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">KM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.KM" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.KN">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">KN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Params.steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.KN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.bernoulli">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">bernoulli</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.bernoulli" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.betabinom">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">betabinom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.betabinom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.betanbinom">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">betanbinom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.betanbinom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.binom">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">binom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.binom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.boltzmann">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">boltzmann</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.boltzmann" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.dlaplace">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">dlaplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.dlaplace" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.geom">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">geom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.geom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.hypergeom">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">hypergeom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.hypergeom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.logser">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">logser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.logser" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.nbinom">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">nbinom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.nbinom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.nchypergeom_fisher">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">nchypergeom_fisher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.nchypergeom_fisher" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.nchypergeom_wallenius">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">nchypergeom_wallenius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.nchypergeom_wallenius" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.nhypergeom">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">nhypergeom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.nhypergeom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.planck">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">planck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.planck" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.poisson">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">poisson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.poisson" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.randint">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">randint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.randint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.skellam">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">skellam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.skellam" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.yulesimon">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">yulesimon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.yulesimon" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.zipf">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">zipf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.zipf" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.zipfian">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">zipfian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.zipfian" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.normal">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">normal</span></span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.normal" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.N">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">N</span></span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.N" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.gaussian">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">gaussian</span></span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.gaussian" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.U">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">U</span></span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.U" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.lognorm">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">lognorm</span></span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.lognorm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.pbox.named_pbox">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.pbox.</span></span><span class="sig-name descname"><span class="pre">named_pbox</span></span><a class="headerlink" href="#pyuncertainnumber.pba.pbox.named_pbox" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../pbox_base/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">pyuncertainnumber.pba.pbox_base</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../params/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">pyuncertainnumber.pba.params</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, (Leslie) Yu Chen
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pyuncertainnumber.pba.pbox</a><ul>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox._get_bounds"><code class="docutils literal notranslate"><span class="pre">_get_bounds()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox._bound_pcdf"><code class="docutils literal notranslate"><span class="pre">_bound_pcdf()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.makePbox"><code class="docutils literal notranslate"><span class="pre">makePbox()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.norm"><code class="docutils literal notranslate"><span class="pre">norm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.alpha"><code class="docutils literal notranslate"><span class="pre">alpha()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.anglit"><code class="docutils literal notranslate"><span class="pre">anglit()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.argus"><code class="docutils literal notranslate"><span class="pre">argus()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.arcsine"><code class="docutils literal notranslate"><span class="pre">arcsine()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.beta"><code class="docutils literal notranslate"><span class="pre">beta()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.betaprime"><code class="docutils literal notranslate"><span class="pre">betaprime()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.bradford"><code class="docutils literal notranslate"><span class="pre">bradford()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.burr"><code class="docutils literal notranslate"><span class="pre">burr()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.burr12"><code class="docutils literal notranslate"><span class="pre">burr12()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.cauchy"><code class="docutils literal notranslate"><span class="pre">cauchy()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.chi"><code class="docutils literal notranslate"><span class="pre">chi()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.chi2"><code class="docutils literal notranslate"><span class="pre">chi2()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.cosine"><code class="docutils literal notranslate"><span class="pre">cosine()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.crystalball"><code class="docutils literal notranslate"><span class="pre">crystalball()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.dgamma"><code class="docutils literal notranslate"><span class="pre">dgamma()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.dweibull"><code class="docutils literal notranslate"><span class="pre">dweibull()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.erlang"><code class="docutils literal notranslate"><span class="pre">erlang()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.expon"><code class="docutils literal notranslate"><span class="pre">expon()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.exponnorm"><code class="docutils literal notranslate"><span class="pre">exponnorm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.exponweib"><code class="docutils literal notranslate"><span class="pre">exponweib()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.exponpow"><code class="docutils literal notranslate"><span class="pre">exponpow()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.f"><code class="docutils literal notranslate"><span class="pre">f()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.fatiguelife"><code class="docutils literal notranslate"><span class="pre">fatiguelife()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.fisk"><code class="docutils literal notranslate"><span class="pre">fisk()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.foldcauchy"><code class="docutils literal notranslate"><span class="pre">foldcauchy()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.foldnorm"><code class="docutils literal notranslate"><span class="pre">foldnorm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.genlogistic"><code class="docutils literal notranslate"><span class="pre">genlogistic()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gennorm"><code class="docutils literal notranslate"><span class="pre">gennorm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.genpareto"><code class="docutils literal notranslate"><span class="pre">genpareto()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.genexpon"><code class="docutils literal notranslate"><span class="pre">genexpon()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.genextreme"><code class="docutils literal notranslate"><span class="pre">genextreme()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gausshyper"><code class="docutils literal notranslate"><span class="pre">gausshyper()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gamma"><code class="docutils literal notranslate"><span class="pre">gamma()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gengamma"><code class="docutils literal notranslate"><span class="pre">gengamma()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.genhalflogistic"><code class="docutils literal notranslate"><span class="pre">genhalflogistic()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.geninvgauss"><code class="docutils literal notranslate"><span class="pre">geninvgauss()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gompertz"><code class="docutils literal notranslate"><span class="pre">gompertz()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gumbel_r"><code class="docutils literal notranslate"><span class="pre">gumbel_r()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gumbel_l"><code class="docutils literal notranslate"><span class="pre">gumbel_l()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.halfcauchy"><code class="docutils literal notranslate"><span class="pre">halfcauchy()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.halflogistic"><code class="docutils literal notranslate"><span class="pre">halflogistic()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.halfnorm"><code class="docutils literal notranslate"><span class="pre">halfnorm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.halfgennorm"><code class="docutils literal notranslate"><span class="pre">halfgennorm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.hypsecant"><code class="docutils literal notranslate"><span class="pre">hypsecant()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.invgamma"><code class="docutils literal notranslate"><span class="pre">invgamma()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.invgauss"><code class="docutils literal notranslate"><span class="pre">invgauss()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.invweibull"><code class="docutils literal notranslate"><span class="pre">invweibull()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.irwinhall"><code class="docutils literal notranslate"><span class="pre">irwinhall()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.jf_skew_t"><code class="docutils literal notranslate"><span class="pre">jf_skew_t()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.johnsonsb"><code class="docutils literal notranslate"><span class="pre">johnsonsb()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.johnsonsu"><code class="docutils literal notranslate"><span class="pre">johnsonsu()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.kappa4"><code class="docutils literal notranslate"><span class="pre">kappa4()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.kappa3"><code class="docutils literal notranslate"><span class="pre">kappa3()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.ksone"><code class="docutils literal notranslate"><span class="pre">ksone()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.kstwo"><code class="docutils literal notranslate"><span class="pre">kstwo()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.kstwobign"><code class="docutils literal notranslate"><span class="pre">kstwobign()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.laplace"><code class="docutils literal notranslate"><span class="pre">laplace()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.laplace_asymmetric"><code class="docutils literal notranslate"><span class="pre">laplace_asymmetric()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.levy"><code class="docutils literal notranslate"><span class="pre">levy()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.levy_l"><code class="docutils literal notranslate"><span class="pre">levy_l()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.levy_stable"><code class="docutils literal notranslate"><span class="pre">levy_stable()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.logistic"><code class="docutils literal notranslate"><span class="pre">logistic()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.loggamma"><code class="docutils literal notranslate"><span class="pre">loggamma()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.loglaplace"><code class="docutils literal notranslate"><span class="pre">loglaplace()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.loguniform"><code class="docutils literal notranslate"><span class="pre">loguniform()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.lomax"><code class="docutils literal notranslate"><span class="pre">lomax()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.maxwell"><code class="docutils literal notranslate"><span class="pre">maxwell()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.mielke"><code class="docutils literal notranslate"><span class="pre">mielke()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.moyal"><code class="docutils literal notranslate"><span class="pre">moyal()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nakagami"><code class="docutils literal notranslate"><span class="pre">nakagami()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.ncx2"><code class="docutils literal notranslate"><span class="pre">ncx2()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.ncf"><code class="docutils literal notranslate"><span class="pre">ncf()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nct"><code class="docutils literal notranslate"><span class="pre">nct()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.norminvgauss"><code class="docutils literal notranslate"><span class="pre">norminvgauss()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.pareto"><code class="docutils literal notranslate"><span class="pre">pareto()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.pearson3"><code class="docutils literal notranslate"><span class="pre">pearson3()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.powerlaw"><code class="docutils literal notranslate"><span class="pre">powerlaw()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.powerlognorm"><code class="docutils literal notranslate"><span class="pre">powerlognorm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.powernorm"><code class="docutils literal notranslate"><span class="pre">powernorm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.rdist"><code class="docutils literal notranslate"><span class="pre">rdist()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.rayleigh"><code class="docutils literal notranslate"><span class="pre">rayleigh()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.rel_breitwigner"><code class="docutils literal notranslate"><span class="pre">rel_breitwigner()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.rice"><code class="docutils literal notranslate"><span class="pre">rice()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.recipinvgauss"><code class="docutils literal notranslate"><span class="pre">recipinvgauss()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.semicircular"><code class="docutils literal notranslate"><span class="pre">semicircular()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.skewcauchy"><code class="docutils literal notranslate"><span class="pre">skewcauchy()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.skewnorm"><code class="docutils literal notranslate"><span class="pre">skewnorm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.studentized_range"><code class="docutils literal notranslate"><span class="pre">studentized_range()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.t"><code class="docutils literal notranslate"><span class="pre">t()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.trapezoid"><code class="docutils literal notranslate"><span class="pre">trapezoid()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.triang"><code class="docutils literal notranslate"><span class="pre">triang()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.truncexpon"><code class="docutils literal notranslate"><span class="pre">truncexpon()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.truncnorm"><code class="docutils literal notranslate"><span class="pre">truncnorm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.truncpareto"><code class="docutils literal notranslate"><span class="pre">truncpareto()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.truncweibull_min"><code class="docutils literal notranslate"><span class="pre">truncweibull_min()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.tukeylambda"><code class="docutils literal notranslate"><span class="pre">tukeylambda()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.uniform_sps"><code class="docutils literal notranslate"><span class="pre">uniform_sps()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.vonmises"><code class="docutils literal notranslate"><span class="pre">vonmises()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.vonmises_line"><code class="docutils literal notranslate"><span class="pre">vonmises_line()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.wald"><code class="docutils literal notranslate"><span class="pre">wald()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.weibull_min"><code class="docutils literal notranslate"><span class="pre">weibull_min()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.weibull_max"><code class="docutils literal notranslate"><span class="pre">weibull_max()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.wrapcauchy"><code class="docutils literal notranslate"><span class="pre">wrapcauchy()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.lognormal"><code class="docutils literal notranslate"><span class="pre">lognormal()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.trapz"><code class="docutils literal notranslate"><span class="pre">trapz()</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">truncnorm()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.uniform"><code class="docutils literal notranslate"><span class="pre">uniform()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.weibull"><code class="docutils literal notranslate"><span class="pre">weibull()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.KM"><code class="docutils literal notranslate"><span class="pre">KM()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.KN"><code class="docutils literal notranslate"><span class="pre">KN()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.bernoulli"><code class="docutils literal notranslate"><span class="pre">bernoulli()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.betabinom"><code class="docutils literal notranslate"><span class="pre">betabinom()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.betanbinom"><code class="docutils literal notranslate"><span class="pre">betanbinom()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.binom"><code class="docutils literal notranslate"><span class="pre">binom()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.boltzmann"><code class="docutils literal notranslate"><span class="pre">boltzmann()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.dlaplace"><code class="docutils literal notranslate"><span class="pre">dlaplace()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.geom"><code class="docutils literal notranslate"><span class="pre">geom()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.hypergeom"><code class="docutils literal notranslate"><span class="pre">hypergeom()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.logser"><code class="docutils literal notranslate"><span class="pre">logser()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nbinom"><code class="docutils literal notranslate"><span class="pre">nbinom()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nchypergeom_fisher"><code class="docutils literal notranslate"><span class="pre">nchypergeom_fisher()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nchypergeom_wallenius"><code class="docutils literal notranslate"><span class="pre">nchypergeom_wallenius()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.nhypergeom"><code class="docutils literal notranslate"><span class="pre">nhypergeom()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.planck"><code class="docutils literal notranslate"><span class="pre">planck()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.poisson"><code class="docutils literal notranslate"><span class="pre">poisson()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.randint"><code class="docutils literal notranslate"><span class="pre">randint()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.skellam"><code class="docutils literal notranslate"><span class="pre">skellam()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.yulesimon"><code class="docutils literal notranslate"><span class="pre">yulesimon()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.zipf"><code class="docutils literal notranslate"><span class="pre">zipf()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.zipfian"><code class="docutils literal notranslate"><span class="pre">zipfian()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.normal"><code class="docutils literal notranslate"><span class="pre">normal</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.N"><code class="docutils literal notranslate"><span class="pre">N</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.gaussian"><code class="docutils literal notranslate"><span class="pre">gaussian</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.U"><code class="docutils literal notranslate"><span class="pre">U</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.lognorm"><code class="docutils literal notranslate"><span class="pre">lognorm</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.pbox.named_pbox"><code class="docutils literal notranslate"><span class="pre">named_pbox</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

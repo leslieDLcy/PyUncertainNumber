@@ -5,5 +5,7 @@
 # from .logical import *
 # # from .dists import *
 # from .pbox_nonparam import *
-# from .pbox import *
+from .pbox import *
+
 # from .ds import *
+from .interval import *

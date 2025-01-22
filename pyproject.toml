@@ -17,7 +17,7 @@ dependencies = [
   "pymoo",
   "scipy",
   "tqdm",
-  "jupyterlab ",
+  "pytest",
 ]
 description = "Rigorous computation with Uncertain Number in Python"
 license = {text = "MIT License"}

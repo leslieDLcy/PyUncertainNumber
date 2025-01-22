@@ -1,3 +1,6 @@
+Overall:
+    ☐ come up with a consistent behaviour between `pba` API and `pun` API (e.g. pba.`constraints`, pba.`hedge_interpret`, `KS_bundle` call are returning pbox per se)
+
 UC module:
     ✔ work on the functionality of units @done (21/10/2024, 10:37:04)
     ✔ add the auxiliary information to UC module @done (30/09/2024, 07:12:12)
@@ -13,37 +16,39 @@ fit distribution:
 
 other:
     ✔ plot function @done (03/12/2024, 14:45:18)
-    ☐ matplotlib what if `latex` not installed
-    ☐ add `importlib` to operation.py
+    ✔ matplotlib what if `latex` not installed @done (20/01/2025, 12:09:38)
+    ✔ add `importlib` to operation.py @done (20/01/2025, 12:09:40)
     ☐ unit not finished due to the stupid two Registry stuff
 
 
 
 interval stuff:
     ☐ add the plotting functions to Marco's package
-    add language parsing funcs to Marco's package
+    ☐ add language parsing funcs to Marco's package
+    ☐ make interval creation consistent throught the package, such as UN.I() should also take hedges
 
 
 
 DS structure:
     ✔ create a class for that @done (08/12/2024, 16:04:08)
     ✔ stochastic mixture of DS structure not finished @done (08/12/2024, 16:04:09)
-    ☐ color of both bounds seem to be reversed as in (stacking())
+    ✔ color of both bounds seem to be reversed as in (stacking()) @done (20/01/2025, 09:14:02)
 
 
 pbox:
-    ☐ construct pbox(either distributional or nonparametric) from dataset 
+    ✔ construct pbox(either distributional or nonparametric) from dataset @done (20/01/2025, 09:13:10)
     ☐ drawing samples from pbox
     ☐ propagating with pbox
     ✔ construct pbox from data or from partial knowledge on the distribution property (i.e. min, max, mean, variance, etc.)? @done (04/11/2024, 11:46:39)
     ☐ pbox arithmetic with various dependecy NOT finsihed
-    ☐ pbox aggregation from multiple sources
+    ✔ pbox aggregation from multiple sources @done (20/01/2025, 09:13:52)
     ☐ unary functions are still lacking for e.g. sin(), cos(), etc..
+    ☐ bug in `checkinreasingerror` if pun.norm([2,3], [0,1])
 
 
 
 cbox:
-    ☐ ci function with arguments
+    ✔ ci function with arguments @done (20/01/2025, 09:13:45)
     ✔ print out the bounds parameters when instantiating the cbox @done (03/12/2024, 14:24:46)
     ☐ interval statistics
 
@@ -99,8 +104,8 @@ preparation for the December workshop:
 
     
 Overarching:
-    ☐ plotting with range between the bounds
-    ☐ report a pba bug in the function `min_max_mean_var`
+    ✔ plotting with range between the bounds @done (20/01/2025, 12:09:08)
+    ✔ report a pba bug in the function `min_max_mean_var` @done (20/01/2025, 12:08:59)
 
 
 
@@ -115,3 +120,9 @@ website workshop:
 
 some questions for the workshop:
     ☐ levels of abstractions
+
+
+today:
+    ✔ `propagation_results` capitalisation for Class @done (20/01/2025, 12:09:17)
+    ☐ what's difference between `monte_carlo` and `monte_carlo_endpoints`?
+    ✔ sqrt of UN not supported yet @done (20/01/2025, 12:09:28)

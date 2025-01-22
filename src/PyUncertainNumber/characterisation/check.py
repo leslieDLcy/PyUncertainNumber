@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PyUncertainNumber.characterisation.utils import initial_list_checking
+from .utils import initial_list_checking
 from ..pba.interval import Interval as nInterval
-from intervals import Interval
+from ..pba.intervals import Interval
 
 """ This module is for checking the logic for the instantiation and propagation of the Uncertain Number object"""
 
@@ -28,7 +28,7 @@ class DistributionSpecification:
         self.tell_i_flag()
 
     def tell_i_flag(self):
-        """ boolean about if imprecise specification"""
+        """boolean about if imprecise specification"""
 
         if isinstance(self.dist_params[0], float | int):
             self._i_flag = False

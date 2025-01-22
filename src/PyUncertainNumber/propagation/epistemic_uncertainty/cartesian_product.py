@@ -1,7 +1,8 @@
 import numpy as np
 
+
 def cartesian(*arrays):
-    """ Computes the Cartesian product of multiple input arrays
+    """Computes the Cartesian product of multiple input arrays
 
     args:
        - *arrays: Variable number of np.arrays representing the sets of values for each dimension.
@@ -14,31 +15,32 @@ def cartesian(*arrays):
        - The data type of the output array is determined based on the input arrays to ensure compatibility.
 
     return:
-        - darray: A NumPy array where each row represents one combination from the Cartesian product. 
+        - darray: A NumPy array where each row represents one combination from the Cartesian product.
                   The number of columns equals the number of input arrays.
 
     example:
-        x = np.array([1, 2], [3, 4], [5, 6])
-        y = cartesian(*x)
-        # Output: 
-        # array([[1, 3, 5],
-        #        [1, 3, 6],
-        #        [1, 4, 5],
-        #        [1, 4, 6],
-        #        [2, 3, 5],
-        #        [2, 3, 6],
-        #        [2, 4, 5],
-        #        [2, 4, 6]])
+        >>> x = np.array([1, 2], [3, 4], [5, 6])
+        >>> y = cartesian(*x)
+        >>> # Output:
+        >>> # array([[1, 3, 5],
+        >>> #        [1, 3, 6],
+        >>> #        [1, 4, 5],
+        >>> #        [1, 4, 6],
+        >>> #        [2, 3, 5],
+        >>> #        [2, 3, 6],
+        >>> #        [2, 4, 5],
+        >>> #        [2, 4, 6]])
 
-"""
+    """
     la = len(arrays)
     dtype = np.result_type(*arrays)
     arr = np.empty([len(a) for a in arrays] + [la], dtype=dtype)
     for i, a in enumerate(np.ix_(*arrays)):
-        arr[...,i] = a
+        arr[..., i] = a
     return arr.reshape(-1, la)
 
-# def cartesian(sides): to be deleted perhaps 
+
+# def cartesian(sides): to be deleted perhaps
 #   """
 #   Generates the Cartesian product of the input sets.
 
@@ -46,7 +48,7 @@ def cartesian(*arrays):
 #     sides: A NumPy array where each row represents a set of values.
 
 #   Returns:
-#     A NumPy array containing the Cartesian product of the input sets, 
+#     A NumPy array containing the Cartesian product of the input sets,
 #     where each row represents a unique combination.
 #   """
 #   n = sides.shape[0]  # Number of sets
@@ -58,7 +60,7 @@ def cartesian(*arrays):
 #   C = np.unique(G, axis=0)  # Find unique rows
 #   return C
 
-# # # example 
+# # # example
 # # # Define the sets
 # # sides = np.array([
 # #     [1, 2],    # First set
@@ -71,4 +73,3 @@ def cartesian(*arrays):
 
 # # # Print the result
 # # print(C)
-

@@ -1,0 +1,32 @@
+pyuncertainnumber.pba.intervals.arithmetic
+==========================================
+
+.. py:module:: pyuncertainnumber.pba.intervals.arithmetic
+
+.. autoapi-nested-parse::
+
+   --------------------------
+   Created Feb 2022
+   Marco De Angelis
+   github.com/marcodeangelis
+   MIT License
+   --------------------------
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.intervals.arithmetic.multiply
+   pyuncertainnumber.pba.intervals.arithmetic.divide
+
+
+Module Contents
+---------------
+
+.. py:function:: multiply(s, o)
+
+.. py:function:: divide(s, o)
+

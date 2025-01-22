@@ -1,0 +1,390 @@
+pyuncertainnumber.pba.intervals.methods
+=======================================
+
+.. py:module:: pyuncertainnumber.pba.intervals.methods
+
+.. autoapi-nested-parse::
+
+   ------------------------------
+   cre: Feb 2022
+
+   web: github.com/marcodeangelis
+   org: Univerity of Liverpool
+
+   MIT License
+   ------------------------------
+
+   These methods are designed to behave neutrally on non-interval inputs.
+   So, if a non-interval is passed equivalent rules for floats apply.
+
+   Interval to float methods, IR -> R:
+
+   Interval to bool methods, IR -> {0,1}:
+
+   Binary operations, IR2 -> IR
+   Unary operations, IR -> IR
+
+   Parser, R^(nx2) -> IR^n, R^(mxnx2) -> IR^(mxn), R^(2xmxn) -> IR^(mxn)
+   This method turns an array of compatible dimension into an interval (array).
+
+   Subintervalisation methods, IR -> IR^n.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.intervals.methods.numpy_min
+   pyuncertainnumber.pba.intervals.methods.numpy_max
+   pyuncertainnumber.pba.intervals.methods.numpy_sqrt
+   pyuncertainnumber.pba.intervals.methods.numpy_abs
+   pyuncertainnumber.pba.intervals.methods.numpy_exp
+   pyuncertainnumber.pba.intervals.methods.numpy_sum
+   pyuncertainnumber.pba.intervals.methods.numpy_sin
+   pyuncertainnumber.pba.intervals.methods.numpy_cos
+   pyuncertainnumber.pba.intervals.methods.numpy_tan
+   pyuncertainnumber.pba.intervals.methods.numpy_pi
+   pyuncertainnumber.pba.intervals.methods.numpy_inf
+   pyuncertainnumber.pba.intervals.methods.numpy_transpose
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.intervals.methods.lo
+   pyuncertainnumber.pba.intervals.methods.hi
+   pyuncertainnumber.pba.intervals.methods.width
+   pyuncertainnumber.pba.intervals.methods.rad
+   pyuncertainnumber.pba.intervals.methods.mid
+   pyuncertainnumber.pba.intervals.methods.mig
+   pyuncertainnumber.pba.intervals.methods.mag
+   pyuncertainnumber.pba.intervals.methods.abs
+   pyuncertainnumber.pba.intervals.methods.sqrt
+   pyuncertainnumber.pba.intervals.methods.exp
+   pyuncertainnumber.pba.intervals.methods.max
+   pyuncertainnumber.pba.intervals.methods.min
+   pyuncertainnumber.pba.intervals.methods.sin
+   pyuncertainnumber.pba.intervals.methods.sin_vector
+   pyuncertainnumber.pba.intervals.methods.cos
+   pyuncertainnumber.pba.intervals.methods.cos_vector
+   pyuncertainnumber.pba.intervals.methods.tan
+   pyuncertainnumber.pba.intervals.methods.tan_vector
+   pyuncertainnumber.pba.intervals.methods.straddle_zero
+   pyuncertainnumber.pba.intervals.methods.intersect
+   pyuncertainnumber.pba.intervals.methods.contain
+   pyuncertainnumber.pba.intervals.methods.almost_contain
+   pyuncertainnumber.pba.intervals.methods.intersect_vector
+   pyuncertainnumber.pba.intervals.methods.intervalise
+   pyuncertainnumber.pba.intervals.methods.sizeit
+   pyuncertainnumber.pba.intervals.methods.unsizeit
+   pyuncertainnumber.pba.intervals.methods.tolist
+   pyuncertainnumber.pba.intervals.methods.subintervalise
+   pyuncertainnumber.pba.intervals.methods.split_interval
+   pyuncertainnumber.pba.intervals.methods.reconstitute
+   pyuncertainnumber.pba.intervals.methods.space_product
+   pyuncertainnumber.pba.intervals.methods.bisect
+   pyuncertainnumber.pba.intervals.methods.is_Interval
+   pyuncertainnumber.pba.intervals.methods.is_not_Interval
+   pyuncertainnumber.pba.intervals.methods.dot
+   pyuncertainnumber.pba.intervals.methods.rowcol_old
+   pyuncertainnumber.pba.intervals.methods.rowcol_W_x
+   pyuncertainnumber.pba.intervals.methods.rowcol_xT_WT
+   pyuncertainnumber.pba.intervals.methods.matmul
+   pyuncertainnumber.pba.intervals.methods.transpose
+   pyuncertainnumber.pba.intervals.methods.squeeze
+   pyuncertainnumber.pba.intervals.methods.relu_nointerval
+   pyuncertainnumber.pba.intervals.methods.relu_deriv
+   pyuncertainnumber.pba.intervals.methods.relu
+   pyuncertainnumber.pba.intervals.methods.relu_deriv_interval
+   pyuncertainnumber.pba.intervals.methods.sigmoid
+   pyuncertainnumber.pba.intervals.methods.sigmoid_deriv
+   pyuncertainnumber.pba.intervals.methods.tanh
+   pyuncertainnumber.pba.intervals.methods.tanh
+   pyuncertainnumber.pba.intervals.methods.cosh
+   pyuncertainnumber.pba.intervals.methods.tanh_deriv
+
+
+Module Contents
+---------------
+
+.. py:data:: numpy_min
+
+.. py:data:: numpy_max
+
+.. py:data:: numpy_sqrt
+
+.. py:data:: numpy_abs
+
+.. py:data:: numpy_exp
+
+.. py:data:: numpy_sum
+
+.. py:data:: numpy_sin
+
+.. py:data:: numpy_cos
+
+.. py:data:: numpy_tan
+
+.. py:data:: numpy_pi
+
+.. py:data:: numpy_inf
+
+.. py:data:: numpy_transpose
+
+.. py:function:: lo(x: pyuncertainnumber.pba.intervals.number.Interval) -> Union[float, numpy.ndarray]
+
+   Return the left endpoint of an Interval object.
+
+   If x is not of class Interval, input is returned.
+
+
+
+.. py:function:: hi(x: pyuncertainnumber.pba.intervals.number.Interval) -> Union[float, numpy.ndarray]
+
+   Return the right endpoint of an Interval object.
+
+   If x is not of class Interval, input is returned.
+
+
+
+.. py:function:: width(x: pyuncertainnumber.pba.intervals.number.Interval) -> Union[float, numpy.ndarray]
+
+   Return the width of an Interval object.
+
+   If x is not of class Interval, input is returned.
+
+
+
+.. py:function:: rad(x: pyuncertainnumber.pba.intervals.number.Interval) -> Union[float, numpy.ndarray]
+
+   Return the radius of an Interval object.
+
+   If x is not of class Interval, input is returned.
+
+
+
+.. py:function:: mid(x: pyuncertainnumber.pba.intervals.number.Interval) -> Union[float, numpy.ndarray]
+
+   Return the midpoint of an Interval.
+
+   If x is not of class Interval, input is returned.
+
+
+
+.. py:function:: mig(x)
+
+.. py:function:: mag(x)
+
+.. py:function:: abs(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+   Return the absolute value of an Interval.
+
+   If x is not of class Interval, absolute value is returned assuming input is numerical.
+
+   If x is neither a number (neither Interval not numeric), numpy will throw an exception.
+
+
+
+.. py:function:: sqrt(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+   Return the square root of an Interval.
+
+   If x is not of class Interval, the square root is returned assuming input is numerical.
+
+   If x is neither a number (neither Interval not numeric), numpy will throw an exception.
+
+
+
+.. py:function:: exp(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: max(x: pyuncertainnumber.pba.intervals.number.Interval, y: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: min(x: pyuncertainnumber.pba.intervals.number.Interval, y: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: sin(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+   Implementation of Interval Arithmetic in CORA 2016
+
+   Matthias Althoff and Dmitry Grebenyuk
+
+   EPiC Series in Computing Volume 43, 2017, Pages 91-105
+
+   ARCH16. 3rd International Workshop on Applied Verification for Continuous and Hybrid Systems
+
+
+.. py:function:: sin_vector(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: cos(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+   Implementation of Interval Arithmetic in CORA 2016
+
+   Matthias Althoff and Dmitry Grebenyuk
+
+   EPiC Series in Computing Volume 43, 2017, Pages 91-105
+
+   ARCH16. 3rd International Workshop on Applied Verification for Continuous and Hybrid Systems
+
+
+.. py:function:: cos_vector(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: tan(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+   Implementation of Interval Arithmetic in CORA 2016
+
+   Matthias Althoff and Dmitry Grebenyuk
+
+   EPiC Series in Computing Volume 43, 2017, Pages 91-105
+
+   ARCH16. 3rd International Workshop on Applied Verification for Continuous and Hybrid Systems
+
+
+.. py:function:: tan_vector(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: straddle_zero(x: pyuncertainnumber.pba.intervals.number.Interval) -> bool
+
+.. py:function:: intersect(x: pyuncertainnumber.pba.intervals.number.Interval, y: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: contain(x: pyuncertainnumber.pba.intervals.number.Interval, y: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: almost_contain(x: pyuncertainnumber.pba.intervals.number.Interval, y: pyuncertainnumber.pba.intervals.number.Interval, tol=1e-09)
+
+.. py:function:: intersect_vector(x_: pyuncertainnumber.pba.intervals.number.Interval, y_: pyuncertainnumber.pba.intervals.number.Interval)
+
+   This function checks if the focal elements x, intersect the subpaving y.
+
+   x: A n-list of d-boxes or d-intervals, e.g. a subpaving. x.shape=(r,d)
+   y: A m-list of d-boxes or d-intervals, e.g. a focal element. y.shape=(p,d)
+
+   out: A (rp)-list of d-arrays of booleans
+
+
+.. py:function:: intervalise(x_: Any, interval_index=-1) -> Union[pyuncertainnumber.pba.intervals.number.Interval, Any]
+
+   This function casts an array-like structure into an Interval structure.
+   All array-like structures will be first coerced into an ndarray of floats.
+   If the coercion is unsuccessful the following error is thrown: `ValueError: setting an array element with a sequence.`
+
+   For example this is the expected behaviour:
+   (*) an ndarray of shape (4,2) will be cast as an Interval of shape (4,).
+
+   (*) an ndarray of shape (7,3,2) will be cast as an Interval of shape (7,3).
+
+   (*) an ndarray of shape (3,2,7) will be cast as a degenerate Interval of shape (3,2,7).
+
+   (*) an ndarray of shape (2,3,7) will be cast as an Interval of shape (3,7).
+
+   (*) an ndarray of shape (2,3,7,2) will be cast as an Interval of shape (2,3,7) if interval_index is set to -1.
+
+   If an ndarray has shape with multiple dimensions having size 2, then the last dimension is intervalised.
+   So, an ndarray of shape (7,2,2) will be cast as an Interval of shape (7,2) with the last dimension intervalised.
+   When the ndarray has shape (2,2) again is the last dimension that gets intervalised.
+
+   In case of ambiguity, e.g. (2,5,2), now the first dimension can be forced to be intervalised, selecting index=0, default is -1.
+
+   It returns an interval only if the input is an array-like structure, otherwise it returns the following numpy error:
+   `ValueError: setting an array element with a sequence.`
+
+   TODO: Parse a list of mixed numbers: interval and ndarrays.
+
+
+
+.. py:function:: sizeit(x: pyuncertainnumber.pba.intervals.number.Interval) -> pyuncertainnumber.pba.intervals.number.Interval
+
+   Takes an unsized scalar interval and turns it in to a sized one.
+
+
+.. py:function:: unsizeit(x: pyuncertainnumber.pba.intervals.number.Interval) -> pyuncertainnumber.pba.intervals.number.Interval
+
+   Takes a sized scalar interval and turns it in to a unsized one.
+
+
+
+.. py:function:: tolist(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: subintervalise(x_: pyuncertainnumber.pba.intervals.number.Interval, n: Union[int, tuple] = 0)
+
+.. py:function:: split_interval(x: pyuncertainnumber.pba.intervals.number.Interval, y: float = None)
+
+.. py:function:: reconstitute(x_: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: space_product(x_: Union[numpy.ndarray, pyuncertainnumber.pba.intervals.number.Interval], y_: Union[numpy.ndarray, pyuncertainnumber.pba.intervals.number.Interval])
+
+.. py:function:: bisect(x_: pyuncertainnumber.pba.intervals.number.Interval, i: int = None)
+
+   :x_: Interval of shape (n,)
+
+   Bisect the largest box if i is None.
+
+
+.. py:function:: is_Interval(x: Any) -> bool
+
+.. py:function:: is_not_Interval(x: Any) -> bool
+
+.. py:function:: dot(x: pyuncertainnumber.pba.intervals.number.Interval, y: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: rowcol_old(W, x)
+
+   (m,n) x (n,1) -> (m,1)
+   (m,n) x (n,p) -> (m,p)
+   (1,n) x (n,1) -> (1,1)
+
+
+.. py:function:: rowcol_W_x(W, x)
+
+   Row by column multiplication between a matrix W and a column vector x.
+
+   (m,n) x (n,1) -> (m,1)
+   (1,n) x (n,1) -> (1,1)
+   The following cases are also accepted even though mathematically impossible
+   (m,n) x (n,) -> (m,1)
+   (1,n) x (n,1) -> (1,1)
+   (1,n) x (1,n) -> (1,1)
+
+
+.. py:function:: rowcol_xT_WT(x, W)
+
+   Row by column multiplication between the row vector xT and the matrix transpose WT.
+   (1,n) x (n,m) -> (1,m)
+   (1,n) x (n,1) -> (1,1)
+   The following cases are also accepted even though mathematically impossible
+   (,n) x (n,m) -> (1,m)
+   (n,1) x (n,m) -> (1,1)
+
+
+.. py:function:: matmul(A, B)
+
+   (m,n) x (n,p) -> (m,p)
+   (1,n) x (n,1) -> (1,1)
+
+
+.. py:function:: transpose(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+   Input an interval of shape (m,n) returns an interval of shape (n,m).
+
+
+.. py:function:: squeeze(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: relu_nointerval(x: numpy.ndarray)
+
+.. py:function:: relu_deriv(x: numpy.ndarray)
+
+.. py:function:: relu(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: relu_deriv_interval(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: sigmoid(x)
+
+.. py:function:: sigmoid_deriv(x)
+
+.. py:function:: tanh(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: tanh(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: cosh(x: pyuncertainnumber.pba.intervals.number.Interval)
+
+.. py:function:: tanh_deriv(x: pyuncertainnumber.pba.intervals.number.Interval)
+

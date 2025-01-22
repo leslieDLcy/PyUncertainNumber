@@ -1,0 +1,44 @@
+pyuncertainnumber.characterisation.check
+========================================
+
+.. py:module:: pyuncertainnumber.characterisation.check
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyuncertainnumber.characterisation.check.DistributionSpecification
+
+
+Module Contents
+---------------
+
+.. py:class:: DistributionSpecification(dist_family: str, dist_params: tuple)
+
+   an attempt to double check the user specification for a pbox or dist
+
+   .. note:: - canonical form: ['gaussian', ([0,1], [1,2])]
+
+   # TODO: unfinished logic
+
+
+   .. py:attribute:: dist_family
+
+
+   .. py:attribute:: dist_params
+
+
+   .. py:method:: tell_i_flag()
+
+      boolean about if imprecise specification
+
+
+
+   .. py:property:: i_flag
+
+
+   .. py:method:: get_specification()
+
+

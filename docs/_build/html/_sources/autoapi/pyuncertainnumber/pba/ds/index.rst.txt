@@ -1,0 +1,100 @@
+pyuncertainnumber.pba.ds
+========================
+
+.. py:module:: pyuncertainnumber.pba.ds
+
+.. autoapi-nested-parse::
+
+   Constructors for Dempester-Shafer structures.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.ds.dempstershafer_element
+   pyuncertainnumber.pba.ds.DempsterShafer
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.ds.plot_DS_structure
+
+
+Module Contents
+---------------
+
+.. py:class:: dempstershafer_element
+
+   Bases: :py:obj:`tuple`
+
+
+   .. py:attribute:: interval
+
+
+   .. py:attribute:: mass
+
+
+.. py:class:: DempsterShafer(intervals, masses: list[float])
+
+   Class for Dempester-Shafer structures.
+
+   :param - the `intervals` argument accepts wildcard vector intervals {list of list pairs:
+   :param Interval:
+   :param pairs of nInterval};:
+   :param - masses: probability masses
+   :type - masses: list
+
+
+   .. py:attribute:: _intrep
+
+
+   .. py:attribute:: _intervals
+
+
+   .. py:attribute:: _masses
+
+
+   .. py:method:: _create_DSstructure()
+
+
+   .. py:property:: structure
+
+
+   .. py:property:: intervals
+
+
+   .. py:property:: masses
+
+
+   .. py:method:: disassemble()
+
+
+   .. py:method:: display(style='box', **kwargs)
+
+
+   .. py:method:: to_pbox()
+
+
+   .. py:method:: from_dsElements(*ds_elements: dempstershafer_element)
+      :classmethod:
+
+
+      Create a Dempster-Shafer structure from a list of Dempster-Shafer elements.
+
+
+
+.. py:function:: plot_DS_structure(vec_interval: list[pyuncertainnumber.pba.interval.Interval | pyuncertainnumber.pba.intervals.Interval], weights=None, offset=0.3, ax=None, **kwargs)
+
+   plot the intervals in a vectorised form
+
+   :param vec_interval: vectorised interval objects
+   :param weights: weights of the intervals
+   :param offset: offset for display the weights next to the intervals
+
+

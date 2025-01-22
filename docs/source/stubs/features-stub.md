@@ -7,3 +7,7 @@
    example, **ReadTheDocs**
 - **Uncertainty extrapolation**: Pre-configured version bumping upon merging pull request to main
 - Auto-release to **testPyPI** upon merging pull request to main
+
+- many ancillary uncertainty information
+- features the save and loading of UN objects
+- yields much informative results such as the combination that leads to the maximum in vertex method.

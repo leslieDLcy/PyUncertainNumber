@@ -1,0 +1,135 @@
+pyuncertainnumber.pba.params
+============================
+
+.. py:module:: pyuncertainnumber.pba.params
+
+.. autoapi-nested-parse::
+
+   Hyperparameters for the pba
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyuncertainnumber.pba.params.Params
+   pyuncertainnumber.pba.params.Data
+   pyuncertainnumber.pba.params.Named
+
+
+Module Contents
+---------------
+
+.. py:class:: Params
+
+   .. py:attribute:: hedge_cofficients
+
+
+   .. py:attribute:: steps
+      :value: 200
+
+
+
+   .. py:attribute:: many
+      :value: 2000
+
+
+
+   .. py:attribute:: p_values
+
+
+   .. py:attribute:: p_lboundary
+      :value: 0.0001
+
+
+
+   .. py:attribute:: p_hboundary
+      :value: 0.9999
+
+
+
+   .. py:attribute:: scott_hedged_interpretation
+
+
+   .. py:attribute:: user_hedged_interpretation
+
+
+   .. py:attribute:: result_path
+      :value: './results/'
+
+
+
+   .. py:attribute:: hw
+      :value: 0.5
+
+
+
+.. py:class:: Data
+
+   .. py:attribute:: skinny
+      :value: [[1.0, 1.52], [2.68, 2.98], [7.52, 7.67], [7.73, 8.35], [9.44, 9.99], [3.66, 4.58]]
+
+
+
+   .. py:attribute:: puffy
+      :value: [[3.5, 6.4], [6.9, 8.8], [6.1, 8.4], [2.8, 6.7], [3.5, 9.7], [6.5, 9.9], [0.15, 3.8], [4.5,...
+
+
+
+   .. py:attribute:: sudret
+      :value: [4.02, 4.07, 4.25, 4.32, 4.36, 4.45, 4.47, 4.57, 4.58, 4.62, 4.68, 4.71, 4.72, 4.79, 4.85, 4.86,...
+
+
+
+   .. py:attribute:: k
+      :value: 22
+
+
+
+   .. py:attribute:: m
+      :value: 11
+
+
+
+   .. py:attribute:: n
+      :value: 33
+
+
+
+   .. py:attribute:: fdata
+
+
+   .. py:attribute:: bdata
+
+
+   .. py:attribute:: idata
+
+
+   .. py:attribute:: data
+
+
+   .. py:attribute:: x2
+
+
+   .. py:attribute:: error
+
+
+.. py:class:: Named
+
+   .. py:attribute:: k
+      :value: 22
+
+
+
+   .. py:attribute:: m
+      :value: 11
+
+
+
+   .. py:attribute:: n
+      :value: 33
+
+
+

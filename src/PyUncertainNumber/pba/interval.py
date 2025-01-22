@@ -756,8 +756,7 @@ class Interval:
 
         """
         if not isinstance(other, Interval):
-            raise TypeError(
-                f"Needs to be an instance of Interval not {type(other)}")
+            raise TypeError(f"Needs to be an instance of Interval not {type(other)}")
 
         return self.left == other.left and self.right == other.right
 
@@ -1023,7 +1022,6 @@ class Interval:
 
     # ---------------------methods---------------------#
 
-    @mpl.rc_context({"text.usetex": True})
     def display(self, title="", ax=None, style="band", **kwargs):
 
         if ax is None:
@@ -1108,8 +1106,10 @@ class Interval:
             r.seed(seed)
         return self.left + r.random() * self.width()
 
-    def round(self,):
-        """ outward rounding operation for an interval object """
+    def round(
+        self,
+    ):
+        """outward rounding operation for an interval object"""
         return Interval(np.floor(self.left), np.ceil(self.right))
 
     # ---------------------Constructors---------------------#
