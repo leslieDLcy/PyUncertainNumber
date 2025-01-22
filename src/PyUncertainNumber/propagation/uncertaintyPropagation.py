@@ -17,7 +17,6 @@ from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber, 
 #TODO the cauchy with save_raw_data = 'yes' raises issues.  
 # ---------------------the top level UP function ---------------------#
 
-
 def aleatory_propagation(
     vars: list = None,
     fun: Callable = None,
@@ -138,8 +137,8 @@ def aleatory_propagation(
                     "n (number of samples) is required for sampling methods."
                 )
             results = sampling_aleatory_method(
-                vars=vars,
-                fun=fun,
+                x=vars,
+                f=fun,
                 results=results,
                 n_sam=n_sam,
                 method=method.lower(),
@@ -151,7 +150,6 @@ def aleatory_propagation(
             print("Taylor expansion is not implemented in this version")
         case _:
             raise ValueError("Invalid UP method.")
-
 
 def mixed_propagation(
     vars: list = None,
@@ -341,7 +339,6 @@ def mixed_propagation(
             return process_mixed_results(results)
         case _:
             raise ValueError("Invalid UP method.")
-
 
 def epistemic_propagation(
     vars: list = None,
@@ -554,7 +551,7 @@ def epistemic_propagation(
                                            save_raw_data=save_raw_data)
             return process_results(results)
         
-        case "cauchy" | "subinterval_reconstitution":
+        case "subinterval" | "subinterval_reconstitution":
             if n_sub is None:
                 raise ValueError(
                     "n (number of subintervals) is required for subinterval methods."
@@ -564,7 +561,7 @@ def epistemic_propagation(
                                            save_raw_data=save_raw_data)
             return process_results(results)
 
-        case "monte_carlo" | "endpoints_cauchy":
+        case "cauchy" | "endpoint_cauchy"| "endpoints_cauchy":
             if n_sam is None:
                 raise ValueError(
                     "n (number of samples) is required for sampling methods."
@@ -783,45 +780,44 @@ def Propagation(vars:list,
 
     return y
 
+# def plotPbox(xL, xR, p=None):
+#     """
+#     Plots a p-box (probability box) using matplotlib.
 
-def plotPbox(xL, xR, p=None):
-    """
-    Plots a p-box (probability box) using matplotlib.
+#     Args:
+#         xL (np.ndarray): A 1D NumPy array of lower bounds.
+#         xR (np.ndarray): A 1D NumPy array of upper bounds.
+#         p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
+#                                    Defaults to None, which generates equally spaced probabilities.
+#         color (str, optional): The color of the plot. Defaults to 'k' (black).
+#     """
+#     xL = np.squeeze(xL)  # Ensure xL is a 1D array
+#     xR = np.squeeze(xR)  # Ensure xR is a 1D array
 
-    Args:
-        xL (np.ndarray): A 1D NumPy array of lower bounds.
-        xR (np.ndarray): A 1D NumPy array of upper bounds.
-        p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
-                                   Defaults to None, which generates equally spaced probabilities.
-        color (str, optional): The color of the plot. Defaults to 'k' (black).
-    """
-    xL = np.squeeze(xL)  # Ensure xL is a 1D array
-    xR = np.squeeze(xR)  # Ensure xR is a 1D array
+#     if p is None:
+#         p = np.linspace(0, 1,len(xL))  # p should have one more element than xL/xR
 
-    if p is None:
-        p = np.linspace(0, 1,len(xL))  # p should have one more element than xL/xR
+#     if p.min() > 0:
+#         p = np.concatenate(([0], p))
+#         xL = np.concatenate(([xL[0]], xL))
+#         xR = np.concatenate(([xR[0]], xR))
 
-    if p.min() > 0:
-        p = np.concatenate(([0], p))
-        xL = np.concatenate(([xL[0]], xL))
-        xR = np.concatenate(([xR[0]], xR))
-
-    if p.max() < 1:
-        p = np.concatenate((p, [1]))
-        xR = np.concatenate((xR, [xR[-1]]))
-        xL = np.concatenate((xL, [xL[-1]]))
+#     if p.max() < 1:
+#         p = np.concatenate((p, [1]))
+#         xR = np.concatenate((xR, [xR[-1]]))
+#         xL = np.concatenate((xL, [xL[-1]]))
     
-    colors = 'black'
-    # Highlight the points (xL, p)
-    plt.scatter(xL, p, color=colors, marker='o', edgecolors='black', zorder=3)
+#     colors = 'black'
+#     # Highlight the points (xL, p)
+#     plt.scatter(xL, p, color=colors, marker='o', edgecolors='black', zorder=3)
 
-    # Highlight the points (xR, p)
-    plt.scatter(xR, p, color=colors, marker='o', edgecolors='black', zorder=3)
+#     # Highlight the points (xR, p)
+#     plt.scatter(xR, p, color=colors, marker='o', edgecolors='black', zorder=3)
 
-    plt.fill_betweenx(p, xL, xR, color=colors, alpha=0.5)
-    plt.plot( [xL[0], xR[0]], [0, 0],color=colors, linewidth=3)
-    plt.plot([xL[-1], xR[-1]],[1, 1],  color=colors, linewidth=3)
-    plt.show()
+#     plt.fill_betweenx(p, xL, xR, color=colors, alpha=0.5)
+#     plt.plot( [xL[0], xR[0]], [0, 0],color=colors, linewidth=3)
+#     plt.plot([xL[-1], xR[-1]],[1, 1],  color=colors, linewidth=3)
+#     plt.show()
 
 def main():
     """ implementation of any method for epistemic uncertainty on the cantilever beam example"""
@@ -882,25 +878,25 @@ def main():
 
         return np.array([deflection, stress])
 #     # example
-    # y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
-    # L = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
-    # I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
-    # F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
-    # E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
+    y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
+    L = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
+    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
+    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
+    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
     
-    y = UncertainNumber(name='beam width', symbol='y', units='m', essence='interval', bounds=[0.145, 0.155]) 
-    L = UncertainNumber(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
-    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
-    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
-    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
+    # y = UncertainNumber(name='beam width', symbol='y', units='m', essence='interval', bounds=[0.145, 0.155]) 
+    # L = UncertainNumber(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
+    # I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
+    # F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
+    # E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
   
     METHOD = "extremepoints"
     base_path = "C:\\Users\\Ioanna\\OneDrive - The University of Liverpool\\DAWS2_code\\UP\\"
 
     a = Propagation(vars= [ L, I, F, E], 
                             fun= cantilever_beam_deflection, 
-                            method= 'extremepoints', 
-                            n_disc=8,
+                            method= 'latin_hypercube', 
+                            n_sam=8,
                             #save_raw_data= "no"#,
                             save_raw_data= "yes",
                             base_path= base_path
