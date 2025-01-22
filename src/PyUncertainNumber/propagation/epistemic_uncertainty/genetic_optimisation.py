@@ -33,14 +33,14 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable,
                         (str or array of shape (2,)).
     
     signature:
-        genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, results:dict,
+        genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, 
                                     pop_size=1000, n_gen=100, tol=1e-3,
-                                    n_gen_last=10, algorithm_type="NSGA2") -> dict
+                                    n_gen_last=10, algorithm_type="NSGA2") -> propagation_results
 
     returns:
         propagation_results: A `propagation_results` object containing the results of the 
-            uncertainty propagation. The results include p-boxes representing 
-            the output uncertainty. The raw_data are a dictionary containing a summary of the optimization results:
+            uncertainty propagation. The results include uncertain numbers for the outputs. 
+            The raw_data are a dictionary containing a summary of the optimization results:
             - 'bounds': An np.ndarray of the bounds for the output parameter (if f is not None). 
             - 'min': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for minimisation results.
             - 'max': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for maximisation results.

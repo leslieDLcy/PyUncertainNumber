@@ -34,26 +34,31 @@ def sampling_method(x: np.ndarray, f: Callable,
                     n_sam: int = 500, method='monte_carlo',     
                     save_raw_data='no', endpoints=False )-> propagation_results:  # Specify return type
     """
+    description:
+        - The function propagates intervals through a black box models by generating a set of sample points within 
+          the input intervals and evaluating the function at those points. 
+        - The function assumes that the uncertainty in the inputs can be represented by uniform distributions within
+          the given intervals.
+
     args:
-        x (np.ndarray): A 2D NumPy array where each row represents an input variable and 
+        - x (np.ndarray): A 2D NumPy array where each row represents an input variable and 
                             the two columns define its lower and upper bounds (interval).
-        f (Callable): A callable function that takes a 1D NumPy array of input values and returns the 
+        - f (Callable): A callable function that takes a 1D NumPy array of input values and returns the 
                         corresponding output(s). Can be None, in which case only samples are generated.
-        n_sam (int): The number of samples to generate for the chosen sampling method.
-        method (str, optional): The sampling method to use. Choose from:
+        - n_sam (int): The number of samples to generate for the chosen sampling method.
+        - method (str, optional): The sampling method to use. Choose from:
                                  - 'monte_carlo': Monte Carlo sampling (random sampling from uniform distributions)
                                  - 'latin_hypercube': Latin Hypercube sampling (stratified sampling for better space coverage)
                                 Defaults to 'monte_carlo'.
-        endpoints (bool, optional): If True, include the interval endpoints in the sampling. 
+        - endpoints (bool, optional): If True, include the interval endpoints in the sampling. 
                                     Defaults to False. 
-        save_raw_data (str, optional): Whether to save raw data. Options: 'yes', 'no'. 
+        - save_raw_data (str, optional): Whether to save raw data. Options: 'yes', 'no'. 
                                         Defaults to 'no'.
     
     signature:
         sampling_method(x:np.ndarray, f:Callable, n_sam:int, method ='montecarlo', endpoints=False, results:dict = None, save_raw_data = 'no') -> dict of np.ndarrays
 
     note:
-        - The function assumes that the na in `x` represent uniform distributions.
         - If the `f` function returns multiple outputs, the `all_output` array will be 2-dimensional y and x for all x samples.
 
     returns:

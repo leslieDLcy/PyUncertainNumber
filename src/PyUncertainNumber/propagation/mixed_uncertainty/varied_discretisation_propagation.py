@@ -10,18 +10,19 @@ def imp(X):
   
     return np.array([np.max(X[:, 0]), np.min(X[:, 1])])
 
-def first_order_propagation_method(x: list, f:Callable = None,  
+def varied_discretisation_propagation_method(x: list, f:Callable = None,  
                                 results: propagation_results = None, 
                                 #method = 'extremepoints',
                                 n_disc: Union[int, np.ndarray] = 10, 
-                                condensation: Union[float, np.ndarray] = None, 
+                                
                                 tOp: Union[float, np.ndarray] = 0.999,
                                 bOt: Union[float, np.ndarray] = 0.001,
+                                condensation: Union[float, np.ndarray] = None, 
                                 save_raw_data= 'no')-> propagation_results:  # Specify return type
 
     """
     description:
-        - Performs first-order uncertainty propagation for mixed uncertain numbers.
+        - Performs uncertainty propagation for mixed uncertain numbers.
         - The function handles different types of uncertain numbers (distributions 
           and p-boxes for this version) and discretizes them with the same number of n_disc.
         - To ensure conservative results, the function employs an outward-directed discretization approach when 
@@ -34,8 +35,7 @@ def first_order_propagation_method(x: list, f:Callable = None,
         - For each input, the function constructs a pbox output.  It then combines these individual p-boxes by finding 
           the overlapping region of uncertainty that is common to all of them.  This overlapping region 
           represents the overall uncertainty in the output(s).
-        - The `condensation` parameter can be used to reduce the number of intervals in the output p-boxes.
-          
+        - The `condensation` parameter can be used to reduce the number of intervals in the output p-boxes.        
 
     args:
         - x (list): A list of `UncertainNumber` objects representing the uncertain inputs.
@@ -50,20 +50,20 @@ def first_order_propagation_method(x: list, f:Callable = None,
                                     specifies the number of discretization 
                                     points for the corresponding input. 
                                     Defaults to 10.
-        - condensation (Union[float, np.ndarray], optional): A parameter or array of parameters 
-                                    to control the condensation of the output p-boxes. 
-                                    Defaults to None.
         - tOp (Union[float, np.ndarray], optional): Upper threshold or array of thresholds for 
                                     discretization. 
                                     Defaults to 0.999.
         - bOt (Union[float, np.ndarray], optional): Lower threshold or array of thresholds for 
                                     discretization. 
                                     Defaults to 0.001.
+        - condensation (Union[float, np.ndarray], optional): A parameter or array of parameters 
+                                    to control the condensation of the output p-boxes. 
+                                    Defaults to None.
         - save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). 
                                    Defaults to 'no'.
     
     signature:
-        first_order_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results
+        varied_discretisation_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results
    
     notes:
         - It is more efficient and more conserative than the second order propagation.
@@ -121,7 +121,7 @@ def first_order_propagation_method(x: list, f:Callable = None,
             UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[4], stds[4]]]),
             ]
         
-        results = first_order_propagation_method(x=x, f=Fun, n_disc= 5)
+        results = varied_discretisation_propagation_method(x=x, f=Fun, n_disc= 5)
     """
     d = len(x) # dimension of uncertain numbers 
     results = propagation_results()
@@ -196,7 +196,7 @@ def first_order_propagation_method(x: list, f:Callable = None,
 
         # Determine the number of outputs from the first evaluation
         try:
-            num_outputs = res.raw_data['sign_x'].shape[0]
+            num_outputs = res.raw_data['part_deriv_sign'].shape[0]
         except TypeError:
             num_outputs = 1  # If f returns a single value
 
@@ -223,7 +223,7 @@ def first_order_propagation_method(x: list, f:Callable = None,
                 temp_X[input] = []
                 temp_X[input].extend(np.array([xl[input][slice], xr[input][slice]]).tolist())
                 rang = np.array([temp_X[i] for i in range(d)], dtype=object)
-                Xsings[slice, :, :] = extreme_pointX(rang, res.raw_data['sign_x'])  # Use the entire sign_x array
+                Xsings[slice, :, :] = extreme_pointX(rang, res.raw_data['part_deriv_sign'])  # Use the entire part_deriv_sign array
                 current_index += 1
 
                 for k in range(Xsings.shape[1]):
@@ -336,7 +336,7 @@ def first_order_propagation_method(x: list, f:Callable = None,
 #         UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[4], stds[4]]]),
 #     ]
 
-# results = first_order_propagation_method(x=x, f=myFunctionWithTwoOutputs, n_disc=n_disc)
+# results = varied_discretisation_propagation_method(x=x, f=myFunctionWithTwoOutputs, n_disc=n_disc)
 
 # print(results)
 

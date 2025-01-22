@@ -26,7 +26,7 @@ def endpoints_method(x:np.ndarray, f:Callable,
 
 
     signature:
-        endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no') -> dict
+        endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no') -> propagation_results
 
     note:
         - If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.

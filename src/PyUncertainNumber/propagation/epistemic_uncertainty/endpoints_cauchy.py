@@ -6,9 +6,13 @@ from PyUncertainNumber.propagation.utils import propagation_results
 
 def cauchydeviates_method(x: np.ndarray, f: Callable, 
                           results: propagation_results = None, 
-                          n_sam: int =500, 
+                          n_sam: int = 500, 
                           save_raw_data='no') -> propagation_results:  # Specify return type
     """
+    description:
+        - This method propagates intervals through a black box model with the endpoint Cauchy deviate method. 
+        - It is an approximate method, so the user should expect non-identical results for different runs. 
+
     args:
         x (np.ndarray): A 2D NumPy array representing the intervals for each input variable.
                          Each row should contain two elements: the lower and upper bounds of the interval.
@@ -23,14 +27,10 @@ def cauchydeviates_method(x: np.ndarray, f: Callable,
     
     signature:
         cauchydeviate_method(x: np.ndarray, f: Callable, results_class = propagation_results, 
-                        n_sam: int, save_raw_data='no') -> dict
-
-    note:
-        - This method propagates intervals through a balck box model with the endpoint Cauchy deviate method. 
-        - It is an approximate method, so the user should expect non-identical results for different runs. 
+                        n_sam: int, save_raw_data='no') -> propagation_results
 
     returns:
-        A PropagationResult object containing the results.
+        A propagation_results object containing the results.
             - 'raw_data': A dictionary containing raw data (if f is None):
                 - 'x': Cauchy deviates (x).
                 - 'K': Maximum Cauchy deviate (K).

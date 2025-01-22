@@ -9,6 +9,12 @@ def sampling_aleatory_method(x: list, f: Callable,
                              n_sam: int = 500, method='monte_carlo',      
                              save_raw_data='no')-> propagation_results:  # Specify return type
     """
+    description:
+        - Propagates aleatory uncertainty in the input by generating random samples from the input 
+        distributions and evaluating the function at those samples.
+        - It estimates the distribution of possible outputs of a function (f),
+          when its inputs are uncertain and described by probability distributions.
+ 
     args:
         - x (list): A list of `UncertainNumber` objects, each representing an input 
                  variable with its associated uncertainty.
@@ -31,12 +37,13 @@ def sampling_aleatory_method(x: list, f: Callable,
                                    Defaults to 'no'.
     
     signature:
-        sampling_aleatory_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results
+        sampling_aleatory_method(x: list, f: Callable, ...) -> propagation_results
 
     note:
         - Performs uncertainty propagation using Monte Carlo or Latin Hypercube sampling, 
           similar to the `sampling_method`. 
         - If the `f` function returns multiple outputs, the code can accomodate. 
+        - This version allows only for the propagation of independent variables.
 
     returns:
         - propagation_results: A `propagation_results` object containing:

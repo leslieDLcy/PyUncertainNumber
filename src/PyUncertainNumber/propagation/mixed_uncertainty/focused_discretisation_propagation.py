@@ -8,17 +8,18 @@ from PyUncertainNumber.propagation.utils import propagation_results, condense_bo
 
 #TODO add tail concentrating algorithms.
 #TODO add x valus for min and max
-def second_order_propagation_method(x: list, f:Callable = None,  
+def focused_discretisation_propagation_method(x: list, f:Callable = None,  
                                     results: propagation_results = None, 
                                     method = 'endpoints',
                                     n_disc: Union[int, np.ndarray] = 10, 
-                                    condensation: Union[float, np.ndarray] = None, 
+                                 
                                     tOp: Union[float, np.ndarray] = 0.999,
                                     bOt: Union[float, np.ndarray] = 0.001,
+                                    condensation: Union[float, np.ndarray] = None, 
                                     save_raw_data= 'no')-> propagation_results:  # Specify return type
     """
     description:
-        - This function performs second-order uncertainty propagation for a mix of uncertain numbers. 
+        - This function performs uncertainty propagation for a mix of uncertain numbers. 
         - It is designed to handle situations where there are different types of uncertainty in the model's inputs, 
            such as probability distributions, intervals, and p-boxes. 
         - To ensure conservative results, the function employs an outward-directed discretization approach when 
@@ -49,23 +50,25 @@ def second_order_propagation_method(x: list, f:Callable = None,
                                     each element specifies the number of discretization 
                                     points for the corresponding input. 
                                     Defaults to 10.
-        - condensation (Union[float, np.ndarray], optional): A parameter or array of parameters 
-                                    to control the condensation of the output p-boxes. 
-                                    Defaults to None.
         - tOp (Union[float, np.ndarray], optional): Upper threshold or array of thresholds for 
                                     discretization. 
                                     Defaults to 0.999.
         - bOt (Union[float, np.ndarray], optional): Lower threshold or array of thresholds for 
                                     discretization. 
                                     Defaults to 0.001.
+        - condensation (Union[float, np.ndarray], optional): A parameter or array of parameters 
+                                    to control the condensation of the output p-boxes. 
+                                    Defaults to None.
         - save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). 
                                    Defaults to 'no'.
     
     signature:
-        second_order_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results      
+        focused_discretisation_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results      
     
+    raises:
+      - 
     returns:
-        propagation_results:  A `propagation_results` object containing:
+        - propagation_results:  A `propagation_results` object containing:
             - raw_data (dict): Dictionary containing raw data shared across output(s):
                     - x (np.ndarray): Input values.
                     - f (np.ndarray): Output values.
@@ -103,7 +106,7 @@ def second_order_propagation_method(x: list, f:Callable = None,
             UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
             ]
     
-        results = second_order_propagation_method(x=x, f=Fun, method = 'endpoints', n_disc= 5)
+        results = focused_discretisation_propagation_method(x=x, f=Fun, method = 'endpoints', n_disc= 5)
     
     """
     d = len(x) # dimension of uncertain numbers 
@@ -193,7 +196,7 @@ def second_order_propagation_method(x: list, f:Callable = None,
         numRun = 0
 
         match method:
-            case "endpoints" | "second_order_endpoints":
+            case "endpoints" | "focused_discretisation_endpoints":
                 x_combinations = np.empty(( focal_elements_comb.shape[0]*(2**d), d), dtype=float)  # Pre-allocate the array
                 current_index = 0  # Keep track of the current insertion index
 
@@ -249,14 +252,14 @@ def second_order_propagation_method(x: list, f:Callable = None,
                     bounds[i, 0, :] = lower_bound[i,:]
                     bounds[i, 1, :] = upper_bound[i,:]
 
-            case "extremepoints"| "second_order_extremepoints":
+            case "extremepoints"| "focused_discretisation_extremepoints":
                 # Determine the positive or negative signs for each input
 
                 res = extremepoints_method(ranges.T, f)
                 
                  # Determine the number of outputs from the first evaluation
                 try:
-                    num_outputs = res.raw_data['sign_x'].shape[0]
+                    num_outputs = res.raw_data['part_deriv_sign'].shape[0]
                 except TypeError:
                     num_outputs = 1  # If f returns a single value
 
@@ -274,7 +277,7 @@ def second_order_propagation_method(x: list, f:Callable = None,
                 
                 for i, slice in tqdm.tqdm(enumerate(focal_elements_comb), desc="Evaluating focal points", total=len(focal_elements_comb)):  # Iterate over focal_elements_comb
                     Xsings = np.empty((2, d))  # Changed to 2 for the two extreme points
-                    Xsings[:, :] = extreme_pointX(slice, res.raw_data['sign_x'])  # Use the entire sign_x array
+                    Xsings[:, :] = extreme_pointX(slice, res.raw_data['part_deriv_sign'])  # Use the entire part_deriv_sign array
 
                     for k in range(Xsings.shape[0]):  # 
                         c = Xsings[k, :]

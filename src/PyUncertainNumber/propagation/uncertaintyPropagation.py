@@ -12,8 +12,8 @@ from PyUncertainNumber.propagation.epistemic_uncertainty.genetic_optimisation im
 from PyUncertainNumber.propagation.epistemic_uncertainty.local_optimisation import local_optimisation_method
 from PyUncertainNumber.propagation.epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
 from PyUncertainNumber.propagation.aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
-from PyUncertainNumber.propagation.mixed_uncertainty.second_order_propagation import second_order_propagation_method
-from PyUncertainNumber.propagation.mixed_uncertainty.first_order_propagation import first_order_propagation_method
+from PyUncertainNumber.propagation.mixed_uncertainty.focused_discretisation_propagation import focused_discretisation_propagation_method
+from PyUncertainNumber.propagation.mixed_uncertainty.varied_discretisation_propagation import varied_discretisation_propagation_method
 from PyUncertainNumber.propagation.utils import create_folder, save_results, propagation_results
 from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber, Distribution #_parse_interverl_inputs,
  
@@ -170,11 +170,12 @@ def aleatory_propagation(vars:list = None,
 
 def mixed_propagation(vars: list, fun:Callable = None,  
                     results: propagation_results = None, 
-                    method = 'second_order_extremepoints',
+                    method = 'focused_discretisation_extremepoints',
                     n_disc: Union[int, np.ndarray] = 10, 
-                    condensation:int = None,
+                    
                     tOp: Union[float, np.ndarray] = 0.999,
                     bOt: Union[float, np.ndarray] = 0.001,
+                    condensation:int = None,
                     save_raw_data= 'no', 
                     *,  # Keyword-nly arguments start here
                     base_path=np.nan,
@@ -188,19 +189,19 @@ def mixed_propagation(vars: list, fun:Callable = None,
                                 Defaults to None, in which case a new
                                 `propagation_results` object is created.
         - method (str, optional): The mixed uncertainty propagation method. Can be one of:
-                                'second_order_endpoints', 'second_order_vertex', 'second_order_extremepoints',
-                                'first_order_extremepoints'.
-                                Defaults to 'second_order_extremepoints'.
+                                'focused_discretisation_endpoints', 'focused_discretisation_vertex', 'focused_discretisation_extremepoints',
+                                'varied_discretisation_extremepoints'.
+                                Defaults to 'focused_discretisation_extremepoints'.
         - n_disc (Union[int, np.ndarray], optional): Number of discretization points for 
                                 interval variables. 
                                 Defaults to 10.
-        - condensation (int, optional): Parameter for reducing the complexity of the output 
-                                uncertainty representation. 
-                                Defaults to None.
         - tOp (Union[float, np.ndarray], optional): Upper threshold or bound used in some methods. 
                                 Defaults to 0.999.
         - bOt (Union[float, np.ndarray], optional): Lower threshold or bound used in some methods. 
                                 Defaults to 0.001.
+        - condensation (int, optional): Parameter for reducing the complexity of the output 
+                                uncertainty representation. 
+                                Defaults to None.
         - save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). 
                                 Defaults to 'no'.
         - base_path (str, optional): Path for saving results (if save_raw_data is 'yes'). 
@@ -250,7 +251,7 @@ def mixed_propagation(vars: list, fun:Callable = None,
  
         a = mixed_propagation(vars= [y, L, I, F, E], 
                             fun= cantilever_beam_func, 
-                            method= 'second_order_extremepoints', 
+                            method= 'focused_discretisation_extremepoints', 
                             n_disc=8,
                             #save_raw_data= "no"#,
                             save_raw_data= "yes",
@@ -305,50 +306,53 @@ def mixed_propagation(vars: list, fun:Callable = None,
         #     else:
         #         raise ValueError("Invalid shape for 'bounds'. Expected 2D array or 1D array with two values.")
 
-        #if save_raw_data == "yes":
-            #res_path = create_folder(base_path, method)
-            #save_results(results.raw_data, method=method, res_path=res_path, fun=fun) 
+        if save_raw_data == "yes":
+            res_path = create_folder(base_path, method)
+            save_results(results.raw_data, method=method, res_path=res_path, fun=fun) 
         
         return results
     
     match method:       
-        case ("second_order_endpoints" | "second_order_vertex" | "endpoints" |"vertex"):
-            results = second_order_propagation_method(vars,                                
+        case ("focused_discretisation_endpoints" | "focused_discretisation_vertex" | "endpoints" |"vertex"):
+            results = focused_discretisation_propagation_method(vars,                                
                                                 fun,
                                                 results,
-                                                method = 'endpoints',
+                                                method = method,
                                                 n_disc= n_disc,
-                                                condensation =condensation, 
+                                                
                                                 tOp =tOp,
                                                 bOt= bOt,
+                                                condensation =condensation, 
                                                 save_raw_data = save_raw_data,
                                                 **kwargs,
                                                 )  # Pass save_raw_data directly
             return process_mixed_results(results) 
         
-        case ("second_order_extremepoints" | "extremepoints" ):       
-            results =  second_order_propagation_method(vars,                                
+        case ("focused_discretisation_extremepoints" | "extremepoints" ):       
+            results =  focused_discretisation_propagation_method(vars,                                
                                                 fun,
                                                 results,
                                                 method = 'extremepoints',
                                                 n_disc= n_disc,
-                                                condensation =condensation, 
+                                                
                                                 tOp =tOp,
                                                 bOt= bOt,
+                                                condensation =condensation, 
                                                 save_raw_data = save_raw_data,
                                                 **kwargs,   
                                                 )  # Pass save_raw_data directly
             return process_mixed_results(results) 
         
-        case ("first_order"|"first_order_extremepoints"):
-            results = first_order_propagation_method(vars,                              
+        case ("varied_discretisation"|"varied_discretisation_extremepoints"):
+            results = varied_discretisation_propagation_method(vars,                              
                                                 fun,
                                                 results,
                                                 #method = 'extremepoints',
                                                 n_disc= n_disc,
-                                                condensation =condensation, 
+                                                 
                                                 tOp =tOp,
                                                 bOt= bOt,
+                                                condensation =condensation,
                                                 save_raw_data = save_raw_data,
                                                 **kwargs,  
                                                 ) 
@@ -622,9 +626,10 @@ def Propagation(vars:list,
         x0: np.ndarray = None,
         method=None,
         n_disc: Union[int, np.ndarray] = 10, 
-        condensation:int = None,
+        
         tOp: Union[float, np.ndarray] = 0.999,
         bOt: Union[float, np.ndarray] = 0.001,
+        condensation:int = None,
         save_raw_data="no",
         *,  # Keyword-only arguments start here
         base_path=np.nan,
@@ -655,12 +660,12 @@ def Propagation(vars:list,
                             Defaults to None, which triggers automatic selection.
         - n_disc (Union[int, np.ndarray], optional): Number of discretization points. 
                             Defaults to 10.
-        - condensation (int, optional): Parameter for reducing output complexity. 
-                            Defaults to None.
         - tOp (Union[float, np.ndarray], optional): Upper threshold or bound. 
                             Defaults to 0.999.
         - bOt (Union[float, np.ndarray], optional): Lower threshold or bound. 
                             Defaults to 0.001.
+        - condensation (int, optional): Parameter for reducing output complexity. 
+                            Defaults to None.
         - save_raw_data (str, optional): Whether to save intermediate results ('yes' or 'no'). 
                             Defaults to 'no'.
         - base_path (str, optional): Path for saving data. Defaults to np.nan.
@@ -759,16 +764,16 @@ def Propagation(vars:list,
                                         )
  
     elif all(essence == "distribution" for essence in essences):
-        if method in ("second_order_endpoints", "second_order_vertex", 
-                      "second_order_extremepoints", "first_order_extremepoints"):
+        if method in ("focused_discretisation_endpoints", "focused_discretisation_vertex", 
+                      "focused_discretisation_extremepoints", "varied_discretisation_extremepoints"):
             y = mixed_propagation(vars=vars, 
                                   fun=fun, 
                                   results=results,
                                   method = method, 
-                                  n_disc=n_disc,
-                                  condensation=condensation, 
+                                  n_disc=n_disc,                                 
                                   tOp=tOp,
                                   bOt=bOt,
+                                  condensation=condensation, 
                                   save_raw_data=save_raw_data,
                                   base_path=base_path,
                                   **kwargs)
@@ -787,9 +792,9 @@ def Propagation(vars:list,
                               results= results,
                              method = method, 
                               n_disc= n_disc,
-                              condensation =condensation, 
                               tOp =tOp,
                               bOt= bOt,
+                              condensation =condensation, 
                               save_raw_data = save_raw_data,
                               base_path= base_path,
                                 **kwargs)                               

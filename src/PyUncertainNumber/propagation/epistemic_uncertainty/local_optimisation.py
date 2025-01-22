@@ -47,15 +47,16 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
    signature:
         local_optimisation_method(x:np.ndarray, f:Callable,  results:dict = None,
                               *, x0:np.ndarray = None,  
-                              tol_loc:np.ndarray = None, options_loc: dict = None, method_loc = 'Nelder-Mead') -> dict
+                              tol_loc:np.ndarray = None, options_loc: dict = None, method_loc = 'Nelder-Mead') -> propagation_results
    
     returns:
         - propagation_results: A `propagation_results` object containing the results of the 
-            uncertainty propagation. The results include p-boxes representing 
-            the output uncertainty. The raw_data are a dictionary containing a summary of the optimization results:
+            uncertainty propagation. The results include uncertain numbers for the outputs. 
+            The raw_data are a dictionary containing a summary of the optimization results:
             - 'bounds': An np.ndarray of the bounds for the output parameter (if f is not None). 
             - 'min': Results for minimization, including 'x', 'f', 'message', 'nit', 'nfev', 'final_simplex'.
             - 'max': Results for maximization, including 'x', 'f', 'message', 'nit', 'nfev', 'final_simplex'.
+    
     example:
         # Example function 
 
@@ -123,7 +124,6 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
     # Create an instance of the result class
     if results is None:
         results = propagation_results()  # Create an instance of propagation_results
-
 
     # Store ALL results in the results object with descriptions
     results.raw_data['min'] = np.append(results.raw_data['min'], { 'x': min_y.x, 

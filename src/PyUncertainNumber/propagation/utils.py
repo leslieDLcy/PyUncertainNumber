@@ -37,7 +37,7 @@ class propagation_results:
                 'bounds': np.array([])
             }
 
-    def add_raw_data(self, x=None, f=None, K=None, sign_x:np.ndarray = None):
+    def add_raw_data(self, x=None, f=None, K=None, part_deriv_sign:np.ndarray = None):
         """Adds raw data to the results."""
         if x is not None:
             self.raw_data['x'] = x
@@ -45,11 +45,11 @@ class propagation_results:
             self.raw_data['K'] = K
         if f is not None:
             self.raw_data['f'] = f
-        if sign_x is not None:
-            if isinstance(sign_x, np.ndarray) and len(sign_x.shape) > 1:  # Multiple outputs
-                self.raw_data['sign_x'] = sign_x
+        if part_deriv_sign is not None:
+            if isinstance(part_deriv_sign, np.ndarray) and len(part_deriv_sign.shape) > 1:  # Multiple outputs
+                self.raw_data['part_deriv_sign'] = part_deriv_sign
             else:  # Single output
-                self.raw_data['sign_x'] = np.array([sign_x])  # Wrap in an array
+                self.raw_data['part_deriv_sign'] = np.array([part_deriv_sign])  # Wrap in an array
 
     def print(self):
         """Prints the results in a formatted way, handling None values and multiple outputs."""
@@ -131,9 +131,9 @@ class propagation_results:
                         print("ngenerations:", max_data.get('ngenerations'))
                         print("message:", max_data.get('message'))
 
-            if 'sign_x' in self.raw_data:
+            if 'part_deriv_sign' in self.raw_data:
                 print("-" * 30)
-                print("sign_x:", self.raw_data['sign_x'][i]) 
+                print("part_deriv_sign:", self.raw_data['part_deriv_sign'][i]) 
        
         print("-" * 30)
         print("Input combinations and corresponding output(s):")

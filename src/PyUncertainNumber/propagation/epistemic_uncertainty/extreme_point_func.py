@@ -8,8 +8,9 @@ def extreme_pointX(ranges, signX):
                  (each row is a variable, each column is a bound).
         signX: A NumPy array of shape (1, d) representing the signs.
     
-    notes: 
-        Calculates the extreme points of a set of ranges based on signs.
+    descrition: 
+        Calculates the extreme points of a set of ranges based on signs 
+        of the partial derivatives.
     returns:
         A NumPy array of shape (2, d) representing the extreme points.
     """

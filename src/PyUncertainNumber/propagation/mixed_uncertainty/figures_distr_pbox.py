@@ -148,8 +148,8 @@ def plotPbox_pbox(xL, xR,  p=None):
     # y_norm = norm.cdf(x_norm, mean, std)  # Calculate the corresponding PDF values
     # plt.plot(x_norm, y_norm, color='blue')  # Plot the normal distribution
 
-    # Add the pbox distribution
-    y = UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",[[1.5, 2.5], 0.20]])
+    # Add the pbox distribution['gaussian', ([0,1], [1,2])]
+    y = UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",([1.46, 1,46], 0.10)])
 
     x_l = y._construct.left  # Generate x-values for the normal distribution
     x_r = y._construct.right  # Generate x-values for the normal distribution
@@ -158,23 +158,12 @@ def plotPbox_pbox(xL, xR,  p=None):
     plt.plot(x_r, y_val, color='green')  # Plot the normal distribution
 
     # Add x and y axis labels
-    plt.xlabel("U", fontsize=14)  
+    plt.xlabel("X", fontsize=14)  
     plt.ylabel("Cumulative Probability", fontsize=14) 
     # Increase font size for axis numbers
     plt.xticks(fontsize=12)
     plt.yticks(fontsize=12)
 
-    #plt.legend()
-    #plt.show()
-    # # Highlight the points (xL, p)
-    # plt.scatter(xL, p, color=colors, marker='o', edgecolors='black', zorder=3)
-
-    # # Highlight the points (xR, p)
-    # plt.scatter(xR, p, color=colors, marker='o', edgecolors='black', zorder=3)
-
-    # plt.fill_betweenx(p, xL, xR, color=colors, alpha=0.5)
-    # plt.plot( [xL[0], xR[0]], [0, 0],color=colors, linewidth=3)
-    # plt.plot([xL[-1], xR[-1]],[1, 1],  color=colors, linewidth=3)
     plt.show()
 
         
@@ -216,30 +205,34 @@ def plotPbox(xL, xR, p=None):
 means = np.array([1, 2, 3, 4, 5])
 stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
 
-n_disc = 10  # Number of discretizations
+n_disc = 100  # Number of discretizations
 
-x = [
-        UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]])
+# x = [
+#         UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",(means[0], stds[0])])
 
-      #  UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
-       # UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]])
+#       #  UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
+#        # UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]])
+# ]
+
+# xl, xr = outward_direction(x, n_disc=n_disc)
+
+# plotPbox(xl, xr, p=None)
+# plt.show()
+
+
+# x0 = [
+#     UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",([1.5, 2.5], 0.20)])
+#    #UncertainNumber(essence = 'interval', bounds = [2.5, 3.5])
+
+# ]
+# xl, xr = outward_direction(x0, n_disc= n_disc)
+# plotPbox_pbox(xl, xr, p=None)
+# plt.show()
+
+y = [UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",([0.5, 1.5], 0.10)])
 ]
 
-xl, xr = outward_direction(x)
-
-#plotPbox(xl, xr, p=None)
-#plt.show()
-
-
-x0 = [
-    UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",[[1.5, 2.5], 0.20]])
-   #UncertainNumber(essence = 'interval', bounds = [2.5, 3.5])
-
-]
-
-y = UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",[[0.5, 1.5], 0.10]])
-print('y', y._construct.left)
-xl, xr = outward_direction(x0)
+xl, xr = outward_direction(y, n_disc= n_disc)
 plotPbox_pbox(xl, xr, p=None)
 plt.show()
 
@@ -267,7 +260,28 @@ def plot_interval(lower_bound, upper_bound, color='blue', label=None):
   plt.yticks(fontsize=12)
 
 y =  UncertainNumber(essence = 'interval', bounds = [2.5, 3.5])
-plot_interval(2.5, 3.5)
+# plot_interval(2.5, 3.5)
+# plt.show()
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+
+# Generate x values
+x = np.linspace(0, 6, 100)  # Range from -4 to 4 with 100 points
+
+# Calculate corresponding y values (probability density function)
+y = norm.cdf(x, means[2], stds[2])  # Standard normal distribution (mean=0, std_dev=1)
+
+# Plot the distribution
+plt.plot(x, y)
+#plt.title('CDF')
+plt.xlabel('V', fontsize=14)
+plt.ylabel('CDF', fontsize=14)
+plt.xticks(fontsize=16)
+plt.yticks(fontsize=16)
 plt.show()
 
 
