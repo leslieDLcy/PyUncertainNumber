@@ -1,9 +1,9 @@
-import pyuncertainnumber as pun
+import PyUncertainNumber as pun
 import numpy as np
-from pyuncertainnumber import pba
-from pyuncertainnumber import UncertainNumber as UN
-from pyuncertainnumber.pba.pbox_base import Pbox
-from pyuncertainnumber import stochastic_mixture
+from PyUncertainNumber import pba
+from PyUncertainNumber import UncertainNumber as UN
+from PyUncertainNumber.pba.pbox_base import Pbox
+from PyUncertainNumber import stochastic_mixture
 
 
 # *  ---------------------construction---------------------*#

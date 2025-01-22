@@ -2,14 +2,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import functools
 import numpy as np
-from pyuncertainnumber import pba
+from PyUncertainNumber import pba
 from scipy.stats import beta, t, gamma, betabinom, nbinom
 from .params import Params
 from .intervals import Interval
 import scipy
 from .cbox_Leslie import cbox_from_extredists, cbox_from_pseudosamples
 from .constructors import pbox_from_extredists, pbox_from_pseudosamples
-import pyuncertainnumber.pba.distributions as d
+import PyUncertainNumber.pba.distributions as d
 
 if TYPE_CHECKING:
     from .cbox_Leslie import Cbox

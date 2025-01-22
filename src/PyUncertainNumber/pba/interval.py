@@ -66,7 +66,7 @@ class Interval:
     """
 
     def __init__(self, left=None, right=None):
-        """
+        r"""
         args:
             - left: The left end of the interval.
             - right: The right end of the interval.
@@ -624,7 +624,7 @@ class Interval:
         return Interval(self.left * other.right, self.right * other.left)
 
     def div(self, other, method=None):
-        """
+        r"""
         .. _interval.div:
 
         Divides self by other
@@ -775,7 +775,7 @@ class Interval:
 
     @property
     def hi(self):
-        """
+        r"""
         **Returns**:
             ``self.right``
 
@@ -787,7 +787,7 @@ class Interval:
         return self._right
 
     def width(self) -> float:
-        """
+        r"""
         **Returns**:
 
             ``float``: The width of the interval, :math:`\mathrm{right} - \mathrm{left}`
@@ -801,7 +801,7 @@ class Interval:
         return self.right - self.left
 
     def halfwidth(self) -> float:
-        """
+        r"""
         **Returns**:
 
             ``float``: The half-width of the interval, :math:`(\mathrm{right} - \mathrm{left})/2`
@@ -819,7 +819,7 @@ class Interval:
         return self.width() / 2
 
     def midpoint(self) -> float:
-        """Returns the midpoint of the interval
+        r"""Returns the midpoint of the interval
 
         note:
             - this serves as the deterministic value representation of the interval, a.k.a. the naked value for an interval

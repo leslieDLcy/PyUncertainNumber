@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from .interval import nInterval
     from .ds import DempsterShafer
 
-makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
+makeUN = importlib.import_module("PyUncertainNumber.characterisation.core").makeUN
 
 __all__ = ["stochastic_mixture", "envelope", "imposition", "stacking"]
 
