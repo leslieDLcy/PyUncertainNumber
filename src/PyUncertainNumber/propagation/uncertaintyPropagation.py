@@ -28,7 +28,9 @@ def aleatory_propagation(
     base_path=np.nan,
     **kwargs,
 ):
-    """This function propagates aleatory uncertainty through a given function (`fun`) using either Monte Carlo or Latin Hypercube sampling, considering the aleatory uncertainty represented by a list of `UncertainNumber` objects (`vars`).
+    """This function propagates aleatory uncertainty through a given function (`fun`) using either Monte Carlo or Latin Hypercube sampling, 
+       considering the aleatory uncertainty represented by a list of `UncertainNumber` objects (`vars`).
+    
     args:
         vars (list): A list of UncertainNumber objects, each representing an input
                     variable with its associated uncertainty.

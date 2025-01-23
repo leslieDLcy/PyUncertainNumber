@@ -149,7 +149,7 @@ def plotPbox_pbox(xL, xR,  p=None):
     # plt.plot(x_norm, y_norm, color='blue')  # Plot the normal distribution
 
     # Add the pbox distribution['gaussian', ([0,1], [1,2])]
-    y = UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",([1.46, 1,46], 0.10)])
+    y = UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",([1.2, 1.4], 0.10)])
 
     x_l = y._construct.left  # Generate x-values for the normal distribution
     x_r = y._construct.right  # Generate x-values for the normal distribution
@@ -164,7 +164,7 @@ def plotPbox_pbox(xL, xR,  p=None):
     plt.xticks(fontsize=12)
     plt.yticks(fontsize=12)
 
-    plt.show()
+    #plt.show()
 
         
 def plotPbox(xL, xR, p=None):
@@ -229,9 +229,12 @@ n_disc = 100  # Number of discretizations
 # plotPbox_pbox(xl, xr, p=None)
 # plt.show()
 
-y = [UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",([0.5, 1.5], 0.10)])
+y = [UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",([1.2, 1.4], 0.10)])
 ]
-
+n_disc= 3
+xl, xr = outward_direction(y, n_disc= n_disc)
+plotPbox_pbox(xl, xr, p=None)
+n_disc= 9
 xl, xr = outward_direction(y, n_disc= n_disc)
 plotPbox_pbox(xl, xr, p=None)
 plt.show()
@@ -285,3 +288,24 @@ plt.yticks(fontsize=16)
 plt.show()
 
 
+#pbox plot
+
+# Add the pbox distribution['gaussian', ([0,1], [1,2])]
+y = UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",([1.2, 1.4], 0.10)])
+
+x_l = y._construct.left  # Generate x-values for the normal distribution
+x_r = y._construct.right  # Generate x-values for the normal distribution
+y_val = np.linspace(0,1,len(y._construct.left))  # Calculate the corresponding PDF values
+plt.plot(x_l, y_val, color='blue')  # Plot the normal distribution
+plt.plot(x_r, y_val, color='green')  # Plot the normal distribution
+
+# Add x and y axis labels
+plt.xlabel("X", fontsize=14)  
+plt.ylabel("Cumulative Probability", fontsize=14) 
+# Increase font size for axis numbers
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.show()
+
+y.display()
+plt.show()
