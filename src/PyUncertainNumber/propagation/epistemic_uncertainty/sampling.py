@@ -28,7 +28,6 @@ def index_to_bool_(index: np.ndarray, dim=2):
     index = np.asarray(index, dtype=int)
     return np.asarray([index == j for j in range(dim)], dtype=bool)
 
-
 def sampling_method(
     x: np.ndarray,
     f: Callable,

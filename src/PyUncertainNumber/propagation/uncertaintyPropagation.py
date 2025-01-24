@@ -577,7 +577,23 @@ def epistemic_propagation(
             )
             return process_results(results)
         
-        case "monte_carlo_endpoints" | "latin_hypercube":
+        case ("monte_carlo" |"latin_hypercube") :
+            if n_sam is None:
+                raise ValueError(
+                    "n (number of samples) is required for sampling methods."
+                )
+            results = sampling_method(
+                x=x,
+                f=fun,
+                results=results,
+                n_sam=n_sam,
+                method=method.lower(),
+                endpoints= False,
+                save_raw_data=save_raw_data,
+            )
+            return process_results(results)
+        
+        case "monte_carlo_endpoints" :
             if n_sam is None:
                 raise ValueError(
                     "n (number of samples) is required for sampling methods."
