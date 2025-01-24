@@ -123,7 +123,7 @@ def aleatory_propagation(
             results.un = []
             # Access raw_data from results object
             for sample_data in results.raw_data["f"].T:
-                d = Distribution(sample= sample_data)
+                d = Distribution(sample_data= sample_data)
                 results.un.append(UncertainNumber.fromDistribution(d))
 
         if save_raw_data == "yes":
