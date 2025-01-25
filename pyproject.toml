@@ -34,5 +34,5 @@ version = "0.0.3"
 where = ["src"] # ["."] by default   
 
 [project.urls]
-Documentation = "https://readthedocs.org"
+Documentation = "https://pyuncertainnumber.readthedocs.io/en/latest/index.html"
 Homepage = "https://example.com"

@@ -1,5 +1,7 @@
 # Data
 /data/
+/visualisations/
+/results/
 # /_personal/
 # Mac OS-specific storage files
 .DS_Store

@@ -2,7 +2,9 @@
 
 ### variability and incertitude
 
-Partial specification given information, bla bla ..
+Modern risk analysts distinguish between variability and incertitude. Variability (also called randomness, aleatory uncertainty, or irreducible uncertainty) arises from natural stochasticity, environmental or structural variation across space or time, manufacturing heterogeneity among components or individuals. Incertitude, also called ignorance, epistemic uncertainty, subjective uncertainty or reducible uncertainty, arises from incompleteness of knowledge. Sources of incertitude include measurement uncertainty, small sample sizes, and data censoring, ignorance about the details of physical mechanisms and processes.
+
+For an engineering analysis, the **challenge** lies in formulating suitable uncertainty models given available information, **without introducing unwarranted assumptions**. However, the available information is often vague, ambiguous, or qualitive. Available data are frequently limited and of poor quality, giving rise to challenges in eliciting precise probabilistic specifications. Solutions to this problem are discussed in the literature, under the framework of imprecise probability, from various perspectives using different mathematical concepts, including for example random sets, evidence theory, fuzzy stochastic concepts, info-gap theory, and probability bounds analysis.
 
 ```{tip}
 It is suggested to use interval analysis for propagating ignorance and the methods of probability theory for propagating variability.
