@@ -1,10 +1,10 @@
 import numpy as np
 import tqdm
 from typing import Callable
-from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product import (
+from PyUncertainNumber.propagation.epistemic_uncertainty.cartesian_product import (
     cartesian,
 )
-from pyuncertainnumber.propagation.utils import Propagation_results
+from PyUncertainNumber.propagation.utils import Propagation_results
 
 
 def endpoints_method(

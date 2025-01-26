@@ -2,7 +2,7 @@ import numpy as np
 import tqdm
 from typing import Callable
 from scipy.optimize import brentq
-from pyuncertainnumber.propagation.utils import Propagation_results
+from PyUncertainNumber.propagation.utils import Propagation_results
 
 
 def cauchydeviates_method(

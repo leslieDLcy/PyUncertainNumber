@@ -1,10 +1,10 @@
 import numpy as np
 from typing import Callable, Union
 import tqdm
-from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
-from pyuncertainnumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
-from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
-from pyuncertainnumber.propagation.utils import Propagation_results, condense_bounds
+from PyUncertainNumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
+from PyUncertainNumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
+from PyUncertainNumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
+from PyUncertainNumber.propagation.utils import Propagation_results, condense_bounds
 
 #TODO add tail concentrating algorithms.
 #TODO add x valus for min and max

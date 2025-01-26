@@ -2,7 +2,6 @@
 from typing import Callable, Union
 import numpy as np
 from PyUncertainNumber.propagation.epistemic_uncertainty.endpoints import endpoints_method
-from PyUncertainNumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
 from PyUncertainNumber.propagation.epistemic_uncertainty.subinterval import subinterval_method
 from PyUncertainNumber.propagation.epistemic_uncertainty.sampling import sampling_method
 from PyUncertainNumber.propagation.epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
@@ -12,7 +11,7 @@ from PyUncertainNumber.propagation.aleatory_uncertainty.sampling_aleatory import
 from PyUncertainNumber.propagation.mixed_uncertainty.focused_discretisation_propagation import focused_discretisation_propagation_method
 from PyUncertainNumber.propagation.mixed_uncertainty.varied_discretisation_propagation import varied_discretisation_propagation_method
 from PyUncertainNumber.propagation.utils import create_folder, save_results, Propagation_results
-from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber, Distribution #_parse_interverl_inputs,
+from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber
 from PyUncertainNumber.pba.distributions import Distribution
 
 #TODO the cauchy with save_raw_data = 'yes' raises issues.  

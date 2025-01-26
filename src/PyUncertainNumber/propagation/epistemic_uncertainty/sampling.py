@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import qmc
 import tqdm
 from typing import Callable
-from pyuncertainnumber.propagation.utils import Propagation_results
+from PyUncertainNumber.propagation.utils import Propagation_results
 
 
 def index_to_bool_(index: np.ndarray, dim=2):
