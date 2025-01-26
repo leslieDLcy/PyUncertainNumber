@@ -14,6 +14,20 @@ from ..pba.params import Params
 # TODO create a defending mechanism for parsing '[15+-10%]' as only '[15 +- 10%]' works now
 
 
+def save2Vis(figname):
+    """a shortcut function to save plot to visualization dir
+
+    Note
+    ----
+
+    We simply assume that every repo will have a 'visulizations'
+    dir under the root directory
+    """
+
+    axe = plt.gca()
+    plt.savefig(f"{figname}.png", format="png", dpi=300, bbox_inches="tight")
+
+
 def tranform_ecdf(s, display=False, **kwargs):
     """plot the CDF return the quantile
 

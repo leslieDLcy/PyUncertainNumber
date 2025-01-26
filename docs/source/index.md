@@ -37,13 +37,14 @@ autoapi/index
 ## features
 
 - `PyUncertainNumber` is a Python package for generic computational tasks focussing on rigourou uncertainty analysis, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation.
+- `PyUncertainNumber` supports probability bounds analysis to rigorously bound the prediction for the quantity of interest with mixed uncertainty propagation.
 - `PyUncertainNumber` also features great natural language support as such characterisatin of input uncertainty can be intuitively done by using natural language like `about 7` or simple expression like `[15 +- 10%]`, without worrying about the elicitation.
 - features the save and loading of UN objects
 - yields much informative results such as the combination that leads to the maximum in vertex method.
 
 ## quick start
 
-`PyUncertainNumber` can be used to easily create a `PBox` or an `Interval` object:
+`PyUncertainNumber` can be used to easily create an `UncertainNumber` object, which may embody a mathematical construct such as `PBox`, `Interval`, `Distribution`, or `DempsterShafer` structure.
 
 ```python
 from pyuncertainnumber import UncertainNumber as UN
@@ -54,6 +55,19 @@ e = UN(
     units='Pa', 
     essence='pbox', 
     distribution_parameters=['gaussian', ([0,12],[1,4])])
+```
+
+Many propagation methodologies are provided to rigorously propgate the uncertainty through the computational pipeline, intrusively or non-intrusively.
+
+```python
+a = Propagation(
+    vars=[L, I, F, E],
+    fun=cantilever_beam_deflection,
+    method="extremepoints",
+    n_disc=8,
+    save_raw_data="yes",
+    base_path=base_path,
+)
 ```
 
 <!-- add some pbox plots herein

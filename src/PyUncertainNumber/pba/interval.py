@@ -2,7 +2,6 @@ from typing import Union
 import numpy as np
 import random as r
 import warnings
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 
@@ -1056,7 +1055,7 @@ class Interval:
         ax.margins(x=0.1)
         ax.set_xlabel(r"$x$")
         ax.set_ylabel("CDF")
-        plt.show()
+        return ax
 
     def sample(self, seed=None, numpy_rng: np.random.Generator = None) -> float:
         """

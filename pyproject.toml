@@ -27,12 +27,12 @@ maintainers = [
 name = "pyuncertainnumber"
 readme = "README.md"
 requires-python = ">= 3.10"
-version = "0.0.3"
+version = "0.0.4"
 
 [tool.setuptools.packages.find]
 # All the following settings are optional:
 where = ["src"] # ["."] by default   
 
 [project.urls]
-Documentation = "https://readthedocs.org"
+Documentation = "https://pyuncertainnumber.readthedocs.io/en/latest/index.html"
 Homepage = "https://example.com"
