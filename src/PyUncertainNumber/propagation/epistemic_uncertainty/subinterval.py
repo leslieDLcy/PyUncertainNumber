@@ -1,8 +1,8 @@
 import numpy as np
 import tqdm
 from typing import Callable
-from PyUncertainNumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
-from  PyUncertainNumber.propagation.utils import Propagation_results
+from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
+from pyuncertainnumber.propagation.utils import Propagation_results
 
 def subinterval_method(
     x: np.ndarray,

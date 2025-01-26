@@ -6,7 +6,7 @@ from pymoo.core.problem import Problem
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.core.callback import Callback
-from PyUncertainNumber.propagation.utils import Propagation_results
+from pyuncertainnumber.propagation.utils import Propagation_results
 
 def a(x): return np.asarray(x, dtype=float)
 

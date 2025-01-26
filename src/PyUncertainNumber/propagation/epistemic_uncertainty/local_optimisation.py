@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Callable, Union
 from scipy.optimize import minimize
-from PyUncertainNumber.propagation.utils import Propagation_results
+from pyuncertainnumber.propagation.utils import Propagation_results
 
 
 def local_optimisation_method(x: np.ndarray, f: Callable,
