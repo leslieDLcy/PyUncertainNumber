@@ -42,6 +42,10 @@ un = pun.norm([0,12],[1,4])
 ```
 ````
 
+```{tip}
+shortcut may not work for some distribution families at the moment as an internal restructure is underway. Use the canonical verbose constructor for best compatibility.
+```
+
 ### aggregation of multiple sources of information
 
 Expert elicitation has been a challenging topic, especially when knowledge is limited and measurements are sparse. Multiple experts may not necessarily agree on the choice of elicited prbability distributions, which leads to the need for aggregation. Below shows two situations for illustration.
