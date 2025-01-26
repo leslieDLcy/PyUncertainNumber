@@ -12,7 +12,7 @@ python3 -m venv myenv
 source myenv/bin/activate 
 ```
 
-```note
+```{attention}
 **Requirement:**
 - It requires Python >=3.10 
 ```

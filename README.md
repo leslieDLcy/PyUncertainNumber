@@ -28,10 +28,7 @@ e = UN(
 
 ## installation
 
-```note
-**Requirement:**
-- It requires Python >=3.10 
-```
+**Requirement:** It requires Python >=3.10
 
 `PyUncertainNumber` can be installed from [PyPI](https://pypi.org/project/pyuncertainnumber/). Upon activation of your virtual environment, use your terminal. For additional details, refer to [installation guide](https://pyuncertainnumber.readthedocs.io/en/latest/guides/installation.html).
 
