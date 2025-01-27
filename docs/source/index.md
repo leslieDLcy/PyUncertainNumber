@@ -70,17 +70,14 @@ a = Propagation(
 )
 ```
 
-<!-- add some pbox plots herein
-```{image} ../../assets/myAnimation.gif
-:alt: pbox dynamic visualisation
-:class: bg-primary
-:width: 600px
-:align: center
-``` -->
-
 ## installation
 
-bla bla simple bla bla
+```{tip}
+- See [installation](./guides/installation.md) for additional details.
+- **Requirement:** Python >=3.10
+```
+
+`PyUncertainNumber` can be installed from [PyPI](https://pypi.org/project/pyuncertainnumber/). Upon activation of your virtual environment, use your terminal. For additional details, refer to [installation guide](https://pyuncertainnumber.readthedocs.io/en/latest/guides/installation.html).
 
 ```shell
 pip install pyuncertainnumber
