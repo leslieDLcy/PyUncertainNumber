@@ -119,11 +119,12 @@ def aleatory_propagation(
             # UncertainNumber(essence="distribution", distribution_parameters=None, **kwargs)
             results.un = None
         else:
-            results.un = []
-            # Access raw_data from results object
-            for sample_data in results.raw_data["f"].T:
-                d = Distribution(sample_data= sample_data)
-                results.un.append(UncertainNumber.fromDistribution(d))
+            results.un = None
+        #     results.un = []
+        #     # Access raw_data from results object
+        #     for sample_data in results.raw_data["f"].T:
+        #         d = Distribution(sample_data= sample_data)
+        #         results.un.append(UncertainNumber.fromDistribution(d))
 
         if save_raw_data == "yes":
             res_path = create_folder(base_path, method)
@@ -297,8 +298,8 @@ def mixed_propagation(
     
     match method:       
         case ("focused_discretisation_endpoints" | "focused_discretisation_vertex" | "endpoints" |"vertex"):
-            results = focused_discretisation_propagation_method(vars=vars,                                
-                                                fun=fun,
+            results = focused_discretisation_propagation_method(x=vars,                                
+                                                f=fun,
                                                 results=results,
                                                 method = method,
                                                 n_disc= n_disc,
@@ -312,8 +313,8 @@ def mixed_propagation(
             return process_mixed_results(results) 
         
         case ("focused_discretisation_extremepoints" | "extremepoints" ):       
-            results =  focused_discretisation_propagation_method(vars=vars,                                
-                                                fun=fun,
+            results =  focused_discretisation_propagation_method(x=vars,                                
+                                                f=fun,
                                                 results=results,
                                                 method = method,
                                                 n_disc= n_disc,
@@ -326,10 +327,10 @@ def mixed_propagation(
             return process_mixed_results(results) 
         
         case ("varied_discretisation"|"varied_discretisation_extremepoints"):
-            results = varied_discretisation_propagation_method(vars=vars,                                
-                                                fun=fun,
+            results = varied_discretisation_propagation_method(x=vars,                                
+                                                f=fun,
                                                 results=results,
-                                                method = method,
+                                                #method = method,
                                                 #method = 'extremepoints',
                                                 n_disc= n_disc,
                                                 tOp =tOp,
@@ -628,7 +629,7 @@ def epistemic_propagation(
         case ("genetic_optimisation" | "genetic_optimization"| "genetic optimization"|"genetic optimisation"):
             if save_raw_data == 'yes':
                 print("The intermediate steps cannot be saved for genetic optimisation methods")            
-            results = genetic_optimisation_method(x=x, f=fun, results=results, 
+            results = genetic_optimisation_method(x_bounds=x, f=fun, results=results, 
                                                   pop_size=pop_size, n_gen=n_gen, tol= tol, n_gen_last= n_gen_last, 
                                                   algorithm_type= algorithm_type) 
             print('results', results)                     
@@ -637,7 +638,7 @@ def epistemic_propagation(
         case ("local_optimisation" | "local_optimization"):
             if save_raw_data == 'yes':
                 print("The intermediate steps cannot be saved for local optimisation methods")            
-            results = local_optimisation_method(x=vars, f=fun,  results=results, 
+            results = local_optimisation_method(x=x, f=fun,  results=results, 
                               x0 = x0, tol_loc = tol_loc, options_loc = options_loc, method_loc = method_loc)
             print('results', results)                     
             return process_results(results) 

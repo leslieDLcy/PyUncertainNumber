@@ -184,7 +184,7 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
 
     # Calculate Cartesian product of indices using your cartesian function
     cartesian_product_indices = cartesian(*bounds_x_index)
-
+    print("cartesian_product_indices", cartesian_product_indices)
     # Generate the final array using the indices
     focal_elements_comb = []
     for indices in cartesian_product_indices:
@@ -194,6 +194,7 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
         focal_elements_comb.append(temp)
 
     focal_elements_comb = np.array(focal_elements_comb, dtype=object)
+    print('focal_elements_comb',focal_elements_comb)
     all_output = None
 
     if f is not None:
@@ -260,6 +261,7 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
                     max_values[:, i] = np.sort(max_values[:, i])
                     lower_bound[i, :] = min_values[:, i]  # Extract each column
                     upper_bound[i, :] = max_values[:, i]
+                    bounds[i,:,:] = np.array([lower_bound[i,:], upper_bound[i,:]])
 
             case "extremepoints"| "focused_discretisation_extremepoints":
                 # Determine the positive or negative signs for each input
@@ -295,7 +297,7 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
                     Xsings = np.empty((2, d))
                     # Use the entire sign_x array
                     Xsings[:, :] = extreme_pointX(
-                        slice, res.raw_data['sign_x'])
+                        slice, res.raw_data['part_deriv_sign'])
 
                     for k in range(Xsings.shape[0]):  #
                         c = Xsings[k, :]
@@ -335,8 +337,7 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
                 bounds = np.empty((num_outputs, 2, lower_bound.shape[1]))
 
                 for i in range(num_outputs):
-                    lower_bound[i, :] = np.sort(
-                        min_values[i, :])  # Extract each column
+                    lower_bound[i, :] = np.sort(min_values[i, :])  # Extract each column
                     upper_bound[i, :] = np.sort(max_values[i, :])
 
                     bounds[i, 0, :] = lower_bound[i, :]
@@ -367,3 +368,74 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
             "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
     return results
+from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber
+import matplotlib.pyplot as plt
+def Fun(x):
+
+    input1= x[0]
+    input2=x[1]
+    input3=x[2]
+    input4=x[3]
+    input5=x[4]
+
+    output1 = input1 + input2 + input3 + input4 + input5
+    output2 = input1 * input2 * input3 * input4 * input5
+
+    return np.array([output1, output2])
+
+means = np.array([ 1,   2,   3,   4,   5])
+stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+print(means[0])
+print(stds[0])
+x = [  UncertainNumber(essence="distribution", distribution_parameters=["gaussian", [10, 0.1]]),
+      UncertainNumber(essence="distribution", distribution_parameters=["gaussian", [20, 0.2]]),
+      UncertainNumber(essence="distribution", distribution_parameters=["gaussian", [30, 0.3]]),
+       UncertainNumber(essence="distribution", distribution_parameters=["gaussian", [40, 0.4]]),
+        UncertainNumber(essence="distribution", distribution_parameters=["gaussian", [50, 0.5]])
+
+           # UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
+          #  UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
+          #  UncertainNumber(essence = 'interval', bounds= [means[3]-2* stds[3], means[3]+2* stds[3]]),
+            #UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
+            ]
+print(x)    
+results = focused_discretisation_propagation_method(x=x, f=Fun, method = 'endpoints', n_disc= 2,
+                                                    condensation=2,
+                                                    save_raw_data= 'yes')
+results.summary()
+def plotPbox(xL, xR, p=None):
+    """
+    Plots a p-box (probability box) using matplotlib.
+
+    Args:
+        xL (np.ndarray): A 1D NumPy array of lower bounds.
+        xR (np.ndarray): A 1D NumPy array of upper bounds.
+        p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
+                                   Defaults to None, which generates equally spaced probabilities.
+        color (str, optional): The color of the plot. Defaults to 'k' (black).
+    """
+    xL = np.squeeze(xL)  # Ensure xL is a 1D array
+    xR = np.squeeze(xR)  # Ensure xR is a 1D array
+
+    
+    if p is None:
+        p = np.linspace(0, 1, len(xL) + 1)  # p should have one more element than xL/xR
+
+    #Plot the step functions
+    plt.step(np.concatenate(([xL[0]], xL)), p, where='post', color='black')
+    plt.step(np.concatenate(([xR[0]], xR)), p, where='post', color='red')
+
+    #Add bottom and top lines to close the box
+    plt.plot([xL[0], xR[0]], [0, 0], color='red')  # Bottom line
+    plt.plot([xL[-1], xR[-1]], [1, 1], color='black')  # Top line
+
+    # Add x and y axis labels
+    plt.xlabel("X", fontsize=14)  
+    plt.ylabel("Cumulative Probability", fontsize=14) 
+    # Increase font size for axis numbers
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+
+    plt.show()
+print(results.raw_data['x'])
+plotPbox(results.raw_data['min'][1]['f'],results.raw_data['max'][1]['f'])
