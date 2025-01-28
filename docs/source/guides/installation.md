@@ -14,7 +14,7 @@ source myenv/bin/activate
 
 ```{attention}
 **Requirement:**
-- It requires Python >=3.10 
+- It requires Python >=3.11
 ```
 
 ## Install using pip
