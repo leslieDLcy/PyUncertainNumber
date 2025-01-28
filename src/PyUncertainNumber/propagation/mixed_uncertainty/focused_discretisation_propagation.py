@@ -197,27 +197,27 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
     print('focal_elements_comb',focal_elements_comb)
     all_output = None
 
-    if f is not None:
-        # Efficiency upgrade: store repeated evaluations
-        inpsList = np.zeros((0, d))
-        evalsList = []
-        numRun = 0
+    
+    # Efficiency upgrade: store repeated evaluations
+    inpsList = np.zeros((0, d))
+    evalsList = []
+    numRun = 0
 
-        match method:
-            case "endpoints" | "focused_discretisation_endpoints":
-                x_combinations = np.empty(( focal_elements_comb.shape[0]*(2**d), d), dtype=float)  # Pre-allocate the array
-                current_index = 0  # Keep track of the current insertion index
+    match method:
+        case "endpoints" | "focused_discretisation_endpoints":
+            x_combinations = np.empty(( focal_elements_comb.shape[0]*(2**d), d), dtype=float)  # Pre-allocate the array
+            current_index = 0  # Keep track of the current insertion index
 
-                for array in focal_elements_comb:
-                    cartesian_product_x = cartesian(*array)
-                    # Get the number of combinations from cartesian(*array)
-                    num_combinations = cartesian_product_x.shape[0]
+            for array in focal_elements_comb:
+                cartesian_product_x = cartesian(*array)
+                # Get the number of combinations from cartesian(*array)
+                num_combinations = cartesian_product_x.shape[0]
 
-                    # Assign the cartesian product to the appropriate slice of x_combinations
-                    x_combinations[current_index: current_index +
-                                   num_combinations] = cartesian_product_x
-                    current_index += num_combinations  # Update the insertion index
-
+                # Assign the cartesian product to the appropriate slice of x_combinations
+                x_combinations[current_index: current_index + num_combinations] = cartesian_product_x
+                current_index += num_combinations  # Update the insertion index
+            
+            if f is not None:
                 # Initialize all_output as a list to store outputs initially
                 all_output_list = []
                 evalsList = []
@@ -262,8 +262,26 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
                     lower_bound[i, :] = min_values[:, i]  # Extract each column
                     upper_bound[i, :] = max_values[:, i]
                     bounds[i,:,:] = np.array([lower_bound[i,:], upper_bound[i,:]])
+                
+                if condensation is not None:
+                    bounds = condense_bounds(bounds, condensation)
 
-            case "extremepoints"| "focused_discretisation_extremepoints":
+                results.raw_data['bounds'] = bounds
+                results.raw_data['min'] = {'f': np.array(lower_bound[:num_outputs,:])}  # Store min as a 2D NumPy array
+                results.raw_data['max'] = {'f': np.array(upper_bound[:num_outputs,:])}  # Store max as a 2D NumPy array
+
+                if save_raw_data == 'yes':
+                    #print('No raw data provided for this method!')
+                    results.add_raw_data(f= all_output, x= x_combinations)
+
+            elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
+                results.add_raw_data(f=None, x=x_combinations)
+
+            else:
+                raise ValueError(
+                    "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
+
+        case "extremepoints"| "focused_discretisation_extremepoints":
                 # Determine the positive or negative signs for each input
 
                 res = extremepoints_method(ranges.T, f)
@@ -343,29 +361,28 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
                     bounds[i, 0, :] = lower_bound[i, :]
                     bounds[i, 1, :] = upper_bound[i, :]
 
-            case _:
-                raise ValueError(
-                    "Invalid UP method! endpoints_cauchy are under development.")
+        case _: raise ValueError(
+                     "Invalid UP method! endpoints_cauchy are under development.")
 
-        if condensation is not None:
-            bounds = condense_bounds(bounds, condensation)
+    #     if condensation is not None:
+    #         bounds = condense_bounds(bounds, condensation)
 
-        results.raw_data['bounds'] = bounds
-        results.raw_data['min'] = np.array([{'f': lower_bound[i, :]} for i in range(
-            num_outputs)])  # Initialize as a NumPy array
-        results.raw_data['max'] = np.array([{'f': upper_bound[i, :]} for i in range(
-            num_outputs)])  # Initialize as a NumPy array
+    #     results.raw_data['bounds'] = bounds
+    #     results.raw_data['min'] = np.array([{'f': lower_bound[i, :]} for i in range(
+    #         num_outputs)])  # Initialize as a NumPy array
+    #     results.raw_data['max'] = np.array([{'f': upper_bound[i, :]} for i in range(
+    #         num_outputs)])  # Initialize as a NumPy array
 
-        if save_raw_data == 'yes':
-            print('No raw data provided for this method!')
-            # results.add_raw_data(f= all_output, x= x_combinations)
+    #     if save_raw_data == 'yes':
+    #         print('No raw data provided for this method!')
+    #         # results.add_raw_data(f= all_output, x= x_combinations)
 
-    elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        results.add_raw_data(f=None, x=x_combinations)
+    # elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
+    #     results.add_raw_data(f=None, x=x_combinations)
 
-    else:
-        raise ValueError(
-            "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
+    # else:
+    #     raise ValueError(
+    #         "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
     return results
 from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber
@@ -402,7 +419,7 @@ print(x)
 results = focused_discretisation_propagation_method(x=x, f=Fun, method = 'endpoints', n_disc= 2,
                                                     condensation=2,
                                                     save_raw_data= 'yes')
-results.summary()
+#results.summary()
 def plotPbox(xL, xR, p=None):
     """
     Plots a p-box (probability box) using matplotlib.
@@ -438,4 +455,4 @@ def plotPbox(xL, xR, p=None):
 
     plt.show()
 print(results.raw_data['x'])
-plotPbox(results.raw_data['min'][1]['f'],results.raw_data['max'][1]['f'])
+plotPbox(results.raw_data['min']['f'][0],results.raw_data['max']['f'][0])
