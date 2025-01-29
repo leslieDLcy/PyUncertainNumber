@@ -86,25 +86,20 @@ class Propagation_results:
             else:
                 print("Uncertain Number: None")
 
-            if (
-                "bounds" in self.raw_data
-                and self.raw_data["bounds"] is not None
-                and len(self.raw_data["bounds"]) > 0
-            ):
+            if ("bounds" in self.raw_data and self.raw_data["bounds"] is not None and len(self.raw_data["bounds"]) > 0):
                 print("-" * 30)
                 if num_outputs == 1:
                     print("Bounds:", self.raw_data["bounds"])
                 else:
                     print("Bounds:", self.raw_data["bounds"][i])
 
-            if (
-                "min" in self.raw_data
-                and self.raw_data["min"] is not None
-                and len(self.raw_data["min"]) > 0
-            ):
+            if ("min" in self.raw_data and self.raw_data["min"] is not None and len(self.raw_data["min"]) > 0):
                 print("-" * 30)
                 print("Minimum:")
-                min_data = self.raw_data["min"][i]
+                if num_outputs == 1:
+                    min_data = self.raw_data["min"]
+                else:
+                    min_data = self.raw_data["min"][i]
                 if min_data.get("f") is not None:
                     print("f:", min_data.get("f"))
                     if min_data.get("x") is None:  # Handle the case where 'x' is None
@@ -122,14 +117,13 @@ class Propagation_results:
                         print("ngenerations", min_data.get("ngenerations"))
                         print("message:", min_data.get("message"))
 
-            if (
-                "max" in self.raw_data
-                and self.raw_data["max"] is not None
-                and len(self.raw_data["max"]) > 0
-            ):
+            if ("max" in self.raw_data and self.raw_data["max"] is not None and len(self.raw_data["max"]) > 0):
                 print("-" * 30)
                 print("Maximum:")
-                max_data = self.raw_data["max"][i]
+                if num_outputs == 1:
+                    max_data = self.raw_data["max"]
+                else:
+                    max_data = self.raw_data["max"][i]
                 if max_data.get("f") is not None:
                     print("f:", max_data.get("f"))
                     if max_data.get("x") is None:  # Handle the case where 'x' is None
@@ -146,9 +140,10 @@ class Propagation_results:
                         print("ngenerations:", max_data.get("ngenerations"))
                         print("message:", max_data.get("message"))
 
-            if 'part_deriv_sign' in self.raw_data:
-                print("-" * 30)
-                print("part_deriv_sign:", self.raw_data['part_deriv_sign'][i]) 
+
+                    if 'part_deriv_sign' in self.raw_data:
+                        print("-" * 30)
+                        print("part_deriv_sign:", self.raw_data['part_deriv_sign'][i]) 
        
         print("-" * 30)
         print("Input combinations and corresponding output(s):")
@@ -390,12 +385,12 @@ def condense_bounds(bounds, N):
 
         condensed_lower = np.array(
             [
-                lower_bounds_sorted[j * interval_size + interval_size - 1]
+                lower_bounds_sorted[j * interval_size]
                 for j in range(N[i])
             ]
         )
         condensed_upper = np.array(
-            [upper_bounds_sorted[j * interval_size] for j in range(N[i])]
+            [upper_bounds_sorted[j * interval_size + interval_size - 1] for j in range(N[i])]
         )
 
         # Assign to the correct slice

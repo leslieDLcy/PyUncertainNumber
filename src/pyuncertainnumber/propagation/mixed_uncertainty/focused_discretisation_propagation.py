@@ -1,10 +1,10 @@
 import numpy as np
 from typing import Callable, Union
 import tqdm
-from PyUncertainNumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
-from PyUncertainNumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
-from PyUncertainNumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
-from PyUncertainNumber.propagation.utils import Propagation_results, condense_bounds
+from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
+from pyuncertainnumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
+from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
+from pyuncertainnumber.propagation.utils import Propagation_results, condense_bounds
 
 #TODO add tail concentrating algorithms.
 #TODO add x valus for min and max
@@ -184,7 +184,7 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
 
     # Calculate Cartesian product of indices using your cartesian function
     cartesian_product_indices = cartesian(*bounds_x_index)
-    print("cartesian_product_indices", cartesian_product_indices)
+    #print("cartesian_product_indices", cartesian_product_indices)
     # Generate the final array using the indices
     focal_elements_comb = []
     for indices in cartesian_product_indices:
@@ -194,10 +194,9 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
         focal_elements_comb.append(temp)
 
     focal_elements_comb = np.array(focal_elements_comb, dtype=object)
-    print('focal_elements_comb',focal_elements_comb)
+    #print('focal_elements_comb',focal_elements_comb)
     all_output = None
-
-    
+   
     # Efficiency upgrade: store repeated evaluations
     inpsList = np.zeros((0, d))
     evalsList = []
@@ -282,8 +281,8 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
                     "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
         case "extremepoints"| "focused_discretisation_extremepoints":
-                # Determine the positive or negative signs for each input
-
+            # Determine the positive or negative signs for each input
+            if f is not None:
                 res = extremepoints_method(ranges.T, f)
 
                 # Determine the number of outputs from the first evaluation
@@ -294,64 +293,36 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
 
                 inpsList = np.zeros((0, d))
                 evalsList = np.zeros((0, num_outputs))
-                all_output_list = []
+                all_output = np.empty((num_outputs, len(focal_elements_comb), 2))
 
                 # Preallocate all_output_list with explicit loops
-                all_output_list = []
-                for _ in range(num_outputs):
-                    output_for_current_output = []
-                    # Changed to focal_elements_comb
-                    for _ in range(len(focal_elements_comb)):
-                        output_for_current_output.append([None, None])
-                    all_output_list.append(output_for_current_output)
-                
-                for i, slice in tqdm.tqdm(enumerate(focal_elements_comb), desc="Evaluating focal points", total=len(focal_elements_comb)):  # Iterate over focal_elements_comb
-                    Xsings = np.empty((2, d))  # Changed to 2 for the two extreme points
-                    Xsings[:, :] = extreme_pointX(slice, res.raw_data['part_deriv_sign'])  # Use the entire part_deriv_sign array
-
-                # Iterate over focal_elements_comb
                 for i, slice in tqdm.tqdm(enumerate(focal_elements_comb), desc="Evaluating focal points", total=len(focal_elements_comb)):
-                    # Changed to 2 for the two extreme points
-                    Xsings = np.empty((2, d))
-                    # Use the entire sign_x array
-                    Xsings[:, :] = extreme_pointX(
-                        slice, res.raw_data['part_deriv_sign'])
+                    for out in range(num_outputs):  # Iterate over each output
+                        for k in range(2):  # For each of the two extreme points
+                            # Calculate Xsings using the correct part_deriv_sign for the current output
+                            Xsings = np.empty((2, d))
+                            Xsings[:,:] = extreme_pointX(slice, res.raw_data['part_deriv_sign'][out,:]) 
 
-                    for k in range(Xsings.shape[0]):  #
-                        c = Xsings[k, :]
-                        im = np.where((inpsList == c).all(axis=1))[0]
-                        if not im.size:
-                            output = f(c)
+                            c = Xsings[k,:]
+                            im = np.where((inpsList == c).all(axis=1))[0]
+                            
+                            if not im.size:
+                                output = f(c)
+                                inpsList = np.vstack([inpsList, c])
+                                evalsList = np.vstack([evalsList, output])
+                            else:
+                               output = evalsList[im[0]]
+                            
+                            all_output[out, i, k] = output[out] 
 
-                            # Store each output in a separate sublist
-                            for out in range(num_outputs):
-                                # Changed indexing
-                                all_output_list[out][i][k] = output[out]
+                             # Store the specific output value
 
-                            inpsList = np.vstack([inpsList, c])
-
-                            # Ensure output is always a NumPy array
-                            if not isinstance(output, np.ndarray):
-                                output = np.array(output)
-
-                            evalsList = np.vstack([evalsList, output])
-                        else:
-                            for out in range(num_outputs):
-                                # Changed indexing
-                                all_output_list[out][i][k] = evalsList[im[0]][out]
-
-                # Reshape all_output based on the actual number of elements per output
-                all_output = np.array(all_output_list, dtype=object)
-                all_output = np.reshape(
-                    all_output, (num_outputs, -1, 2))  # Reshape to 3D
-
-                # Calculate min and max for each sublist in all_output
+                # Calculate min and max efficiently
                 min_values = np.min(all_output, axis=2)
                 max_values = np.max(all_output, axis=2)
 
                 lower_bound = np.zeros((num_outputs, min_values.shape[1]))
                 upper_bound = np.zeros((num_outputs, max_values.shape[1]))
-
                 bounds = np.empty((num_outputs, 2, lower_bound.shape[1]))
 
                 for i in range(num_outputs):
@@ -360,99 +331,26 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
 
                     bounds[i, 0, :] = lower_bound[i, :]
                     bounds[i, 1, :] = upper_bound[i, :]
+                
+                if condensation is not None:
+                    bounds = condense_bounds(bounds, condensation)
+                
+                results.raw_data['bounds'] = bounds
+                results.raw_data['min'] = {'f': np.array(lower_bound[:num_outputs,:])}  # Store min as a 2D NumPy array
+                results.raw_data['max'] = {'f': np.array(upper_bound[:num_outputs,:])}  # Store max as a 2D NumPy array
+                
+                if save_raw_data == 'yes':
+                    #print('No raw data provided for this method!')
+                    results.add_raw_data(f= all_output, x= x_combinations)
+
+            elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
+                results.add_raw_data(f=None, x=x_combinations)
+
+            else:
+                raise ValueError(
+                    "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
         case _: raise ValueError(
-                     "Invalid UP method! endpoints_cauchy are under development.")
-
-    #     if condensation is not None:
-    #         bounds = condense_bounds(bounds, condensation)
-
-    #     results.raw_data['bounds'] = bounds
-    #     results.raw_data['min'] = np.array([{'f': lower_bound[i, :]} for i in range(
-    #         num_outputs)])  # Initialize as a NumPy array
-    #     results.raw_data['max'] = np.array([{'f': upper_bound[i, :]} for i in range(
-    #         num_outputs)])  # Initialize as a NumPy array
-
-    #     if save_raw_data == 'yes':
-    #         print('No raw data provided for this method!')
-    #         # results.add_raw_data(f= all_output, x= x_combinations)
-
-    # elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-    #     results.add_raw_data(f=None, x=x_combinations)
-
-    # else:
-    #     raise ValueError(
-    #         "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
+                     "Invalid UP method! focused_discretisation_cauchy is under development.")
 
     return results
-from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber
-import matplotlib.pyplot as plt
-def Fun(x):
-
-    input1= x[0]
-    input2=x[1]
-    input3=x[2]
-    input4=x[3]
-    input5=x[4]
-
-    output1 = input1 + input2 + input3 + input4 + input5
-    output2 = input1 * input2 * input3 * input4 * input5
-
-    return np.array([output1, output2])
-
-means = np.array([ 1,   2,   3,   4,   5])
-stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
-print(means[0])
-print(stds[0])
-x = [  UncertainNumber(essence="distribution", distribution_parameters=["gaussian", [10, 0.1]]),
-      UncertainNumber(essence="distribution", distribution_parameters=["gaussian", [20, 0.2]]),
-      UncertainNumber(essence="distribution", distribution_parameters=["gaussian", [30, 0.3]]),
-       UncertainNumber(essence="distribution", distribution_parameters=["gaussian", [40, 0.4]]),
-        UncertainNumber(essence="distribution", distribution_parameters=["gaussian", [50, 0.5]])
-
-           # UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
-          #  UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
-          #  UncertainNumber(essence = 'interval', bounds= [means[3]-2* stds[3], means[3]+2* stds[3]]),
-            #UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
-            ]
-print(x)    
-results = focused_discretisation_propagation_method(x=x, f=Fun, method = 'endpoints', n_disc= 2,
-                                                    condensation=2,
-                                                    save_raw_data= 'yes')
-#results.summary()
-def plotPbox(xL, xR, p=None):
-    """
-    Plots a p-box (probability box) using matplotlib.
-
-    Args:
-        xL (np.ndarray): A 1D NumPy array of lower bounds.
-        xR (np.ndarray): A 1D NumPy array of upper bounds.
-        p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
-                                   Defaults to None, which generates equally spaced probabilities.
-        color (str, optional): The color of the plot. Defaults to 'k' (black).
-    """
-    xL = np.squeeze(xL)  # Ensure xL is a 1D array
-    xR = np.squeeze(xR)  # Ensure xR is a 1D array
-
-    
-    if p is None:
-        p = np.linspace(0, 1, len(xL) + 1)  # p should have one more element than xL/xR
-
-    #Plot the step functions
-    plt.step(np.concatenate(([xL[0]], xL)), p, where='post', color='black')
-    plt.step(np.concatenate(([xR[0]], xR)), p, where='post', color='red')
-
-    #Add bottom and top lines to close the box
-    plt.plot([xL[0], xR[0]], [0, 0], color='red')  # Bottom line
-    plt.plot([xL[-1], xR[-1]], [1, 1], color='black')  # Top line
-
-    # Add x and y axis labels
-    plt.xlabel("X", fontsize=14)  
-    plt.ylabel("Cumulative Probability", fontsize=14) 
-    # Increase font size for axis numbers
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
-
-    plt.show()
-print(results.raw_data['x'])
-plotPbox(results.raw_data['min']['f'][0],results.raw_data['max']['f'][0])

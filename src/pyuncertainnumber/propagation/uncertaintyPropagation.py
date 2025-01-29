@@ -1,18 +1,18 @@
 # import plotly.express as ps
 from typing import Callable, Union
 import numpy as np
-from PyUncertainNumber.propagation.epistemic_uncertainty.endpoints import endpoints_method
-from PyUncertainNumber.propagation.epistemic_uncertainty.subinterval import subinterval_method
-from PyUncertainNumber.propagation.epistemic_uncertainty.sampling import sampling_method
-from PyUncertainNumber.propagation.epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
-from PyUncertainNumber.propagation.epistemic_uncertainty.local_optimisation import local_optimisation_method
-from PyUncertainNumber.propagation.epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
-from PyUncertainNumber.propagation.aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
-from PyUncertainNumber.propagation.mixed_uncertainty.focused_discretisation_propagation import focused_discretisation_propagation_method
-from PyUncertainNumber.propagation.mixed_uncertainty.varied_discretisation_propagation import varied_discretisation_propagation_method
-from PyUncertainNumber.propagation.utils import create_folder, save_results, Propagation_results
-from PyUncertainNumber.characterisation.uncertainNumber import UncertainNumber
-from PyUncertainNumber.pba.distributions import Distribution
+from pyuncertainnumber.propagation.epistemic_uncertainty.endpoints import endpoints_method
+from pyuncertainnumber.propagation.epistemic_uncertainty.subinterval import subinterval_method
+from pyuncertainnumber.propagation.epistemic_uncertainty.sampling import sampling_method
+from pyuncertainnumber.propagation.epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
+from pyuncertainnumber.propagation.epistemic_uncertainty.local_optimisation import local_optimisation_method
+from pyuncertainnumber.propagation.epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
+from pyuncertainnumber.propagation.aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
+from pyuncertainnumber.propagation.mixed_uncertainty.focused_discretisation_propagation import focused_discretisation_propagation_method
+from pyuncertainnumber.propagation.mixed_uncertainty.varied_discretisation_propagation import varied_discretisation_propagation_method
+from pyuncertainnumber.propagation.utils import create_folder, save_results, Propagation_results
+from pyuncertainnumber.characterisation.uncertainNumber import UncertainNumber
+from pyuncertainnumber.pba.distributions import Distribution
 
 #TODO the cauchy with save_raw_data = 'yes' raises issues.  
 # ---------------------the top level UP function ---------------------#
@@ -119,12 +119,11 @@ def aleatory_propagation(
             # UncertainNumber(essence="distribution", distribution_parameters=None, **kwargs)
             results.un = None
         else:
-            results.un = None
-        #     results.un = []
-        #     # Access raw_data from results object
-        #     for sample_data in results.raw_data["f"].T:
-        #         d = Distribution(sample_data= sample_data)
-        #         results.un.append(UncertainNumber.fromDistribution(d))
+            results.un = []
+            # Access raw_data from results object
+            for sample_data in results.raw_data["f"].T:
+                d = Distribution(sample_data= sample_data)
+                results.un.append(UncertainNumber.fromDistribution(d))
 
         if save_raw_data == "yes":
             res_path = create_folder(base_path, method)

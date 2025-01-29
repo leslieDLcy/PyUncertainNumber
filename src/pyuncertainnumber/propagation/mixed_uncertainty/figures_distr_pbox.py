@@ -2,7 +2,7 @@ import numpy as np
 from typing import Callable, Union
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-from PyUncertainNumber import UncertainNumber
+from pyuncertainnumber import UncertainNumber
 
 def outward_direction(x: list, 
                     n_disc: Union[int, np.ndarray] = 10, 

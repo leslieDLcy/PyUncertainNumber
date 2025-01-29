@@ -25,7 +25,11 @@ class DistributionSpecification:
     def __init__(self, dist_family: str, dist_params: tuple):
         self.dist_family = dist_family
         self.dist_params = dist_params
-        self.tell_i_flag()
+        if self.dist_params is not None:  
+            self.tell_i_flag()
+        else:
+            # Handle the case where dist_params is None, e.g., set a default value
+            self._i_flag = True  # or True, depending on your logic
 
     def tell_i_flag(self):
         """boolean about if imprecise specification"""

@@ -25,7 +25,7 @@ from scipy.stats import (
 import scipy.stats as sps
 from ..pba.intervalOperators import mean
 from ..pba.intervals import Interval
-from PyUncertainNumber import pba
+from pyuncertainnumber import pba
 from ..pba.distributions import Distribution as D
 from ..pba.distributions import named_dists
 from ..pba.pbox import named_pbox

@@ -338,6 +338,7 @@ class UncertainNumber:
                 essence="distribution",
                 distribution_parameters=None,
                 _samples=D.sample_data,
+                **kwargs,
             )
 
     # @classmethod
