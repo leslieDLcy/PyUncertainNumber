@@ -5,7 +5,6 @@ from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product impor
 from pyuncertainnumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
 from pyuncertainnumber.propagation.utils import Propagation_results
 
-
 def extremepoints_method(x: np.ndarray, f: Callable,
                          results: Propagation_results = None,
                          save_raw_data='no') -> Propagation_results:  # Specify return type
@@ -67,15 +66,12 @@ def extremepoints_method(x: np.ndarray, f: Callable,
     # Select rows based on indices (adjusting for 0-based indexing)
     Xeval = X[inds - 1]
 
-    print(
-        f"Total number of input combinations for the endpoints extreme points method: {d + 3}")
-
-    # propagates the epistemic uncertainty through subinterval reconstitution
+    # propagates the epistemic uncertainty through extremepoints
     if f is not None:
 
         # Simulate function for the selected subset
         all_output = []
-        for c in tqdm.tqdm(Xeval, desc="Evaluating samples"):
+        for c in tqdm.tqdm(Xeval, desc="Number of function evaluations"):
             output = f(c)
             all_output.append(output)
 
@@ -98,23 +94,35 @@ def extremepoints_method(x: np.ndarray, f: Callable,
             # Calculate extreme points
             Xsign[2*i:2*(i+1), :] = extreme_pointX(x, part_deriv_sign[i])
         
-        lower_bound = np.zeros(num_outputs)
-        upper_bound = np.zeros(num_outputs)
-
-        if num_outputs == 1:
-            lower_bound[0] = f(Xsign[2*i, :])
-            upper_bound[0] = f(Xsign[2*i + 1, :])
-        else:
-            for i in range(num_outputs):
-                lower_bound[i] = f(Xsign[2*i, :])[i]
-                upper_bound[i] = f(Xsign[2*i + 1, :])[i]
-
+        # Store and reuse evaluations
+        evaluated_points = {}
+        lower_bound = np.full(num_outputs, np.inf)  # Initialize with inf
+        upper_bound = np.full(num_outputs, -np.inf)  # Initialize with -inf
         min_indices = np.zeros((d, num_outputs))
         max_indices = np.zeros((d, num_outputs))
-        for i in range(num_outputs):  # Iterate over outputs
-            min_indices[:, i] = Xsign[2*i, :]
-            max_indices[:, i] = Xsign[2*i+1, :]
+        num_evaluations = 0  # Initialize evaluation counter
 
+        for i in range(num_outputs):
+            for j in range(2):  # For lower and upper bounds
+                key = tuple(Xsign[2*i + j,:])
+                if key not in evaluated_points:
+                    evaluated_points[key] = f(Xsign[2*i + j,:])
+                    num_evaluations += 1
+                if num_outputs == 1:
+                    output = evaluated_points[key]
+                   
+                else:
+                    output = evaluated_points[key][i]
+
+                # Determine if this is the lower or upper bound for this output
+                if output < lower_bound[i]:
+                    lower_bound[i] = output
+                    min_indices[:, i] = Xsign[2*i + j,:] 
+                if output > upper_bound[i]:
+                    upper_bound[i] = output
+                    max_indices[:, i] = Xsign[2*i + j,:] 
+        
+        print(f"Number of total function evaluations: {num_evaluations + len(Xeval)}")
         # Convert to 2D arrays (if necessary) and append
         for i in range(num_outputs):
             results.raw_data['min'] = np.append(
@@ -128,7 +136,6 @@ def extremepoints_method(x: np.ndarray, f: Callable,
         results.raw_data['x']= Xeval
         results.raw_data['f']= all_output
     
-
     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
         # Store Xeval in raw_data['x'] even if f is None
         results.add_raw_data(x=Xeval)
@@ -139,13 +146,3 @@ def extremepoints_method(x: np.ndarray, f: Callable,
         )
 
     return results
-
-# # Example usage with different parameters for minimization and maximization
-# f = lambda x: x[0] + x[1] + x[2]  # Example function
-
-# # Determine input parameters for function and method
-# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-# n=2
-# # Call the method
-# y = extremepoints_method(x_bounds, f=f, save_raw_data= 'yes')
-# y.print()

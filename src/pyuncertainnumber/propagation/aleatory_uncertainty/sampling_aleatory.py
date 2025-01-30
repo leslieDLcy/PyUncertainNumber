@@ -8,18 +8,12 @@ def sampling_aleatory_method(
     x: list,
     f: Callable,
     results: Propagation_results = None,
-    n_sam: int = 500,
     method="monte_carlo",
+    n_sam: int = 500,
     save_raw_data="no") -> Propagation_results:  # Specify return type
-    """Performs uncertainty propagation using Monte Carlo or Latin Hypercube sampling, similar to the `sampling_method`.
-       It also combines the sampling method with the ednpoints method.  
-
-    description:
-        - Propagates aleatory uncertainty in the input by generating random samples from the input 
-        distributions and evaluating the function at those samples.
-        - It estimates the distribution of possible outputs of a function (f),
-          when its inputs are uncertain and described by probability distributions.
- 
+    """Performs aleatory uncertainty propagation using Monte Carlo or Latin Hypercube sampling,
+        when its inputs are uncertain and described by probability distributions. 
+       
     args:
         x (list): A list of `UncertainNumber` objects, each representing an input
                  variable with its associated uncertainty.
@@ -29,8 +23,6 @@ def sampling_aleatory_method(
         results (Propagation_results, optional): An object to store propagation results.
                                             Defaults to None, in which case a new
                                             `Propagation_results` object is created.
-        n_sam (int): The number of samples to generate for the chosen sampling method.
-                Defaults to 500.
         method (str, optional): The sampling method to use. Choose from:
                             - 'monte_carlo': Monte Carlo sampling (random sampling
                                               from the distributions specified in
@@ -38,8 +30,10 @@ def sampling_aleatory_method(
                             - 'latin_hypercube': Latin Hypercube sampling (stratified
                                                   sampling for better space coverage)
                             Defaults to 'monte_carlo'.
-        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw input data when a function (f) 
-          is not provided.
+        n_sam (int): The number of samples to generate for the chosen sampling method.
+                Defaults to 500.
+        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw 
+          input data when a function (f) is not provided.
           - 'no': Returns an error that no function is provided.
           - 'yes': Returns the full arrays of unique input combinations.
 
@@ -73,50 +67,47 @@ def sampling_aleatory_method(
     if results is None:
         results = Propagation_results()
 
-    if method not in ("monte_carlo", "latin_hypercube"):
-        raise ValueError(
-            "Invalid sampling method. Choose 'monte_carlo' or 'latin_hypercube'."
-        )
-
     if save_raw_data not in ("yes", "no"):
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
 
     print(f"Total number of input combinations for the {method} method: {n_sam}")
+    match method:
+        case "monte_carlo":
+            parameter_samples = np.array([un.random(size=n_sam) for un in x])
+        case "latin_hypercube":
+            sampler = qmc.LatinHypercube(d=len(x))
+            lhd_samples = sampler.random(n=n_sam)
 
-    if method == "monte_carlo":
-        parameter_samples = np.array([un.random(size=n_sam) for un in x])
+            parameter_samples = []  # Initialize an empty list to store the samples
 
-    elif method == "latin_hypercube":
-        sampler = qmc.LatinHypercube(d=len(x))
-        lhd_samples = sampler.random(n=n_sam)
+            for i, un in enumerate(x):  # Iterate over each UncertainNumber in the list 'x'
+                # Get the entire column of quantiles for this UncertainNumber
+                q_values = lhd_samples[:, i]
 
-        parameter_samples = []  # Initialize an empty list to store the samples
+                # Now we need to calculate the ppf for each q value in the q_values array
+                ppf_values = (
+                    []
+                )  # Initialize an empty list to store the ppf values for this UncertainNumber
+                for q in q_values:  # Iterate over each individual q value
+                    ppf_value = un.ppf(q)  # Calculate the ppf value for this q
+                    # Add the calculated ppf value to the list
+                    ppf_values.append(ppf_value)
 
-        for i, un in enumerate(x):  # Iterate over each UncertainNumber in the list 'x'
-            # Get the entire column of quantiles for this UncertainNumber
-            q_values = lhd_samples[:, i]
+                # Add the list of ppf values to the main list
+                parameter_samples.append(ppf_values)
 
-            # Now we need to calculate the ppf for each q value in the q_values array
-            ppf_values = (
-                []
-            )  # Initialize an empty list to store the ppf values for this UncertainNumber
-            for q in q_values:  # Iterate over each individual q value
-                ppf_value = un.ppf(q)  # Calculate the ppf value for this q
-                # Add the calculated ppf value to the list
-                ppf_values.append(ppf_value)
-
-            # Add the list of ppf values to the main list
-            parameter_samples.append(ppf_values)
-
-        # Convert the list of lists to a NumPy array
-        parameter_samples = np.array(parameter_samples)
+            # Convert the list of lists to a NumPy array
+            parameter_samples = np.array(parameter_samples)
+        
+        case _: raise ValueError(
+                     "Invalid UP method! focused_discretisation_cauchy is under development.")
 
     # Transpose to have each row as a sample
     parameter_samples = parameter_samples.T
 
     if f is not None:  # Only evaluate if f is provided
         all_output = np.array(
-            [f(xi) for xi in tqdm.tqdm(parameter_samples, desc="Evaluating samples")]
+            [f(xi) for xi in tqdm.tqdm(parameter_samples, desc="function evaluations for samples")]
         )
 
         if all_output.ndim == 1:  # If f returns a single output

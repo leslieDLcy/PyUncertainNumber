@@ -186,15 +186,15 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
     cartesian_product_indices = cartesian(*bounds_x_index)
     #print("cartesian_product_indices", cartesian_product_indices)
     # Generate the final array using the indices
-    focal_elements_comb = []
+    intervals_comb = []
     for indices in cartesian_product_indices:
         temp = []
         for i, index in enumerate(indices):
             temp.append(bounds_x[i][index])
-        focal_elements_comb.append(temp)
+        intervals_comb.append(temp)
 
-    focal_elements_comb = np.array(focal_elements_comb, dtype=object)
-    #print('focal_elements_comb',focal_elements_comb)
+    intervals_comb = np.array(intervals_comb, dtype=object)
+    #print('intervals_comb',intervals_comb)
     all_output = None
    
     # Efficiency upgrade: store repeated evaluations
@@ -204,10 +204,10 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
 
     match method:
         case "endpoints" | "focused_discretisation_endpoints":
-            x_combinations = np.empty(( focal_elements_comb.shape[0]*(2**d), d), dtype=float)  # Pre-allocate the array
+            x_combinations = np.empty(( intervals_comb.shape[0]*(2**d), d), dtype=float)  # Pre-allocate the array
             current_index = 0  # Keep track of the current insertion index
 
-            for array in focal_elements_comb:
+            for array in intervals_comb:
                 cartesian_product_x = cartesian(*array)
                 # Get the number of combinations from cartesian(*array)
                 num_combinations = cartesian_product_x.shape[0]
@@ -225,7 +225,7 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
                 inpsList = np.empty((0, x_combinations.shape[1]))
 
                 # Wrap the loop with tqdmx_combinations
-                for case in tqdm.tqdm(x_combinations, desc="Evaluating focal points"):
+                for case in tqdm.tqdm(x_combinations, desc="input combinations"):
                     im = np.where((inpsList == case).all(axis=1))[0]
                     if not im.size:
                         output = f(case)
@@ -244,7 +244,7 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
 
                 # Convert all_output to a 2D NumPy array
                 all_output = np.array(all_output_list).reshape(
-                    focal_elements_comb.shape[0], (2**d), num_outputs)
+                    intervals_comb.shape[0], (2**d), num_outputs)
 
                 # Calculate min and max for each sublist in all_output
                 min_values = np.min(all_output, axis=1)
@@ -293,10 +293,10 @@ def focused_discretisation_propagation_method(x: list, f:Callable = None,
 
                 inpsList = np.zeros((0, d))
                 evalsList = np.zeros((0, num_outputs))
-                all_output = np.empty((num_outputs, len(focal_elements_comb), 2))
+                all_output = np.empty((num_outputs, len(intervals_comb), 2))
 
                 # Preallocate all_output_list with explicit loops
-                for i, slice in tqdm.tqdm(enumerate(focal_elements_comb), desc="Evaluating focal points", total=len(focal_elements_comb)):
+                for i, slice in tqdm.tqdm(enumerate(intervals_comb), desc="input combinations", total=len(intervals_comb)):
                     for out in range(num_outputs):  # Iterate over each output
                         for k in range(2):  # For each of the two extreme points
                             # Calculate Xsings using the correct part_deriv_sign for the current output

@@ -32,8 +32,8 @@ def sampling_method(
     x: np.ndarray,
     f: Callable,
     results: Propagation_results = None,
-    n_sam: int = 500,
     method="monte_carlo",
+    n_sam: int = 500, 
     save_raw_data="no",
     endpoints=False,
 ) -> Propagation_results:  # Specify return type
@@ -47,11 +47,11 @@ def sampling_method(
         results (Propagation_results, optional): An object to store propagation results.
                                             Defaults to None, in which case a new
                                             `Propagation_results` object is created.
-        n_sam (int): The number of samples to generate for the chosen sampling method.
         method (str, optional): The sampling method to use. Choose from:
                                  - 'monte_carlo': Monte Carlo sampling (random sampling from uniform distributions)
                                  - 'latin_hypercube': Latin Hypercube sampling (stratified sampling for better space coverage)
                                 Defaults to 'monte_carlo'.
+        n_sam (int): The number of samples to generate for the chosen sampling method.
         endpoints (bool, optional): If True, include the interval endpoints in the sampling.
                                     Defaults to False.
         save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw input data when a function (f) 

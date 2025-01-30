@@ -2,12 +2,14 @@
 from typing import Callable, Union
 import numpy as np
 from pyuncertainnumber.propagation.epistemic_uncertainty.endpoints import endpoints_method
+from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
 from pyuncertainnumber.propagation.epistemic_uncertainty.subinterval import subinterval_method
 from pyuncertainnumber.propagation.epistemic_uncertainty.sampling import sampling_method
 from pyuncertainnumber.propagation.epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
 from pyuncertainnumber.propagation.epistemic_uncertainty.local_optimisation import local_optimisation_method
 from pyuncertainnumber.propagation.epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
 from pyuncertainnumber.propagation.aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
+from pyuncertainnumber.propagation.aleatory_uncertainty.sampling_aleatory_dispersive import dispersive_sampling_method
 from pyuncertainnumber.propagation.mixed_uncertainty.focused_discretisation_propagation import focused_discretisation_propagation_method
 from pyuncertainnumber.propagation.mixed_uncertainty.varied_discretisation_propagation import varied_discretisation_propagation_method
 from pyuncertainnumber.propagation.utils import create_folder, save_results, Propagation_results
@@ -21,8 +23,11 @@ def aleatory_propagation(
     vars: list = None,
     fun: Callable = None,
     results: Propagation_results = None,
-    n_sam: int = 500,
     method: str = "monte_carlo",
+    n_sam: int = 500,
+    tOp: Union[float, np.ndarray] =0.999,
+    bOt: Union[float, np.ndarray] = 0.001,
+    part_derv_sign = None,
     save_raw_data="no",
     *,  # Keyword-only arguments start here
     base_path=np.nan,
@@ -38,10 +43,14 @@ def aleatory_propagation(
         results (Propagation_results, optional): An object to store propagation results.
                                     Defaults to None, in which case a new
                                     `Propagation_results` object is created.
-        n_sam (int): The number of samples to generate.
-                    Default is 500.
         method (str, optional): The sampling method ('monte_carlo' or 'latin_hypercube').
                     Defaults to 'monte_carlo'.
+        n_sam (int): The number of samples to generate.
+                    Default is 500.
+        tOp (Union[float, np.ndarray], optional): Upper threshold or bound used in some methods. 
+                                Defaults to 0.999.
+        bOt (Union[float, np.ndarray], optional): Lower threshold or bound used in some methods.
+                                Defaults to 0.001.
         save_raw_data (str, optional): Whether to save raw data ('yes' or 'no').
                     Defaults to 'no'.
         base_path (str, optional): Path for saving results (if save_raw_data is 'yes').
@@ -142,8 +151,27 @@ def aleatory_propagation(
                 x=vars,
                 f=fun,
                 results=results,
-                n_sam=n_sam,
                 method=method.lower(),
+                n_sam=n_sam,
+                save_raw_data=save_raw_data,
+                **kwargs,
+            )
+            return process_alea_results(results)
+        case "dispersive_monte_carlo":
+
+            if n_sam is None:
+                raise ValueError(
+                    "n_sam (number of samples) is required for sampling methods."
+                )
+            results = dispersive_sampling_method(
+                x=vars,
+                f=fun,
+                results=results,
+                method=method.lower(),
+                n_sam=n_sam,
+                tOp =tOp,
+                bOt = bOt,
+                part_derv_sign = part_derv_sign,
                 save_raw_data=save_raw_data,
                 **kwargs,
             )
@@ -302,7 +330,6 @@ def mixed_propagation(
                                                 results=results,
                                                 method = method,
                                                 n_disc= n_disc,
-                                                
                                                 tOp =tOp,
                                                 bOt= bOt,
                                                 condensation =condensation, 
@@ -329,8 +356,7 @@ def mixed_propagation(
             results = varied_discretisation_propagation_method(x=vars,                                
                                                 f=fun,
                                                 results=results,
-                                                #method = method,
-                                                #method = 'extremepoints',
+                                                method = method,
                                                 n_disc= n_disc,
                                                 tOp =tOp,
                                                 bOt= bOt,
@@ -346,10 +372,10 @@ def epistemic_propagation(
     vars: list = None,
     fun: Callable = None,
     results: Propagation_results = None,
+    method: str = None,
     n_sub: np.integer = None,
     n_sam: np.integer = None,
     x0: np.ndarray = None,
-    method: str = None,
     save_raw_data="no",
     *,  # Keyword-nly arguments start here
     base_path=np.nan,
@@ -373,14 +399,14 @@ def epistemic_propagation(
         results (Propagation_results, optional): An object to store propagation results.
                         Defaults to None, in which case a new
                         `Propagation_results` object is created.
+        method (str, optional): The uncertainty propagation method to use.
+                        Defaults to "endpoint".
         n_sub (np.integer, optional): Number of subintervals for subinterval methods.
                         Defaults to None.
         n_sam (np.integer, optional): Number of samples for sampling-based methods.
                         Defaults to None.
         x0 (np.ndarray, optional): Initial guess for local optimization methods.
                         Defaults to None.
-        method (str, optional): The uncertainty propagation method to use.
-                        Defaults to "endpoint".
         save_raw_data (str, optional): Whether to save raw data ('yes' or 'no').
                         Defaults to "no".
         base_path (str, optional): Path for saving results (if save_raw_data is 'yes').
@@ -648,12 +674,11 @@ def epistemic_propagation(
 def Propagation(vars:list,
         fun:Callable,
         results: Propagation_results = None,
+        method=None,
         n_sub: np.integer = 3,
         n_sam: np.integer = 500,
-        x0: np.ndarray = None,
-        method=None,
-        n_disc: Union[int, np.ndarray] = 10, 
-        
+        x0: np.ndarray = None, 
+        n_disc: Union[int, np.ndarray] = 10,        
         tOp: Union[float, np.ndarray] = 0.999,
         bOt: Union[float, np.ndarray] = 0.001,
         condensation:int = None,
@@ -677,14 +702,14 @@ def Propagation(vars:list,
         results (Propagation_results, optional): An object to store propagation results.
                                 Defaults to None, in which case a new
                                 `Propagation_results` object is created.
+        method (str, optional):  Specifies the uncertainty propagation method.
+                            Defaults to None, which triggers automatic selection.
         n_sub (np.integer, optional): Number of subintervals for interval-based methods.
                             Defaults to 3.
         n_sam (np.integer, optional): Number of samples for Monte Carlo simulation.
                             Defaults to 500.
         x0 (np.ndarray, optional): Initial guess for optimization-based methods.
                             Defaults to None.
-        method (str, optional):  Specifies the uncertainty propagation method.
-                            Defaults to None, which triggers automatic selection.
         n_disc (Union[int, np.ndarray], optional): Number of discretization points.
                             Defaults to 10.
         tOp (Union[float, np.ndarray], optional): Upper threshold or bound. 
@@ -716,7 +741,6 @@ def Propagation(vars:list,
     signature:
        Propagation(vars: list, fun: Callable, results: Propagation_results = None, ...) -> Propagation_results
 
-
     return:
         Propagation_results: A  `Propagation_results` object including:
                         - 'un': A list of UncertainNumber objects, each representing
@@ -743,10 +767,10 @@ def Propagation(vars:list,
         y = epistemic_propagation(vars = vars,
                                         fun = fun,
                                         results= results, 
+                                        method = method,
                                         n_sub = n_sub,
                                         n_sam = n_sam,
                                         x0 = x0,
-                                        method = method,
                                         save_raw_data = save_raw_data,
                                         base_path = base_path ,
                                         tol_loc= tol_loc,
@@ -778,8 +802,8 @@ def Propagation(vars:list,
             y = aleatory_propagation(vars=vars,
                                       fun=fun,
                                       results=results,
-                                      n_sam=n_sam,
                                       method=method,
+                                      n_sam=n_sam,                                      
                                       save_raw_data=save_raw_data,
                                       base_path=base_path,
                                       **kwargs)
@@ -787,7 +811,7 @@ def Propagation(vars:list,
         y = mixed_propagation(vars = vars,                                
                               fun= fun,
                               results= results,
-                             method = method, 
+                              method = method, 
                               n_disc= n_disc,
                               tOp =tOp,
                               bOt= bOt,

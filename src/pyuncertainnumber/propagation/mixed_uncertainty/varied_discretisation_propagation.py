@@ -5,7 +5,6 @@ from pyuncertainnumber.propagation.epistemic_uncertainty.extreme_point_func impo
 from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
 from pyuncertainnumber.propagation.utils import Propagation_results, condense_bounds
 
-#TODO if funciton is none, print input combinations. 
 def imp(X):
     """Imposition of intervals."""
 
@@ -13,7 +12,7 @@ def imp(X):
 
 def varied_discretisation_propagation_method(x: list, f:Callable = None,  
                                 results: Propagation_results = None, 
-                                #method = 'extremepoints',
+                                method = 'extremepoints',
                                 n_disc: Union[int, np.ndarray] = 10, 
                                 tOp: Union[float, np.ndarray] = 0.999,
                                 bOt: Union[float, np.ndarray] = 0.001,
@@ -37,6 +36,9 @@ def varied_discretisation_propagation_method(x: list, f:Callable = None,
         results (Propagation_results, optional): An object to store propagation results.
                                     Defaults to None, in which case a new
                                     `Propagation_results` object is created.
+        method (str, optional): The method to use.
+                            - 'extremepoints', 'varied_discretisation_extremepoints': Only method 
+                                supported. 
         n_disc (Union[int, np.ndarray], optional): The number of discretization points 
                                     for each uncertain input. If an integer 
                                     is provided, it is used for all inputs. 
@@ -178,121 +180,128 @@ def varied_discretisation_propagation_method(x: list, f:Callable = None,
 
         xl.append(temp_xl)  # Add the temporary list to xl
         xr.append(temp_xr)  # Add the temporary list to xr
-    if f is not None:
-        # Determine the positive or negative signs for each input
-        res = extremepoints_method(ranges.T, f)
+    
+    match method:
+        case "extremepoints" | "varied_discretisation_extremepoints":
+            if f is not None:
+                # Determine the positive or negative signs for each input
+                res = extremepoints_method(ranges.T, f)
 
-        # Determine the number of outputs from the first evaluation
-        try:
-            num_outputs = res.raw_data['part_deriv_sign'].shape[0]
-        except TypeError:
-            num_outputs = 1  # If f returns a single value
+                # Determine the number of outputs from the first evaluation
+                try:
+                    num_outputs = res.raw_data['part_deriv_sign'].shape[0]
+                except TypeError:
+                    num_outputs = 1  # If f returns a single value
 
-        all_output_list = []
-        for _ in range(num_outputs):
-            output_for_current_output = []
-            for input in range(d):
-                slices_for_input = []
-                for _ in range(n_slices[input]-1):  # Use n_slices[input] here
-                    slices_for_input.append([None, None])
-                output_for_current_output.append(slices_for_input)
-            all_output_list.append(output_for_current_output)
+                all_output_list = []
+                for _ in range(num_outputs):
+                    output_for_current_output = []
+                    for input in range(d):
+                        slices_for_input = []
+                        for _ in range(n_slices[input]-1):  # Use n_slices[input] here
+                            slices_for_input.append([None, None])
+                        output_for_current_output.append(slices_for_input)
+                    all_output_list.append(output_for_current_output)
 
-        inpsList = np.zeros((0, d))
-        evalsList = np.zeros((0, num_outputs))
+                inpsList = np.zeros((0, d))
+                evalsList = np.zeros((0, num_outputs))
 
-        for input in range(d):  # Iterate over input variables first
-            X = [ranges[:, k].tolist() for k in range(d)]
-            temp_X = X.copy()
-            Xsings = np.empty((n_slices[input], 2, d))
-            current_index = 0
+                for input in range(d):  # Iterate over input variables first
+                    X = [ranges[:, k].tolist() for k in range(d)]
+                    temp_X = X.copy()
+                    Xsings = np.empty((n_slices[input], 2, d))
+                    current_index = 0
 
-            for slice in tqdm.tqdm(range(n_slices[input] - 1), desc=f"Processing input {input+1}"):
-                temp_X[input] = []
-                temp_X[input].extend(
-                    np.array([xl[input][slice], xr[input][slice]]).tolist())
-                rang = np.array([temp_X[i] for i in range(d)], dtype=object)
-                Xsings[slice, :, :] = extreme_pointX(rang, res.raw_data['part_deriv_sign'])  # Use the entire part_deriv_sign array
-                current_index += 1
+                    for slice in tqdm.tqdm(range(n_slices[input] - 1), desc=f"Processing input {input+1}"):
+                        temp_X[input] = []
+                        temp_X[input].extend(
+                            np.array([xl[input][slice], xr[input][slice]]).tolist())
+                        rang = np.array([temp_X[i] for i in range(d)], dtype=object)
+                        Xsings[slice, :, :] = extreme_pointX(rang, res.raw_data['part_deriv_sign'])  # Use the entire part_deriv_sign array
+                        current_index += 1
 
-                for k in range(Xsings.shape[1]):
-                    c = Xsings[slice, k, :]
-                    im = np.where((inpsList == c).all(axis=1))[0]
-                    if not im.size:
-                        output = f(c)
+                        for k in range(Xsings.shape[1]):
+                            c = Xsings[slice, k, :]
+                            im = np.where((inpsList == c).all(axis=1))[0]
+                            if not im.size:
+                                output = f(c)
 
-                        # Store each output in a separate sublist
-                        for out in range(num_outputs):
-                            all_output_list[out][input][slice][k] = output[out]
+                                # Store each output in a separate sublist
+                                for out in range(num_outputs):
+                                    all_output_list[out][input][slice][k] = output[out]
 
-                        inpsList = np.vstack([inpsList, c])
-                        evalsList = np.vstack([evalsList, np.array(output)])
-                    else:
-                        for out in range(num_outputs):
-                            all_output_list[out][input][slice][k] = evalsList[im[0]][out]
+                                inpsList = np.vstack([inpsList, c])
+                                evalsList = np.vstack([evalsList, np.array(output)])
+                            else:
+                                for out in range(num_outputs):
+                                    all_output_list[out][input][slice][k] = evalsList[im[0]][out]
 
-                current_index = 0  # Reset for the next input
+                        current_index = 0  # Reset for the next input
 
-        # Reshape all_output based on the actual number of elements per output
-        all_output = np.array(all_output_list, dtype=object)
+                # Reshape all_output based on the actual number of elements per output
+                all_output = np.array(all_output_list, dtype=object)
 
-        all_output = np.reshape(
-            all_output, (num_outputs, d, -1, 2))  # Reshape to 4D
+                all_output = np.reshape(
+                    all_output, (num_outputs, d, -1, 2))  # Reshape to 4D
 
-        # Calculate min and max for each output and input variable
-        min_values = np.min(all_output, axis=3)
-        max_values = np.max(all_output, axis=3)
+                # Calculate min and max for each output and input variable
+                min_values = np.min(all_output, axis=3)
+                max_values = np.max(all_output, axis=3)
 
-        # Initialize bounds_input
-        bounds_input = np.empty((num_outputs, d, n_disc, 2))
+                # Initialize bounds_input
+                bounds_input = np.empty((num_outputs, d, n_disc, 2))
 
-        for i in range(num_outputs):
-            for j in range(d):  # Iterate over input variables
-                # Merge min_values and max_values into bounds_input
-                for k in range(n_disc):
-                    bounds_input[i, j, k, 0] = min_values[i, j, k]
-                    bounds_input[i, j, k, 1] = max_values[i, j, k]
+                for i in range(num_outputs):
+                    for j in range(d):  # Iterate over input variables
+                        # Merge min_values and max_values into bounds_input
+                        for k in range(n_disc):
+                            bounds_input[i, j, k, 0] = min_values[i, j, k]
+                            bounds_input[i, j, k, 1] = max_values[i, j, k]
 
-                # Sort bounds_input along the last axis (k)
-                bounds_input[i, j, :, :] = np.sort(
-                    bounds_input[i, j, :, :], axis=-1)
+                        # Sort bounds_input along the last axis (k)
+                        bounds_input[i, j, :, :] = np.sort(
+                            bounds_input[i, j, :, :], axis=-1)
 
-        bounds = np.empty((num_outputs, 2, n_disc))  # Initialize bounds
-        lower_bound = np.zeros((num_outputs, n_disc))  # Initialize lower_bound
-        upper_bound = np.zeros((num_outputs, n_disc))  # Initialize upper_bound
+                bounds = np.empty((num_outputs, 2, n_disc))  # Initialize bounds
+                lower_bound = np.zeros((num_outputs, n_disc))  # Initialize lower_bound
+                upper_bound = np.zeros((num_outputs, n_disc))  # Initialize upper_bound
 
-        for i in range(num_outputs):
-            temp_bounds = []  # Temporary list for bounds
+                for i in range(num_outputs):
+                    temp_bounds = []  # Temporary list for bounds
 
-            for k in range(n_disc):  # Iterate over input variables
-                # Impose the p-boxes for each input variable and store in temporary list
-                temp_bounds.append(imp(bounds_input[i, :, k, :]))
+                    for k in range(n_disc):  # Iterate over input variables
+                        # Impose the p-boxes for each input variable and store in temporary list
+                        temp_bounds.append(imp(bounds_input[i, :, k, :]))
 
-            # Impose the p-boxes across all input variables for the current output
-            bounds[i, :, :] = np.array(temp_bounds).T
+                    # Impose the p-boxes across all input variables for the current output
+                    bounds[i, :, :] = np.array(temp_bounds).T
 
-            # Extract lower_bound and upper_bound from bounds
-            lower_bound[i, :] = bounds[i, 1, :]
-            upper_bound[i, :] = bounds[i, 0, :]
+                    # Extract lower_bound and upper_bound from bounds
+                    lower_bound[i, :] = bounds[i, 1, :]
+                    upper_bound[i, :] = bounds[i, 0, :]
 
-        if condensation is not None:
-            bounds = condense_bounds(bounds, condensation)
+                if condensation is not None:
+                    bounds = condense_bounds(bounds, condensation)
 
-        results.raw_data['bounds'] = bounds
-        results.raw_data['min'] = np.array([{'f': lower_bound[i, :]} for i in range(
-            num_outputs)])  # Initialize as a NumPy array
-        results.raw_data['max'] = np.array([{'f': upper_bound[i, :]} for i in range(
-            num_outputs)])  # Initialize as a NumPy array
+                results.raw_data['bounds'] = bounds
+                results.raw_data['min'] = np.array([{'f': lower_bound[i, :]} for i in range(
+                    num_outputs)])  # Initialize as a NumPy array
+                results.raw_data['max'] = np.array([{'f': upper_bound[i, :]} for i in range(
+                    num_outputs)])  # Initialize as a NumPy array
 
-        if save_raw_data == 'yes':
-            print('No raw data provided for this method!')
-            # results.add_raw_data(f= all_output, x= x_combinations)
+                if save_raw_data == 'yes':
+                    print('No raw data provided for this method!')
+                    # results.add_raw_data(f= all_output, x= x_combinations)
 
-    elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        # results.add_raw_data(f= None, x= x_combinations)
-        raise ValueError('No raw data provided for this method!')
+            elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
+                # results.add_raw_data(f= None, x= x_combinations)
+                raise ValueError('No raw data provided for this method!')
 
-    else:
-        raise ValueError("No function is provided. Please provide a function!")
+            else:
+                raise ValueError("No function is provided. Please provide a function!")
+        
+        case _: 
+            raise ValueError(
+                     "Invalid UP method! focused_discretisation_cauchy is under development.")
 
     return results
