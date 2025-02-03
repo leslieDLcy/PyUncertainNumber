@@ -1,6 +1,8 @@
 # import plotly.express as ps
-from typing import Callable, Union
 import numpy as np
+from typing import Callable, Union
+from pyuncertainnumber.characterisation.uncertainNumber import UncertainNumber
+from pyuncertainnumber.pba.distributions import Distribution
 from pyuncertainnumber.propagation.epistemic_uncertainty.endpoints import endpoints_method
 from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
 from pyuncertainnumber.propagation.epistemic_uncertainty.subinterval import subinterval_method
@@ -13,12 +15,9 @@ from pyuncertainnumber.propagation.aleatory_uncertainty.sampling_aleatory_disper
 from pyuncertainnumber.propagation.mixed_uncertainty.focused_discretisation_propagation import focused_discretisation_propagation_method
 from pyuncertainnumber.propagation.mixed_uncertainty.varied_discretisation_propagation import varied_discretisation_propagation_method
 from pyuncertainnumber.propagation.utils import create_folder, save_results, Propagation_results
-from pyuncertainnumber.characterisation.uncertainNumber import UncertainNumber
-from pyuncertainnumber.pba.distributions import Distribution
 
 #TODO the cauchy with save_raw_data = 'yes' raises issues.  
 # ---------------------the top level UP function ---------------------#
-
 def aleatory_propagation(
     vars: list = None,
     fun: Callable = None,
@@ -821,136 +820,3 @@ def Propagation(vars:list,
                                 **kwargs)                               
 
     return y
-
-# def plotPbox(xL, xR, p=None):
-#     """
-#     Plots a p-box (probability box) using matplotlib.
-
-#     Args:
-#         xL (np.ndarray): A 1D NumPy array of lower bounds.
-#         xR (np.ndarray): A 1D NumPy array of upper bounds.
-#         p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
-#                                    Defaults to None, which generates equally spaced probabilities.
-#         color (str, optional): The color of the plot. Defaults to 'k' (black).
-#     """
-#     xL = np.squeeze(xL)  # Ensure xL is a 1D array
-#     xR = np.squeeze(xR)  # Ensure xR is a 1D array
-
-#     if p is None:
-#         p = np.linspace(0, 1,len(xL))  # p should have one more element than xL/xR
-
-#     if p.min() > 0:
-#         p = np.concatenate(([0], p))
-#         xL = np.concatenate(([xL[0]], xL))
-#         xR = np.concatenate(([xR[0]], xR))
-
-#     if p.max() < 1:
-#         p = np.concatenate((p, [1]))
-#         xR = np.concatenate((xR, [xR[-1]]))
-#         xL = np.concatenate((xL, [xL[-1]]))
-    
-#     colors = 'black'
-#     # Highlight the points (xL, p)
-#     plt.scatter(xL, p, color=colors, marker='o', edgecolors='black', zorder=3)
-
-#     # Highlight the points (xR, p)
-#     plt.scatter(xR, p, color=colors, marker='o', edgecolors='black', zorder=3)
-
-#     plt.fill_betweenx(p, xL, xR, color=colors, alpha=0.5)
-#     plt.plot( [xL[0], xR[0]], [0, 0],color=colors, linewidth=3)
-#     plt.plot([xL[-1], xR[-1]],[1, 1],  color=colors, linewidth=3)
-#     plt.show()
-
-def main():
-    """ implementation of any method for epistemic uncertainty on the cantilever beam example"""
-
-    # y = np.array([0.145, 0.155])  # m
-
-    # L = np.array([9.95, 10.05])  # m
-
-    # I = np.array([0.0003861591, 0.0005213425])  # m**4
-
-    # F = np.array([11, 37])  # kN
-
-    # E = np.array([200, 220])  # GPa
-
-    # # Create a 2D np.array with all uncertain input parameters in the **correct** order.
-    # xInt = np.array([L, I, F, E])
-    
-    def cantilever_beam_deflection(x):
-        """Calculates deflection and stress for a cantilever beam.
-
-        Args:
-          x (np.array): Array of input parameters:
-              x[0]: Length of the beam (m)
-              x[1]: Second moment of area (mm^4)
-              x[2]: Applied force (N)
-              x[3]: Young's modulus (MPa)
-
-      Returns:
-          float: deflection (m)
-                 Returns np.nan if calculation error occurs.
-      """
-        beam_length = x[0]
-        I = x[1]
-        F = x[2]
-        E = x[3]
-        try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
-            deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
-
-        except:
-            deflection = np.nan
-
-        return np.array([deflection])
-    
-    def cantilever_beam_func(x):
-        
-        y = x[0]
-        beam_length = x[1]
-        I = x[2]
-        F = x[3]
-        E = x[4]
-        try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
-            deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
-            stress     = F * beam_length * y / I / 1000  # stress in MPa
-        
-        except:
-            deflection = np.nan
-            stress = np.nan
-
-        return np.array([deflection, stress])
-#     # example
-    y = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
-    L = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
-    I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
-    F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='distribution', distribution_parameters=["gaussian", [24, 8.67]])
-    E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='distribution', distribution_parameters=["gaussian", [210, 6.67]])
-    
-    # y = UncertainNumber(name='beam width', symbol='y', units='m', essence='interval', bounds=[0.145, 0.155]) 
-    # L = UncertainNumber(name='beam length', symbol='L', units='m', essence='interval', bounds= [9.95, 10.05])
-    # I = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='interval', bounds= [0.0003861591, 0.0005213425])
-    # F = UncertainNumber(name='vertical force', symbol='F', units='kN', essence='interval', bounds= [11, 37])
-    # E = UncertainNumber(name='elastic modulus', symbol='E', units='GPa', essence='interval', bounds=[200, 220])
-  
-    METHOD = "extremepoints"
-    base_path = "C:\\Users\\Ioanna\\OneDrive - The University of Liverpool\\DAWS2_code\\UP\\"
-
-    a = Propagation(vars= [ L, I, F, E], 
-                            fun= cantilever_beam_deflection, 
-                            method= 'latin_hypercube', 
-                            n_sam=8,
-                            #save_raw_data= "no"#,
-                            save_raw_data= "yes",
-                            base_path= base_path
-                        )
-    
-    a.summary()
-    # plotPbox(a.raw_data['min'][0]['f'], a.raw_data['max'][0]['f'], p=None)
-    # plt.show()
-    # plotPbox(a.raw_data['min'][1]['f'], a.raw_data['max'][1]['f'], p=None)
-    # plt.show() 
-   
-    return a
-
-if __name__ == "__main__":
-    main()

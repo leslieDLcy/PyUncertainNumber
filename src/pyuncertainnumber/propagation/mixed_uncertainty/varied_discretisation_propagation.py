@@ -205,12 +205,12 @@ def varied_discretisation_propagation_method(x: list, f:Callable = None,
 
                 inpsList = np.zeros((0, d))
                 evalsList = np.zeros((0, num_outputs))
+                num_evaluations = 0  # Reset for the next input
 
                 for input in range(d):  # Iterate over input variables first
                     X = [ranges[:, k].tolist() for k in range(d)]
                     temp_X = X.copy()
                     Xsings = np.empty((n_slices[input], 2, d))
-                    current_index = 0
 
                     for slice in tqdm.tqdm(range(n_slices[input] - 1), desc=f"Processing input {input+1}"):
                         temp_X[input] = []
@@ -218,13 +218,13 @@ def varied_discretisation_propagation_method(x: list, f:Callable = None,
                             np.array([xl[input][slice], xr[input][slice]]).tolist())
                         rang = np.array([temp_X[i] for i in range(d)], dtype=object)
                         Xsings[slice, :, :] = extreme_pointX(rang, res.raw_data['part_deriv_sign'])  # Use the entire part_deriv_sign array
-                        current_index += 1
-
+                        
                         for k in range(Xsings.shape[1]):
                             c = Xsings[slice, k, :]
                             im = np.where((inpsList == c).all(axis=1))[0]
                             if not im.size:
                                 output = f(c)
+                                num_evaluations += 1
 
                                 # Store each output in a separate sublist
                                 for out in range(num_outputs):
@@ -234,10 +234,9 @@ def varied_discretisation_propagation_method(x: list, f:Callable = None,
                                 evalsList = np.vstack([evalsList, np.array(output)])
                             else:
                                 for out in range(num_outputs):
-                                    all_output_list[out][input][slice][k] = evalsList[im[0]][out]
-
-                        current_index = 0  # Reset for the next input
-
+                                    all_output_list[out][input][slice][k] = evalsList[im[0]][out]                       
+                
+                print(f"Number of total function evaluations: {num_evaluations + len(res)}")
                 # Reshape all_output based on the actual number of elements per output
                 all_output = np.array(all_output_list, dtype=object)
 
@@ -248,6 +247,9 @@ def varied_discretisation_propagation_method(x: list, f:Callable = None,
                 min_values = np.min(all_output, axis=3)
                 max_values = np.max(all_output, axis=3)
 
+                min_val = np.sort(min_values, axis=2)
+                max_val = np.sort(max_values, axis=2)
+
                 # Initialize bounds_input
                 bounds_input = np.empty((num_outputs, d, n_disc, 2))
 
@@ -255,12 +257,11 @@ def varied_discretisation_propagation_method(x: list, f:Callable = None,
                     for j in range(d):  # Iterate over input variables
                         # Merge min_values and max_values into bounds_input
                         for k in range(n_disc):
-                            bounds_input[i, j, k, 0] = min_values[i, j, k]
-                            bounds_input[i, j, k, 1] = max_values[i, j, k]
+                            bounds_input[i, j, k, 0] = min_val[i, j, k]
+                            bounds_input[i, j, k, 1] = max_val[i, j, k]
 
                         # Sort bounds_input along the last axis (k)
-                        bounds_input[i, j, :, :] = np.sort(
-                            bounds_input[i, j, :, :], axis=-1)
+                        bounds_input[i, j, :, :] = np.sort(bounds_input[i, j, :, :], axis=-1)
 
                 bounds = np.empty((num_outputs, 2, n_disc))  # Initialize bounds
                 lower_bound = np.zeros((num_outputs, n_disc))  # Initialize lower_bound

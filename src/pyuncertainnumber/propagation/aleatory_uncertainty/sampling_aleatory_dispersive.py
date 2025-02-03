@@ -54,14 +54,13 @@ def dispersive_sampling_method(
             - 'un': UncertainNumber object(s) to represent the empirical distribution(s) of the output(s).
             - 'raw_data' (dict): Dictionary containing raw data shared across output(s):
                     - 'x' (np.ndarray): Input values.
-                    - 'f' (np.ndarray): Output values.
+                    - 'f' (np.ndarray): Output(s) values.
 
     raises:
         ValueError if no function is provided and save_raw_data is 'no' and if invald UP method is selected.
 
     example:
         # Example usage with different parameters for minimization and maximization
-
         >>> results = disperive_sampling_method(x=x, f=f, n_sam = 300, method = 'dispersive_monte_carlo', save_raw_data = "no")
     """
     if results is None:
