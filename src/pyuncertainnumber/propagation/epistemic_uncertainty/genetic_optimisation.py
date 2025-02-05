@@ -30,17 +30,27 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable,
                         (str or array of shape (2,)).
 
     signature:
-        genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, results:dict,
+        genetic_optimisation_method(x_bounds: np.ndarray, f: Callable, 
                                     pop_size=1000, n_gen=100, tol=1e-3,
-                                    n_gen_last=10, algorithm_type="NSGA2") -> dict
+                                    n_gen_last=10, algorithm_type="NSGA2") -> Propagation_results
 
+
+    notes:
+        It only handles a function which produces a single output.
+        Refer to `pymoo.optimize` documentation for available options.
 
     returns:
-        dict: A dictionary containing the optimisation results:
-            - 'bounds': An np.ndarray of the bounds for the output parameter (if f is not None). 
-            - 'min': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for minimisation results.
-            - 'max': A dictionary with keys 'x', 'f', 'n_gen', and 'n_iter' for maximisation results.
-
+        An `Propagation_results` object which contains:
+            - 'un': UncertainNumber object(s) to represent the interval of the output.
+            - 'raw_data' (dict): Dictionary containing raw data shared across output:
+                    - 'x' (np.ndarray): Input values.
+                    - 'f' (np.ndarray): Output values.
+                    - 'min' (np.ndarray): Array of dictionaries for the function's output,
+                              containing 'f' for the minimum of that output as well 'message', 'nit', 'nfev', 'final_simplex'.
+                    - 'max' (np.ndarray): Array of dictionaries for the function's output,
+                              containing 'f' for the maximum of that output as well 'message', 'nit', 'nfev', 'final_simplex'.
+                    - 'bounds' (np.ndarray): 2D array of lower and upper bounds for the output.
+    
     example:
         >>> # Example usage with different parameters for minimisation and maximisation
         >>> f = lambda x: x[0] + x[1] + x[2] # Example function
@@ -55,9 +65,7 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable,
         >>> algorithm_type = np.array(["GA", "NSGA2"])  
         >>> y = genetic_optimisation_method(x_bounds, f, pop_size=pop_size, n_gen=n_gen,
         >>>                                 tol=tol, n_gen_last=10, algorithm_type=algorithm_type)
-        >>> # Print the results                                               
-        >>> y.print()
-
+    
     """
 
     class ProblemWrapper(Problem):
