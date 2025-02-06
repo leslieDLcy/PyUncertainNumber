@@ -1,0 +1,363 @@
+import numpy as np
+from typing import Callable, Union
+import tqdm
+from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
+from pyuncertainnumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
+from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
+from pyuncertainnumber.propagation.utils import Propagation_results, condense_bounds
+
+#TODO add tail concentrating algorithms.
+#TODO add x valus for min and max
+def focused_discretisation_propagation_method(x: list, f:Callable = None,  
+                                    results: Propagation_results = None, 
+                                    method = 'endpoints',
+                                    n_disc: Union[int, np.ndarray] = 10, 
+                                 
+                                    tOp: Union[float, np.ndarray] = 0.999,
+                                    bOt: Union[float, np.ndarray] = 0.001,
+                                    condensation: Union[float, np.ndarray] = None, 
+                                    save_raw_data= 'no')-> Propagation_results:  # Specify return type
+    
+    """ This function performs uncertainty propagation for a mix of uncertain numbers. It is designed to 
+        handle situations where there are different types of uncertainty in the model's inputs, such as probability 
+        distributions, intervals, and p-boxes. To ensure conservative results, the function employs an outward-directed 
+        discretization approach for probability distributions and pboxes.  For distributions that extend to infinity 
+        (e.g., normal distribution), the discretization process incorporates cut-off points defined by the tOp (upper) 
+        and bOt (lower) parameters to bound the distribution. The function generates the cartesian product of the focal
+        elements from the discretized uncertain inputs.
+            - For the 'endpoints' method, it evaluates the function at all combinations of endpoints 
+              of the focal elements.
+            - For the 'extremepoints' method, it uses the `extremepoints_method` to determine the 
+              signs of the partial derivatives and evaluates the function at the extreme points.
+        The output p-boxes are constructed by considering the minimum and maximum values obtained from the function evaluations
+        `condensation` can be used to reduce the number of intervals in the output p-boxes. 
+
+    args:
+        x (list): A list of `UncertainNumber` objects representing the uncertain inputs.
+        f (Callable): The function to evaluate.
+        results (Propagation_results, optional): An object to store propagation results.
+                                    Defaults to None, in which case a new
+                                    `Propagation_results` object is created.
+        method (str, optional): The method used to estimate the bounds of each combination 
+                            of focal elements. Can be either 'endpoints' or 'extremepoints'. 
+                            Defaults to 'endpoints'.
+        n_disc (Union[int, np.ndarray], optional): The number of discretization points 
+                                    for each uncertain input. If an integer is provided,
+                                    it is used for all inputs. If a NumPy array is provided,
+                                    each element specifies the number of discretization 
+                                    points for the corresponding input. 
+                                    Defaults to 10.
+        tOp (Union[float, np.ndarray], optional): Upper threshold or array of thresholds for 
+                                    discretization. 
+                                    Defaults to 0.999.
+        bOt (Union[float, np.ndarray], optional): Lower threshold or array of thresholds for 
+                                    discretization. 
+                                    Defaults to 0.001.
+        condensation (Union[float, np.ndarray], optional): A parameter or array of parameters 
+                                    to control the condensation of the output p-boxes. 
+                                    Defaults to None.
+        save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). 
+                                   Defaults to 'no'.
+
+    signature:
+        focused_discretisation_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results      
+    
+    raises:
+      ValueError for unsupported uncertainty type, invalid UP method and if no fnction is given and saw_raw_data = 'no'
+       is selected.
+    
+    returns:
+        `Propagation_results` object(s) containing:
+            - 'un': UncertainNumber object(s) to characterise the empirical pbox(es) of the output(s).
+            - 'raw_data' (dict): Dictionary containing raw data shared across output(s):
+                    - 'x' (np.ndarray): Input values.
+                    - 'f' (np.ndarray): Output values.
+                    - 'min' (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'f' for the minimum of that output.
+                    - 'max' (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'f' for the maximum of that output.
+                    - 'bounds' (np.ndarray): 2D array of lower and upper bounds for each output.
+
+    example:
+        from PyUncertainNumber import UncertainNumber
+
+        def Fun(x):
+
+            input1= x[0]
+            input2=x[1]
+            input3=x[2]
+            input4=x[3]
+            input5=x[4]
+
+            output1 = input1 + input2 + input3 + input4 + input5
+            output2 = input1 * input2 * input3 * input4 * input5
+
+            return np.array([output1, output2])
+
+        means = np.array([1, 2, 3, 4, 5])
+        stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+
+        x = [
+            UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
+
+            UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
+            UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
+            UncertainNumber(essence = 'interval', bounds= [means[3]-2* stds[3], means[3]+2* stds[3]]),
+            UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
+            ]
+    
+        results = focused_discretisation_propagation_method(x=x, f=Fun, method = 'endpoints', n_disc= 5)
+    
+    """
+    d = len(x)  # dimension of uncertain numbers
+    results = Propagation_results()
+    bounds_x = []
+    ranges = np.zeros((2, d))
+    u_list = []  # List to store 'u' for each uncertain number
+
+    for i, un in enumerate(x):
+        print(f"Processing variable {i + 1} with essence: {un.essence}")
+
+        if un.essence != "interval":
+            # perform outward directed discretisation
+            if isinstance(n_disc, int):
+                nd = n_disc + 1
+            else:
+                nd = n_disc[i] + 1  # Use the i-th element of n_disc array
+
+            distribution_family = un.distribution_parameters[0]
+
+            if distribution_family == 'triang':
+                u = np.linspace(0, 1, nd)
+            else:
+                if isinstance(tOp, np.ndarray):
+                    top = tOp[i]
+                else:
+                    top = tOp
+                if isinstance(bOt, np.ndarray):
+                    bot = bOt[i]
+                else:
+                    bot = bOt
+                u = np.linspace(bot, top, nd)  # Use bOt and tOp here
+
+        else:  # un.essence == "interval"
+            u = np.array([0.0, 1.0])  # Or adjust as needed for intervals
+
+        u_list.append(u)  # Add 'u' to the list
+
+        # Generate discrete p-boxes
+        match un.essence:
+            case "distribution":
+                # Calculate xl and xr for distributions (adjust as needed)
+                # Assuming un.ppf(u) returns a list or array
+                temp_xl = un.ppf(u_list[i][:-1])
+                # Adjust based on your distribution
+                temp_xr = un.ppf(u_list[i][1:])
+                # Create a 2D array of bounds
+                rang = np.array([temp_xl, temp_xr]).T
+                bounds_x.append(rang)
+                ranges[:, i] = np.array([temp_xl[0], temp_xr[-1]])
+
+            case "interval":
+                # Repeat lower bound for all quantiles
+                temp_xl = np.array([un.bounds[0]])
+                # Repeat upper bound for all quantiles
+                temp_xr = np.array([un.bounds[1]])
+                # Create a 2D array of bounds
+                rang = np.array([temp_xl, temp_xr]).T
+                bounds_x.append(rang)
+                ranges[:, i] = un.bounds  # np.array([un.bounds])
+
+            case "pbox":
+                temp_xl = un.ppf(u_list[i][:-1])[0]
+                temp_xr = un.ppf(u_list[i][1:])[1]
+                # Create a 2D array of bounds
+                rang = np.array([temp_xl, temp_xr]).T
+                bounds_x.append(rang)
+                ranges[:, i] = np.array([temp_xl[0], temp_xr[-1]])
+
+            case _:
+                raise ValueError(f"Unsupported uncertainty type: {un.essence}")
+
+    # Automatically generate merged_array_index
+    bounds_x_index = [np.arange(len(sub_array)) for sub_array in bounds_x]
+
+    # Calculate Cartesian product of indices using your cartesian function
+    cartesian_product_indices = cartesian(*bounds_x_index)
+    #print("cartesian_product_indices", cartesian_product_indices)
+    # Generate the final array using the indices
+    intervals_comb = []
+    for indices in cartesian_product_indices:
+        temp = []
+        for i, index in enumerate(indices):
+            temp.append(bounds_x[i][index])
+        intervals_comb.append(temp)
+
+    intervals_comb = np.array(intervals_comb, dtype=object)
+    #print('intervals_comb',intervals_comb)
+    all_output = None
+   
+    # Efficiency upgrade: store repeated evaluations
+    inpsList = np.zeros((0, d))
+    evalsList = []
+    numRun = 0
+
+    match method:
+        case "endpoints" | "focused_discretisation_endpoints":
+            x_combinations = np.empty(( intervals_comb.shape[0]*(2**d), d), dtype=float)  # Pre-allocate the array
+            current_index = 0  # Keep track of the current insertion index
+
+            for array in intervals_comb:
+                cartesian_product_x = cartesian(*array)
+                # Get the number of combinations from cartesian(*array)
+                num_combinations = cartesian_product_x.shape[0]
+
+                # Assign the cartesian product to the appropriate slice of x_combinations
+                x_combinations[current_index: current_index + num_combinations] = cartesian_product_x
+                current_index += num_combinations  # Update the insertion index
+            
+            if f is not None:
+                # Initialize all_output as a list to store outputs initially
+                all_output_list = []
+                evalsList = []
+                numRun = 0
+                # Initialize inpsList with the correct number of columns
+                inpsList = np.empty((0, x_combinations.shape[1]))
+
+                # Wrap the loop with tqdmx_combinations
+                for case in tqdm.tqdm(x_combinations, desc="input combinations"):
+                    im = np.where((inpsList == case).all(axis=1))[0]
+                    if not im.size:
+                        output = f(case)
+                        all_output_list.append(output)
+                        inpsList = np.vstack([inpsList, case])
+                        evalsList.append(output)
+                        numRun += 1
+                    else:
+                        all_output_list.append(evalsList[im[0]])
+
+                print(f'Total number of function evaluation is {numRun}')
+
+                # Determine num_outputs AFTER running the function
+                try:
+                    num_outputs = len(all_output_list[0])
+                except TypeError:
+                    num_outputs = 1
+
+                # Convert all_output to a 2D NumPy array
+                all_output = np.array(all_output_list).reshape(
+                    intervals_comb.shape[0], (2**d), num_outputs)
+
+                # Calculate min and max for each sublist in all_output
+                min_values = np.min(all_output, axis=1)
+                max_values = np.max(all_output, axis=1)
+
+                lower_bound = np.zeros((num_outputs, len(min_values)))
+                upper_bound = np.zeros((num_outputs, len(max_values)))
+
+                bounds = np.empty((num_outputs, 2, lower_bound.shape[1]))
+
+                for i in range(num_outputs):
+                    min_values[:, i] = np.sort(min_values[:, i])
+                    max_values[:, i] = np.sort(max_values[:, i])
+                    lower_bound[i, :] = min_values[:, i]  # Extract each column
+                    upper_bound[i, :] = max_values[:, i]
+                    bounds[i,:,:] = np.array([lower_bound[i,:], upper_bound[i,:]])
+                
+                if condensation is not None:
+                    bounds = condense_bounds(bounds, condensation)
+
+                results.raw_data['bounds'] = bounds
+                results.raw_data['min'] = {'f': np.array(lower_bound[:num_outputs,:])}  # Store min as a 2D NumPy array
+                results.raw_data['max'] = {'f': np.array(upper_bound[:num_outputs,:])}  # Store max as a 2D NumPy array
+
+                if save_raw_data == 'yes':
+                    #print('No raw data provided for this method!')
+                    results.add_raw_data(f= all_output, x= x_combinations)
+
+            elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
+                results.add_raw_data(f=None, x=x_combinations)
+
+            else:
+                raise ValueError(
+                    "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
+
+        case "extremepoints"| "focused_discretisation_extremepoints":
+            # Determine the positive or negative signs for each input
+            if f is not None:
+                res = extremepoints_method(ranges.T, f)
+
+                # Determine the number of outputs from the first evaluation
+                try:
+                    num_outputs = res.raw_data['part_deriv_sign'].shape[0]
+                except TypeError:
+                    num_outputs = 1  # If f returns a single value
+
+                inpsList = np.zeros((0, d))
+                evalsList = np.zeros((0, num_outputs))
+                all_output = np.empty((num_outputs, len(intervals_comb), 2))
+                numRun = 0
+
+                # Preallocate all_output_list with explicit loops
+                for i, slice in tqdm.tqdm(enumerate(intervals_comb), desc="input combinations", total=len(intervals_comb)):
+                    for out in range(num_outputs):  # Iterate over each output
+                        for k in range(2):  # For each of the two extreme points
+                            # Calculate Xsings using the correct part_deriv_sign for the current output
+                            Xsings = np.empty((2, d))
+                            Xsings[:,:] = extreme_pointX(slice, res.raw_data['part_deriv_sign'][out,:]) 
+
+                            c = Xsings[k,:]
+                            im = np.where((inpsList == c).all(axis=1))[0]
+                            
+                            if not im.size:
+                                output = f(c)
+                                inpsList = np.vstack([inpsList, c])
+                                evalsList = np.vstack([evalsList, output])
+                                numRun += 1
+                            else:
+                               output = evalsList[im[0]]
+                            
+                            all_output[out, i, k] = output[out] 
+
+                             # Store the specific output value
+                
+                print(f'Total number of function evaluations is {numRun + len(res)}')
+
+                # Calculate min and max efficiently
+                min_values = np.min(all_output, axis=2)
+                max_values = np.max(all_output, axis=2)
+
+                lower_bound = np.zeros((num_outputs, min_values.shape[1]))
+                upper_bound = np.zeros((num_outputs, max_values.shape[1]))
+                bounds = np.empty((num_outputs, 2, lower_bound.shape[1]))
+
+                for i in range(num_outputs):
+                    lower_bound[i, :] = np.sort(min_values[i, :])  # Extract each column
+                    upper_bound[i, :] = np.sort(max_values[i, :])
+
+                    bounds[i, 0, :] = lower_bound[i, :]
+                    bounds[i, 1, :] = upper_bound[i, :]
+                
+                if condensation is not None:
+                    bounds = condense_bounds(bounds, condensation)
+                
+                results.raw_data['bounds'] = bounds
+                results.raw_data['min'] = np.array([{'f': bounds[i,0,:]} for i in range(
+                    num_outputs)])  # Initialize as a NumPy array
+                results.raw_data['max'] = np.array([{'f': bounds[i,1,:]} for i in range(
+                    num_outputs)])  # Initialize as a NumPy array
+                
+                if save_raw_data == 'yes':
+                    #print('No raw data provided for this method!')
+                    results.add_raw_data(f= all_output, x= x_combinations)
+
+            elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
+                results.add_raw_data(f=None, x=x_combinations)
+
+            else:
+                raise ValueError(
+                    "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
+
+        case _: raise ValueError("Invalid UP method! Please choose from 'focused_discretisation_endpoints' or 'focused_discretisation_extremepoints' for the 'method' parameter.")
+    
+    return results
