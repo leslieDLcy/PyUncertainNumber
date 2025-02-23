@@ -1,155 +1,128 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from clayton.rng import base, evd, archimedean, monte_carlo
-from pyDOE2 import lhs
-from scipy.stats import norm, expon  # For marginal distributions
+from typing import Callable
+import openturns as ot  # Import OpenTURNS
+from pyuncertainnumber.propagation.utils import Propagation_results
 
-def generate_copula_samples(copula, n_samples, marginal_distributions, sampling_method="lhs", copula_params=None, correlation_matrix=None):
+def monte_carlo_copula(x: list,
+                        f: Callable,
+                        results: Propagation_results = None,
+                        n_sam: int = 500,
+                        method:str = "monte_carlo",
+                        save_raw_data:str ="no", 
+                        copula_type = None,
+                        **kwargs):
     """
-    Generates copula samples using Monte Carlo.
+    Performs Monte Carlo simulation with copula-dependent input variables,
+    using UncertainNumber objects for marginal distributions.
 
     Args:
-        copula: A copula object.
-        n_samples: The number of samples to generate.
-        marginal_distributions: A dictionary specifying the marginal distributions.
-        sampling_method: Either "lhs" (for Latin Hypercube) or "mc" (for Monte Carlo).
-        copula_params (optional): A dictionary of copula parameters (e.g., {"theta": 2.0}).
-        correlation_matrix (optional): A correlation matrix (for multivariate copulas).
+        x: A list of UncertainNumber objects representing the input variables.
+        f: The function to evaluate (optional). It should take the input variables as arguments.
+        results: A Propagation_results object to store the results (optional).
+        n_sam: The number of Monte Carlo samples.
+        method: The uncertainty propagation method (currently only "monte_carlo" is supported).
+        save_raw_data: Whether to save the raw transformed samples ('yes' or 'no').
+        copula_type: The type of copula (e.g., "clayton", "gumbel", "frank", "gaussian", "student").
+        **kwargs: Keyword arguments for copula parameters:
+            - theta: Parameter for Archimedean copulas.
+            - corr_matrix: Correlation matrix for Gaussian and Student copulas.
+            - df: Degrees of freedom for Student copula.
 
     Returns:
-        A dictionary where keys are variable names and values are the generated samples,
-        or None if there is an error.
+        A Propagation_results object containing the results.
     """
+    if results is None:
+        results = Propagation_results()  # Create a default Propagation_results object
+    
+    dim = len(x)
 
-    n_dimensions = len(marginal_distributions)
-
-    # Copula Initialization (same as before)
-    if correlation_matrix is not None:
-        #... (same logic as before for fitting with correlation matrix)
-        if copula_params is not None:
-            print("Error: Provide either correlation_matrix OR copula_params, not both.")
-            return None
-        try:
-            copula = copula.fit(correlation_matrix)
-        except AttributeError:
-            print("Error: Copula object does not have the fit method")
-            return None
-        except Exception as e:
-            print(f"Error fitting copula: {e}")
-            return None
-
-    elif copula_params is not None:  # If copula parameters are provided
-        try:
-            copula = copula(**copula_params)  # Create copula with parameters
-        except TypeError as e:
-            print(f"Error initializing copula with parameters: {e}")
-            return None
-        except Exception as e:
-            print(f"Error initializing copula: {e}")
-            return None
-
-    elif hasattr(copula, 'fit'):  # If the copula object has the fit method but no correlation matrix nor copula parameters are provided
-        print("Error: Copula object requires a correlation matrix or copula parameters but none were provided")
-        return None
-
-    # Sampling
-    if sampling_method == "lhs":
-        u = lhs(n_dimensions, samples=n_samples, criterion='center')
-    elif sampling_method == "mc":
-        u = copula.sample(n_samples)  # Monte Carlo sampling
+    # Create copula object based on copula_type
+    if copula_type.lower() == "clayton":
+        copula = ot.ClaytonCopula(kwargs.get('theta'))  # Use OpenTURNS copula
+    elif copula_type.lower() == "gumbel":
+        copula = ot.GumbelCopula(kwargs.get('theta'), dim)
+    elif copula_type.lower() == "frank":
+        copula = ot.FrankCopula(kwargs.get('theta'), dim)
+    elif copula_type.lower() == "gaussian":
+        # Convert NumPy correlation matrix to OpenTURNS CorrelationMatrix
+        corr_matrix_ot = ot.CorrelationMatrix(kwargs.get('corr_matrix').tolist())
+        copula = ot.NormalCopula(corr_matrix_ot)
+    elif copula_type.lower() == "student":
+        # Convert NumPy correlation matrix to OpenTURNS CorrelationMatrix
+        corr_matrix_ot = ot.CorrelationMatrix(kwargs.get('corr_matrix').tolist())
+        copula = ot.StudentCopula(corr_matrix_ot, kwargs.get('df'))
     else:
-        print("Error: Invalid sampling method. Choose 'lhs' or 'mc'.")
-        return None
+        raise ValueError("Invalid copula_type.")
 
-    # Transform to copula samples (only needed for LHS, MC samples are already copula samples)
-    if sampling_method == "lhs":
-        try:
-            v = copula.icdf(u)
-        except AttributeError:
-            print("Error: Copula object does not have the icdf method")
-            return None
-        except Exception as e:
-            print(f"Error getting inverse CDF: {e}")
-            return None
-    else:  # Monte Carlo already has copula samples
-        v = u
+    # Generate copula samples
+    copula_samples = copula.getSample(n_sam)
+    print('copula_samples',  type(copula_samples))
+    print('copula_samples',  copula_samples[:,1])
 
-    # Transform to marginal distributions (same as before)
-    samples = {}
-    for i, (var_name, (dist_func, *params)) in enumerate(marginal_distributions.items()):
-        samples[var_name] = dist_func(v[:, i], *params)
-
-    return samples
-
-
-import numpy as np
-import matplotlib.pyplot as plt
-from copulas.multivariate import GumbelCopula
-from scipy.stats import norm, expon
-
-# 1. Define the Gumbel copula
-theta = 2.0  # Parameter for the Gumbel copula (controls dependence)
-dim = 2      # Dimension of the copula (bivariate in this case)
-gumbel_copula = GumbelCopula(theta, dim=dim)
-
-# 2. Generate samples from the Gumbel copula
-n_samples = 1000
-samples = gumbel_copula.sample(n_samples)
-
-# 3. Visualize the copula samples
-plt.figure(figsize=(8, 6))
-plt.scatter(samples[:, 0], samples[:, 1], alpha=0.6)
-plt.title(f"Gumbel Copula Samples (theta={theta})")
-plt.xlabel("U1")
-plt.ylabel("U2")
-plt.grid(True)
-plt.show()
-
-# 4. Define marginal distributions
-marginal_distributions = {
-    "x1": (norm.ppf, 0, 1),  # Normal(0, 1)
-    "x2": (expon.ppf, 2, 0.5), # Exponential(loc=2, scale=0.5)
-}
-
-# 5. Transform copula samples to marginal distributions
-transformed_samples = {}
-for i, (var_name, (dist_func, *params)) in enumerate(marginal_distributions.items()):
-    transformed_samples[var_name] = dist_func(samples[:, i], *params)
-
-# 6. Visualize transformed samples
-plt.figure(figsize=(12, 5))
-for i, (var_name, samples) in enumerate(transformed_samples.items()):
-    plt.subplot(1, 2, i + 1)
-    plt.hist(samples, bins=30, alpha=0.7)
-    plt.title(f"{var_name} (Marginal Distribution)")
-    plt.grid(True)
-plt.show()
-
-
-# 7. Function to generate copula samples with marginal distributions
-def generate_copula_samples(copula, n_samples, marginal_distributions):
-    """
-    Generates copula samples and transforms them to marginal distributions.
-    """
-    samples = copula.sample(n_samples)
+    # Transform to marginal distributions using UncertainNumber's essence distribution
     transformed_samples = {}
-    for i, (var_name, (dist_func, *params)) in enumerate(marginal_distributions.items()):
-        transformed_samples[var_name] = dist_func(samples[:, i], *params)
-    return transformed_samples
+    for i, uncertain_num in enumerate(x):
+        transformed_samples[f"x{i+1}"] = uncertain_num.ppf(copula_samples[:, i])
 
-# Example usage
-samples_gumbel = generate_copula_samples(gumbel_copula, n_samples, marginal_distributions)
+    # Evaluate the function if provided
+    if f is not None:
+        args = [transformed_samples[f"x{i+1}"] for i in range(dim)]
+        results.add_raw_data(x= args)
+        results.add_raw_data(f= f(*args))
+    elif save_raw_data.lower() == "yes":  # If f is None and save_raw_data is 'yes'
+        results.add_raw_data(x=np.array([transformed_samples[f"x{i+1}"] for i in range(dim)]))  # Store transformed samples
+    else:
+        print("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
-# Visualize the transformed samples (similar to step 6)
-#...
+    return results
 
-# sample = copula.sample(n_samples, inv_cdf= [(norm.ppf, 0, 1), (expon.ppf, 2, 0.5), (norm.ppf, 5, 2)]) #Explicitly added inv_cdf=[]
+from pyuncertainnumber.characterisation.uncertainNumber import UncertainNumber
 
-# fig, ax = plt.subplots()
-# ax.scatter(sample[:, 0], sample[:, 1],
-#             edgecolors='#6F6F6F', color='#C5C5C5', s=5)
-# ax.set_xlabel(r'$u_0$')
-# ax.set_ylabel(r'$u_1$')
-# plt.show()
+# Define the function to evaluate
+def my_function(x):
+    # Example function with multiple outputs
+    out1 = x[0]**2 + 2*x[1]*x2
+    out2 = np.sin(x[1]) + np.log(x[2] + 1)
+    return np.array([out1, out2])  # Return as a NumPy array
+
+# Define UncertainNumber objects with essence distributions
+x1 = UncertainNumber(name='distance to neutral axis', symbol='y', units='m', essence='distribution', distribution_parameters=["gaussian", [0.15, 0.00333]])
+x2 = UncertainNumber(name='beam length', symbol='L', units='m', essence='distribution', distribution_parameters=["gaussian", [10.05, 0.033]])
+x3 = UncertainNumber(name='moment of inertia', symbol='I', units='m', essence='distribution', distribution_parameters=["gaussian", [0.000454, 4.5061e-5]])
+ 
+# Choose a copula and parameters
+copula_type = "clayton"
+theta = 3.0
+
+# Run Monte Carlo simulation with the function
+results_with_function = monte_carlo_copula(
+    x=[x1, x2, x3],
+    f=my_function,
+    copula_type=copula_type,
+    theta=theta,
+    n_sam=10,
+    save_raw_data="yes"
+)
+
+# Analyze results
+print("Results with function:")
+print("Mean of outputs:", np.mean(results_with_function.f, axis=0))
+print("Variance of outputs:", np.var(results_with_function.f, axis=0))
+
+# Run Monte Carlo simulation without the function (only generate samples)
+results_no_function = monte_carlo_copula(
+    x=[x1, x2, x3],
+    f=None,
+    copula_type=copula_type,
+    theta=theta,
+    n_sam=10000,
+    save_raw_data="yes"
+)
 
 
+# Access the raw transformed samples
+transformed_samples = results_no_function.raw_data
+
+# Analyze or use the transformed samples
+print("\nShape of transformed_samples:", transformed_samples.shape)
+#... further analysis or use of transformed_samples
