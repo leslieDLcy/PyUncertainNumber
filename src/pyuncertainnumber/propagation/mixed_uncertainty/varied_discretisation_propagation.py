@@ -80,7 +80,7 @@ def varied_discretisation_propagation_method(x: list, f:Callable = None,
                     - 'bounds' (np.ndarray): 2D array of lower and upper bounds for each output.
 
     example:
-        from PyUncertaiNnumber import UncertainNumber
+        from pyUncertaiNnumber import UncertainNumber
 
         def Fun(x):
 
