@@ -246,12 +246,9 @@ def interval_monte_carlo_method(x: list, f:Callable = None,
                 bounds = np.empty((num_outputs, 2, lower_bound.shape[1]))
 
                 for i in range(num_outputs):
-                    min_values[:, i] = np.sort(min_values[:, i])
-                    max_values[:, i] = np.sort(max_values[:, i])
-                    lower_bound[i, :] = min_values[:, i]  # Extract each column
-                    upper_bound[i, :] = max_values[:, i]
-                    bounds[i,:,:] = np.array([lower_bound[i,:], upper_bound[i,:]])
-                
+                    bounds[i, 0, :] = min_values[:, i]
+                    bounds[i, 1, :] = max_values[:, i]
+
                 if condensation is not None:
                     bounds = condense_bounds(bounds, condensation)
 
@@ -504,3 +501,33 @@ print(results.raw_data['min'][0]['message'])
 
 plotPbox(results.raw_data['min'][0]['f'], results.raw_data['max'][0]['f'], p=None)
 #plotPbox(results.raw_data['min'][1]['f'], results.raw_data['max'][1]['f'], p=None)
+
+
+from pyuncertainnumber import UncertainNumber
+
+def Fun(x):
+
+    input1= x[0]
+    input2=x[1]
+    input3=x[2]
+    input4=x[3]
+    input5=x[4]
+
+    output1 = input1 + input2 + input3 + input4 + input5
+    output2 = input1 * input2 * input3 * input4 * input5
+
+    return np.array([output1, output2])
+
+means = np.array([1, 2, 3, 4, 5])
+stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+
+x = [
+    UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
+
+    UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
+    UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
+    UncertainNumber(essence = 'interval', bounds= [means[3]-2* stds[3], means[3]+2* stds[3]]),
+    UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
+    ]
+
+results = interval_monte_carlo_method(x=x, f=Fun, method = 'endpoints', n_disc= 5)
