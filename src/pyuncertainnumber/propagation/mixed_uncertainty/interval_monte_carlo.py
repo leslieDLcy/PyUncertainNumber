@@ -1,16 +1,18 @@
 import numpy as np
 from typing import Callable, Union
 import tqdm
+import matplotlib.pyplot as plt
 from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product import cartesian
-#from pyuncertainnumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
-#from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
+from pyuncertainnumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
+from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
+from pyuncertainnumber.propagation.epistemic_uncertainty.local_optimisation import local_optimisation_method
+from pyuncertainnumber.propagation.epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
 from pyuncertainnumber.propagation.utils import Propagation_results, condense_bounds
 
-#TODO add tail concentrating algorithms.
-#TODO add x valus for min and max
+#TODO add genetic algorithm
 def interval_monte_carlo_method(x: list, f:Callable = None,  
                                     results: Propagation_results = None, 
-                                    method = 'endpoints',
+                                    method = 'interval_mc_endpoints',
                                     n_sam: int = 500,
                                     condensation: Union[float, np.ndarray] = None, 
                                     save_raw_data= 'no')-> Propagation_results:  # Specify return type
@@ -103,182 +105,371 @@ def interval_monte_carlo_method(x: list, f:Callable = None,
             UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
             ]
     
-        results = interval_monte_carlo_method(x=x, f=Fun, method = 'endpoints', n_disc= 5)
+        results = focused_discretisation_propagation_method(x=x, f=Fun, method = 'endpoints', n_disc= 5)
     
     """
-    num_uncertainties = len(x)
-    bounds_x = np.zeros((num_uncertainties, n_sam, 2))  # Preallocate the NumPy array
-    u_list = []
+    d = len(x)  # dimension of uncertain numbers
+    results = Propagation_results()
+    bounds_x = []
+    ranges = np.zeros((2, d))
+    u_list = []  # List to store 'u' for each uncertain number
+    convergence_issues = []# Initialize convergence_issues
 
     for i, un in enumerate(x):
         print(f"Processing variable {i + 1} with essence: {un.essence}")
 
         if un.essence != "interval":
-            u = np.random.uniform(size=n_sam)
-        else:
-            u = np.linspace(0, 1, n_sam)
+            u = np.random.uniform(size = n_sam)
 
-        u_list.append(u)
+        else:  # un.essence == "interval"
+            u = np.array([0.0, 1.0])  # Or adjust as needed for intervals
 
+        u_list.append(u)  # Add 'u' to the list
+
+        # Generate discrete p-boxes
         match un.essence:
             case "distribution":
-                temp = un.ppf(u_list[i][:])
-                bounds_x[i, :, 0] = temp
-                bounds_x[i, :, 1] = temp
+                # Calculate xl and xr for distributions (adjust as needed)
+                # Assuming un.ppf(u) returns a list or array
+                temp_xl = un.ppf(u_list[i][:])
+                # Adjust based on your distribution
+                temp_xr = un.ppf(u_list[i][:])
+                # Create a 2D array of bounds
+                rang = np.array([temp_xl, temp_xr]).T
+                bounds_x.append(rang)
 
             case "interval":
-                bounds_x[i, :, 0] = np.full(n_sam, un.bounds[0])
-                bounds_x[i, :, 1] = np.full(n_sam, un.bounds[1])
+                # Repeat lower bound for all quantiles
+                temp_xl = np.array([un.bounds[0]])
+                # Repeat upper bound for all quantiles
+                temp_xr = np.array([un.bounds[1]])
+                # Create a 2D array of bounds
+                rang = np.array([temp_xl, temp_xr]).T
+                bounds_x.append(rang)
 
             case "pbox":
-                 bounds_x[i,:,0] = un.ppf(u_list[i])[:,0]
-                 bounds_x[i,:,1] = un.ppf(u_list[i])[:,1]
+                temp_xl = un.ppf(u_list[i][:])[0]
+                temp_xr = un.ppf(u_list[i][:])[1]
+                # Create a 2D array of bounds
+                rang = np.array([temp_xl, temp_xr]).T
+                bounds_x.append(rang)
 
             case _:
                 raise ValueError(f"Unsupported uncertainty type: {un.essence}")
-            
+
+    bounds_x_index = [np.arange(len(sub_array)) for sub_array in bounds_x]
+
+    # Determine the length of the arrays that have n_sam samples
+    n_sam_length = 0
+    for index_array in bounds_x_index:
+        if len(index_array) > 1:
+            n_sam_length = len(index_array)
+            break  # Assume all n_sam arrays have the same length
+
+    # Generate the combinations of indices
+    intervals_comb = []
+    if n_sam_length > 0:
+        for i in range(n_sam_length):
+            temp = []
+            for j, index_array in enumerate(bounds_x_index):
+                if len(index_array) > 1:
+                    temp.append(bounds_x[j][index_array[i]])
+                else:
+                    temp.append(bounds_x[j][0])  # Use the first (and only) element for intervals
+            intervals_comb.append(temp)
+    else :
+        temp = []
+        for j, index_array in enumerate(bounds_x_index):
+            temp.append(bounds_x[j][0])
+        intervals_comb.append(temp)
+
+    intervals_comb = np.array(intervals_comb, dtype=object)
+    all_output = None
+   
+    # Efficiency upgrade: store repeated evaluations
+    inpsList = np.zeros((0, d))
+    evalsList = []
 
     match method:
-        case "interval_mc_endpoints" | "interval_monte_carlo_endpoints":
-            all_output = np.empty((n_sam, 2**num_uncertainties)) if f is not None else None
-            x_combinations = np.empty((n_sam, 2**num_uncertainties, num_uncertainties))
+        case "interval_mc_endpoints" | "interval_monte_carlo_endpoints" :
+            x_combinations = np.empty(( intervals_comb.shape[0]*(2**d), d), dtype=float)  # Pre-allocate the array
+            current_index = 0  # Keep track of the current insertion index
 
-            inpsList = np.zeros((0, num_uncertainties))
-            evalsList = []
-            numRun = 0
+            for array in intervals_comb:
+                cartesian_product_x = cartesian(*array)
+                # Get the number of combinations from cartesian(*array)
+                num_combinations = cartesian_product_x.shape[0]
 
-            for sample_index in tqdm.tqdm(range(n_sam), desc="Processing samples"):
-                sample_intervals = [bounds_x[i, sample_index, :] for i in range(num_uncertainties)]
-                cartesian_product_x = cartesian(*sample_intervals)
-                x_combinations[sample_index, :, :] = cartesian_product_x
-
-                if f is not None:
-                    outputs = []
-                    for case in cartesian_product_x:
-                        im = np.where((inpsList == case).all(axis=1))[0]
-                        if not im.size:
-                            output = f(case)
-                            outputs.append(output)
-                            inpsList = np.vstack([inpsList, case])
-                            evalsList.append(output)
-                            numRun += 1
-                        else:
-                            outputs.append(evalsList[im[0]])
-                    all_output[sample_index, :] = np.array(outputs)
-
+                # Assign the cartesian product to the appropriate slice of x_combinations
+                x_combinations[current_index: current_index + num_combinations] = cartesian_product_x
+                current_index += num_combinations  # Update the insertion index
+            
             if f is not None:
-                num_outputs = 1
-                if isinstance(all_output[0, 0], (list, np.ndarray)):
-                    num_outputs = len(all_output[0, 0])
+                # Initialize all_output as a list to store outputs initially
+                all_output_list = []
+                evalsList = []
+                num_evaluations = 0
+                # Initialize inpsList with the correct number of columns
+                inpsList = np.empty((0, x_combinations.shape[1]))
 
-                min_values = np.empty((n_sam, num_outputs))
-                max_values = np.empty((n_sam, num_outputs))
-
-                for i in range(n_sam):
-                    if num_outputs == 1:
-                        min_values[i, 0] = np.min(all_output[i, :])
-                        max_values[i, 0] = np.max(all_output[i, :])
+                # Wrap the loop with tqdmx_combinations
+                for case in tqdm.tqdm(x_combinations, desc="input combinations"):
+                    im = np.where((inpsList == case).all(axis=1))[0]
+                    if not im.size:
+                        output = f(case)
+                        all_output_list.append(output)
+                        inpsList = np.vstack([inpsList, case])
+                        evalsList.append(output)
+                        num_evaluations += 1
                     else:
-                        for j in range(num_outputs):
-                            min_values[i, j] = np.min(all_output[i, :, j])
-                            max_values[i, j] = np.max(all_output[i, :, j])
+                        all_output_list.append(evalsList[im[0]])
 
-                bounds = np.empty((num_outputs, 2, n_sam))
+                print(f'Total number of function evaluations is: {num_evaluations}')
+
+                # Determine num_outputs AFTER running the function
+                try:
+                    num_outputs = len(all_output_list[0])
+                except TypeError:
+                    num_outputs = 1
+
+                # Convert all_output to a 2D NumPy array
+                all_output = np.array(all_output_list).reshape(
+                    intervals_comb.shape[0], (2**d), num_outputs)
+
+                # Calculate min and max for each sublist in all_output
+                min_values = np.min(all_output, axis=1)
+                max_values = np.max(all_output, axis=1)
+
+                lower_bound = np.zeros((num_outputs, len(min_values)))
+                upper_bound = np.zeros((num_outputs, len(max_values)))
+
+                bounds = np.empty((num_outputs, 2, lower_bound.shape[1]))
+
                 for i in range(num_outputs):
-                    bounds[i, 0, :] = min_values[:, i]
-                    bounds[i, 1, :] = max_values[:, i]
-
+                    min_values[:, i] = np.sort(min_values[:, i])
+                    max_values[:, i] = np.sort(max_values[:, i])
+                    lower_bound[i, :] = min_values[:, i]  # Extract each column
+                    upper_bound[i, :] = max_values[:, i]
+                    bounds[i,:,:] = np.array([lower_bound[i,:], upper_bound[i,:]])
+                
                 if condensation is not None:
                     bounds = condense_bounds(bounds, condensation)
 
                 results.raw_data['bounds'] = bounds
-                results.raw_data['min'] = {'f': min_values}
-                results.raw_data['max'] = {'f': max_values}
+                results.raw_data['min'] = np.array([{'f': bounds[i,0,:]} for i in range(
+                    num_outputs)])  # Initialize as a NumPy array
+                results.raw_data['max'] = np.array([{'f': bounds[i,1,:]} for i in range(
+                    num_outputs)])  # Initialize as a NumPy array
+                
+                if save_raw_data == 'yes':
+                    results.add_raw_data(f= all_output, x= x_combinations)
+
+            elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
+                results.add_raw_data(f=None, x=x_combinations)
+
+            else:
+                raise ValueError(
+                    "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
+
+        case "extremepoints"| "focused_discretisation_extremepoints":
+            # Determine the positive or negative signs for each input
+            if f is not None:
+                res = extremepoints_method(ranges.T, f)
+                num_evaluations = 0
+
+                # Determine the number of outputs from the first evaluation
+                try:
+                    num_outputs = res.raw_data['part_deriv_sign'].shape[0]
+                except TypeError:
+                    num_outputs = 1  # If f returns a single value
+                
+                inpsList = np.zeros((0, d))
+                evalsList = np.zeros((0, num_outputs))
+                all_output = np.empty((num_outputs, len(intervals_comb), 2))
+
+                # Preallocate all_output_list with explicit loops
+                for i, slice in tqdm.tqdm(enumerate(intervals_comb), desc="input combinations", total=len(intervals_comb)):
+                    for out in range(num_outputs):  # Iterate over each output
+                        for k in range(2):  # For each of the two extreme points
+                            # Calculate Xsings using the correct part_deriv_sign for the current output
+                            Xsings = np.empty((2, d))
+                            Xsings[:,:] = extreme_pointX(slice, res.raw_data['part_deriv_sign'][out,:]) 
+
+                            c = Xsings[k,:]
+                            im = np.where((inpsList == c).all(axis=1))[0]
+                            
+                            if not im.size:
+                                output = f(c)
+                                inpsList = np.vstack([inpsList, c])
+                                evalsList = np.vstack([evalsList, output])
+                                num_evaluations += 1
+                            else:
+                               output = evalsList[im[0]]
+                            
+                            all_output[out, i, k] = output[out] 
+
+                             # Store the specific output value
+
+                print(f'Total number of function evaluations is: {num_evaluations + len(res)}')
+
+                # Calculate min and max efficiently
+                min_values = np.min(all_output, axis=2)
+                max_values = np.max(all_output, axis=2)
+
+                lower_bound = np.zeros((num_outputs, min_values.shape[1]))
+                upper_bound = np.zeros((num_outputs, max_values.shape[1]))
+                bounds = np.empty((num_outputs, 2, lower_bound.shape[1]))
+
+                for i in range(num_outputs):
+                    lower_bound[i, :] = np.sort(min_values[i, :])  # Extract each column
+                    upper_bound[i, :] = np.sort(max_values[i, :])
+
+                    bounds[i, 0, :] = lower_bound[i, :]
+                    bounds[i, 1, :] = upper_bound[i, :]
+                
+                if condensation is not None:
+                    bounds = condense_bounds(bounds, condensation)
+                
+                results.raw_data['bounds'] = bounds
+                results.raw_data['min'] = np.array([{'f': bounds[i,0,:]} for i in range(
+                    num_outputs)])  # Initialize as a NumPy array
+                results.raw_data['max'] = np.array([{'f': bounds[i,1,:]} for i in range(
+                    num_outputs)])  # Initialize as a NumPy array
+                
+                if save_raw_data == 'yes':
+                    results.add_raw_data(f= all_output, x= x_combinations)
+
+            elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
+                results.add_raw_data(f=None, x=x_combinations)
+
+            else:
+                raise ValueError(
+                    "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
+
+        case "interval_mc_local_opt" | "interval_monte_carlo_local_optimisation" :
+           
+            if f is not None:
+                x_min_y = None
+                x_max_y= None
+                message_min = None
+                message_max = None
+
+                for interval_set in tqdm.tqdm(intervals_comb, desc="Processing input combinations"):
+                    inputs = np.array([np.array(interval).flatten() for interval in interval_set])
+                    local_opt_results = local_optimisation_method(inputs, f)
+                    
+                    # Extract results and inputs
+                    min_result = local_opt_results.raw_data['min']
+                    max_result = local_opt_results.raw_data['max']
+
+                    if all_output is None:
+                        all_output = np.array([[min_result[0]['f'], max_result[0]['f']]])
+                    else:
+                        all_output = np.concatenate((all_output, np.array([[min_result[0]['f'], max_result[0]['f']]])), axis=0)
+                    
+                    if x_min_y is None:
+                        x_min_y =  np.array([min_result[0]['x']])
+                    else:
+                        x_min_y = np.concatenate((x_min_y, np.array([min_result[0]['x']])), axis=0) 
+                    
+                    if x_max_y is None:
+                        x_max_y =  np.array([max_result[0]['x']])
+                    else:
+                        x_max_y = np.concatenate((x_max_y, np.array([max_result[0]['x']])), axis=0) 
+                    
+                    if message_min is None:
+                        message_min =  np.array([min_result[0]['message']])
+                    else:
+                        message_min = np.concatenate((message_min, np.array([min_result[0]['message']])), axis=0) 
+                    
+                    if message_max is None:
+                        message_max =  np.array([max_result[0]['message']])
+                    else:
+                        message_max = np.concatenate((message_max, np.array([max_result[0]['message']])), axis=0) 
+
+
+                # Determine num_outputs AFTER running the function          
+                num_outputs = 1
+
+                # Calculate min and max for each sublist in all_output
+                min_values =  all_output[:, 0]
+                max_values =  all_output[:, 1]
+
+                lower_bound = np.zeros((len(min_values)))
+                upper_bound = np.zeros((len(max_values)))
+
+                bounds = np.empty(( 2, lower_bound.shape[0]))
+
+                index_min_values = np.argsort(min_values)
+                index_max_values = np.argsort(max_values)
+
+                x_min_y = x_min_y[index_min_values]
+                x_max_y = x_max_y[index_max_values]
+
+
+                lower_bound = min_values[index_min_values]  # Extract each column
+                upper_bound = max_values[index_max_values]
+                bounds = np.array([lower_bound, upper_bound])
+                
+                if condensation is not None:
+                    bounds = condense_bounds(bounds, condensation)
+
+                # Update results.raw_data with sorted x values
+                results.raw_data['bounds'] = bounds
+
+                results.raw_data['min'] = np.append(
+                                            results.raw_data["min"],
+                                            {"x": x_min_y, "f": lower_bound, "message": message_min},)
+                results.raw_data['max'] = np.append(
+                                            results.raw_data["max"],
+                                            {"x": x_max_y, "f": upper_bound, "message": message_max},)
 
                 if save_raw_data == 'yes':
-                    results.add_raw_data(f=all_output, x=x_combinations)
+                    results.add_raw_data(f=all_output, x=intervals_comb)
 
-            elif save_raw_data == 'yes':
-                results.add_raw_data(f=None, x=x_combinations)
             else:
-                raise ValueError("No function is provided. Select save_raw_data = 'yes' to save the input combinations")
-
-        # case "extremepoints"| "focused_discretisation_extremepoints":
-        #     # Determine the positive or negative signs for each input
-        #     if f is not None:
-        #         res = extremepoints_method(ranges.T, f)
-
-        #         # Determine the number of outputs from the first evaluation
-        #         try:
-        #             num_outputs = res.raw_data['part_deriv_sign'].shape[0]
-        #         except TypeError:
-        #             num_outputs = 1  # If f returns a single value
-
-        #         inpsList = np.zeros((0, d))
-        #         evalsList = np.zeros((0, num_outputs))
-        #         all_output = np.empty((num_outputs, len(intervals_comb), 2))
-
-        #         # Preallocate all_output_list with explicit loops
-        #         for i, slice in tqdm.tqdm(enumerate(intervals_comb), desc="input combinations", total=len(intervals_comb)):
-        #             for out in range(num_outputs):  # Iterate over each output
-        #                 for k in range(2):  # For each of the two extreme points
-        #                     # Calculate Xsings using the correct part_deriv_sign for the current output
-        #                     Xsings = np.empty((2, d))
-        #                     Xsings[:,:] = extreme_pointX(slice, res.raw_data['part_deriv_sign'][out,:]) 
-
-        #                     c = Xsings[k,:]
-        #                     im = np.where((inpsList == c).all(axis=1))[0]
-                            
-        #                     if not im.size:
-        #                         output = f(c)
-        #                         inpsList = np.vstack([inpsList, c])
-        #                         evalsList = np.vstack([evalsList, output])
-        #                     else:
-        #                        output = evalsList[im[0]]
-                            
-        #                     all_output[out, i, k] = output[out] 
-
-        #                      # Store the specific output value
-
-        #         # Calculate min and max efficiently
-        #         min_values = np.min(all_output, axis=2)
-        #         max_values = np.max(all_output, axis=2)
-
-        #         lower_bound = np.zeros((num_outputs, min_values.shape[1]))
-        #         upper_bound = np.zeros((num_outputs, max_values.shape[1]))
-        #         bounds = np.empty((num_outputs, 2, lower_bound.shape[1]))
-
-        #         for i in range(num_outputs):
-        #             lower_bound[i, :] = np.sort(min_values[i, :])  # Extract each column
-        #             upper_bound[i, :] = np.sort(max_values[i, :])
-
-        #             bounds[i, 0, :] = lower_bound[i, :]
-        #             bounds[i, 1, :] = upper_bound[i, :]
-                
-        #         if condensation is not None:
-        #             bounds = condense_bounds(bounds, condensation)
-                
-        #         results.raw_data['bounds'] = bounds
-        #         results.raw_data['min'] = {'f': np.array(lower_bound[:num_outputs,:])}  # Store min as a 2D NumPy array
-        #         results.raw_data['max'] = {'f': np.array(upper_bound[:num_outputs,:])}  # Store max as a 2D NumPy array
-                
-        #         if save_raw_data == 'yes':
-        #             #print('No raw data provided for this method!')
-        #             results.add_raw_data(f= all_output, x= x_combinations)
-
-        #     elif save_raw_data == 'yes':  # If f is None and save_raw_data is 'yes'
-        #         results.add_raw_data(f=None, x=x_combinations)
-
-        #     else:
-        #         raise ValueError(
-        #             "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
+                raise ValueError("A function must be provided.")
 
         case _: raise ValueError(
                      "Invalid UP method! focused_discretisation_cauchy is under development.")
 
     return results
 
-from pyuncertainnumber.characterisation.uncertainNumber import UncertainNumber
+from pyuncertainnumber import UncertainNumber
+def plotPbox(xL, xR, p=None):
+    """
+    Plots a p-box (probability box) using matplotlib.
+
+    Args:
+        xL (np.ndarray): A 1D NumPy array of lower bounds.
+        xR (np.ndarray): A 1D NumPy array of upper bounds.
+        p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
+                                   Defaults to None, which generates equally spaced probabilities.
+        color (str, optional): The color of the plot. Defaults to 'k' (black).
+    """
+    xL = np.squeeze(xL)  # Ensure xL is a 1D array
+    xR = np.squeeze(xR)  # Ensure xR is a 1D array
+
+    if p is None:
+        # p should have one more element than xL/xR
+        p = np.linspace(0, 1, len(xL) + 1)
+
+    # Plot the step functions
+    plt.step(np.concatenate(([xL[0]], xL)), p, where='post', color='black')
+    plt.step(np.concatenate(([xR[0]], xR)), p, where='post', color='red')
+
+    # Add bottom and top lines to close the box
+    plt.plot([xL[0], xR[0]], [0, 0], color='red')  # Bottom line
+    plt.plot([xL[-1], xR[-1]], [1, 1], color='black')  # Top line
+
+    # Add x and y axis labels
+    plt.xlabel("X", fontsize=14)
+    plt.ylabel("Cumulative Probability", fontsize=14)
+    # Increase font size for axis numbers
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+
+    plt.show()
 
 def Fun(x):
 
@@ -291,13 +482,13 @@ def Fun(x):
     output1 = input1 + input2 + input3 + input4 + input5
     output2 = input1 * input2 * input3 * input4 * input5
 
-    return np.array([output1, output2])
+    return np.array([output1]) #, output2
 
 means = np.array([1, 2, 3, 4, 5])
 stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
 
 x = [
-    UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
+    UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[1, 0.1]]),
 
     UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
     UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
@@ -305,4 +496,11 @@ x = [
     UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
     ]
 
-results = interval_monte_carlo_method(x=x, f=Fun, method = 'endpoints', n_disc= 5)
+results = interval_monte_carlo_method(x=x, f=Fun, method = 'interval_monte_carlo_local_optimisation', n_sam= 50)
+
+print(results.raw_data['min'][0]['f'])
+print(results.raw_data['min'][0]['x'])
+print(results.raw_data['min'][0]['message'])
+
+plotPbox(results.raw_data['min'][0]['f'], results.raw_data['max'][0]['f'], p=None)
+#plotPbox(results.raw_data['min'][1]['f'], results.raw_data['max'][1]['f'], p=None)

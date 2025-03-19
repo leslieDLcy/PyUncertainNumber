@@ -8,17 +8,18 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
                               results: Propagation_results = None,
                               tol_loc: np.ndarray = None, options_loc: dict = None,
                               *, method_loc='Nelder-Mead') -> Propagation_results:  # Specify return type
+    
     """  
         Performs local optimization to find both the minimum and maximum values of a given function, within specified bounds.
-        This function utilizes the `scipy.optimize.minimize` function to perform local optimization. 
-        Refer to `scipy.optimize.minimize` documentation for available options
-
 
     args:
         x (np.ndarray): A 2D NumPy array where each row represents an input variable and 
                         the two columns define its lower and upper bounds (interval).
         f (Callable): The objective function to be optimized. It should take a 1D NumPy array 
                       as input and return a scalar value.
+        results (Propagation_results, optional): An object to store propagation results.
+                                            Defaults to None, in which case a new
+                                            `Propagation_results` object is created.
         x0 (np.ndarray, optional): A 1D or 2D NumPy array representing the initial guess for the 
                                     optimization. 
                                     - If x0 has shape (n,), the same initial values are used for both 
@@ -44,18 +45,28 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
                                     Defaults to 'Nelder-Mead'.
 
    signature:
-        local_optimisation_method(x:np.ndarray, f:Callable,  results:dict = None,
+        local_optimisation_method(x:np.ndarray, f:Callable,  results = None,
                               *, x0:np.ndarray = None,  
                               tol_loc:np.ndarray = None, options_loc: dict = None, method_loc = 'Nelder-Mead') -> dict
 
+    notes:
+        This function utilizes the `scipy.optimize.minimize` function to perform local optimization. 
+        Refer to `scipy.optimize.minimize` documentation for available options.
+        It only handles a function which produces a single output.
+    
     returns:
-        dict: A dictionary containing the optimization results:
-            - 'bounds': An np.ndarray of the bounds for the output parameter (if f is not None). 
-            - 'min': Results for minimization, including 'x', 'f', 'message', 'nit', 'nfev', 'final_simplex'.
-            - 'max': Results for maximization, including 'x', 'f', 'message', 'nit', 'nfev', 'final_simplex'.
-
+        An `Propagation_results` object which contains:
+            - 'un': UncertainNumber object(s) to represent the interval of the output.
+            - 'raw_data' (dict): Dictionary containing raw data shared across output:
+                    - 'x' (np.ndarray): Input values.
+                    - 'f' (np.ndarray): Output values.
+                    - 'min' (np.ndarray): Array of dictionaries for the function's output,
+                              containing 'f' for the minimum of that output as well 'message', 'nit', 'nfev', 'final_simplex'.
+                    - 'max' (np.ndarray): Array of dictionaries for the function's output,
+                              containing 'f' for the maximum of that output as well 'message', 'nit', 'nfev', 'final_simplex'.
+                    - 'bounds' (np.ndarray): 2D array of lower and upper bounds for the output.
+    
     example:
-
         >>> f = lambda x: x[0] + x[1] + x[2]  # Example function
         >>> x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
         >>> # Initial guess (same for min and max)
@@ -70,8 +81,7 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
         >>> # Perform optimization
         >>> y = local_optimisation_method(x_bounds, f, x0=x0, tol_loc=tol_loc, 
         >>>                                     options_loc=options_loc)
-        >>> # Print the results
-        >>> y.print()
+
     """
 
     bounds = [(var[0], var[1]) for var in x]
@@ -154,11 +164,11 @@ def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
 # options_loc = [
 #     {'maxiter': 100},  # Options for minimization
 #     {'maxiter': 1000}  # Options for maximization
-#      ]
+#     ]
 
 # # Perform optimization
 # y = local_optimisation_method(x_bounds, f, x0=x0, tol_loc=tol_loc,
 #                                 options_loc=options_loc)
 
 # # Print the results
-# y.print()
+# print(y.raw_data['min'][0]['x'])
