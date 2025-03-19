@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from pyuncertainnumber import pba
+from pyuncertainnumber.pba import pba
 
 ### pba level ###
 fig, axs = plt.subplots(nrows=2, ncols=4, figsize=(12, 7), layout="constrained")
