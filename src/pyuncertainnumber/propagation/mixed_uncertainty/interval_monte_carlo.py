@@ -268,7 +268,7 @@ def interval_monte_carlo_method(x: list, f:Callable = None,
                 raise ValueError(
                     "No function is provided. Select save_raw_data = 'yes' to save the input combinations")
 
-        case "extremepoints"| "focused_discretisation_extremepoints":
+        case "interval_mc_extremepoints"| "interval_monte_carlo_extremepoints":
             # Determine the positive or negative signs for each input
             if f is not None:
                 res = extremepoints_method(ranges.T, f)
