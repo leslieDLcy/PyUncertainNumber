@@ -16,7 +16,9 @@ def interval_monte_carlo_method(x: list, f:Callable = None,
                                     n_sam: int = 500,
                                     x0: np.ndarray = None,                              
                                     tol_loc: np.ndarray = None, options_loc: dict = None,
-                                   *, method_loc='Nelder-Mead',
+                                    *, method_loc='Nelder-Mead',
+                                    pop_size= np.array([500, 1500]), n_gen=100, tol=1e-3,
+                                    n_gen_last=np.array([10, 20]), algorithm_type="NSGA2",
                                     condensation: Union[float, np.ndarray] = None, 
                                     save_raw_data= 'no')-> Propagation_results:  # Specify return type
     
@@ -396,9 +398,11 @@ def interval_monte_carlo_method(x: list, f:Callable = None,
                 x_max_y= None
                 message_min = None
                 message_max = None
+                print('interval_comb',intervals_comb )
 
                 for interval_set in tqdm.tqdm(intervals_comb, desc="Processing input combinations"):
                     inputs = np.array([np.array(interval).flatten() for interval in interval_set])
+                    print('inputs', inputs)
                     genetic_opt_results = genetic_optimisation_method(x_bounds = inputs, f=f,results = None, 
                                         pop_size=pop_size, n_gen=n_gen, tol=tol,
                                         n_gen_last=n_gen_last, algorithm_type=algorithm_type
@@ -408,11 +412,14 @@ def interval_monte_carlo_method(x: list, f:Callable = None,
                     min_result = genetic_opt_results.raw_data['min']
                     max_result = genetic_opt_results.raw_data['max']
 
+                    print('min_result', min_result)
+                    print('max_result', max_result)
+
                     if all_output is None:
                         all_output = np.array([[min_result[0]['f'], max_result[0]['f']]])
                     else:
                         all_output = np.concatenate((all_output, np.array([[min_result[0]['f'], max_result[0]['f']]])), axis=0)
-                    
+                                        
                     if x_min_y is None:
                         x_min_y =  np.array([min_result[0]['x']])
                     else:
@@ -534,7 +541,7 @@ means = np.array([1, 2, 3, 4, 5])
 stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
 
 x = [
-    UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[1, 0.1]]),
+    UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",[[1,2], 0.1]]),
 
     UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
     UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
@@ -542,7 +549,7 @@ x = [
     UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
     ]
 
-results = interval_monte_carlo_method(x=x, f=Fun, method = 'interval_monte_carlo_local_optimisation', n_sam= 50)
+results = interval_monte_carlo_method(x=x, f=Fun, method = 'interval_monte_carlo_genetic_optimisation', n_sam= 10)
 
 print(results.raw_data['min'][0]['f'])
 print(results.raw_data['min'][0]['x'])
