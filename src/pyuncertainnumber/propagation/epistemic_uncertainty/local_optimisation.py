@@ -4,8 +4,8 @@ from scipy.optimize import minimize
 from pyuncertainnumber.propagation.utils import Propagation_results
 
 
-def local_optimisation_method(x: np.ndarray, f: Callable, x0: np.ndarray = None,
-                              results: Propagation_results = None,
+def local_optimisation_method(x: np.ndarray, f: Callable, results: Propagation_results = None,
+                              x0: np.ndarray = None,                              
                               tol_loc: np.ndarray = None, options_loc: dict = None,
                               *, method_loc='Nelder-Mead') -> Propagation_results:  # Specify return type
     

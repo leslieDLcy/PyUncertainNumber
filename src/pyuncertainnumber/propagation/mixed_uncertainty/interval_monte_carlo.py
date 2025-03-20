@@ -12,8 +12,11 @@ from pyuncertainnumber.propagation.utils import Propagation_results, condense_bo
 #TODO add genetic algorithm
 def interval_monte_carlo_method(x: list, f:Callable = None,  
                                     results: Propagation_results = None, 
-                                    method = 'interval_mc_endpoints',
+                                    method:str = 'interval_mc_endpoints',
                                     n_sam: int = 500,
+                                    x0: np.ndarray = None,                              
+                                    tol_loc: np.ndarray = None, options_loc: dict = None,
+                                   *, method_loc='Nelder-Mead',
                                     condensation: Union[float, np.ndarray] = None, 
                                     save_raw_data= 'no')-> Propagation_results:  # Specify return type
     
@@ -353,11 +356,57 @@ def interval_monte_carlo_method(x: list, f:Callable = None,
 
                 for interval_set in tqdm.tqdm(intervals_comb, desc="Processing input combinations"):
                     inputs = np.array([np.array(interval).flatten() for interval in interval_set])
-                    local_opt_results = local_optimisation_method(inputs, f)
+                    local_opt_results = local_optimisation_method(x = inputs, f=f,results = None, 
+                              x0=x0,                              
+                              tol_loc = tol_loc, options_loc = options_loc, method_loc= method_loc)
                     
                     # Extract results and inputs
                     min_result = local_opt_results.raw_data['min']
                     max_result = local_opt_results.raw_data['max']
+
+                    if all_output is None:
+                        all_output = np.array([[min_result[0]['f'], max_result[0]['f']]])
+                    else:
+                        all_output = np.concatenate((all_output, np.array([[min_result[0]['f'], max_result[0]['f']]])), axis=0)
+                    
+                    if x_min_y is None:
+                        x_min_y =  np.array([min_result[0]['x']])
+                    else:
+                        x_min_y = np.concatenate((x_min_y, np.array([min_result[0]['x']])), axis=0) 
+                    
+                    if x_max_y is None:
+                        x_max_y =  np.array([max_result[0]['x']])
+                    else:
+                        x_max_y = np.concatenate((x_max_y, np.array([max_result[0]['x']])), axis=0) 
+                    
+                    if message_min is None:
+                        message_min =  np.array([min_result[0]['message']])
+                    else:
+                        message_min = np.concatenate((message_min, np.array([min_result[0]['message']])), axis=0) 
+                    
+                    if message_max is None:
+                        message_max =  np.array([max_result[0]['message']])
+                    else:
+                        message_max = np.concatenate((message_max, np.array([max_result[0]['message']])), axis=0) 
+
+        case "interval_mc_genetic_opt" | "interval_monte_carlo_genetic_optimisation" :
+           
+            if f is not None:
+                x_min_y = None
+                x_max_y= None
+                message_min = None
+                message_max = None
+
+                for interval_set in tqdm.tqdm(intervals_comb, desc="Processing input combinations"):
+                    inputs = np.array([np.array(interval).flatten() for interval in interval_set])
+                    genetic_opt_results = genetic_optimisation_method(x_bounds = inputs, f=f,results = None, 
+                                        pop_size=pop_size, n_gen=n_gen, tol=tol,
+                                        n_gen_last=n_gen_last, algorithm_type=algorithm_type
+                                    )
+                    
+                    # Extract results and inputs
+                    min_result = genetic_opt_results.raw_data['min']
+                    max_result = genetic_opt_results.raw_data['max']
 
                     if all_output is None:
                         all_output = np.array([[min_result[0]['f'], max_result[0]['f']]])
@@ -503,31 +552,3 @@ plotPbox(results.raw_data['min'][0]['f'], results.raw_data['max'][0]['f'], p=Non
 #plotPbox(results.raw_data['min'][1]['f'], results.raw_data['max'][1]['f'], p=None)
 
 
-from pyuncertainnumber import UncertainNumber
-
-def Fun(x):
-
-    input1= x[0]
-    input2=x[1]
-    input3=x[2]
-    input4=x[3]
-    input5=x[4]
-
-    output1 = input1 + input2 + input3 + input4 + input5
-    output2 = input1 * input2 * input3 * input4 * input5
-
-    return np.array([output1, output2])
-
-means = np.array([1, 2, 3, 4, 5])
-stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
-
-x = [
-    UncertainNumber(essence = 'distribution', distribution_parameters= ["gaussian",[means[0], stds[0]]]),
-
-    UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
-    UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
-    UncertainNumber(essence = 'interval', bounds= [means[3]-2* stds[3], means[3]+2* stds[3]]),
-    UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
-    ]
-
-results = interval_monte_carlo_method(x=x, f=Fun, method = 'endpoints', n_disc= 5)
