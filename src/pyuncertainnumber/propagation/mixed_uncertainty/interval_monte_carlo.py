@@ -9,6 +9,7 @@ from pyuncertainnumber.propagation.epistemic_uncertainty.local_optimisation impo
 #from pyuncertainnumber.propagation.epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
 from pyuncertainnumber.propagation.utils import Propagation_results, condense_bounds
 
+#TODO remove genetic algorithm and update the interval monte carlo
 import numpy as np
 from typing import Callable
 from pymoo.optimize import minimize
@@ -139,61 +140,61 @@ def interval_monte_carlo_method(x: list, f:Callable = None,
                                     results: Propagation_results = None, 
                                     method:str = 'interval_mc_endpoints',
                                     n_sam: int = 500,
-                                    x0: np.ndarray = None,                              
-                                    tol_loc: np.ndarray = None, options_loc: dict = None,
-                                    *, method_loc='Nelder-Mead',
-                                    pop_size= np.array([1500, 1500]), n_gen=150, tol=1e-3,
-                                    n_gen_last=np.array([10, 20]),
+                                    x0: Union[float, np.ndarray] = None,                              
+                                    tol_loc: Union[float, np.ndarray] = None, options_loc: dict = None,
+                                    *, method_loc: str ='Nelder-Mead',
+                                    pop_size: Union[int, np.ndarray] = 1500,
+                                    n_gen: Union[int, np.ndarray]= 150,
+                                    tol: Union[int, np.ndarray] = 1e-3,
+                                    n_gen_last: Union[int, np.ndarray] = 10,
                                     condensation: Union[float, np.ndarray] = None, 
                                     save_raw_data= 'no')-> Propagation_results:  # Specify return type
     
-    """ This function performs uncertainty propagation for a mix of uncertain numbers. It is designed to 
-        handle situations where there are different types of uncertainty in the model's inputs, such as probability 
-        distributions, intervals, and p-boxes. To ensure conservative results, the function employs an outward-directed 
-        discretization approach for probability distributions and pboxes.  For distributions that extend to infinity 
-        (e.g., normal distribution), the discretization process incorporates cut-off points defined by the tOp (upper) 
-        and bOt (lower) parameters to bound the distribution. The function generates the cartesian product of the focal
-        elements from the discretized uncertain inputs.
-            - For the 'endpoints' method, it evaluates the function at all combinations of endpoints 
-              of the focal elements.
-            - For the 'extremepoints' method, it uses the `extremepoints_method` to determine the 
-              signs of the partial derivatives and evaluates the function at the extreme points.
-        The output p-boxes are constructed by considering the minimum and maximum values obtained from the function evaluations
-        `condensation` can be used to reduce the number of intervals in the output p-boxes. 
+    """ 
+        Performs uncertainty propagation using interval Monte Carlo methods.
 
-    args:
-        x (list): A list of `UncertainNumber` objects representing the uncertain inputs.
-        f (Callable): The function to evaluate.
-        results (Propagation_results, optional): An object to store propagation results.
-                                    Defaults to None, in which case a new
-                                    `Propagation_results` object is created.
-        method (str, optional): The method used to estimate the bounds of each combination 
-                            of focal elements. Can be either 'endpoints' or 'extremepoints'. 
-                            Defaults to 'endpoints'.
-        n_disc (Union[int, np.ndarray], optional): The number of discretization points 
-                                    for each uncertain input. If an integer is provided,
-                                    it is used for all inputs. If a NumPy array is provided,
-                                    each element specifies the number of discretization 
-                                    points for the corresponding input. 
-                                    Defaults to 10.
-        tOp (Union[float, np.ndarray], optional): Upper threshold or array of thresholds for 
-                                    discretization. 
-                                    Defaults to 0.999.
-        bOt (Union[float, np.ndarray], optional): Lower threshold or array of thresholds for 
-                                    discretization. 
-                                    Defaults to 0.001.
-        condensation (Union[float, np.ndarray], optional): A parameter or array of parameters 
-                                    to control the condensation of the output p-boxes. 
-                                    Defaults to None.
-        save_raw_data (str, optional): Whether to save raw data ('yes' or 'no'). 
-                                   Defaults to 'no'.
+    This function calculates the output uncertainty of a given function 'f' when its inputs 'x' are uncertain.
+    It supports various interval Monte Carlo methods to estimate the bounds of the output uncertainty.
+
+    Args:
+        x (list): A list of uncertain input values. Each element can be an UncertainNumber object or a similar
+                  structure representing an interval or distribution.
+        f (Callable, optional): The function to propagate uncertainty through. If None, only input combinations
+                                will be generated and saved if 'save_raw_data' is 'yes'.
+        results (Propagation_results, optional): An object to store the results of the propagation. If None, a new
+                                                  Propagation_results object will be created.
+        method (str, optional): The method used for interval Monte Carlo propagation. Options include:
+            - 'interval_mc_endpoints' or 'interval_monte_carlo_endpoints': Evaluates the function at all
+              combinations of interval endpoints.
+            - 'interval_mc_extremepoints' or 'interval_monte_carlo_extremepoints': Uses partial derivatives to
+              determine the extreme points and evaluates the function there.
+            - 'interval_mc_local_opt' or 'interval_monte_carlo_local_optimisation': Uses local optimization
+              (e.g., Nelder-Mead) to find the minimum and maximum values within each interval combination.
+            - 'interval_mc_genetic_opt' or 'interval_monte_carlo_genetic_optimisation': Uses a genetic algorithm
+              to find the minimum and maximum values within each interval combination.
+            Defaults to 'interval_mc_endpoints'.
+        n_sam (int, optional): The number of samples to generate for distributions or p-boxes. Defaults to 500.
+        x0 (Union[float, np.ndarray], optional): Initial guess for local optimization methods.
+        tol_loc (Union[float, np.ndarray], optional): Tolerance for convergence in local optimization.
+        options_loc (dict, optional): Options for local optimization.
+        method_loc (str, optional): The local optimization method to use (e.g., 'Nelder-Mead'). Defaults to 'Nelder-Mead'.
+        pop_size (Union[int, np.ndarray], optional): Population size for genetic optimization. Defaults to 1500.
+        n_gen (Union[int, np.ndarray], optional): Number of generations for genetic optimization. Defaults to 150.
+        tol (Union[int, np.ndarray], optional): Tolerance for convergence in genetic optimization. Defaults to 1e-3.
+        n_gen_last (Union[int, np.ndarray], optional): Number of generations without improvement for convergence
+                                                     in genetic optimization. Defaults to 10.
+        condensation (Union[float, np.ndarray], optional): Parameter(s) to control condensation of output p-boxes.
+                                                          If provided, the number of intervals in the output p-boxes
+                                                          will be reduced. Defaults to None.
+        save_raw_data (str, optional): If 'yes', saves the raw input combinations and function outputs.
+                                       If 'no', raw data is not saved unless 'f' is None. Defaults to 'no'.
+   
+    Raises:
+        ValueError: If an unsupported uncertainty type is encountered, an invalid method is specified, or
+                    'save_raw_data' is 'yes' but no function 'f' is provided.
 
     signature:
-        focused_discretisation_propagation_method(x: list, f: Callable, results: propagation_results = None, ...) -> propagation_results      
-    
-    raises:
-      ValueError for unsupported uncertainty type, invalid UP method and if no fnction is given and saw_raw_data = 'no'
-       is selected.
+        interval_monte_carlo_method(x: list, f: Callable, results: propagation_results = None, ...) -> Propagation_Results        
     
     returns:
         Returns `Propagation_results` object(s) containing:
@@ -243,7 +244,6 @@ def interval_monte_carlo_method(x: list, f:Callable = None,
     bounds_x = []
     ranges = np.zeros((2, d))
     u_list = []  # List to store 'u' for each uncertain number
-    convergence_issues = []# Initialize convergence_issues
 
     for i, un in enumerate(x):
         print(f"Processing variable {i + 1} with essence: {un.essence}")
@@ -613,74 +613,74 @@ def interval_monte_carlo_method(x: list, f:Callable = None,
 
     return results
 
-from pyuncertainnumber import UncertainNumber
-def plotPbox(xL, xR, p=None):
-    """
-    Plots a p-box (probability box) using matplotlib.
+# from pyuncertainnumber import UncertainNumber
+# def plotPbox(xL, xR, p=None):
+#     """
+#     Plots a p-box (probability box) using matplotlib.
 
-    Args:
-        xL (np.ndarray): A 1D NumPy array of lower bounds.
-        xR (np.ndarray): A 1D NumPy array of upper bounds.
-        p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
-                                   Defaults to None, which generates equally spaced probabilities.
-        color (str, optional): The color of the plot. Defaults to 'k' (black).
-    """
-    xL = np.squeeze(xL)  # Ensure xL is a 1D array
-    xR = np.squeeze(xR)  # Ensure xR is a 1D array
+#     Args:
+#         xL (np.ndarray): A 1D NumPy array of lower bounds.
+#         xR (np.ndarray): A 1D NumPy array of upper bounds.
+#         p (np.ndarray, optional): A 1D NumPy array of probabilities corresponding to the intervals.
+#                                    Defaults to None, which generates equally spaced probabilities.
+#         color (str, optional): The color of the plot. Defaults to 'k' (black).
+#     """
+#     xL = np.squeeze(xL)  # Ensure xL is a 1D array
+#     xR = np.squeeze(xR)  # Ensure xR is a 1D array
 
-    if p is None:
-        # p should have one more element than xL/xR
-        p = np.linspace(0, 1, len(xL) + 1)
+#     if p is None:
+#         # p should have one more element than xL/xR
+#         p = np.linspace(0, 1, len(xL) + 1)
 
-    # Plot the step functions
-    plt.step(np.concatenate(([xL[0]], xL)), p, where='post', color='black')
-    plt.step(np.concatenate(([xR[0]], xR)), p, where='post', color='red')
+#     # Plot the step functions
+#     plt.step(np.concatenate(([xL[0]], xL)), p, where='post', color='black')
+#     plt.step(np.concatenate(([xR[0]], xR)), p, where='post', color='red')
 
-    # Add bottom and top lines to close the box
-    plt.plot([xL[0], xR[0]], [0, 0], color='red')  # Bottom line
-    plt.plot([xL[-1], xR[-1]], [1, 1], color='black')  # Top line
+#     # Add bottom and top lines to close the box
+#     plt.plot([xL[0], xR[0]], [0, 0], color='red')  # Bottom line
+#     plt.plot([xL[-1], xR[-1]], [1, 1], color='black')  # Top line
 
-    # Add x and y axis labels
-    plt.xlabel("X", fontsize=14)
-    plt.ylabel("Cumulative Probability", fontsize=14)
-    # Increase font size for axis numbers
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
+#     # Add x and y axis labels
+#     plt.xlabel("X", fontsize=14)
+#     plt.ylabel("Cumulative Probability", fontsize=14)
+#     # Increase font size for axis numbers
+#     plt.xticks(fontsize=12)
+#     plt.yticks(fontsize=12)
 
-    plt.show()
+#     plt.show()
 
-def Fun(x):
+# def Fun(x):
 
-    input1= x[0]
-    input2=x[1]
-    input3=x[2]
-    input4=x[3]
-    input5=x[4]
+#     input1= x[0]
+#     input2=x[1]
+#     input3=x[2]
+#     input4=x[3]
+#     input5=x[4]
 
-    output1 = input1 + input2 + input3 + input4 + input5
-    output2 = input1 * input2 * input3 * input4 * input5
+#     output1 = input1 + input2 + input3 + input4 + input5
+#     output2 = input1 * input2 * input3 * input4 * input5
 
-    return np.array([output1]) #, output2
+#     return np.array([output1]) #, output2
 
-means = np.array([1, 2, 3, 4, 5])
-stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+# means = np.array([1, 2, 3, 4, 5])
+# stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
 
-x = [
-    UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",[[1,2], 0.1]]),
+# x = [
+#     UncertainNumber(essence = 'pbox', distribution_parameters= ["gaussian",[[1,2], 0.1]]),
 
-    UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
-    UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
-    UncertainNumber(essence = 'interval', bounds= [means[3]-2* stds[3], means[3]+2* stds[3]]),
-    UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
-    ]
+#     UncertainNumber(essence = 'interval', bounds= [means[1]-2* stds[1], means[1]+2* stds[1]]),
+#     UncertainNumber(essence = 'interval', bounds= [means[2]-2* stds[2], means[2]+2* stds[2]]),
+#     UncertainNumber(essence = 'interval', bounds= [means[3]-2* stds[3], means[3]+2* stds[3]]),
+#     UncertainNumber(essence = 'interval', bounds= [means[4]-2* stds[4], means[4]+2* stds[4]])
+#     ]
 
-results = interval_monte_carlo_method(x=x, f=Fun, method = 'interval_monte_carlo_genetic_optimisation', n_sam= 10)
+# results = interval_monte_carlo_method(x=x, f=Fun, method = 'interval_monte_carlo_genetic_optimisation', n_sam= 10)
 
-print(results.raw_data['min'][0]['f'])
-print(results.raw_data['min'][0]['x'])
-print(results.raw_data['min'][0]['message'])
+# print(results.raw_data['min'][0]['f'])
+# print(results.raw_data['min'][0]['x'])
+# print(results.raw_data['min'][0]['message'])
 
-plotPbox(results.raw_data['min'][0]['f'], results.raw_data['max'][0]['f'], p=None)
-#plotPbox(results.raw_data['min'][1]['f'], results.raw_data['max'][1]['f'], p=None)
+# plotPbox(results.raw_data['min'][0]['f'], results.raw_data['max'][0]['f'], p=None)
+# #plotPbox(results.raw_data['min'][1]['f'], results.raw_data['max'][1]['f'], p=None)
 
 
