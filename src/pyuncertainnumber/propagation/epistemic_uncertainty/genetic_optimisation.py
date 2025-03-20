@@ -1,12 +1,13 @@
 
 import numpy as np
 from typing import Callable
+from typing import Callable, Union
 from pymoo.optimize import minimize
 from pymoo.core.problem import Problem
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.core.callback import Callback
 from pyuncertainnumber.propagation.utils import Propagation_results
-
+#TODO need to add it to final, bug removed. 
 def genetic_optimisation_method(x_bounds:  np.ndarray,  # Updated to list of lists
                                 f: Callable = None,
                                 results: Propagation_results = None,
