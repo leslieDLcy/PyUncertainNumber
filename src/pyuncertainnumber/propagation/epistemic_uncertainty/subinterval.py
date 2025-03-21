@@ -14,46 +14,50 @@ def subinterval_method(
     n_sub: np.array = 3,
     save_raw_data="no",
 ) -> Propagation_results:  # Specify return type
-    """subinterval reconstitution method
+    """The subinterval reconstitution method.
 
     args:
-        - x (nd.array): A 2D NumPy array where each row represents an input variable and the two columns
+        x (nd.array): A 2D NumPy array where each row represents an input variable and the two columns
             define its lower and upper bounds (interval).
-        - f (callable): A callable function that takes a 1D NumPy array of input values and returns the
+        f (callable): A callable function that takes a 1D NumPy array of input values and returns the
             corresponding output(s).
-        - n_sub (nd.array): A scalar (integer) or a 1D NumPy array specifying the number of subintervals for
+        results (Propagation_results): The class to use for storing results (defaults to Propagation_results).
+        n_sub (nd.array): A scalar (integer) or a 1D NumPy array specifying the number of subintervals for
             each input variable.
-             - If a scalar, all input variables are divided into the same number of subintervals (defaults 3 divisions).
-             - If an array, each element specifies the number of subintervals for the
-               corresponding input variable.
-        - save_raw_data (boolean): Controls the amount of data returned:
-             - 'no': Returns only the minimum and maximum output values along with the
-                    corresponding input values.
-             - 'yes': Returns the above, plus the full arrays of unique input combinations
-                      (`all_input`) and their corresponding output values (`all_output`).
-
+            - If a scalar, all input variables are divided into the same number of subintervals (defaults 3 divisions).
+            - If an array, each element specifies the number of subintervals for the
+               corresponding input variable.        
+        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw input data when a function (f) 
+            is not provided.
+            - 'no': Returns an error that no function is provided.
+            - 'yes': Returns the full arrays of unique input combinations.
+    
     signature:
-        subinterval_method(x:np.ndarray, f:Callable, n:np.array, results:dict = None, save_raw_data = 'no') -> dict
+        subinterval_method(x:np.ndarray, f:Callable, n_sub:np.array ...) -> Propagation_results
 
-    note:
-        - The function assumes that the intervals in `x` represent uncertainties and aims to provide conservative
-           bounds on the output uncertainty.
+    notes:
+        - The function assumes that the intervals in `x` represent epistemic uncertainties in the input.
+        - The subinterval reconstitution method subdivides the input intervals into smaller subintervals
+          to accommodate for the presence of non-monotonic trends in the function output(s). 
+        - The subintervals for the input can vary in number. 
         - The computational cost increases exponentially with the number of input variables
-           and the number of subintervals per variable.
-        - If the `f` function returns multiple outputs, the `all_output` array will be 2-dimensional.
+          and the number of subintervals per variable.
+        - The `f` function can return multiple outputs.
 
-    return:
-         - dict: A dictionary containing the results:
-           - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None).
-        - 'min': A dictionary for lower bound results (if f is not None):
-             - 'x': Input values that produced the minimum output value(s).
-             - 'f': Minimum output value(s).
-        - 'max': A dictionary for upper bound results (if f is not None):
-             - 'x': Input values that produced the maximum output value(s).
-             - 'f': Maximum output value(s).
-        - 'raw_data': A dictionary containing raw data (if `save_raw_data` is 'yes'):
-             - 'x': All generated input samples.
-             - 'f': Corresponding output values for each input sample.
+    raises:
+        ValueError if no function is provided and save_raw_data is 'no'.
+
+    returns:
+        `Propagation_results` object(s) containing:
+            - 'un': UncertainNumber object(s) to characterise the interval(s) of the output(s).
+            - 'raw_data' (dict): Dictionary containing raw data shared across output(s):
+                    - 'x' (np.ndarray): Input values.
+                    - 'f' (np.ndarray): Output values.
+                    - 'min' (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'f' for the minimum of that output.
+                    - 'max' (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'f' for the maximum of that output.
+                    - 'bounds' (np.ndarray): 2D array of lower and upper bounds for each output.
 
     example:
         >>> #Define input intervals
@@ -72,10 +76,7 @@ def subinterval_method(
     # Create a sequence of values for each interval based on the number of divisions provided
     # The divisions may be the same for all intervals or they can vary.
     m = x.shape[0]
-    print(
-        f"Total number of input combinations for the subinterval method: {(n_sub+1)**m}"
-    )
-
+   
     if type(n_sub) == int:  # All inputs have identical division
         total = (n_sub + 1) ** m
         Xint = np.zeros((0, n_sub + 1), dtype=object)
@@ -97,7 +98,7 @@ def subinterval_method(
 
     # propagates the epistemic uncertainty through subinterval reconstitution
     if f is not None:
-        all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Evaluating samples")])
+        all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Function evaluations")])
 
         try:
             num_outputs = len(all_output[0])
@@ -166,5 +167,3 @@ def subinterval_method(
 # # Call the method
 # y = subinterval_method(x_bounds, f=None, n_sub=n, save_raw_data = 'yes')
 
-# #Print the results
-# y.print()
