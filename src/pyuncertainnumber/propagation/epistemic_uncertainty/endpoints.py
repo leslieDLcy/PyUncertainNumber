@@ -11,47 +11,50 @@ def endpoints_method(
     x: np.ndarray, f: Callable, results: Propagation_results = None, save_raw_data="no"
 ) -> Propagation_results:  # Specify return type
     """
-        Performs uncertainty propagation using the Endpoints Method. The function assumes that the intervals in `x` represent uncertainties
-        and aims to provide conservative bounds on the output uncertainty. If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.
+        Performs uncertainty propagation using the endpoints or vertex method. 
 
     args:
-        - x: A 2D NumPy array where each row represents an input variable and
+        x (np.ndarray): A 2D NumPy array where each row represents an input variable and
           the two columns define its lower and upper bounds (interval).
-        - f: A callable function that takes a 1D NumPy array of input values and
+        f (Callable): A callable function that takes a 1D NumPy array of input values and
           returns the corresponding output(s).
-        - save_raw_data: Controls the amount of data returned.
-          - 'no': Returns only the minimum and maximum output values along with the
-                  corresponding input values.
-          - 'yes': Returns the above, plus the full arrays of unique input combinations
-                  (`all_input`) and their corresponding output values (`all_output`).
-
+        results (Propagation_results): The class to use for storing results (defaults to Propagation_results).
+        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw input data when a function (f) 
+          is not provided.
+          - 'no': Returns an error that no function is provided.
+          - 'yes': Returns the full arrays of unique input combinations.
 
     signature:
-        endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no') -> dict
+        endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no') -> Propagation_results
+    
+    notes:
+        The function assumes that the intervals in `x` represent uncertainties and aims to provide conservative bounds on the output 
+        uncertainty. 
+        If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.
 
-    note:
+    return:
+        Returns `Propagation_results` object(s) containing:
+            - 'un': UncertainNumber object(s) to characterise the interval(s) of the output(s).
+            - 'raw_data' (dict): Dictionary containing raw data shared across output(s):
+                    - 'x' (np.ndarray): Input values.
+                    - 'f' (np.ndarray): Output values.
+                    - 'min' (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'f' for the minimum of that output.
+                    - 'max' (np.ndarray): Array of dictionaries, one for each output,
+                              containing 'f' for the maximum of that output.
+                    - 'bounds' (np.ndarray): 2D array of lower and upper bounds for each output.
+
+    raises:
+        ValueError if no function is provided and save_raw_data is 'no'.
+
+    example:
         # Example usage with different parameters for minimization and maximization
         f = lambda x: x[0] + x[1] + x[2]  # Example function
 
         # Determine input parameters for function and method
         x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
+        y = endpoints_method(x_bounds, f)
 
-    return:
-        - dict: A dictionary containing the results:
-          - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None).
-          - 'min': A dictionary for lower bound results (if f is not None):
-            - 'x': Input values that produced the minimum output value(s).
-            - 'f': Minimum output value(s).
-          - 'max': A dictionary for upper bound results (if f is not None):
-            - 'x': Input values that produced the maximum output value(s).
-            - 'f': Maximum output value(s).
-          - 'raw_data': A dictionary containing raw data (if `save_raw_data` is 'yes'):
-            - 'x': All generated input samples.
-            - 'f': Corresponding output values for each input sample.
-
-
-    Example:
-        >>> y = endpoints_method(x_bounds, f)
     """
 
     if results is None:
@@ -67,7 +70,7 @@ def endpoints_method(
 
     # propagates the epistemic uncertainty through subinterval reconstitution
     if f is not None:
-        all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Evaluating samples")])
+        all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Function evaluations")])
 
         try:
             num_outputs = len(all_output[0])
