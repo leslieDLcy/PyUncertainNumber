@@ -35,19 +35,22 @@ class Propagation_results:
             self.raw_data = {
                 "x": None,
                 "f": None,
+                'message': None, 
                 "min": np.array([]),
                 "max": np.array([]),
                 "bounds": np.array([]),
             }
 
-    def add_raw_data(self, x=None, f=None, K=None, part_deriv_sign: np.ndarray = None):
+    def add_raw_data(self, x=None, f=None, K=None, message=None, part_deriv_sign: np.ndarray = None):
         """Adds raw data to the results."""
         if x is not None:
             self.raw_data["x"] = x
         if K is not None:
             self.raw_data["K"] = K
         if f is not None:
-            self.raw_data["f"] = f
+            self.raw_data["f"] = f           
+        if message is not None:
+            self.raw_data["message"] = message
         if part_deriv_sign is not None:
             if (
                 isinstance(part_deriv_sign, np.ndarray) and len(part_deriv_sign.shape) > 1
