@@ -4,6 +4,7 @@ import tqdm
 from pyuncertainnumber.propagation.epistemic_uncertainty.extreme_point_func import extreme_pointX
 from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import extremepoints_method
 from pyuncertainnumber.propagation.epistemic_uncertainty.local_optimisation import local_optimisation_method
+from pyuncertainnumber.propagation.epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
 from pyuncertainnumber.propagation.utils import Propagation_results, condense_bounds
 
 def imp(X):
@@ -16,11 +17,14 @@ def varied_discretisation_propagation_method(
     f: Callable = None,
     results: Propagation_results = None,
     method: str = 'extremepoints',
-
     n_disc: Union[int, np.ndarray] = 10,
     x0: Union[float, np.ndarray] = None,                              
     tol_loc: Union[float, np.ndarray] = None, options_loc: dict = None,
     method_loc: str ='Nelder-Mead',
+    pop_size: Union[int, np.ndarray] = 1500,
+    n_gen: Union[int, np.ndarray]= 150,
+    tol: Union[int, np.ndarray] = 1e-3,
+    n_gen_last: Union[int, np.ndarray] = 10,
     tOp: Union[float, np.ndarray] = 0.999,
     bOt: Union[float, np.ndarray] = 0.001,
     condensation: Union[float, np.ndarray] = None,
@@ -34,10 +38,13 @@ def varied_discretisation_propagation_method(
         results (Propagation_results, optional): An object to store propagation results.
                                                 Defaults to None, in which case a new
                                                 `Propagation_results` object is created.
-        method (str, optional): The method to use.
-                                - 'extremepoints', 'varied_discretisation_extremepoints':
-                                  Only methods supported.
-                                Defaults to 'extremepoints'.
+        method (str, optional): Available methods:
+                                - 'varied_discretisation_extremepoints':
+                                - 'varied_discretisation_local_opt' or 'varied_discretisation_local_optimisation': Uses local optimization
+                                  (e.g., Nelder-Mead) to find the minimum and maximum values within each interval combination.
+                                - 'varied_discretisation_genetic_opt' or 'varied_discretisation_genetic_optimisation': Uses a genetic algorithm
+                                    to find the minimum and maximum values within each interval combination.
+                            Defaults to 'varied_discretisation_extremepoints'.
         n_disc (Union[int, np.ndarray], optional): The number of discretization points
                                                 for each uncertain input. If an integer
                                                 is provided, it is used for all inputs.
@@ -45,7 +52,15 @@ def varied_discretisation_propagation_method(
                                                 specifies the number of discretization
                                                 points for the corresponding input.
                                                 Defaults to 10.
-                                                
+        x0 (Union[float, np.ndarray], optional): Initial guess for local optimization methods.
+        tol_loc (Union[float, np.ndarray], optional): Tolerance for convergence in local optimization.
+        options_loc (dict, optional): Options for local optimization.
+        method_loc (str, optional): The local optimization method to use (e.g., 'Nelder-Mead'). Defaults to 'Nelder-Mead'.
+        pop_size (Union[int, np.ndarray], optional): Population size for genetic optimization. Defaults to 1500.
+        n_gen (Union[int, np.ndarray], optional): Number of generations for genetic optimization. Defaults to 150.
+        tol (Union[int, np.ndarray], optional): Tolerance for convergence in genetic optimization. Defaults to 1e-3.
+        n_gen_last (Union[int, np.ndarray], optional): Number of generations without improvement for convergence
+                                                     in genetic optimization. Defaults to 10.                                                
         tOp (Union[float, np.ndarray], optional): Upper threshold or array of thresholds
                                                 for discretization.
                                                 Defaults to 0.999.
@@ -127,7 +142,7 @@ def varied_discretisation_propagation_method(
                           distribution_parameters=["gaussian", [means[4], stds[1]]])
         ]
 
-        results = varied_discretisation_propagation_method(x=x, f=Fun, n_disc=5)
+        results = varied_discretisation_propagation_method(x=x, f=Fun, meethod = 'varied_discretisation_extremepoints', n_disc=5)
     """
     d = len(x)  # dimension of uncertain numbers
     results = Propagation_results()
@@ -427,41 +442,128 @@ def varied_discretisation_propagation_method(
 
             else:
                 raise ValueError("No function is provided. Please provide a function!")
-            
+
+        case "varied_discretisation_genetic_optimisation"|"varied_discretisation_genetic_opt":
+            if f is not None:
+                num_outputs = 1  # If f returns a single value
+
+                all_output_list = []
+                for _ in range(num_outputs):
+                    output_for_current_output = []
+                    for input in range(d):
+                        slices_for_input = []
+                        for _ in range(n_slices[input] - 1):  # Use n_slices[input] here
+                            slices_for_input.append([None, None])
+                        output_for_current_output.append(slices_for_input)
+                    all_output_list.append(output_for_current_output)
+                
+                all_messages_min = [[([''] * (n_slices[i] - 1)) for _ in range(d)] for _ in range(num_outputs)]
+                all_messages_max = [[([''] * (n_slices[i] - 1)) for _ in range(d)] for _ in range(num_outputs)]
+                all_combined_messages  = [[([''] * (n_slices[i] - 1)) for _ in range(d)] for _ in range(num_outputs)]
+                all_input_list = [[([None] * (n_slices[i] - 1)) for _ in range(d)] for _ in range(num_outputs)]
+   
+                for input_index in range(d):  # Iterate over input variables first
+                    X = [ranges[:, k].tolist() for k in range(d)]
+                    temp_X = X.copy()
+
+                    for slice_index in tqdm.tqdm(range(n_slices[input_index] - 1),
+                                        desc=f"Processing input {input_index + 1}"):
+                        temp_X[input_index] = []
+                        temp_X[input_index].extend(
+                            np.array([xl[input_index][slice_index], xr[input_index][slice_index]]).tolist())
+                        rang = np.array([temp_X[i] for i in range(d)], dtype=object) 
+
+                        # Store the interval 'rang'
+                        all_input_list[0][input_index][slice_index] = rang.copy()
+                        
+                        local_opt_results = genetic_optimisation_method(x_bounds = rang, f=f,results = None, 
+                                        pop_size=pop_size, n_gen=n_gen, tol=tol,
+                                        n_gen_last=n_gen_last
+                                    )
+                    
+                        # Extract results and inputs
+                        min_result = local_opt_results.raw_data['min'][0]
+                        max_result = local_opt_results.raw_data['max'][0]
+
+                        all_output_list[0][input_index][slice_index] = np.array([[min_result['f'], max_result['f']]])
+                        min_msg = min_result['message']
+                        max_msg = max_result['message']
+                        all_messages_min[0][input_index][slice_index] = min_msg
+                        all_messages_max[0][input_index][slice_index] = max_msg 
+
+                        
+                        # Create the combined message
+                        if min_msg == "Optimization terminated successfully" and max_msg == "Optimization terminated successfully":
+                            all_combined_messages[0][input_index][slice_index] = "Optimisation terminated successfully"
+                        elif min_msg == max_msg:
+                            all_combined_messages[0][input_index][slice_index] = min_msg
+                        else:
+                            all_combined_messages[0][input_index][slice_index] = f"Min: {min_msg}, Max: {max_msg}"
+
+                
+                # Reshape all_output based on the actual number of elements per output
+                all_output = np.array(all_output_list, dtype=object)
+
+                results.add_raw_data(x= all_input_list)
+                results.add_raw_data(f= all_output)
+                results.add_raw_data(message= all_combined_messages)
+
+                all_output = np.reshape(
+                    all_output, (num_outputs, d, -1, 2))  # Reshape to 4D
+
+                # Calculate min and max for each output and input variable
+                min_values = np.min(all_output, axis=3)
+                max_values = np.max(all_output, axis=3)
+
+                min_val = np.sort(min_values, axis=2)
+                max_val = np.sort(max_values, axis=2)
+
+                # Initialize bounds_input
+                bounds_input = np.empty((num_outputs, d, n_disc, 2))
+
+                for i in range(num_outputs):
+                    for j in range(d):  # Iterate over input variables
+                        # Merge min_values and max_values into bounds_input
+                        for k in range(n_disc):
+                            bounds_input[i, j, k, 0] = min_val[i, j, k]
+                            bounds_input[i, j, k, 1] = max_val[i, j, k]
+
+                        # Sort bounds_input along the last axis (k)
+                        bounds_input[i, j, :, :] = np.sort(bounds_input[i, j, :, :], axis=-1)
+
+                bounds = np.empty((num_outputs, 2, n_disc))  # Initialize bounds
+                lower_bound = np.zeros((num_outputs, n_disc))  # Initialize lower_bound
+                upper_bound = np.zeros((num_outputs, n_disc))  # Initialize upper_bound
+
+                for i in range(num_outputs):
+                    temp_bounds = []# Temporary list for bounds
+
+                    for k in range(n_disc):  # Iterate over input variables
+                        # Impose the p-boxes for each input variable and store in temporary list
+                        temp_bounds.append(imp(bounds_input[i, :, k, :]))
+
+                    # Impose the p-boxes across all input variables for the current output
+                    bounds[i, :, :] = np.array(temp_bounds).T
+
+                    # Extract lower_bound and upper_bound from bounds
+                    lower_bound[i, :] = bounds[i, 1, :]
+                    upper_bound[i, :] = bounds[i, 0, :]
+
+                if condensation is not None:
+                    bounds = condense_bounds(bounds, condensation)
+
+                results.raw_data['bounds'] = bounds
+                results.raw_data['min'] = np.array([{'f': bounds[i, 0, :]} for i in
+                                                   range(num_outputs)])  # Initialize as a NumPy array
+                results.raw_data['max'] = np.array([{'f': bounds[i, 1, :]} for i in
+                                                   range(num_outputs)])  # Initialize as a NumPy array
+
+            else:
+                raise ValueError("No function is provided. Please provide a function!")
+               
         case _:
             raise ValueError(
                 "Invalid UP method!")
 
     return results
 
-from pyuncertainnumber import UncertainNumber
-
-def Fun(x):
-    input1 = x[0]
-    input2 = x[1]
-    input3 = x[2]
-    input4 = x[3]
-    input5 = x[4]
-
-    output1 = input1 + input2 + input3 + input4 + input5
-    output2 = input1 * input2 * input3 * input4 * input5
-
-    return np.array([output1]) #, output2
-
-means = np.array([1, 2, 3, 4, 5])
-stds = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
-
-x = [
-    UncertainNumber(essence='distribution',
-                    distribution_parameters=["gaussian", [1, 0.1]]),
-    UncertainNumber(essence='distribution',
-                    distribution_parameters=["gaussian", [2, 0.2]]),
-    UncertainNumber(essence='distribution',
-                    distribution_parameters=["gaussian", [3, 0.3]]),
-    UncertainNumber(essence='distribution',
-                    distribution_parameters=["gaussian", [4, 0.4]]),
-    UncertainNumber(essence='distribution',
-                    distribution_parameters=["gaussian", [5, 0.5]])
-]
-
-results = varied_discretisation_propagation_method(x=x, f=Fun, method = 'varied_discretisation_local_opt', n_disc=5)

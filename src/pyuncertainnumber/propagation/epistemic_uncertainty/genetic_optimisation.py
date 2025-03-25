@@ -151,7 +151,7 @@ def genetic_optimisation_method(x_bounds: np.ndarray, f: Callable,
         'niterations': n_iter_min
     })
 
-    results.raw_data['max'] = np.append(results.raw_data['min'], {
+    results.raw_data['max'] = np.append(results.raw_data['max'], {
         'x': result_max.X,
         'f': -result_max.F,  # Negate the result for maximisation
         'message': message_max,
