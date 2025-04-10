@@ -58,17 +58,16 @@ def _nick_interval_like(bound: nInterval):
 
 def make_vec_interval(vec):
     """vector interval implementation tmp"""
+
     assert len(vec) > 1, "Interval must have more than one element"
 
     if isinstance(vec, Interval):
         return vec
-
     elif isinstance(vec[0], nInterval):
         lo_endpoints = [un.left for un in vec]
         hi_endpoints = [un.right for un in vec]
         return Interval(lo_endpoints, hi_endpoints)
-
-    elif isinstance(vec[0], list | tuple | np.ndarray):
+    elif isinstance(vec[0], Interval | list | tuple | np.ndarray):
         # lo_endpoints = [un[0] for un in vec]
         # hi_endpoints = [un[1] for un in vec]
         # return Interval(lo_endpoints, hi_endpoints)

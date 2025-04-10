@@ -49,7 +49,7 @@ def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
 
 
 def stacking(
-    vec_interval: nInterval | Interval, weights, display=False, return_type="pbox"
+    vec_interval: nInterval | Interval, weights=None, display=False, return_type="pbox"
 ):
     """stochastic mixture operation of Intervals with probability masses
 

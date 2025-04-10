@@ -128,7 +128,7 @@ class Interval:
         self.__hi = asarray(hi, dtype=float)  # check lo and hi have same shape
         # if (len(self.__hi.shape)>0) | (len(self.__hi.shape)>0): self.__unsized = False
         # check lo, hi order
-        assert (
+        assert np.all(
             self.__lo <= self.__hi
         ), "low larger than high, needed to invert the interval"
         self.__shape = self.__lo.shape

@@ -45,3 +45,17 @@ def factor(a, c):
 def control_bcc(a, c):
     """controlled backcalculation solution for A + B = C"""
     return -1 * backcalc(c, a)
+
+
+# * ------------------ mixture ------------------ *#
+
+
+def additive_bcc(a, c):
+    """additive backcalc"""
+    if a.scalar & c.scalar:
+        lo = c.lo - a.lo
+        hi = c.hi - a.hi
+        try:
+            return Interval(lo, hi)
+        except:
+            return Interval(hi, lo)

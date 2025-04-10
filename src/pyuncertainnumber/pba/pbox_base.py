@@ -1039,8 +1039,8 @@ class Pbox:
         """
         p_values = np.arange(0, discretisation) / discretisation
         interval_list = [self.cuth(p_v) for p_v in p_values]
-        ds = importlib.import_module("DempsterShafer")
-        return ds.DempsterShafer(
+        ds = importlib.import_module("pyuncertainnumber.pba.ds").DempsterShafer
+        return ds(
             interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation)
         )
 
@@ -1048,10 +1048,18 @@ class Pbox:
         """convert to ds object"""
 
         _, interval_list = self.outer_approximate(discretisation)
-        ds = importlib.import_module("DempsterShafer")
-        return ds.DempsterShafer(
+        ds = importlib.import_module("pyuncertainnumber.pba.ds").DempsterShafer
+        return ds(
             interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation - 1)
         )
+
+    def to_interval(self, discretisation=Params.steps):
+        """return Interval object"""
+        from pyuncertainnumber.pba.intervalOperators import make_vec_interval
+
+        p_values = np.arange(0, discretisation) / discretisation
+        interval_list = [self.cuth(p_v) for p_v in p_values]
+        return make_vec_interval(interval_list)
 
 
 # * ---------------------module functions--------------------- *#

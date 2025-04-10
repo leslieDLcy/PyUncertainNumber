@@ -910,30 +910,3 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
         return Pbox(left, right, steps=steps, interpolation="outer")
     except:
         raise Exception("Unable to generate p-box")
-
-
-# ML-ME
-"""
-Maximum Likelihood methods
-__________________________
-
-Maximum likelihood estimation (MLE) is a method of estimating the parameters of a probability distribution by maximizing a likelihood function, so that under the assumed statistical model the observed data is most probable. The point in the parameter space that maximizes the likelihood function is called the maximum likelihood estimate. The logic of maximum likelihood is both intuitive and flexible, and as such the method has become a dominant means of statistical inference.
-"""
-
-
-# def ME_min_max_mean_std(
-#         minimum: Union[nInterval, float, int],
-#         maximum: Union[nInterval, float, int],
-#         mean: Union[nInterval, float, int],
-#         stddev: Union[nInterval, float, int],
-#         steps: int = Params.steps
-# ) -> Pbox:
-
-#     μ = ((mean - minimum) / (maximum - minimum))
-
-#     σ = (stddev/(maximum - minimum))
-
-#     a = ((1-μ)/(σ**2) - 1/μ)*μ**2
-#     b = a*(1/μ - 1)
-
-#     return beta(a, b, steps=steps) * (maximum - minimum) + minimum
