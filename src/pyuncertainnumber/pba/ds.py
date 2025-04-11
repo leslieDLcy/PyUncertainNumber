@@ -1,4 +1,4 @@
-""" Constructors for Dempester-Shafer structures. """
+"""Constructors for Dempester-Shafer structures."""
 
 import numpy as np
 import matplotlib as mpl
@@ -52,16 +52,16 @@ class DempsterShafer:
     ):
         return self._intrep, self._masses
 
-    def display(self, style="box", **kwargs):
+    def display(self, style="box", ax=None, **kwargs):
         intervals, masses = self.disassemble()
         match style:
             # TODO the to_pbox() interpolation is not perfect
             case "box":
-                stacking(intervals, masses, display=True, return_type="pbox")
+                stacking(intervals, masses, display=True, ax=ax, return_type="pbox")
                 # _ = self.to_pbox()
                 # _.display(**kwargs)
             case "interval":
-                plot_DS_structure(intervals, masses, **kwargs)
+                plot_DS_structure(intervals, masses, ax=ax, **kwargs)
 
     def to_pbox(self):
         intervals, masses = self.disassemble()

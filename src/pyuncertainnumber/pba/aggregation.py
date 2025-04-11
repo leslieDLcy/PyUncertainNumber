@@ -49,7 +49,11 @@ def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
 
 
 def stacking(
-    vec_interval: nInterval | Interval, weights=None, display=False, return_type="pbox"
+    vec_interval: nInterval | Interval,
+    weights=None,
+    display=False,
+    ax=None,
+    return_type="pbox",
 ):
     """stochastic mixture operation of Intervals with probability masses
 
@@ -74,7 +78,8 @@ def stacking(
     q2, p2 = weighted_ecdf(vec_interval.hi, weights)
 
     if display:
-        fig, ax = plt.subplots()
+        if ax is None:
+            fig, ax = plt.subplots()
         ax.step(q1, p1, marker="+", c="g", where="post")
         ax.step(q2, p2, marker="+", c="b", where="post")
         ax.plot([q1[0], q2[0]], [0, 0], c="b")

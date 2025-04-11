@@ -1,4 +1,4 @@
-from pyuncertainnumber.pba.intervals.backcalc import *
+from pyuncertainnumber.pba.intervals.backcalc import additive_bcc
 
 import itertools
 
@@ -45,6 +45,6 @@ def p_backcalc(a, c):
     c_vs = c.to_interval()
     container = []
     for _item in itertools.product(a_vs, c_vs):
-        container.append(backcalc(*_item))
+        container.append(additive_bcc(*_item))
     arr_interval = make_vec_interval(container)
     return stacking(arr_interval)
