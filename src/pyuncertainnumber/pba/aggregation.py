@@ -6,7 +6,6 @@ from .operation import convert
 from .intervalOperators import make_vec_interval
 from .utils import weighted_ecdf, CDF_bundle, reweighting
 import matplotlib.pyplot as plt
-from .constructors import pbox_fromeF
 from typing import TYPE_CHECKING
 from .intervals import Interval
 import importlib
@@ -71,9 +70,9 @@ def stacking(
         - together the interval and masses, it can be deemed that all the inputs
         required is jointly a DS structure
     """
+    from .pbox_abc import Staircase
 
     vec_interval = make_vec_interval(vec_interval)
-
     q1, p1 = weighted_ecdf(vec_interval.lo, weights)
     q2, p2 = weighted_ecdf(vec_interval.hi, weights)
 
@@ -85,13 +84,16 @@ def stacking(
         ax.plot([q1[0], q2[0]], [0, 0], c="b")
         ax.plot([q1[-1], q2[-1]], [1, 1], c="g")
 
+    cdf1 = CDF_bundle(q1, p1)
+    cdf2 = CDF_bundle(q2, p2)
+
     match return_type:
         case "pbox":
-            return pbox_fromeF(CDF_bundle(q1, p1), CDF_bundle(q2, p2))
+            return Staircase.from_CDFbundle(cdf1, cdf2)
         case "ds":
             return DempsterShafer(intervals=vec_interval, masses=weights)
         case "bounds":
-            return CDF_bundle(q1, p1), CDF_bundle(q2, p2)
+            return cdf1, cdf2
         case _:
             raise ValueError("return_type must be one of {'pbox', 'ds', 'bounds'}")
 

@@ -123,6 +123,20 @@ class Staircase(Box):
         "label" in kwargs and ax.legend()
         return ax
 
+    ### constructors ###
+    @classmethod
+    def from_CDFbundle(cls, a, b):
+        """pbox from emipirical CDF bundle
+        args:
+            - a : CDF bundle of lower extreme F;
+            - b : CDF bundle of upper extreme F;
+        """
+        from .constructors import interpolate_p
+
+        p_lo, q_lo = interpolate_p(a.probabilities, a.quantiles)
+        p_hi, q_hi = interpolate_p(b.probabilities, b.quantiles)
+        return cls(left=q_lo, right=q_hi)
+
 
 class Leaf(Staircase):
     """parametric pbox"""

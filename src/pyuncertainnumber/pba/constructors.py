@@ -11,18 +11,19 @@ if TYPE_CHECKING:
     from .utils import CDF_bundle
 
 
-def pbox_fromeF(a: CDF_bundle, b: CDF_bundle):
-    """pbox from emipirical CDF bundle
-    args:
-        - a : CDF bundle of lower extreme F;
-        - b : CDF bundle of upper extreme F;
-    """
-    from .pbox_abc import Staircase
+# # TODO to integrate it
+# def pbox_fromeF(a: CDF_bundle, b: CDF_bundle):
+#     """pbox from emipirical CDF bundle
+#     args:
+#         - a : CDF bundle of lower extreme F;
+#         - b : CDF bundle of upper extreme F;
+#     """
+#     from .pbox_abc import Staircase
 
-    # TODO currently the interpolation is not perfect
-    p_lo, q_lo = interpolate_p(a.probabilities, a.quantiles)
-    p_hi, q_hi = interpolate_p(b.probabilities, b.quantiles)
-    return Staircase(left=q_lo, right=q_hi)
+#     # TODO currently the interpolation is not perfect
+#     p_lo, q_lo = interpolate_p(a.probabilities, a.quantiles)
+#     p_hi, q_hi = interpolate_p(b.probabilities, b.quantiles)
+#     return Staircase(left=q_lo, right=q_hi)
 
 
 def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
