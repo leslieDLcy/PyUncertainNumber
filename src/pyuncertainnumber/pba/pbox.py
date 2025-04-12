@@ -28,23 +28,27 @@ def makePbox(func) -> Pbox:
     return wrapper_decorator
 
 
-def _bound_pcdf(dist_family, *args, steps=Params.steps):
+def _bound_pcdf(dist_family, *args, **kwargs):
     """bound the parametric CDF
 
     note:
         - only support fully bounded parameters
     """
+    from .pbox_abc import Leaf
 
-    Left, Right, mean, var = _get_bounds(dist_family, *args)
+    Left, Right, mean, var = _get_bounds(dist_family, *args, **kwargs)
 
-    return Pbox(
-        Left,
-        Right,
-        shape=dist_family,
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
+    # return Pbox(
+    #     Left,
+    #     Right,
+    #     shape=dist_family,
+    #     mean_left=mean.left,
+    #     mean_right=mean.right,
+    #     var_left=var.left,
+    #     var_right=var.right,
+    # )
+    return Leaf(
+        left=Left, right=Right, shape=dist_family, dist_params=args, mean=mean, var=var
     )
 
 
@@ -56,6 +60,7 @@ def _get_bounds(dist_family, *args, steps=Params.steps):
     """
 
     from .distributions import named_dists
+    from .intervals.number import Interval as I
 
     # TODO logically speaking, it can be (0,1) ergo support will be [-inf, inf] see it works with other part codes
     # define percentile range thus getting the support
@@ -87,8 +92,8 @@ def _get_bounds(dist_family, *args, steps=Params.steps):
     Left = np.array([min([b[i] for b in bounds]) for i in range(steps)])
     Right = np.array([max([b[i] for b in bounds]) for i in range(steps)])
 
-    var = nInterval(np.float64(var_lo), np.float64(var_hi))
-    mean = nInterval(np.float64(mean_lo), np.float64(mean_hi))
+    var = I(var_lo, var_hi)
+    mean = I(mean_lo, mean_hi)
 
     return Left, Right, mean, var
 

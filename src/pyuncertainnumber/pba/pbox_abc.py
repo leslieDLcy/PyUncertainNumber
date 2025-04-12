@@ -4,6 +4,7 @@ from .pbox_base import _sideVariance
 from .utils import is_increasing
 from .params import Params
 import matplotlib.pyplot as plt
+from .intervals.number import Interval as I
 
 
 def get_var_from_ecdf(q, p):
@@ -64,21 +65,26 @@ class Staircase(Box):
     ):
         super().__init__(left, right, steps, p_values)
 
+    @abstractmethod
     def _init_moments_range(self):
         """initialised `mean`, `var` and `range` bounds"""
 
         #! should we compute mean if it is a Cauchy, var if it's a t distribution?
-
+        #! we assume that two extreme bounds are valid CDFs
         self.mean_lo, self.var_lo = get_var_from_ecdf(self.left, self._pvalues)
         self.mean_hi, self.var_hi = get_var_from_ecdf(self.right, self._pvalues)
-        self._range = [min(self.left).item(), max(self.right).item()]
+        self.mean = I(self.mean_lo, self.mean_hi)
+        self.var = I(self.var_lo, self.var_hi)
+        self._range = I(min(self.left), max(self.right))
 
     def __repr__(self):
-        with np.printoptions(precision=2, suppress=True):
-            mean_text = f"[{self.mean_lo:.2f}, {self.mean_hi:.2f}]"
-            var_text = f"[{self.var_lo:.2f}, {self.var_hi:.2f}]"
-            range_text = f"{self._range}"
-            return f"Pbox ~ (range={range_text}, mean={mean_text}, var={var_text})"
+        # with np.printoptions(precision=2, suppress=True):
+        # mean_text = f"[{self.mean_lo:.2f}, {self.mean_hi:.2f}]"
+        # var_text = f"[{self.var_lo:.2f}, {self.var_hi:.2f}]"
+        mean_text = f"{self.mean}"
+        var_text = f"{self.var}"
+        range_text = f"{self._range}"
+        return f"Pbox ~ (range={range_text}, mean={mean_text}, var={var_text})"
 
     def display(
         self,
@@ -144,14 +150,28 @@ class Staircase(Box):
 class Leaf(Staircase):
     """parametric pbox"""
 
-    def __init__(self, shape, left, right, dist_params, steps=200):
+    def __init__(
+        self,
+        shape=None,
+        left=None,
+        right=None,
+        mean=None,
+        var=None,
+        dist_params=None,
+        steps=200,
+    ):
         super().__init__(left, right, steps)
         self.shape = shape
         self.dist_params = dist_params
+        self.mean = mean
+        self.var = var
+
+    def _init_moments_range(self):
+        self._range = I(min(self.left).item(), max(self.right).item())
 
     def __repr__(self):
         base_repr = super().__repr__().rstrip(")")  # remove trailing ')'
-        return f"{base_repr}, shape={self.shape})"
+        return f"{base_repr}, shape={self.shape}{self.dist_params}"
 
     def sample():
         pass
