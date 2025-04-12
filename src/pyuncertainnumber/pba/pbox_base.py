@@ -983,7 +983,7 @@ class Pbox:
 
     def display(
         self,
-        title="",
+        title=None,
         ax=None,
         style="band",
         fill_color="lightgray",
@@ -1004,14 +1004,14 @@ class Pbox:
         RR_n = np.concatenate((np.array([L[0]]), R))
 
         if bound_colors is None:
-            ax.plot(LL_n, p_axis, color="g")
+            ax.plot(LL_n, p_axis, color="g", **kwargs)
             ax.plot(RR_n, p_axis, color="b")
         else:
-            ax.plot(LL_n, p_axis, color=bound_colors[0])
+            ax.plot(LL_n, p_axis, color=bound_colors[0], **kwargs)
             ax.plot(RR_n, p_axis, color=bound_colors[1])
 
         if title is not None:
-            ax.set_title(title, **kwargs)
+            ax.set_title(title)
         if style == "band":
             ax.fill_betweenx(
                 y=p_axis,
@@ -1020,6 +1020,7 @@ class Pbox:
                 interpolate=True,
                 color=fill_color,
                 alpha=0.3,
+                **kwargs,
             )
         elif style == "simple":
             pass
@@ -1027,6 +1028,7 @@ class Pbox:
             raise ValueError("style must be either 'simple' or 'band'")
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(X \leq x)$")
+        ax.legend()
         return ax
 
     # * ---------------------conversion--------------------- *#
