@@ -123,7 +123,7 @@ class Staircase(Box):
         "label" in kwargs and ax.legend()
         return ax
 
-    ### constructors ###
+    # * --------------------- constructors ---------------------*#
     @classmethod
     def from_CDFbundle(cls, a, b):
         """pbox from emipirical CDF bundle

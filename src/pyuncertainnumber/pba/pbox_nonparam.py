@@ -7,10 +7,9 @@ from typing import *
 from warnings import warn
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.stats as sps
 from .params import Params
 from .logical import sometimes
-from .utils import transform_ecdf_bundle, cdf_bundle, pl_ecdf_bounding_bundles
+from .utils import cdf_bundle, pl_ecdf_bounding_bundles, weighted_ecdf, CDF_bundle
 from .imprecise import imprecise_ecdf
 
 
@@ -53,19 +52,20 @@ def KS_bounds(s, alpha: float, display=True) -> CDF_bundle:
     dn = d_alpha(len(s), alpha)
     # precise data
     if isinstance(s, list | np.ndarray):
-        ecdf = sps.ecdf(s)
-        b = transform_ecdf_bundle(ecdf)
-        f_l, f_r = b.probabilities + dn, b.probabilities - dn
+        # ecdf = sps.ecdf(s)
+        # b = transform_ecdf_bundle(ecdf)
+
+        q, p = weighted_ecdf(s)
+        f_l, f_r = p + dn, p - dn
         f_l, f_r = logical_bounding(f_l), logical_bounding(f_r)
         # new ecdf bundles
-        b_l, b_r = cdf_bundle(b.quantiles, f_l), cdf_bundle(b.quantiles, f_r)
+        b_l, b_r = CDF_bundle(q, f_l), CDF_bundle(q, f_r)
 
         if display:
             fig, ax = plt.subplots()
-            ecdf.cdf.plot(ax, ls=":", color="black", label="empirical")
-            pl_ecdf_bounding_bundles(b_l, b_r, alpha, ax)
+            ax.step(q, p, color="black", ls=":", where="post")
+            pl_ecdf_bounding_bundles(b_l, b_r, ax=ax)
         return b_l, b_r
-
     # imprecise data
     elif isinstance(s, Interval):
         b_l, b_r = imprecise_ecdf(s)
