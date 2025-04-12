@@ -38,7 +38,7 @@ def transform_ecdf_bundle(e):
 
 
 def pl_ecdf_bounding_bundles(
-    b_l: CDF_bundle, b_r: CDF_bundle, alpha=0.025, ax=None, legend=True, title=None
+    b_l: CDF_bundle, b_r: CDF_bundle, ax=None, legend=True, title=None
 ):
     if ax is None:
         fig, ax = plt.subplots()
@@ -69,6 +69,10 @@ def sorting(list1, list2):
 
 def weighted_ecdf(s, w=None, display=False) -> tuple:
     """compute the weighted ecdf from (precise) sample data
+
+    args:
+        s (array-like) : precise sample data
+        w (array-like) : weights
 
     note:
         - Sudret eq.1
@@ -158,7 +162,8 @@ def read_json(file_name):
     return data
 
 
-def check_increasing(arr):
+def is_increasing(arr):
+    """check if 'arr' is increasing"""
     return np.all(np.diff(arr) >= 0)
 
 

@@ -1,4 +1,4 @@
-""" Hyperparameters for the pba """
+"""Hyperparameters for the pba"""
 
 from dataclasses import dataclass
 import numpy as np

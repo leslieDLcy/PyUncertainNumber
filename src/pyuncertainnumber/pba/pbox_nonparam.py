@@ -1,7 +1,8 @@
 from __future__ import annotations
 from .intervals import Interval
 from .interval import Interval as nInterval
-from .pbox_base import Pbox, NotIncreasingError
+from .pbox_base import Pbox
+from .utils import NotIncreasingError
 from typing import *
 from warnings import warn
 import numpy as np

@@ -7,8 +7,7 @@ from matplotlib import pyplot as plt
 from .interval import Interval as nInterval
 from .utils import (
     find_nearest,
-    check_increasing,
-    NotIncreasingError,
+    is_increasing,
     _interval_list_to_array,
 )
 from .params import Params
@@ -98,8 +97,8 @@ class Pbox:
                     right, interpolation=interpolation, left=True, steps=steps
                 )
 
-            if not check_increasing(left) or not check_increasing(right):
-                raise NotIncreasingError("Left and right arrays must be increasing")
+            if not is_increasing(left) or not is_increasing(right):
+                raise Exception("Left and right arrays must be increasing")
 
             l, r = zip(*[(min(i), max(i)) for i in zip(left, right)])
             self.left = np.array(l)
@@ -126,7 +125,7 @@ class Pbox:
         self.get_range()
 
     def __repr__(self):
-
+        # * migrated
         if self.mean_left == self.mean_right:
             mean_text = f"{round(self.mean_left, 4)}"
         else:
@@ -279,9 +278,10 @@ class Pbox:
             np.max([self.left, self.right]).tolist(),
         ]
 
-    def _computemoments(
-        self,
-    ):  # should we compute mean if it is a Cauchy, var if it's a t distribution?
+    def _computemoments(self):
+        # * migrated
+
+        #   # should we compute mean if it is a Cauchy, var if it's a t distribution?
         self.mean_left = np.max([self.mean_left, np.mean(self.left)])
         self.mean_right = np.min([self.mean_right, np.mean(self.right)])
 
