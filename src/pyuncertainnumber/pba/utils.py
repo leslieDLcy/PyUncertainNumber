@@ -67,11 +67,14 @@ def sorting(list1, list2):
     return list1, list2
 
 
-def weighted_ecdf(s, w=None, display=False):
+def weighted_ecdf(s, w=None, display=False) -> tuple:
     """compute the weighted ecdf from (precise) sample data
 
     note:
         - Sudret eq.1
+
+    return:
+        ecdf in the form of a tuple of q and p
     """
 
     if w is None:

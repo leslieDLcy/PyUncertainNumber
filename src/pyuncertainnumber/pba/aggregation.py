@@ -54,7 +54,7 @@ def stacking(
     display=False,
     ax=None,
     return_type="pbox",
-):
+) -> Pbox:
     """stochastic mixture operation of Intervals with probability masses
 
     args:

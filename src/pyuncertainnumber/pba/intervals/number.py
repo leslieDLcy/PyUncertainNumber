@@ -1,32 +1,8 @@
 """
 :#######################################################
-: Intervals Library v02 for Python
-: Developed by Marco de Angelis
+: Intervals Library originally Developed by Marco de Angelis
+: Continuesly developed and refactored by Leslie Yu Chen
 :#######################################################
-
-Place the folder `intervals` that contains this file in your working directory.
-Then place the following line at the top of your code.
-
-`import intervals as ia`
-
-Once the library has been imported you can create an interval
-
-`a = ia.Interval(1,5)`
-`b = ia.Interval(-2,-1)
-
-and perform mathematical operations between them
-
-`a + b`
-`a - b`
-`a * b`
-`a / b`
-
-
-----------------------------------------------------
-:Created Tue Feb 08 2022
-:github.com/marcodeangelis
-:MIT License
-----------------------------------------------------
 """
 
 # Sequence: # Must have __len__() and __getitem__(). Ex.: Tuple, List, Range
