@@ -49,7 +49,7 @@ def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
 
 
 def stacking(
-    vec_interval: nInterval | Interval,
+    vec_interval: nInterval | Interval | list[Interval],
     weights=None,
     display=False,
     ax=None,

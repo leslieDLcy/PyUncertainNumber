@@ -1,13 +1,17 @@
 from pyuncertainnumber.characterisation.uncertainNumber import *
 
 
-# * --------------------- pba---------------------*#
+# * --------------------- pba ---------------------*#
 import pyuncertainnumber.pba as pba
 from pyuncertainnumber.pba.pbox_nonparam import *
 from pyuncertainnumber.characterisation.stats import fit
 from .pba.aggregation import *
 
 # from pyuncertainnumber.pba.pbox import *
+
+# * --------------------- Interval ---------------------*#
+from pyuncertainnumber.pba.intervals.number import Interval as I
+from pyuncertainnumber.pba.intervalOperators import make_vec_interval
 
 # * --------------------- hedge---------------------*#
 from pyuncertainnumber.nlp.language_parsing import hedge_interpret

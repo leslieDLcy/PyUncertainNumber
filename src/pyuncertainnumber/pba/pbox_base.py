@@ -1003,12 +1003,13 @@ class Pbox:
         LL_n = np.concatenate((L, np.array([R[-1]])))
         RR_n = np.concatenate((np.array([L[0]]), R))
 
-        if bound_colors is None:
-            ax.plot(LL_n, p_axis, color="g", **kwargs)
-            ax.plot(RR_n, p_axis, color="b")
-        else:
-            ax.plot(LL_n, p_axis, color=bound_colors[0], **kwargs)
-            ax.plot(RR_n, p_axis, color=bound_colors[1])
+        def display_bounds():
+            if bound_colors is None:
+                ax.plot(LL_n, p_axis, color="g", **kwargs)
+                ax.plot(RR_n, p_axis, color="b")
+            else:
+                ax.plot(LL_n, p_axis, color=bound_colors[0], **kwargs)
+                ax.plot(RR_n, p_axis, color=bound_colors[1])
 
         if title is not None:
             ax.set_title(title)
@@ -1022,13 +1023,14 @@ class Pbox:
                 alpha=0.3,
                 **kwargs,
             )
+            display_bounds()
         elif style == "simple":
-            pass
+            display_bounds()
         else:
             raise ValueError("style must be either 'simple' or 'band'")
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(X \leq x)$")
-        ax.legend()
+        "label" in kwargs and ax.legend()
         return ax
 
     # * ---------------------conversion--------------------- *#

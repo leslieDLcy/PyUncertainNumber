@@ -1,6 +1,6 @@
 """
 :#######################################################
-: Intervals Library originally Developed by Marco de Angelis
+: Intervals Library originally created by Marco de Angelis
 : Continuesly developed and refactored by Leslie Yu Chen
 :#######################################################
 """
@@ -77,16 +77,7 @@ def show(x: Interval) -> str:
 
 
 class Interval:
-    """
-    --------------------------
-    Created Feb 2022
-    github.com/marcodeangelis
-    MIT License
-    --------------------------
-
-    Interval is the main class.
-
-    """
+    """Interval is the main class"""
 
     def __repr__(self):  # return
         return show(self)
