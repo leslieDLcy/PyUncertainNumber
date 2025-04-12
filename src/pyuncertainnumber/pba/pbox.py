@@ -1,3 +1,4 @@
+from __future__ import annotations
 import functools
 from .interval import Interval as nInterval
 from .pbox_base import Pbox
@@ -10,7 +11,41 @@ from warnings import *
 from .intervalOperators import wc_interval
 
 
+if TYPE_CHECKING:
+    from .pbox_base import Pbox
+    from .interval import Interval as nInterval
+
 """ parametric pboxes"""
+
+
+def makePbox(func) -> Pbox:
+    @functools.wraps(func)
+    def wrapper_decorator(*args, **kwargs):
+        i_args = [wc_interval(arg) for arg in args]
+        shape_value = func(*args, **kwargs)
+        return _bound_pcdf(shape_value, *i_args)
+
+    return wrapper_decorator
+
+
+def _bound_pcdf(dist_family, *args, steps=Params.steps):
+    """bound the parametric CDF
+
+    note:
+        - only support fully bounded parameters
+    """
+
+    Left, Right, mean, var = _get_bounds(dist_family, *args)
+
+    return Pbox(
+        Left,
+        Right,
+        shape=dist_family,
+        mean_left=mean.left,
+        mean_right=mean.right,
+        var_left=var.left,
+        var_right=var.right,
+    )
 
 
 def _get_bounds(dist_family, *args, steps=Params.steps):
@@ -58,37 +93,7 @@ def _get_bounds(dist_family, *args, steps=Params.steps):
     return Left, Right, mean, var
 
 
-def _bound_pcdf(dist_family, *args, steps=Params.steps):
-    """bound the parametric CDF
-
-    note:
-        - only support fully bounded parameters
-    """
-
-    Left, Right, mean, var = _get_bounds(dist_family, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        shape=dist_family,
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def makePbox(func):
-    @functools.wraps(func)
-    def wrapper_decorator(*args, **kwargs):
-        i_args = [wc_interval(arg) for arg in args]
-        shape_value = func(*args, **kwargs)
-        return _bound_pcdf(shape_value, *i_args)
-
-    return wrapper_decorator
-
-
-# * ---------------------supported distributional objects for pboxes ---------------------#
+# * ---------------------supported distributional pboxes ---------------------#
 
 
 @makePbox
@@ -665,33 +670,6 @@ def wrapcauchy(*args):
 
 # *---------------------some special ones ---------------------*#
 
-# * not sure why it is still here.
-# def beta(*args, steps=Params.steps):
-#     """
-#     Beta distribution
-#     """
-#     args = list(args)
-#     for i in range(0, len(args)):
-#         if args[i].__class__.__name__ != "nInterval":
-#             args[i] = nInterval(args[i])
-#         if args[i].left == 0:
-#             args[i].left = 1e-5
-#         if args[i].right == 0:
-#             args[i].right = 1e-5
-
-#     Left, Right, mean, var = _get_bounds("beta", steps, *args)
-
-#     return Pbox(
-#         Left,
-#         Right,
-#         steps=steps,
-#         shape="beta",
-#         mean_left=mean.left,
-#         mean_right=mean.right,
-#         var_left=var.left,
-#         var_right=var.right,
-#     )
-
 
 def lognormal(
     mean,
@@ -748,45 +726,6 @@ def lognormal(
     Left = np.array(Left)
     Right = np.array(Right)
     return Pbox(Left, Right, steps=steps, shape="lognormal")
-
-
-# def frechet_r(*args, steps = Params.steps):
-#     args = list(args)
-#     for i in range(0,len(args)):
-#         if args[i].__class__.__name__ != 'nInterval':
-#             args[i] = nInterval(args[i])
-
-#     Left, Right, mean, var = _get_bounds('frechet_r',steps,*args)
-
-#     return Pbox(
-#           Left,
-#           Right,
-#           steps      = steps,
-#           shape      = 'frechet_r',
-#           mean_left  = mean.left,
-#           mean_right = mean.right,
-#           var_left   = var.left,
-#           var_right  = var.right
-#           )
-
-# def frechet_l(*args, steps = Params.steps):
-#     args = list(args)
-#     for i in range(0,len(args)):
-#         if args[i].__class__.__name__ != 'nInterval':
-#             args[i] = nInterval(args[i])
-
-#     Left, Right, mean, var = _get_bounds('frechet_l',steps,*args)
-
-#     return Pbox(
-#           Left,
-#           Right,
-#           steps      = steps,
-#           shape      = 'frechet_l',
-#           mean_left  = mean.left,
-#           mean_right = mean.right,
-#           var_left   = var.left,
-#           var_right  = var.right
-#           )
 
 
 def trapz(a, b, c, d, steps=Params.steps):
@@ -990,13 +929,6 @@ N = normal
 gaussian = norm
 U = uniform
 lognorm = lognormal
-
-
-# def betapert(minimum, maximum, mode):
-#     mu = (minimum + maximum + 4*mode)/6
-#     alpha1 = (mu - minimum)*(2*mode - minimum - maximum)/((mode - mu)*(maximum - minimum))
-#     alpha2 = alpha1*(maximum - mu)/(mu - minimum)
-#     return minimum + (maximum - minimum) * beta(alpha1, alpha2)
 
 
 # *---------------------named pboxes for UN ---------------------*#

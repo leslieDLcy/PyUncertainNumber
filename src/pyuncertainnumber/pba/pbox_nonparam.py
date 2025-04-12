@@ -48,7 +48,7 @@ def KS_bounds(s, alpha: float, display=True) -> CDF_bundle:
         - dn (scalar): KS critical value at a significance level and sample size N;
     """
     # TODO quantile of two bounds have different support ergo not a box yet
-    # TODO to make the output as a pbox
+    # * to make the output as a pbox
     dn = d_alpha(len(s), alpha)
     # precise data
     if isinstance(s, list | np.ndarray):

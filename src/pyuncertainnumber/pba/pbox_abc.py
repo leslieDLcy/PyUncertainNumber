@@ -6,51 +6,41 @@ from .params import Params
 import matplotlib.pyplot as plt
 
 
-def round_numbers(l: list):
-    if isinstance(l, list):
-        return [round(n, 3) for n in l]
-    elif isinstance(l, float | int):
-        return round(l, 3)
-    else:
-        raise Exception("Not implemented")
+def get_var_from_ecdf(q, p):
+    """leslie implementation
+
+    example:
+        # Given ECDF data an example
+        # q = [1, 2, 3, 4]
+        # p = [0.25, 0.5, 0.75, 1.0]
+    """
+
+    # Step 1: Recover PMF
+    pmf = [p[0]] + [p[i] - p[i - 1] for i in range(1, len(p))]
+
+    # Step 2: Compute Mean
+    mean = sum(x * p for x, p in zip(q, pmf))
+
+    # Step 3: Compute Variance
+    variance = sum(p * (x - mean) ** 2 for x, p in zip(q, pmf))
+    return mean, variance
 
 
 class Box(ABC):
     """a base class for Pbox"""
 
-    def __init__(self, left: np.ndarray | list, right: np.ndarray | list, steps):
+    def __init__(
+        self, left: np.ndarray | list, right: np.ndarray | list, steps, p_values=None
+    ):
         self.left = np.array(left)
         self.right = np.array(right)
         self.steps = steps
+        self._pvalues = p_values if p_values is not None else Params.p_values
         self._init_moments_range()
 
+    @abstractmethod
     def _init_moments_range(self):
-        """initialised `mean`, `var` and `range` bounds"""
-        # TODO revise variance computation later on
-        # should we compute mean if it is a Cauchy, var if it's a t distribution?
-        self.mean_left = np.mean(self.left)
-        self.mean_right = np.mean(self.right)
-
-        self.var_left = 0.0
-
-        if not (
-            np.any(np.array(self.left) <= -np.inf)
-            or np.any(np.inf <= np.array(self.right))
-        ):
-            V, JJ = 0, 0
-            j = np.array(range(self.steps))
-
-            for J in np.array(range(self.steps)) - 1:
-                ud = [*self.left[j < J], *self.right[J <= j]]
-                v = _sideVariance(ud)
-
-                if V < v:
-                    JJ = J
-                    V = v
-
-            self.var_right = V
-
-        self._range = [min(self.left).item(), max(self.right).item()]
+        pass
 
     def post_init_check(self):
 
@@ -65,17 +55,30 @@ class Box(ABC):
 class Staircase(Box):
     """distribution free p-box"""
 
-    def __init__(self, left, right, p_values=None, steps=200):
-        super().__init__(left, right, steps)
-        self._pvalues = p_values
+    def __init__(
+        self,
+        left,
+        right,
+        steps=200,
+        p_values=None,
+    ):
+        super().__init__(left, right, steps, p_values)
+
+    def _init_moments_range(self):
+        """initialised `mean`, `var` and `range` bounds"""
+
+        #! should we compute mean if it is a Cauchy, var if it's a t distribution?
+
+        self.mean_lo, self.var_lo = get_var_from_ecdf(self.left, self._pvalues)
+        self.mean_hi, self.var_hi = get_var_from_ecdf(self.right, self._pvalues)
+        self._range = [min(self.left).item(), max(self.right).item()]
 
     def __repr__(self):
-        mean_text = (
-            f"[{round_numbers(self.mean_left)}, {round_numbers(self.mean_right)}]"
-        )
-        var_text = f"[{round_numbers(self.var_left)}, {round_numbers(self.var_right)}]"
-        range_text = f"{round_numbers(self._range)}"
-        return f"Pbox ~ (range={range_text}, mean={mean_text}, var={var_text})"
+        with np.printoptions(precision=2, suppress=True):
+            mean_text = f"[{self.mean_lo:.2f}, {self.mean_hi:.2f}]"
+            var_text = f"[{self.var_lo:.2f}, {self.var_hi:.2f}]"
+            range_text = f"{self._range}"
+            return f"Pbox ~ (range={range_text}, mean={mean_text}, var={var_text})"
 
     def display(
         self,
@@ -135,7 +138,7 @@ class Staircase(Box):
 
         p_lo, q_lo = interpolate_p(a.probabilities, a.quantiles)
         p_hi, q_hi = interpolate_p(b.probabilities, b.quantiles)
-        return cls(left=q_lo, right=q_hi)
+        return cls(left=q_lo, right=q_hi, p_values=p_lo)
 
 
 class Leaf(Staircase):
