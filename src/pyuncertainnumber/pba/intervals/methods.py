@@ -8,12 +8,12 @@ org: Univerity of Liverpool
 MIT License
 ------------------------------
 
-These methods are designed to behave neutrally on non-interval inputs. 
+These methods are designed to behave neutrally on non-interval inputs.
 So, if a non-interval is passed equivalent rules for floats apply.
 
 Interval to float methods, IR -> R:
 
-Interval to bool methods, IR -> {0,1}: 
+Interval to bool methods, IR -> {0,1}:
 
 Binary operations, IR2 -> IR
 Unary operations, IR -> IR
@@ -48,81 +48,6 @@ numpy_tan = numpy.tan
 numpy_pi = numpy.pi
 numpy_inf = numpy.inf
 numpy_transpose = numpy.transpose
-
-# Properties or maybe attributes of the interval class. These apply to all interval-like objects.
-
-#####################################################################################
-# methods.py
-#####################################################################################
-# Interval to float methods, Unary.
-
-
-def lo(x: Interval) -> Union[float, ndarray]:
-    """
-    Return the left endpoint of an Interval object.
-
-    If x is not of class Interval, input is returned.
-
-    """
-    if is_Interval(x):
-        return x.lo
-    return x
-
-
-def hi(x: Interval) -> Union[float, ndarray]:
-    """
-    Return the right endpoint of an Interval object.
-
-    If x is not of class Interval, input is returned.
-
-    """
-    if is_Interval(x):
-        return x.hi
-    return x
-
-
-def width(x: Interval) -> Union[float, ndarray]:
-    """
-    Return the width of an Interval object.
-
-    If x is not of class Interval, input is returned.
-
-    """
-    if is_Interval(x):
-        return hi(x) - lo(x)
-    return x
-
-
-def rad(x: Interval) -> Union[float, ndarray]:
-    """
-    Return the radius of an Interval object.
-
-    If x is not of class Interval, input is returned.
-
-    """
-    if is_Interval(x):
-        return (hi(x) - lo(x)) / 2
-    return x
-
-
-def mid(x: Interval) -> Union[float, ndarray]:
-    """
-    Return the midpoint of an Interval.
-
-    If x is not of class Interval, input is returned.
-
-    """
-    if is_Interval(x):
-        return (hi(x) + lo(x)) / 2
-    return x
-
-
-def mig(x):
-    return numpy_max(numpy_abs(x.lo), numpy_abs(x.hi))  # mignitude
-
-
-def mag(x):
-    return numpy_min(numpy_abs(x.lo), numpy_abs(x.hi))  # magnitude
 
 
 #####################################################################################
@@ -175,6 +100,14 @@ def exp(x: Interval):
     if is_not_Interval(x):
         return numpy_exp(x)
     return Interval(numpy_exp(lo(x)), numpy_exp(hi(x)))
+
+
+def log(x: Interval):
+    if is_not_Interval(x):
+        return numpy.log(x)
+    else:
+        assert x.lo > 0, "interval has to be positive"
+    return Interval(numpy.log(lo(x)), numpy.log(hi(x)))
 
 
 #####################################################################################

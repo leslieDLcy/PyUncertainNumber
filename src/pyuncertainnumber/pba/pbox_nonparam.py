@@ -2,7 +2,6 @@ from __future__ import annotations
 from .intervals import Interval
 from .interval import Interval as nInterval
 from .pbox_base import Pbox, NotIncreasingError
-from .aggregation import imposition
 from typing import *
 from warnings import warn
 import numpy as np
@@ -138,162 +137,92 @@ def KS_bounds(s, alpha: float, display=True) -> Tuple[CDF_bundle, CDF_bundle]:
 
 
 def known_constraints(
-    minimum: Optional[Union[nInterval, float, int]] = None,
-    maximum: Optional[Union[nInterval, float, int]] = None,
-    mean: Optional[Union[nInterval, float, int]] = None,
-    median: Optional[Union[nInterval, float, int]] = None,
-    mode: Optional[Union[nInterval, float, int]] = None,
-    std: Optional[Union[nInterval, float, int]] = None,
-    var: Optional[Union[nInterval, float, int]] = None,
-    cv: Optional[Union[nInterval, float, int]] = None,
-    percentiles: Optional[dict[Union[nInterval, float, int]]] = None,
-    # coverages: Optional[Union[nInterval,float,int]] = None,
-    # shape: Optional[Literal['unimodal', 'symmetric', 'positive', 'nonnegative', 'concave', 'convex', 'increasinghazard', 'decreasinghazard', 'discrete', 'integervalued', 'continuous', '', 'normal', 'lognormal']] = None,
-    # data: Optional[list] = None,
-    # confidence: Optional[float] = 0.95,
-    debug: bool = False,
-    steps: int = Params.steps,
-) -> Pbox:
-    """
-    Generates a distribution free p-box based upon the information given.
-    This function works by calculating every possible non-parametric p-box that can be generated using the information provided.
-    The returned p-box is the intersection of these p-boxes.
+    maximum=None,
+    mean=None,
+    median=None,
+    minimum=None,
+    mode=None,
+    percentiles=None,
+    std=None,
+    var=None,
+):
+    args = {
+        "maximum": maximum,
+        "mean": mean,
+        "median": median,
+        "minimum": minimum,
+        "mode": mode,
+        "percentiles": percentiles,
+        "std": std,
+        "var": var,
+    }
+    shape_control = ["percentiles", "symmetric"]
+    present_keys = tuple(
+        sorted(k for k, v in args.items() if v is not None if k not in shape_control)
+    )
 
-    **Parameters**:
+    # template:
+    # ('a', 'b'): handle_ab,
 
-        ``minimum``: Minimum value of the variable
-        ``maximum``: Maximum value of the variable
-        ``mean``: Mean value of the variable
-        ``median``: Median value of the variable
-        ``mode``: Mode value of the variable
-        ``std``: Standard deviation of the variable
-        ``var``: Variance of the variable
-        ``cv``: Coefficient of variation of the variable
-        ``percentiles``: Dictionary of percentiles and their values (e.g. {0.1: 1, 0.5: 2, 0.9: nInterval(3,4)})
-        ``steps``: Number of steps to use in the p-box
+    routes = {
+        ("percentiles"): from_percentiles,
+        ("maximum", "minimum"): min_max,
+        ("mean", "minimum"): min_mean,
+        ("maximum", "mean"): max_mean,
+        ("mean", "std"): mean_std,
+        ("mean", "var"): mean_var,
+        ("maximum", "mean", "minimum"): min_max_mean,
+        ("maximum", "minimum", "mode"): min_max_mode,
+        ("maximum", "median", "minimum"): min_max_median,
+        ("maximum", "median", "minimum", "std"): min_max_mean_std,
+        ("maximum", "median", "minimum", "var"): min_max_mean_var,
+    }
 
-    .. error::
+    handler1 = routes.get(present_keys, handle_default)
+    base_pbox = handler1(**{k: args[k] for k in present_keys})
 
-        ``ValueError``: If any of the arguments are not consistent with each other. (i.e. if ``std`` and ``var`` are both given, but ``std != sqrt(var)``)
+    # second-level shape control to see if percentiles or some other constraints are present
+    further_shape_controls = [
+        k for k, v in args.items() if v is not None if k in shape_control
+    ]
 
-    **Returns**:
+    if not further_shape_controls:
+        return base_pbox
+    else:
+        for c_keys in further_shape_controls:
+            c_handler = routes.get(c_keys, handle_default)
+            c_pbox = c_handler(args[c_keys])
+            if not isinstance(base_pbox, Pbox):
+                return c_pbox
+            imp_pbox = base_pbox.imp(c_pbox)
+        return imp_pbox
 
-        ``Pbox``: Imposition of possible p-boxes
-    """
 
-    def _print_debug(skk):
-        print("\033[93m {}\033[00m".format(skk), end=" ")
-
-    def _get_pbox(func, *args, steps=steps, debug=False):
-        if debug:
-            _print_debug(func.__name__)
-        try:
-            return func(*args, steps=steps)
-        except:
-            raise Exception(f"Unable to generate {func.__name__} pbox")
-
-    # if 'positive' in shape:
-    #     if minimum is None:
-    #         minimum = 0
-    #     else:
-    #         minimum = max(0,minimum)
-
-    #     if debug: _print_debug("Shape is positive")
-
-    # if 'negative' in shape:
-    #     if maximum is None:
-    #         maximum = 0
-    #     else:
-    #         maximum = min(0,maximum)
-
-    #     if debug: _print_debug("Shape is negative")
-
-    if std is not None and var is not None:
-        if std != np.sqrt(var):
-            raise ValueError("std and var are not consistent")
-
-    imp = []
-
-    if minimum is not None and maximum is not None:
-        imp += _get_pbox(min_max, minimum, maximum, debug=debug)
-
-    if minimum is not None and mean is not None:
-        imp += _get_pbox(min_mean, minimum, mean, debug=debug)
-
-    if maximum is not None and mean is not None:
-        imp += _get_pbox(max_mean, maximum, mean, debug=debug)
-
-    if minimum is not None and maximum is not None and mean is not None:
-        imp += _get_pbox(min_max_mean, minimum, maximum, mean, debug=debug)
-
-    if minimum is not None and maximum is not None and mode is not None:
-        imp += _get_pbox(min_max_mode, minimum, maximum, mode, debug=debug)
-
-    if minimum is not None and maximum is not None and median is not None:
-        imp += _get_pbox(min_max_median, minimum, maximum, median, debug=debug)
-
-    if minimum is not None and mean is not None and std is not None:
-        imp += minimum + _get_pbox(pos_mean_std, mean - minimum, std, debug=debug)
-
-    if maximum is not None and mean is not None and std is not None:
-        imp += _get_pbox(pos_mean_std, maximum - mean, std, debug=debug) - maximum
-
-    if (
-        minimum is not None
-        and maximum is not None
-        and mean is not None
-        and std is not None
-    ):
-        imp += _get_pbox(min_max_mean_std, minimum, maximum, mean, std, debug=debug)
-
-    if (
-        minimum is not None
-        and maximum is not None
-        and mean is not None
-        and var is not None
-    ):
-        imp += _get_pbox(min_max_mean_var, minimum, maximum, mean, var, debug=debug)
-
-    if mean is not None and std is not None:
-        imp += _get_pbox(mean_std, mean, std, debug=debug)
-
-    if mean is not None and var is not None:
-        imp += _get_pbox(mean_var, mean, var, debug=debug)
-
-    if mean is not None and cv is not None:
-        imp += _get_pbox(mean_std, mean, cv * mean, debug=debug)
-
-    if len(imp) == 0:
-        raise Exception("No valid p-boxes found")
-    return imposition(imp)
+def handle_default(**kwargs):
+    return f"No match. Received: {kwargs}"
 
 
 # * ---------------------functions---------------------*#
 
 
 def min_max(
-    a: Union[nInterval, float, int],
-    b: Union[nInterval, float, int] = None,
+    minimum: Union[nInterval, float, int],
+    maximum: Union[nInterval, float, int] = None,
     steps=Params.steps,
     shape="box",
 ) -> Pbox:
-    """
-    Returns a box shaped Pbox. This is equivalent to an nInterval expressed as a Pbox.
+    """Returns a box shaped Pbox. This is equivalent to an nInterval expressed as a Pbox.
 
-    **Parameters**:
+    args:
+        minimum : Left bound of box
+        maximum : Right bound of box
 
-        ``a`` : Left side of box
-        ``b``: Right side of box
-
-
-    **Returns**:
-
-        ``Pbox``
+    returns: Pbox
 
     """
-    if b == None:
-        b = a
-    i = nInterval(a, b)
+    if maximum == None:
+        maximum = minimum
+    i = nInterval(minimum, maximum)
     return Pbox(
         left=np.repeat(i.left, steps),
         right=np.repeat(i.right, steps),
@@ -304,37 +233,6 @@ def min_max(
         steps=steps,
         shape=shape,
     )
-
-
-def min_max_mean(
-    minimum: Union[nInterval, float, int],
-    maximum: Union[nInterval, float, int],
-    mean: Union[nInterval, float, int],
-    steps: int = Params.steps,
-) -> Pbox:
-    """
-    Generates a distribution-free p-box based upon the minimum, maximum and mean of the variable
-
-    **Parameters**:
-
-        ``minimum`` : minimum value of the variable
-
-        ``maximum`` : maximum value of the variable
-
-        ``mean`` : mean value of the variable
-
-
-    **Returns**:
-
-        ``Pbox``
-    """
-    mid = (maximum - mean) / (maximum - minimum)
-    ii = [i / steps for i in range(steps)]
-    left = [minimum if i <= mid else ((mean - maximum) / i + maximum) for i in ii]
-    jj = [j / steps for j in range(1, steps + 1)]
-    right = [maximum if mid <= j else (mean - minimum * j) / (1 - j) for j in jj]
-    # print(len(left))
-    return Pbox(left=np.array(left), right=np.array(right), steps=steps)
 
 
 def min_mean(
@@ -452,6 +350,37 @@ def mean_var(
     return mean_std(mean, np.sqrt(var), steps)
 
 
+def min_max_mean(
+    minimum: Union[nInterval, float, int],
+    maximum: Union[nInterval, float, int],
+    mean: Union[nInterval, float, int],
+    steps: int = Params.steps,
+) -> Pbox:
+    """
+    Generates a distribution-free p-box based upon the minimum, maximum and mean of the variable
+
+    **Parameters**:
+
+        ``minimum`` : minimum value of the variable
+
+        ``maximum`` : maximum value of the variable
+
+        ``mean`` : mean value of the variable
+
+
+    **Returns**:
+
+        ``Pbox``
+    """
+    mid = (maximum - mean) / (maximum - minimum)
+    ii = [i / steps for i in range(steps)]
+    left = [minimum if i <= mid else ((mean - maximum) / i + maximum) for i in ii]
+    jj = [j / steps for j in range(1, steps + 1)]
+    right = [maximum if mid <= j else (mean - minimum * j) / (1 - j) for j in jj]
+    # print(len(left))
+    return Pbox(left=np.array(left), right=np.array(right), steps=steps)
+
+
 def pos_mean_std(
     mean: Union[nInterval, float, int],
     std: Union[nInterval, float, int],
@@ -534,6 +463,7 @@ def min_max_median(
     median: Union[nInterval, float, int],
     steps: int = Params.steps,
 ) -> Pbox:
+    # TODO error in function
     """
     Generates a distribution-free p-box based upon the minimum, maximum and median of the variable
 
@@ -910,30 +840,3 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
         return Pbox(left, right, steps=steps, interpolation="outer")
     except:
         raise Exception("Unable to generate p-box")
-
-
-# ML-ME
-"""
-Maximum Likelihood methods
-__________________________
-
-Maximum likelihood estimation (MLE) is a method of estimating the parameters of a probability distribution by maximizing a likelihood function, so that under the assumed statistical model the observed data is most probable. The point in the parameter space that maximizes the likelihood function is called the maximum likelihood estimate. The logic of maximum likelihood is both intuitive and flexible, and as such the method has become a dominant means of statistical inference.
-"""
-
-
-# def ME_min_max_mean_std(
-#         minimum: Union[nInterval, float, int],
-#         maximum: Union[nInterval, float, int],
-#         mean: Union[nInterval, float, int],
-#         stddev: Union[nInterval, float, int],
-#         steps: int = Params.steps
-# ) -> Pbox:
-
-#     μ = ((mean - minimum) / (maximum - minimum))
-
-#     σ = (stddev/(maximum - minimum))
-
-#     a = ((1-μ)/(σ**2) - 1/μ)*μ**2
-#     b = a*(1/μ - 1)
-
-#     return beta(a, b, steps=steps) * (maximum - minimum) + minimum

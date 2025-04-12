@@ -1,10 +1,10 @@
 """
 :#######################################################
-: Intervals Library v02 for Python                                              
+: Intervals Library v02 for Python
 : Developed by Marco de Angelis
 :#######################################################
 
-Place the folder `intervals` that contains this file in your working directory. 
+Place the folder `intervals` that contains this file in your working directory.
 Then place the following line at the top of your code.
 
 `import intervals as ia`
@@ -14,7 +14,7 @@ Once the library has been imported you can create an interval
 `a = ia.Interval(1,5)`
 `b = ia.Interval(-2,-1)
 
-and perform mathematical operations between them 
+and perform mathematical operations between them
 
 `a + b`
 `a - b`
@@ -29,16 +29,17 @@ and perform mathematical operations between them
 ----------------------------------------------------
 """
 
-from __future__ import annotations
-from typing import Sequence, Sized, Iterable, Optional, Any, Tuple, Union
-
 # Sequence: # Must have __len__() and __getitem__(). Ex.: Tuple, List, Range
 # Sized: # It suffices to have len()
 # Iterable: # Must have __iter__() and __next__(). Ex.: Dict, Set, Tuple, List, numpy.array
 # from intervals.methods import (lo,hi,width,rad,mag,straddlezero,isinterval)
 
+from __future__ import annotations
+from typing import Sequence, Sized, Iterable, Optional, Any, Tuple, Union
+import numpy as np
 import numpy
 from numpy import ndarray, asarray, stack, transpose, ascontiguousarray, zeros
+
 
 # float32=numpy.float32
 
@@ -126,6 +127,10 @@ class Interval:
         # self.__unsized = True
         self.__hi = asarray(hi, dtype=float)  # check lo and hi have same shape
         # if (len(self.__hi.shape)>0) | (len(self.__hi.shape)>0): self.__unsized = False
+        # check lo, hi order
+        assert np.all(
+            self.__lo <= self.__hi
+        ), "low larger than high, needed to invert the interval"
         self.__shape = self.__lo.shape
         # self.__scalar = (self.__shape==()) | (self.__shape==(1,))
 
@@ -151,6 +156,13 @@ class Interval:
         return Interval(lo=self.__lo[i], hi=self.__hi[i])
 
     # -------------- METHODS -------------- #
+    def to_numpy(self) -> np.ndarray:
+        """transform interval objects to numpy arrays"""
+        if self.scalar:
+            return [self.lo.item(), self.hi.item()]
+        else:
+            return list(zip(self.lo.item(), self.hi.item()))
+
     @property
     def lo(self) -> Union[ndarray, float]:
         return self.__lo
@@ -163,6 +175,19 @@ class Interval:
 
     # if len(self.shape)==0: return self.__hi
     # return self.__hi # return transpose(transpose(self.__val)[1])
+
+    @property
+    def width(self):
+        return width(self)
+
+    @property
+    def rad(self):
+        return rad(self)
+
+    @property
+    def mid(self):
+        return mid(self)
+
     @property
     def unsized(self):
         if (len(self.__hi.shape) > 0) | (len(self.__hi.shape) > 0):
@@ -354,6 +379,13 @@ class Interval:
         return not (self == other)
 
 
+# Properties or maybe attributes of the interval class. These apply to all interval-like objects.
+
+#####################################################################################
+# methods.py
+#####################################################################################
+# Interval to float methods, Unary.
+
 # def iterator(x:Interval) -> Interval:
 #     lo_iter,hi_iter = numpy.nditer(x.lo()),numpy.nditer(x.hi())
 #     while True: yield Interval(lo=next(lo_iter),hi=next(hi_iter))
@@ -386,3 +418,47 @@ def hi(x: Interval) -> Union[float, ndarray]:
     if is_Interval(x):
         return x.hi
     return x
+
+
+def width(x: Interval) -> Union[float, ndarray]:
+    """
+    Return the width of an Interval object.
+
+    If x is not of class Interval, input is returned.
+
+    """
+    if is_Interval(x):
+        return hi(x) - lo(x)
+    return x
+
+
+def rad(x: Interval) -> Union[float, ndarray]:
+    """
+    Return the radius of an Interval object.
+
+    If x is not of class Interval, input is returned.
+
+    """
+    if is_Interval(x):
+        return (hi(x) - lo(x)) / 2
+    return x
+
+
+def mid(x: Interval) -> Union[float, ndarray]:
+    """
+    Return the midpoint of an Interval.
+
+    If x is not of class Interval, input is returned.
+
+    """
+    if is_Interval(x):
+        return (hi(x) + lo(x)) / 2
+    return x
+
+
+def mig(x):
+    return numpy_max(numpy_abs(x.lo), numpy_abs(x.hi))  # mignitude
+
+
+def mag(x):
+    return numpy_min(numpy_abs(x.lo), numpy_abs(x.hi))  # magnitude
