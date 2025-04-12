@@ -20,6 +20,8 @@ note:
 
 @dataclass
 class CDF_bundle:
+    """a handy tuple of q and p for a CDF"""
+
     quantiles: np.ndarray
     probabilities: np.ndarray
     # TODO plot ecdf not starting from 0

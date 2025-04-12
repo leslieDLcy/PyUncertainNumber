@@ -37,40 +37,15 @@ __all__ = [
 
 if TYPE_CHECKING:
     from .utils import CDF_bundle
+    from .pbox_base import Pbox
 
 
-def logical_bounding(a):
-    """Sudret p16. eq(2.21)"""
-    a = np.where(a < 0, 0, a)
-    a = np.where(a < 1, a, 1)
-    return a
-
-
-def d_alpha(n, alpha):
-    """compute the Smirnov critical value for a given sample size and significance level
-
-    note:
-        Tretiak p12. eq(8): alpha = (1-c) / 2 where c is the confidence level
-
-    args:
-        - n (int): sample size;
-        - alpha (float): significance level;
-    """
-
-    A = {0.1: 0.00256, 0.05: 0.05256, 0.025: 0.11282}
-    return (
-        np.sqrt(np.log(1 / alpha) / (2 * n))
-        - 0.16693 * (1 / n)
-        - A.get(alpha, 1000) * (n ** (-3 / 2))
-    )
-
-
-def KS_bounds(s, alpha: float, display=True) -> Tuple[CDF_bundle, CDF_bundle]:
+def KS_bounds(s, alpha: float, display=True) -> CDF_bundle:
     """construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
 
     args:
         - s (array-like): sample data, precise and imprecise
-        - dn (scalar): KS critical value at significance level \alpha and sample size N;
+        - dn (scalar): KS critical value at a significance level and sample size N;
     """
     # TODO quantile of two bounds have different support ergo not a box yet
     # TODO to make the output as a pbox
@@ -133,6 +108,32 @@ def KS_bounds(s, alpha: float, display=True) -> Tuple[CDF_bundle, CDF_bundle]:
     return b_l, b_r
 
 
+def logical_bounding(a):
+    """Sudret p16. eq(2.21)"""
+    a = np.where(a < 0, 0, a)
+    a = np.where(a < 1, a, 1)
+    return a
+
+
+def d_alpha(n, alpha):
+    """compute the Smirnov critical value for a given sample size and significance level
+
+    note:
+        Tretiak p12. eq(8): alpha = (1-c) / 2 where c is the confidence level
+
+    args:
+        - n (int): sample size;
+        - alpha (float): significance level;
+    """
+
+    A = {0.1: 0.00256, 0.05: 0.05256, 0.025: 0.11282}
+    return (
+        np.sqrt(np.log(1 / alpha) / (2 * n))
+        - 0.16693 * (1 / n)
+        - A.get(alpha, 1000) * (n ** (-3 / 2))
+    )
+
+
 # * ---------------------top level func for known statistical properties---------------------*#
 
 
@@ -145,7 +146,7 @@ def known_constraints(
     percentiles=None,
     std=None,
     var=None,
-):
+) -> Pbox:
     args = {
         "maximum": maximum,
         "mean": mean,
