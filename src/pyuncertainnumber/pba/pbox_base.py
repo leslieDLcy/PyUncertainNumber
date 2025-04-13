@@ -197,6 +197,7 @@ class Pbox:
     def __rge__(self, other):
         return self.lt(other, method="f")
 
+    # * --------------- bitwise --------------- *#
     def __and__(self, other):
         return self.logicaland(other, method="f")
 
@@ -209,6 +210,7 @@ class Pbox:
     def __ror__(self, other):
         return self.logicalor(other, method="f")
 
+    # * --------------- arithmetic --------------- *#
     def __add__(self, other):
         return self.add(other, method="f")
 

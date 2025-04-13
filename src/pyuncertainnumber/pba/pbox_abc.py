@@ -5,6 +5,9 @@ from .utils import is_increasing
 from .params import Params
 import matplotlib.pyplot as plt
 from .intervals.number import Interval as I
+from numbers import Number
+import operator
+import itertools
 
 
 def get_var_from_ecdf(q, p):
@@ -31,16 +34,27 @@ class Box(ABC):
     """a base class for Pbox"""
 
     def __init__(
-        self, left: np.ndarray | list, right: np.ndarray | list, steps, p_values=None
+        self,
+        left: np.ndarray | list,
+        right: np.ndarray | list,
+        steps,
+        mean=None,
+        var=None,
+        p_values=None,
     ):
         self.left = np.array(left)
         self.right = np.array(right)
         self.steps = steps
+        self.mean = mean
+        self.var = var
         self._pvalues = p_values if p_values is not None else Params.p_values
-        self._init_moments_range()
+        self._init_range()
+
+    def _init_range(self):
+        self._range = I(min(self.left), max(self.right))
 
     @abstractmethod
-    def _init_moments_range(self):
+    def _init_moments(self):
         pass
 
     def post_init_check(self):
@@ -52,6 +66,9 @@ class Box(ABC):
         if (not is_increasing(self.left)) or (not is_increasing(self.right)):
             raise Exception("Left and right arrays must be increasing")
 
+        if (self.mean is not None) and (self.var is not None):
+            self._init_moments_range()
+
 
 class Staircase(Box):
     """distribution free p-box"""
@@ -61,12 +78,13 @@ class Staircase(Box):
         left,
         right,
         steps=200,
+        mean=None,
+        var=None,
         p_values=None,
     ):
-        super().__init__(left, right, steps, p_values)
+        super().__init__(left, right, steps, mean, var, p_values)
 
-    @abstractmethod
-    def _init_moments_range(self):
+    def _init_moments(self):
         """initialised `mean`, `var` and `range` bounds"""
 
         #! should we compute mean if it is a Cauchy, var if it's a t distribution?
@@ -75,12 +93,8 @@ class Staircase(Box):
         self.mean_hi, self.var_hi = get_var_from_ecdf(self.right, self._pvalues)
         self.mean = I(self.mean_lo, self.mean_hi)
         self.var = I(self.var_lo, self.var_hi)
-        self._range = I(min(self.left), max(self.right))
 
     def __repr__(self):
-        # with np.printoptions(precision=2, suppress=True):
-        # mean_text = f"[{self.mean_lo:.2f}, {self.mean_hi:.2f}]"
-        # var_text = f"[{self.var_lo:.2f}, {self.var_hi:.2f}]"
         mean_text = f"{self.mean}"
         var_text = f"{self.var}"
         range_text = f"{self._range}"
@@ -146,28 +160,121 @@ class Staircase(Box):
         p_hi, q_hi = interpolate_p(b.probabilities, b.quantiles)
         return cls(left=q_lo, right=q_hi, p_values=p_lo)
 
+    # * --------------------- operators ---------------------*#
+    def __add__(self):
+        pass
+
+    # * --------------------- methods ---------------------*#
+    def add(self, other, dependency="f"):
+        if isinstance(other, Number):
+            return pbox_number_ops(self, other, operator.add)
+        if is_un(other):
+            other = convert_pbox(other)
+        match dependency:
+            case "f":
+                nleft = np.empty(self.steps)
+                nright = np.empty(self.steps)
+                for i in range(0, self.steps):
+                    j = np.array(range(i, self.steps))
+                    k = np.array(range(self.steps - 1, i - 1, -1))
+                    nright[i] = np.min(self.right[j] + other.right[k])
+                    jj = np.array(range(0, i + 1))
+                    kk = np.array(range(i, -1, -1))
+                    nleft[i] = np.max(self.left[jj] + other.left[kk])
+            case "p":
+                nleft = self.left + other.left
+                nright = self.right + other.right
+            case "o":
+                nleft = self.left + np.flip(other.right)
+                nright = self.right + np.flip(other.left)
+            case "i":
+                nleft = []
+                nright = []
+                for l in itertools.product(self.left, other.left):
+                    nleft.append(operator.add(*l))
+                for r in itertools.product(self.right, other.right):
+                    nright.append(operator.add(*r))
+
+    # as comparison
+    def add_old(self, other, method="f"):
+        """addtion of uncertain numbers with the defined dependency method"""
+
+        from .pbox_base import Pbox
+        from .operation import convert
+
+        self.check_dependency(method)
+        if isinstance(other, (float, int)):
+            # case with constant
+            try:
+                s = self.constant_shape_check()
+                return Pbox(
+                    left=self.left + other,
+                    right=self.right + other,
+                    shape=s,
+                    mean_left=self.mean_left + other,
+                    mean_right=self.mean_right + other,
+                    var_left=self.var_left,
+                    var_right=self.var_right,
+                    steps=self.steps,
+                )
+            except:
+                return NotImplemented
+
+        else:
+            other = convert(other)
+            self.steps_check(other)
+
+            match method:
+                case "f":
+                    nleft = np.empty(self.steps)
+                    nright = np.empty(self.steps)
+                    for i in range(0, self.steps):
+                        j = np.array(range(i, self.steps))
+                        k = np.array(range(self.steps - 1, i - 1, -1))
+                        nright[i] = np.min(self.right[j] + other.right[k])
+                        jj = np.array(range(0, i + 1))
+                        kk = np.array(range(i, -1, -1))
+                        nleft[i] = np.max(self.left[jj] + other.left[kk])
+                case "p":
+                    nleft = self.left + other.left
+                    nright = self.right + other.right
+                case "o":
+                    nleft = self.left + np.flip(other.right)
+                    nright = self.right + np.flip(other.left)
+                case "i":
+                    nleft = []
+                    nright = []
+                    for i in self.left:
+                        for j in other.left:
+                            nleft.append(i + j)
+                    for ii in self.right:
+                        for jj in other.right:
+                            nright.append(ii + jj)
+            nleft.sort()
+            nright.sort()
+
+            return Pbox(left=nleft, right=nright, steps=self.steps)
+
 
 class Leaf(Staircase):
     """parametric pbox"""
 
     def __init__(
         self,
-        shape=None,
         left=None,
         right=None,
+        steps=200,
         mean=None,
         var=None,
         dist_params=None,
-        steps=200,
+        shape=None,
     ):
-        super().__init__(left, right, steps)
+        super().__init__(left, right, steps, mean, var)
         self.shape = shape
         self.dist_params = dist_params
-        self.mean = mean
-        self.var = var
 
     def _init_moments_range(self):
-        self._range = I(min(self.left).item(), max(self.right).item())
+        print("not decided yet")
 
     def __repr__(self):
         base_repr = super().__repr__().rstrip(")")  # remove trailing ')'
@@ -180,3 +287,52 @@ class Leaf(Staircase):
 class Cbox(Box):
     def __init__(self, left, right, steps=200):
         super().__init__(left, right, steps)
+
+
+# * --------------------- module functions ---------------------*#
+
+
+def is_un(un):
+    """if the `un` is modelled by accepted constructs"""
+
+    from .intervals.number import Interval
+    from .ds import DempsterShafer
+    from .distributions import Distribution
+
+    return isinstance(un, Box | Interval | DempsterShafer | Distribution)
+
+
+def convert_pbox(un):
+    """transform the input un into a Pbox object
+
+    note:
+        - theorically 'un' can be {Interval, DempsterShafer, Distribution, float, int}
+    """
+
+    from .pbox_base import Pbox
+    from .interval import Interval as nInterval
+    from .ds import DempsterShafer
+    from .distributions import Distribution
+
+    if isinstance(un, Box):
+        return un
+    if isinstance(un, nInterval):
+        return Pbox(un.left, un.right)
+    elif isinstance(un, Pbox):
+        return un
+    elif isinstance(un, Distribution):
+        return un.to_pbox()
+    elif isinstance(un, DempsterShafer):
+        return un.to_pbox()
+    else:
+        raise TypeError(f"Unable to convert {type(un)} object to Pbox")
+
+
+def pbox_number_ops(pbox: Staircase | Leaf, n: float | int, f: callable):
+    """blueprint for arithmetic between pbox and real numbers"""
+    l = f(pbox.left, n)
+    r = f(pbox.right, n)
+    new_mean = f(pbox.mean, n)
+    return Staircase(left=l, right=r, mean=new_mean, var=pbox.var)
+
+    # Staircase(left=pbox.left + n, right=pbox.right + n)

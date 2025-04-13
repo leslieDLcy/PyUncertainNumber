@@ -1,8 +1,8 @@
 from pyuncertainnumber.pba.intervals.backcalc import additive_bcc
-
 import itertools
 
 
+# there is an new `convert` func
 def convert(un):
     """transform the input un into a Pbox object
 
@@ -64,3 +64,5 @@ def p_backcalc(a, c):
         container.append(additive_bcc(*_item))
     arr_interval = make_vec_interval(container)
     return stacking(arr_interval)
+
+    # * --------------- arithmetic with plain numbers --------------- *#
