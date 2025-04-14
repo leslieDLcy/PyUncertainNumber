@@ -27,13 +27,10 @@ Subintervalisation methods, IR -> IR^n.
 
 from __future__ import annotations
 from typing import Sequence, Sized, Iterable, Optional, Any, Tuple, Union
-
 from itertools import product
-
 import numpy
 from numpy import ndarray, asarray, vstack, linspace, zeros, argmax
-
-from .number import Interval, MACHINE_EPS
+from .number import Interval, MACHINE_EPS, lo, hi, width, mid
 
 numpy_min = numpy.min
 numpy_max = numpy.max

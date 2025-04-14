@@ -1,5 +1,7 @@
-from pyuncertainnumber.pba.intervals.backcalc import additive_bcc
+# from pyuncertainnumber.pba.intervals.backcalc import additive_bcc
+
 import itertools
+from numbers import Number
 
 
 # there is an new `convert` func
@@ -47,21 +49,30 @@ def interval_monte_carlo(f, x, y):
     return stacking(arr_interval)
 
 
-def p_backcalc(a, c):
+def p_backcalc(a, c, ops):
     """backcal for p-boxes
 
     args:
         a, c (Pbox):probability box objects
+        ops (object) : {'additive_bcc', 'multiplicative_bcc'} whether additive or multiplicative
     """
     from pyuncertainnumber.pba.intervalOperators import make_vec_interval
     from pyuncertainnumber.pba.aggregation import stacking
+    from .pbox_base import Pbox
+    from .intervals.number import Interval as I
+    from .params import Params
 
-    # a_vs = a.to_ds().intervals  #backup
     a_vs = a.to_interval()
-    c_vs = c.to_interval()
+
+    if isinstance(c, Pbox):
+        c_vs = c.to_interval()
+    elif isinstance(c, Number):
+        c_vs = [I(c, c)] * Params.steps
+
     container = []
     for _item in itertools.product(a_vs, c_vs):
-        container.append(additive_bcc(*_item))
+        container.append(ops(*_item))
+    # print(len(container))  # shall be 40_000  # checkedout
     arr_interval = make_vec_interval(container)
     return stacking(arr_interval)
 

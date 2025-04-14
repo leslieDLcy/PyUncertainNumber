@@ -1059,13 +1059,18 @@ class Pbox:
             interval_list, np.repeat(a=(1 / discretisation), repeats=discretisation - 1)
         )
 
-    def to_interval(self, discretisation=Params.steps):
-        """return Interval object"""
-        from pyuncertainnumber.pba.intervalOperators import make_vec_interval
+    # def to_interval(self, discretisation=Params.steps):
+    #     """return Interval object"""
+    #     from pyuncertainnumber.pba.intervalOperators import make_vec_interval
 
-        p_values = np.arange(0, discretisation) / discretisation
-        interval_list = [self.cuth(p_v) for p_v in p_values]
-        return make_vec_interval(interval_list)
+    #     p_values = np.arange(0, discretisation) / discretisation
+    #     interval_list = [self.cuth(p_v) for p_v in p_values]
+    #     return make_vec_interval(interval_list)
+
+    def to_interval(self):
+        from .intervals.number import Interval as I
+
+        return I(lo=self.left, hi=self.right)
 
 
 # * ---------------------module functions--------------------- *#
