@@ -1,5 +1,6 @@
 from .number import Interval
 from .methods import log, exp
+from numbers import Number
 
 """interval backcalculation"""
 
@@ -51,10 +52,39 @@ def control_bcc(a, c):
 
 
 def additive_bcc(a, c):
-    """additive backcalc"""
+    """additive backcalc
+
+    note:
+        when c is real number, it is an extreme case of controlled backcalc
+        and its results is equivalent to a naive solution
+    """
+    if isinstance(c, Number):
+        c = Interval(c, c)
+
     if a.scalar & c.scalar:
         lo = c.lo - a.lo
         hi = c.hi - a.hi
+        try:
+            return Interval(lo, hi)
+        except:
+            return Interval(hi, lo)
+
+
+def multiplicative_bcc(a, c):
+    """multiplicative backcalc operation to solve B
+
+    note:
+        when c is real number, it is an extreme case of controlled backcalc
+        and its results is equivalent to a naive solution.
+    """
+    # TODO shall I call it backcalc or `factor`?
+
+    if isinstance(c, Number):
+        c = Interval(c, c)
+
+    if a.scalar & c.scalar:
+        lo = c.lo / a.lo
+        hi = c.hi / a.hi
         try:
             return Interval(lo, hi)
         except:
