@@ -107,10 +107,6 @@ def reweighting(*masses):
     return masses / masses.sum()
 
 
-def round():
-    pass
-
-
 def uniform_reparameterisation(a, b):
     """reparameterise the uniform distribution to a, b"""
     #! incorrect in the case of Interval args
@@ -169,3 +165,56 @@ def is_increasing(arr):
 
 class NotIncreasingError(Exception):
     pass
+
+
+def condensation(bounds, number):
+    """condense the bounds of number pbox
+
+    args:
+        number (int) : the number to be reduced
+        bounds (list or tuple): the left and right bound to be reduced
+    """
+    b = bounds[0]
+
+    if number > len(b):
+        raise ValueError("Cannot sample more elements than exist in the list.")
+    if len(bounds[0]) != len(bounds[1]):
+        raise Exception("steps of two bounds are different")
+
+    indices = np.linspace(0, len(b) - 1, number, dtype=int)
+
+    l = np.array([bounds[0][i] for i in indices])
+    r = np.array([bounds[1][i] for i in indices])
+    return l, r
+
+
+def smooth_condensation(bounds, number=200):
+
+    def smooth_ecdf(V, steps):
+
+        m = len(V) - 1
+
+        if m == 0:
+            return np.repeat(V, steps)
+        if steps == 1:
+            return np.array([min(V), max(V)])
+
+        d = 1 / m
+        n = round(d * steps * 200)
+
+        if n == 0:
+            c = V
+        else:
+            c = []
+            for i in range(m):
+                v = V[i]
+                w = V[i + 1]
+                c.extend(np.linspace(start=v, stop=w, num=n))
+
+        u = [c[round((len(c) - 1) * (k + 0) / (steps - 1))] for k in range(steps)]
+
+        return np.array(u)
+
+    l_smooth = smooth_ecdf(bounds[0], number)
+    r_smooth = smooth_ecdf(bounds[1], number)
+    return l_smooth, r_smooth

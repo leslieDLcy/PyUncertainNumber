@@ -8,6 +8,7 @@ from .intervals.number import Interval as I
 from numbers import Number
 import operator
 import itertools
+from .utils import condensation, smooth_condensation
 
 
 def get_var_from_ecdf(q, p):
@@ -37,7 +38,7 @@ class Box(ABC):
         self,
         left: np.ndarray | list,
         right: np.ndarray | list,
-        steps,
+        steps=Params.steps,
         mean=None,
         var=None,
         p_values=None,
@@ -48,7 +49,7 @@ class Box(ABC):
         self.mean = mean
         self.var = var
         self._pvalues = p_values if p_values is not None else Params.p_values
-        self._init_range()
+        self.post_init_check()
 
     def _init_range(self):
         self._range = I(min(self.left), max(self.right))
@@ -63,11 +64,16 @@ class Box(ABC):
             self.right
         ), "steps of lower/upper bounds not consistent"
 
+        if len(self.left) > self.steps:
+            self.left, self.right = condensation([self.left, self.right], self.steps)
+
         if (not is_increasing(self.left)) or (not is_increasing(self.right)):
             raise Exception("Left and right arrays must be increasing")
 
-        if (self.mean is not None) and (self.var is not None):
-            self._init_moments_range()
+        if (self.mean is None) and (self.var is None):
+            self._init_moments()
+
+        self._init_range()
 
 
 class Staircase(Box):
@@ -100,7 +106,7 @@ class Staircase(Box):
         range_text = f"{self._range}"
         return f"Pbox ~ (range={range_text}, mean={mean_text}, var={var_text})"
 
-    def display(
+    def plot(
         self,
         title=None,
         ax=None,
@@ -121,8 +127,8 @@ class Staircase(Box):
             """display two F curves plus the top-bottom horizontal lines"""
             ax.step(self.left, p_axis, c=plot_bound_colors[0], where="post")
             ax.step(self.right, p_axis, c=plot_bound_colors[1], where="post")
-            ax.plot([self.left[0], self.right[0]], [0, 0], c="b")
-            ax.plot([self.left[-1], self.right[-1]], [1, 1], c="g")
+            ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[0])
+            ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[1])
 
         if title is not None:
             ax.set_title(title)
@@ -145,6 +151,10 @@ class Staircase(Box):
         ax.set_ylabel(r"$\Pr(X \leq x)$")
         "label" in kwargs and ax.legend()
         return ax
+
+    def display(self):
+        self.plot()
+        plt.show()
 
     # * --------------------- constructors ---------------------*#
     @classmethod
@@ -194,66 +204,47 @@ class Staircase(Box):
                     nleft.append(operator.add(*l))
                 for r in itertools.product(self.right, other.right):
                     nright.append(operator.add(*r))
+        nleft.sort()
+        nright.sort()
+        return Staircase(left=nleft, right=nright)
 
     # as comparison
     def add_old(self, other, method="f"):
         """addtion of uncertain numbers with the defined dependency method"""
 
         from .pbox_base import Pbox
-        from .operation import convert
 
-        self.check_dependency(method)
-        if isinstance(other, (float, int)):
-            # case with constant
-            try:
-                s = self.constant_shape_check()
-                return Pbox(
-                    left=self.left + other,
-                    right=self.right + other,
-                    shape=s,
-                    mean_left=self.mean_left + other,
-                    mean_right=self.mean_right + other,
-                    var_left=self.var_left,
-                    var_right=self.var_right,
-                    steps=self.steps,
-                )
-            except:
-                return NotImplemented
+        match method:
+            case "f":
+                nleft = np.empty(self.steps)
+                nright = np.empty(self.steps)
+                for i in range(0, self.steps):
+                    j = np.array(range(i, self.steps))
+                    k = np.array(range(self.steps - 1, i - 1, -1))
+                    nright[i] = np.min(self.right[j] + other.right[k])
+                    jj = np.array(range(0, i + 1))
+                    kk = np.array(range(i, -1, -1))
+                    nleft[i] = np.max(self.left[jj] + other.left[kk])
+            case "p":
+                nleft = self.left + other.left
+                nright = self.right + other.right
+            case "o":
+                nleft = self.left + np.flip(other.right)
+                nright = self.right + np.flip(other.left)
+            case "i":
+                nleft = []
+                nright = []
+                for i in self.left:
+                    for j in other.left:
+                        nleft.append(i + j)
+                for ii in self.right:
+                    for jj in other.right:
+                        nright.append(ii + jj)
+        print(len(nleft))
+        nleft.sort()
+        nright.sort()
 
-        else:
-            other = convert(other)
-            self.steps_check(other)
-
-            match method:
-                case "f":
-                    nleft = np.empty(self.steps)
-                    nright = np.empty(self.steps)
-                    for i in range(0, self.steps):
-                        j = np.array(range(i, self.steps))
-                        k = np.array(range(self.steps - 1, i - 1, -1))
-                        nright[i] = np.min(self.right[j] + other.right[k])
-                        jj = np.array(range(0, i + 1))
-                        kk = np.array(range(i, -1, -1))
-                        nleft[i] = np.max(self.left[jj] + other.left[kk])
-                case "p":
-                    nleft = self.left + other.left
-                    nright = self.right + other.right
-                case "o":
-                    nleft = self.left + np.flip(other.right)
-                    nright = self.right + np.flip(other.left)
-                case "i":
-                    nleft = []
-                    nright = []
-                    for i in self.left:
-                        for j in other.left:
-                            nleft.append(i + j)
-                    for ii in self.right:
-                        for jj in other.right:
-                            nright.append(ii + jj)
-            nleft.sort()
-            nright.sort()
-
-            return Pbox(left=nleft, right=nright, steps=self.steps)
+        return Pbox(left=nleft, right=nright, steps=self.steps)
 
 
 class Leaf(Staircase):
