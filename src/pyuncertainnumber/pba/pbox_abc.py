@@ -31,6 +31,18 @@ def get_var_from_ecdf(q, p):
     return mean, variance
 
 
+def bound_steps_check(bound):
+    # condensation needed
+    if len(bound) > Params.steps:
+        bound = condensation(bound, Params.steps)
+    elif len(bound) < Params.steps:
+        # 'next' kind interpolation needed
+        from .constructors import interpolate_p
+
+        p_lo, bound = interpolate_p(p=np.linspace(0.0001, 0.9999, len(bound)), q=bound)
+    return bound
+
+
 class Box(ABC):
     """a base class for Pbox"""
 
@@ -80,18 +92,34 @@ class Box(ABC):
             self.right
         ), "Length of lower and upper bounds is not consistent"
 
-        if len(self.left) > self.steps:
-            self.left, self.right = condensation([self.left, self.right], self.steps)
-        elif len(self.left) < self.steps:
-            # 'next' kind interpolation needed
-            from .constructors import interpolate_p
+        # if len(self.left) > self.steps:
+        #     self.left, self.right = condensation([self.left, self.right], self.steps)
+        # elif len(self.left) < self.steps:
+        #     # 'next' kind interpolation needed
+        #     from .constructors import interpolate_p
 
-            p_lo, self.left = interpolate_p(
-                p=np.linspace(0.0001, 0.9999, len(self.left)), q=self.left
-            )
-            p_hi, self.right = interpolate_p(
-                p=np.linspace(0.0001, 0.9999, len(self.right)), q=self.right
-            )
+        #     p_lo, self.left = interpolate_p(
+        #         p=np.linspace(0.0001, 0.9999, len(self.left)), q=self.left
+        #     )
+        #     p_hi, self.right = interpolate_p(
+        #         p=np.linspace(0.0001, 0.9999, len(self.right)), q=self.right
+        #     )
+
+    @property
+    def left(self):
+        return self._left
+
+    @left.setter
+    def left(self, value):
+        self._left = bound_steps_check(value)
+
+    @property
+    def right(self):
+        return self._right
+
+    @right.setter
+    def right(self, value):
+        self._right = bound_steps_check(value)
 
     # * --------------------- operators ---------------------*#
 

@@ -167,7 +167,15 @@ class NotIncreasingError(Exception):
     pass
 
 
-def condensation(bounds, number):
+def condensation(bound, number):
+    """a joint implementation for condensation"""
+    if isinstance(bound, list | tuple):
+        return condensation_bounds(bound, number)
+    else:
+        return condensation_bound(bound, number)
+
+
+def condensation_bounds(bounds, number):
     """condense the bounds of number pbox
 
     args:
@@ -186,6 +194,23 @@ def condensation(bounds, number):
     l = np.array([bounds[0][i] for i in indices])
     r = np.array([bounds[1][i] for i in indices])
     return l, r
+
+
+def condensation_bound(bound, number):
+    """condense the bounds of number pbox
+
+    args:
+        number (int) : the number to be reduced
+        bound (array-like): either the left or right bound to be reduced
+    """
+
+    if number > len(bound):
+        raise ValueError("Cannot sample more elements than exist in the list.")
+
+    indices = np.linspace(0, len(bound) - 1, number, dtype=int)
+
+    new_bound = np.array([bound[i] for i in indices])
+    return new_bound
 
 
 def smooth_condensation(bounds, number=200):

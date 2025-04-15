@@ -64,10 +64,12 @@ def interpolate_p(p, q):
     note:
         - p: probabilities (x)
         - q: quantiles (y)
+
+    return: a tuple of new (p, q)
     """
 
     f = interp1d(p, q, kind="next", fill_value=(p[0], p[-1]), bounds_error=False)
     # range
-    new_q = np.linspace(p[0], p[-1], Params.steps)
-    new_p = f(new_q)
-    return new_q, new_p
+    new_p = np.linspace(p[0], p[-1], Params.steps)
+    new_q = f(new_p)
+    return new_p, new_q

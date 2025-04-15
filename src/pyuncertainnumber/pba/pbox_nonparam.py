@@ -136,7 +136,7 @@ def d_alpha(n, alpha):
     )
 
 
-# * ---------------------top level func for known statistical properties---------------------*#
+# * ---------top level func for known statistical properties------*#
 
 
 def known_constraints(
@@ -177,8 +177,8 @@ def known_constraints(
         ("maximum", "mean", "minimum"): min_max_mean,
         ("maximum", "minimum", "mode"): min_max_mode,
         ("maximum", "median", "minimum"): min_max_median,
-        ("maximum", "median", "minimum", "std"): min_max_mean_std,
-        ("maximum", "median", "minimum", "var"): min_max_mean_var,
+        ("maximum", "mean", "minimum", "std"): min_max_mean_std,
+        ("maximum", "mean", "minimum", "var"): min_max_mean_var,
     }
 
     handler1 = routes.get(present_keys, handle_default)
@@ -205,7 +205,7 @@ def handle_default(**kwargs):
     return f"No match. Received: {kwargs}"
 
 
-# * ---------------------functions---------------------*#
+# * --------------------- supporting functions---------------------*#
 
 
 def min_max(minimum: Number, maximum: Number) -> Staircase:
