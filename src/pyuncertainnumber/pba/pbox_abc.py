@@ -1,14 +1,12 @@
 import numpy as np
 from abc import ABC, abstractmethod
-from .pbox_base import _sideVariance
-from .utils import is_increasing
 from .params import Params
 import matplotlib.pyplot as plt
 from .intervals.number import Interval as I
 from numbers import Number
 import operator
 import itertools
-from .utils import condensation, smooth_condensation
+from .utils import condensation, smooth_condensation, find_nearest, is_increasing
 
 
 def get_var_from_ecdf(q, p):
@@ -64,14 +62,14 @@ class Box(ABC):
         self._pvalues = p_values if p_values is not None else Params.p_values
         self.post_init_check()
 
-    def _init_range(self):
-        self._range = I(min(self.left), max(self.right))
-
     # * --------------------- setup ---------------------*#
 
     @abstractmethod
     def _init_moments(self):
         pass
+
+    def _init_range(self):
+        self._range = I(min(self.left), max(self.right))
 
     def post_init_check(self):
 
@@ -106,6 +104,10 @@ class Box(ABC):
         #     )
 
     @property
+    def range(self):
+        return self._range
+
+    @property
     def left(self):
         return self._left
 
@@ -120,6 +122,16 @@ class Box(ABC):
     @right.setter
     def right(self, value):
         self._right = bound_steps_check(value)
+
+    @property
+    def lo(self):
+        """Returns the left-most value in the interval"""
+        return self.left[0]
+
+    @property
+    def hi(self):
+        """Returns the right-most value in the interval"""
+        return self.right[-1]
 
     # * --------------------- operators ---------------------*#
 
@@ -228,8 +240,44 @@ class Staircase(Box):
         return cls(left=q_lo, right=q_hi, p_values=p_lo)
 
     # * --------------------- operators ---------------------*#
-    def __add__(self):
-        pass
+
+    def __neg__(self):
+        return Staircase(
+            left=sorted(-np.flip(self.right)),
+            right=sorted(-np.flip(self.left)),
+            mean=-self.mean,
+            var=self.var,
+        )
+
+    def __add__(self, other):
+        return self.add(other, method="f")
+
+    def __radd__(self, other):
+        return self.add(other, method="f")
+
+    def __sub__(self, other):
+        return self.sub(other, method="f")
+
+    def __rsub__(self, other):
+        self = -self
+        return self.add(other, method="f")
+
+    def __mul__(self, other):
+        return self.mul(other, method="f")
+
+    def __rmul__(self, other):
+        return self.mul(other, method="f")
+
+    def __truediv__(self, other):
+
+        return self.div(other, method="f")
+
+    def __rtruediv__(self, other):
+
+        try:
+            return other * self.recip()
+        except:
+            return NotImplemented
 
     # * --------------------- methods ---------------------*#
     def add(self, other, dependency="f"):
@@ -265,29 +313,87 @@ class Staircase(Box):
         nright.sort()
         return Staircase(left=nleft, right=nright)
 
-    # as comparison
-    def add_old(self, other, method="f"):
-        """addtion of uncertain numbers with the defined dependency method"""
+    def sub(self, other, dependency="f"):
 
-        from .pbox_base import Pbox
+        if dependency == "o":
+            dependency = "p"
+        elif dependency == "p":
+            dependency = "o"
 
-        match method:
+        return self.add(-other, dependency)
+
+    def mul(self, other, dependency="f"):
+        """Multiplication of uncertain numbers with the defined dependency dependency"""
+
+        if isinstance(other, Number):
+            return pbox_number_ops(self, other, operator.mul)
+        if is_un(other):
+            other = convert_pbox(other)
+
+        match dependency:
+            case "f":
+                nleft = np.empty(self.steps)
+                nright = np.empty(self.steps)
+
+                for i in range(0, self.steps):
+                    j = np.array(range(i, self.steps))
+                    k = np.array(range(self.steps - 1, i - 1, -1))
+                    nright[i] = np.min(self.right[j] * other.right[k])
+                    jj = np.array(range(0, i + 1))
+                    kk = np.array(range(i, -1, -1))
+                    nleft[i] = np.max(self.left[jj] * other.left[kk])
+            case "p":
+                nleft = self.left * other.left
+                nright = self.right * other.right
+            case "o":
+                nleft = self.left * np.flip(other.right)
+                nright = self.right * np.flip(other.left)
+            case "i":
+                nleft = []
+                nright = []
+                for i in self.left:
+                    for j in other.left:
+                        nleft.append(i * j)
+                for ii in self.right:
+                    for jj in other.right:
+                        nright.append(ii * jj)
+        nleft.sort()
+        nright.sort()
+        return Staircase(left=nleft, right=nright)
+
+    def div(self, other, dependency="f"):
+
+        if dependency == "o":
+            dependency = "p"
+        elif dependency == "p":
+            dependency = "o"
+
+        return self.mul(1 / other, dependency)
+
+    def pow(self, other, dependency="f"):
+
+        if isinstance(other, Number):
+            return pbox_number_ops(self, other, operator.pow)
+        if is_un(other):
+            other = convert_pbox(other)
+
+        match dependency:
             case "f":
                 nleft = np.empty(self.steps)
                 nright = np.empty(self.steps)
                 for i in range(0, self.steps):
                     j = np.array(range(i, self.steps))
                     k = np.array(range(self.steps - 1, i - 1, -1))
-                    nright[i] = np.min(self.right[j] + other.right[k])
+                    nright[i] = np.min(self.right[j] ** other.right[k])
                     jj = np.array(range(0, i + 1))
                     kk = np.array(range(i, -1, -1))
-                    nleft[i] = np.max(self.left[jj] + other.left[kk])
+                    nleft[i] = np.max(self.left[jj] ** other.left[kk])
             case "p":
-                nleft = self.left + other.left
-                nright = self.right + other.right
+                nleft = self.left**other.left
+                nright = self.right**other.right
             case "o":
-                nleft = self.left + np.flip(other.right)
-                nright = self.right + np.flip(other.left)
+                nleft = self.left ** np.flip(other.right)
+                nright = self.right ** np.flip(other.left)
             case "i":
                 nleft = []
                 nright = []
@@ -297,11 +403,42 @@ class Staircase(Box):
                 for ii in self.right:
                     for jj in other.right:
                         nright.append(ii + jj)
-        print(len(nleft))
         nleft.sort()
         nright.sort()
+        return Staircase(left=nleft, right=nright)
 
-        return Pbox(left=nleft, right=nright, steps=self.steps)
+    def cdf(self, x):
+        """get the bounds on the cdf w.r.t x value"""
+
+        lo_ind = find_nearest(self.right, x)
+        hi_ind = find_nearest(self.left, x)
+        return I(Params.p_values[lo_ind], Params.p_values[hi_ind])
+
+    def cuth(self, alpha=0.5):
+        """get the bounds on the quantile at any particular probability level"""
+        ind = find_nearest(Params.p_values, alpha)
+        return I(self.left[ind], self.right[ind])
+
+    def outer_approximate(self, n=100) -> tuple:
+        """outer approximation of a p-box
+
+        note:
+            - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
+
+        return:
+            all sliced slivers
+        """
+        p_values = np.arange(0, n) / n
+        p_leftend = p_values[0:-1]
+        p_rightend = p_values[1:]
+
+        q_l = [self.cuth(p).left for p in p_leftend]
+        q_r = [self.cuth(p).right for p in p_rightend]
+
+        # get the interval list
+        # TODO streamline below the interval list into Marco interval vector
+        the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
+        return p_values, the_interval_list
 
 
 class Leaf(Staircase):

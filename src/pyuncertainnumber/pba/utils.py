@@ -115,7 +115,11 @@ def uniform_reparameterisation(a, b):
 
 
 def find_nearest(array, value):
-    """find the index of the nearest value in the array to the given value"""
+    """find the index of the nearest value in the array to the given value
+
+    note:
+        it works both for quantiles and probabilities
+    """
 
     array = np.asarray(array)
     # find the nearest value
