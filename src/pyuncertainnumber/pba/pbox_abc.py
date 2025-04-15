@@ -90,19 +90,6 @@ class Box(ABC):
             self.right
         ), "Length of lower and upper bounds is not consistent"
 
-        # if len(self.left) > self.steps:
-        #     self.left, self.right = condensation([self.left, self.right], self.steps)
-        # elif len(self.left) < self.steps:
-        #     # 'next' kind interpolation needed
-        #     from .constructors import interpolate_p
-
-        #     p_lo, self.left = interpolate_p(
-        #         p=np.linspace(0.0001, 0.9999, len(self.left)), q=self.left
-        #     )
-        #     p_hi, self.right = interpolate_p(
-        #         p=np.linspace(0.0001, 0.9999, len(self.right)), q=self.right
-        #     )
-
     @property
     def range(self):
         return self._range
@@ -132,6 +119,14 @@ class Box(ABC):
     def hi(self):
         """Returns the right-most value in the interval"""
         return self.right[-1]
+
+    @property
+    def support(self):
+        return self._range
+
+    @property
+    def median(self):
+        return I(np.median(self.left), np.median(self.right))
 
     # * --------------------- operators ---------------------*#
 
@@ -313,6 +308,118 @@ class Staircase(Box):
         # TODO streamline below the interval list into Marco interval vector
         the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
         return p_values, the_interval_list
+
+    def truncate(self, a, b, method="f"):
+        """Equivalent to self.min(a,method).max(b,method)"""
+        return self.min(a, method=method).max(b, method=method)
+
+    def min(self, other, method="f"):
+        """Returns a new Pbox object that represents the element-wise minimum of two Pboxes.
+
+        args:
+            - other: Another Pbox object or a numeric value.
+            - method: Calculation method to determine the minimum. Can be one of 'f', 'p', 'o', 'i'.
+
+        returns:
+            Pbox
+        """
+
+        other = convert_pbox(other)
+        match method:
+            case "f":
+                nleft = np.empty(self.steps)
+                nright = np.empty(self.steps)
+                for i in range(0, self.steps):
+                    j = np.array(range(i, self.steps))
+                    k = np.array(range(self.steps - 1, i - 1, -1))
+                    nright[i] = min(list(self.right[j]) + list(other.right[k]))
+                    jj = np.array(range(0, i + 1))
+                    kk = np.array(range(i, -1, -1))
+                    nleft[i] = min(list(self.left[jj]) + list(other.left[kk]))
+            case "p":
+                nleft = np.minimum(self.left, other.left)
+                nright = np.minimum(self.right, other.right)
+            case "o":
+                nleft = np.minimum(self.left, np.flip(other.left))
+                nright = np.minimum(self.right, np.flip(other.right))
+            case "i":
+                nleft = []
+                nright = []
+                for i in self.left:
+                    for j in other.left:
+                        nleft.append(np.minimum(i, j))
+                for ii in self.right:
+                    for jj in other.right:
+                        nright.append(np.minimum(ii, jj))
+        nleft.sort()
+        nright.sort()
+
+        return Staircase(left=nleft, right=nright)
+
+    def max(self, other, method="f"):
+
+        other = convert_pbox(other)
+        match method:
+            case "f":
+                nleft = np.empty(self.steps)
+                nright = np.empty(self.steps)
+                for i in range(0, self.steps):
+                    j = np.array(range(i, self.steps))
+                    k = np.array(range(self.steps - 1, i - 1, -1))
+                    nright[i] = max(list(self.right[j]) + list(other.right[k]))
+                    jj = np.array(range(0, i + 1))
+                    kk = np.array(range(i, -1, -1))
+                    nleft[i] = max(list(self.left[jj]) + list(other.left[kk]))
+            case "p":
+                nleft = np.maximum(self.left, other.left)
+                nright = np.maximum(self.right, other.right)
+            case "o":
+                nleft = np.maximum(self.left, np.flip(other.right))
+                nright = np.maximum(self.right, np.flip(other.left))
+            case "i":
+                nleft = []
+                nright = []
+                for i in self.left:
+                    for j in other.left:
+                        nleft.append(np.maximum(i, j))
+                for ii in self.right:
+                    for jj in other.right:
+                        nright.append(np.maximum(ii, jj))
+
+        nleft.sort()
+        nright.sort()
+
+        return Staircase(left=nleft, right=nright)
+
+    # * --------------------- aggregations--------------------- *#
+    def env(self, other):
+        """computes the envelope of two Pboxes.
+
+        args:
+            other (Pbox)
+
+        returns:
+            - Pbox
+        """
+
+        nleft = np.minimum(self.left, other.left)
+        nright = np.maximum(self.right, other.right)
+        return Staircase(left=nleft, right=nright, steps=self.steps)
+
+    def imp(self, other):
+        """Returns the imposition of self with other pbox
+
+        note:
+            - binary imposition between two pboxes only
+        """
+        u = []
+        d = []
+        for sL, sR, oL, oR in zip(self.left, self.right, other.left, other.right):
+            if max(sL, oL) > min(sR, oR):
+                raise Exception("Imposition does not exist")
+            u.append(max(sL, oL))
+            d.append(min(sR, oR))
+        return Staircase(left=u, right=d)
 
     # * ---------------------unary operations--------------------- *#
 
