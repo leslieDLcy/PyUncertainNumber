@@ -250,27 +250,27 @@ class Staircase(Box):
         )
 
     def __add__(self, other):
-        return self.add(other, method="f")
+        return self.add(other, dependency="f")
 
     def __radd__(self, other):
-        return self.add(other, method="f")
+        return self.add(other, dependency="f")
 
     def __sub__(self, other):
-        return self.sub(other, method="f")
+        return self.sub(other, dependency="f")
 
     def __rsub__(self, other):
         self = -self
-        return self.add(other, method="f")
+        return self.add(other, dependency="f")
 
     def __mul__(self, other):
-        return self.mul(other, method="f")
+        return self.mul(other, dependency="f")
 
     def __rmul__(self, other):
-        return self.mul(other, method="f")
+        return self.mul(other, dependency="f")
 
     def __truediv__(self, other):
 
-        return self.div(other, method="f")
+        return self.div(other, dependency="f")
 
     def __rtruediv__(self, other):
 
@@ -280,6 +280,57 @@ class Staircase(Box):
             return NotImplemented
 
     # * --------------------- methods ---------------------*#
+
+    def cdf(self, x):
+        """get the bounds on the cdf w.r.t x value"""
+
+        lo_ind = find_nearest(self.right, x)
+        hi_ind = find_nearest(self.left, x)
+        return I(Params.p_values[lo_ind], Params.p_values[hi_ind])
+
+    def cuth(self, alpha=0.5):
+        """get the bounds on the quantile at any particular probability level"""
+        ind = find_nearest(Params.p_values, alpha)
+        return I(self.left[ind], self.right[ind])
+
+    def outer_approximate(self, n=100) -> tuple:
+        """outer approximation of a p-box
+
+        note:
+            - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
+
+        return:
+            all sliced slivers
+        """
+        p_values = np.arange(0, n) / n
+        p_leftend = p_values[0:-1]
+        p_rightend = p_values[1:]
+
+        q_l = [self.cuth(p).left for p in p_leftend]
+        q_r = [self.cuth(p).right for p in p_rightend]
+
+        # get the interval list
+        # TODO streamline below the interval list into Marco interval vector
+        the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
+        return p_values, the_interval_list
+
+    # * ---------------------unary operations--------------------- *#
+
+    def _unary_template(self, f):
+        l, r = f(self.left), f(self.right)
+        return Staircase(left=l, right=r)
+
+    def exp(self):
+        return self._unary_template(np.exp)
+
+    def sqrt(self):
+        return self._unary_template(np.sqrt)
+
+    def recip(self):
+        return Staircase(left=1 / np.flip(self.right), right=1 / np.flip(self.left))
+
+    # * ---------------------binary operations--------------------- *#
+
     def add(self, other, dependency="f"):
         if isinstance(other, Number):
             return pbox_number_ops(self, other, operator.add)
@@ -406,39 +457,6 @@ class Staircase(Box):
         nleft.sort()
         nright.sort()
         return Staircase(left=nleft, right=nright)
-
-    def cdf(self, x):
-        """get the bounds on the cdf w.r.t x value"""
-
-        lo_ind = find_nearest(self.right, x)
-        hi_ind = find_nearest(self.left, x)
-        return I(Params.p_values[lo_ind], Params.p_values[hi_ind])
-
-    def cuth(self, alpha=0.5):
-        """get the bounds on the quantile at any particular probability level"""
-        ind = find_nearest(Params.p_values, alpha)
-        return I(self.left[ind], self.right[ind])
-
-    def outer_approximate(self, n=100) -> tuple:
-        """outer approximation of a p-box
-
-        note:
-            - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
-
-        return:
-            all sliced slivers
-        """
-        p_values = np.arange(0, n) / n
-        p_leftend = p_values[0:-1]
-        p_rightend = p_values[1:]
-
-        q_l = [self.cuth(p).left for p in p_leftend]
-        q_r = [self.cuth(p).right for p in p_rightend]
-
-        # get the interval list
-        # TODO streamline below the interval list into Marco interval vector
-        the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
-        return p_values, the_interval_list
 
 
 class Leaf(Staircase):
