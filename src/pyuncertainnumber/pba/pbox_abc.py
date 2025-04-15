@@ -48,11 +48,14 @@ class Box(ABC):
         self.steps = steps
         self.mean = mean
         self.var = var
+        # we force the steps but allow the p_values to be flexible
         self._pvalues = p_values if p_values is not None else Params.p_values
         self.post_init_check()
 
     def _init_range(self):
         self._range = I(min(self.left), max(self.right))
+
+    # * --------------------- setup ---------------------*#
 
     @abstractmethod
     def _init_moments(self):
@@ -60,20 +63,35 @@ class Box(ABC):
 
     def post_init_check(self):
 
-        assert len(self.left) == len(
-            self.right
-        ), "steps of lower/upper bounds not consistent"
-
-        if len(self.left) > self.steps:
-            self.left, self.right = condensation([self.left, self.right], self.steps)
+        self.steps_check()
 
         if (not is_increasing(self.left)) or (not is_increasing(self.right)):
             raise Exception("Left and right arrays must be increasing")
 
+        # pass along moments information
         if (self.mean is None) and (self.var is None):
             self._init_moments()
 
         self._init_range()
+
+    def steps_check(self):
+
+        assert len(self.left) == len(
+            self.right
+        ), "Length of lower and upper bounds is not consistent"
+
+        if len(self.left) > self.steps:
+            self.left, self.right = condensation([self.left, self.right], self.steps)
+        elif len(self.left) < self.steps:
+            # 'next' kind interpolation needed
+            from .constructors import interpolate_p
+
+            p_lo, self.left = interpolate_p(
+                p=np.linspace(0.0001, 0.9999, len(self.left)), q=self.left
+            )
+            p_hi, self.right = interpolate_p(
+                p=np.linspace(0.0001, 0.9999, len(self.right)), q=self.right
+            )
 
     # * --------------------- operators ---------------------*#
 

@@ -58,15 +58,16 @@ def pbox_from_pseudosamples(samples):
     return Pbox(tranform_ecdf(samples, display=False))
 
 
-def interpolate_p(x, y):
+def interpolate_p(p, q):
     """interpolate the cdf bundle for discrete distribution or ds structure
+
     note:
-        - x: probabilities
-        - y: quantiles
+        - p: probabilities (x)
+        - q: quantiles (y)
     """
 
-    f = interp1d(x, y, kind="next", fill_value=(x[0], x[-1]), bounds_error=False)
+    f = interp1d(p, q, kind="next", fill_value=(p[0], p[-1]), bounds_error=False)
     # range
-    q = np.linspace(x[0], x[-1], Params.steps)
-    p = f(q)
-    return q, p
+    new_q = np.linspace(p[0], p[-1], Params.steps)
+    new_p = f(new_q)
+    return new_q, new_p
