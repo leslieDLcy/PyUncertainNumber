@@ -654,3 +654,7 @@ def pbox_number_ops(pbox: Staircase | Leaf, n: float | int, f: callable):
     return Staircase(left=l, right=r, mean=new_mean, var=pbox.var)
 
     # Staircase(left=pbox.left + n, right=pbox.right + n)
+
+
+def truncate(pbox, min, max):
+    return pbox.truncate(min, max)
