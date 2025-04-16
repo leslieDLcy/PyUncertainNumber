@@ -128,6 +128,10 @@ class Box(ABC):
     def median(self):
         return I(np.median(self.left), np.median(self.right))
 
+    @property
+    def naked_value(self):
+        return self.mean.mid
+
     # * --------------------- operators ---------------------*#
 
     def __iter__(self):
@@ -216,8 +220,8 @@ class Staircase(Box):
         "label" in kwargs and ax.legend()
         return ax
 
-    def display(self):
-        self.plot()
+    def display(self, *args, **kwargs):
+        self.plot(*args, **kwargs)
         plt.show()
 
     # * --------------------- constructors ---------------------*#

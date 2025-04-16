@@ -8,4 +8,4 @@
 from .pbox import *
 
 # from .ds import *
-from .interval import *
+from .intervals.number import Interval as I

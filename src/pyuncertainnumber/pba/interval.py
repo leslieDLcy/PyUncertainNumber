@@ -119,6 +119,10 @@ class Interval:
     def right(self):
         return self._right
 
+    @property
+    def naked_value(self):
+        return (self.left + self.right) / 2
+
     def __repr__(self) -> str:  # return
         return "Interval [%g, %g]" % (self.left, self.right)
 

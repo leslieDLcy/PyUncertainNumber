@@ -177,6 +177,10 @@ class Interval:
     def shape(self):
         return self.__shape
 
+    @property
+    def naked_value(self):
+        return self.mid
+
     # -------------- ARITHMETIC -------------- #
     # unary operators #
     def __neg__(self):

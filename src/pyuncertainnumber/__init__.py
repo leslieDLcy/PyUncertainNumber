@@ -10,7 +10,7 @@ from .pba.aggregation import *
 # from pyuncertainnumber.pba.pbox import *
 
 # * --------------------- Interval ---------------------*#
-from pyuncertainnumber.pba.intervals.number import Interval as I
+# from pyuncertainnumber.pba.intervals.number import Interval as I
 from pyuncertainnumber.pba.intervalOperators import make_vec_interval
 
 # * --------------------- hedge---------------------*#

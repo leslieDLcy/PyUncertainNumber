@@ -124,25 +124,13 @@ class UncertainNumber:
         match self.essence:
             case "interval":
                 self._construct = parse_bounds(self.bounds)
-                self.naked_value = self._construct.midpoint()
-            case "distribution":
-                if self._samples is not None:
-                    self._construct = Distribution(sample_data=self._samples)
-                elif self.distribution_parameters is not None:
-                    p_ = DistributionSpecification(
-                        dist_family=self.distribution_parameters[0],
-                        dist_params=self.distribution_parameters[1],
-                    )
-                    if p_.i_flag:
-                        self.parameterised_pbox_specification()
-                    else:
-                        self._construct = Distribution(
-                            dist_family=self.distribution_parameters[0],
-                            dist_params=self.distribution_parameters[1],
-                        )
-                        self.naked_value = self._construct._naked_value
-            case "pbox":
-                self.parameterised_pbox_specification()
+            case "distribution" | "pbox":
+                par = Parameterisation(
+                    self.distribution_parameters, essence=self.essence
+                )
+                self._construct = par.yield_construct()
+
+        self.naked_value = self._construct.naked_value
 
         ### 'unit' representation of the un ###
         ureg = UnitRegistry()
@@ -265,6 +253,11 @@ class UncertainNumber:
                     return [rv.ppf(0.025), rv.ppf(0.975)]
             case "pbox":
                 return "unfinshed"
+
+    def plot(self, **kwargs):
+        """quick plot of the uncertain number object"""
+
+        return self._construct.plot(**kwargs)
 
     def display(self, **kwargs):
         """quick plot of the uncertain number object"""
@@ -711,3 +704,74 @@ def _parse_interverl_inputs(vars):
 
     if isinstance(vars, list):
         return UncertainNumber._toIntervalBackend(vars)
+
+
+def match_pbox(keyword, parameters):
+    """match the distribution keyword from the initialisation to create the underlying distribution object
+
+    args:
+        - keyword: (str) the distribution keyword
+        - parameters: (list) the parameters of the distribution
+    """
+    obj = named_pbox.get(keyword, "You're lucky as the distribution is not supported")
+    if isinstance(obj, str):
+        print(obj)  # print the error message
+    return obj(*parameters)
+
+
+from numbers import Number
+from ..pba.distributions import Distribution
+
+
+class Parameterisation:
+    def __init__(self, parm_specification, essence: str):
+        self.parm_specification = ParamSpecification(parm_specification)
+        self.essence = essence
+
+    def yield_construct(self):
+        # to ouput Distribution or Pbox accordingly
+        if "pbox" in (self.essence, self.parm_specification._true_type):
+            pbox = match_pbox(
+                self.parm_specification.family, self.parm_specification.parameters
+            )
+            return pbox
+        else:
+            dist = Distribution(
+                dist_family=self.parm_specification.family,
+                dist_params=self.parm_specification.parameters,
+            )
+            return dist
+
+
+class ParamSpecification:
+    """only for the format of specification
+
+    note:
+        a recommended specification: ['gaussian', (12,4)] or ['gaussian', ([0,12],[1,4])]
+    """
+
+    def __init__(self, input):
+        if (
+            not isinstance(input, list)
+            or len(input) != 2
+            or not isinstance(input[0], str)
+            or not isinstance(input[1], tuple)
+        ):
+            raise ValueError("Input must be in the format ['str', (a, b)]")
+
+        self.family = input[0]
+        self.parameters = input[1]
+        self.un_type_check()
+
+    def supported_distribution_check(self):
+        """check if the family is implemented"""
+        pass
+
+    def un_type_check(self):
+        """infer the real type of UN given the specification"""
+
+        # distribution case
+        if all(isinstance(x, Number) for x in self.parameters):
+            self._true_type = "distribution"
+        else:
+            self._true_type = "pbox"
