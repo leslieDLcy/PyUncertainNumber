@@ -3,7 +3,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from .intervalOperators import wc_interval, make_vec_interval
+from .intervalOperators import wc_scalar_interval, make_vec_interval
 from collections import namedtuple
 from dataclasses import dataclass
 from .intervals import Interval
@@ -109,7 +109,7 @@ def reweighting(*masses):
 def uniform_reparameterisation(a, b):
     """reparameterise the uniform distribution to a, b"""
     #! incorrect in the case of Interval args
-    a, b = wc_interval(a), wc_interval(b)
+    a, b = wc_scalar_interval(a), wc_scalar_interval(b)
     return a, b - a
 
 

@@ -8,8 +8,9 @@ import itertools
 from .params import Params
 from typing import *
 from warnings import *
-from .intervalOperators import wc_interval
-
+from .intervalOperators import wc_scalar_interval
+from .intervals.number import Interval
+from .pbox_abc import Leaf
 
 if TYPE_CHECKING:
     from .pbox_base import Pbox
@@ -21,13 +22,13 @@ if TYPE_CHECKING:
 def makePbox(func) -> Pbox:
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-        i_args = [wc_interval(arg) for arg in args]
-        shape_value = func(*args, **kwargs)
-        return _bound_pcdf(shape_value, *i_args)
+        family_str = func(*args, **kwargs)
+        return _bound_pcdf(family_str, *args)
 
     return wrapper_decorator
 
 
+# top-level
 def _bound_pcdf(dist_family, *args, **kwargs):
     """bound the parametric CDF
 
@@ -37,16 +38,6 @@ def _bound_pcdf(dist_family, *args, **kwargs):
     from .pbox_abc import Leaf
 
     Left, Right, mean, var = _get_bounds(dist_family, *args, **kwargs)
-
-    # return Pbox(
-    #     Left,
-    #     Right,
-    #     shape=dist_family,
-    #     mean_left=mean.left,
-    #     mean_right=mean.right,
-    #     var_left=var.left,
-    #     var_right=var.right,
-    # )
     return Leaf(
         left=Left, right=Right, shape=dist_family, dist_params=args, mean=mean, var=var
     )
@@ -57,6 +48,7 @@ def _get_bounds(dist_family, *args, steps=Params.steps):
 
     args:
         - dist_family: (str) the name of the distribution
+        *args : several parameter (interval or list)
     """
 
     from .distributions import named_dists
@@ -64,10 +56,13 @@ def _get_bounds(dist_family, *args, steps=Params.steps):
 
     # TODO logically speaking, it can be (0,1) ergo support will be [-inf, inf] see it works with other part codes
     # define percentile range thus getting the support
+
+    i_args = [wc_scalar_interval(b) for b in args]
+
     p = Params.p_values
 
     # get bound arguments
-    new_args = itertools.product(*args)
+    new_args = itertools.product(*[i.to_numpy() for i in i_args])
 
     bounds = []
 
@@ -234,10 +229,10 @@ def foldcauchy(*args):
 def foldnorm(mu, s, steps=Params.steps):
 
     x = np.linspace(0.0001, 0.9999, steps)
-    if mu.__class__.__name__ != "nInterval":
-        mu = nInterval(mu)
-    if s.__class__.__name__ != "nInterval":
-        s = nInterval(s)
+    if mu.__class__.__name__ != "wc_scalar_interval":
+        mu = wc_scalar_interval(mu)
+    if s.__class__.__name__ != "wc_scalar_interval":
+        s = wc_scalar_interval(s)
 
     new_args = [
         [mu.lo() / s.lo(), 0, s.lo()],
@@ -270,8 +265,8 @@ def foldnorm(mu, s, steps=Params.steps):
     Left = [min([b[i] for b in bounds]) for i in range(steps)]
     Right = [max([b[i] for b in bounds]) for i in range(steps)]
 
-    var = nInterval(np.float64(var_lo), np.float64(var_hi))
-    mean = nInterval(np.float64(mean_lo), np.float64(mean_hi))
+    var = wc_scalar_interval(np.float64(var_lo), np.float64(var_hi))
+    mean = wc_scalar_interval(np.float64(mean_lo), np.float64(mean_hi))
 
     Left = np.array(Left)
     Right = np.array(Right)
@@ -708,10 +703,10 @@ def lognormal(
     else:
         x = np.linspace(0.001, 0.999, Params.steps)
 
-    if mean.__class__.__name__ != "nInterval":
-        mean = nInterval(mean, mean)
-    if var.__class__.__name__ != "nInterval":
-        var = nInterval(var, var)
+    if mean.__class__.__name__ != "wc_scalar_interval":
+        mean = wc_scalar_interval(mean, mean)
+    if var.__class__.__name__ != "wc_scalar_interval":
+        var = wc_scalar_interval(var, var)
 
     def __lognorm(mean, var):
 
@@ -734,14 +729,14 @@ def lognormal(
 
 
 def trapz(a, b, c, d, steps=Params.steps):
-    if a.__class__.__name__ != "nInterval":
-        a = nInterval(a)
-    if b.__class__.__name__ != "nInterval":
-        b = nInterval(b)
-    if c.__class__.__name__ != "nInterval":
-        c = nInterval(c)
-    if d.__class__.__name__ != "nInterval":
-        d = nInterval(d)
+    if a.__class__.__name__ != "wc_scalar_interval":
+        a = wc_scalar_interval(a)
+    if b.__class__.__name__ != "wc_scalar_interval":
+        b = wc_scalar_interval(b)
+    if c.__class__.__name__ != "wc_scalar_interval":
+        c = wc_scalar_interval(c)
+    if d.__class__.__name__ != "wc_scalar_interval":
+        d = wc_scalar_interval(d)
 
     x = np.linspace(0.0001, 0.9999, steps)
     left = sps.trapz.ppf(
@@ -756,14 +751,14 @@ def trapz(a, b, c, d, steps=Params.steps):
 
 def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
-    if left.__class__.__name__ != "nInterval":
-        left = nInterval(left)
-    if right.__class__.__name__ != "nInterval":
-        right = nInterval(right)
-    if mean.__class__.__name__ != "nInterval":
-        mean = nInterval(mean)
-    if stddev.__class__.__name__ != "nInterval":
-        stddev = nInterval(stddev)
+    if left.__class__.__name__ != "wc_scalar_interval":
+        left = wc_scalar_interval(left)
+    if right.__class__.__name__ != "wc_scalar_interval":
+        right = wc_scalar_interval(right)
+    if mean.__class__.__name__ != "wc_scalar_interval":
+        mean = wc_scalar_interval(mean)
+    if stddev.__class__.__name__ != "wc_scalar_interval":
+        stddev = wc_scalar_interval(stddev)
 
     a, b = (left - mean) / stddev, (right - mean) / stddev
 
@@ -793,14 +788,14 @@ def uniform(a, b, steps=Params.steps):
     # loc, scale = uniform_reparameterisation(a,  b)
     # return uniform_sps(loc, scale)
 
-    a, b = [nInterval(arg) for arg in [a, b] if arg is not isinstance(arg, nInterval)]
+    a, b = [wc_scalar_interval(arg) for arg in [a, b]]
 
     Left = np.linspace(a.left, b.left, steps)
     Right = np.linspace(a.right, b.right, steps)
 
-    return Pbox(
-        Left,
-        Right,
+    return Leaf(
+        left=Left,
+        right=Right,
         steps=steps,
         shape="uniform",
     )
@@ -818,7 +813,9 @@ def weibull(*args, steps=Params.steps):
 def KM(k, m, steps=Params.steps):
     with catch_warnings():
         simplefilter("ignore")
-        return beta(nInterval(k, k + 1), nInterval(m, m + 1), steps=steps)
+        return beta(
+            wc_scalar_interval(k, k + 1), wc_scalar_interval(m, m + 1), steps=steps
+        )
 
 
 def KN(k, n, steps=Params.steps):

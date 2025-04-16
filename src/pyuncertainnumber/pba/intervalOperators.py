@@ -2,6 +2,7 @@ from functools import singledispatch
 import numpy as np
 from .intervals import intervalise, Interval
 from ..nlp.language_parsing import parse_interval_expression, hedge_interpret
+from numbers import Number
 
 """ operations for generic Interval objects """
 
@@ -11,7 +12,7 @@ from ..nlp.language_parsing import parse_interval_expression, hedge_interpret
 @singledispatch
 def parse_bounds(bounds):
     """parse the self.bounds argument"""
-    return wc_interval(bounds)
+    return wc_scalar_interval(bounds)
 
 
 @parse_bounds.register(str)
@@ -32,19 +33,29 @@ def _str(bounds: str):
 
 
 @singledispatch
-def wc_interval(bound):
+def wc_scalar_interval(bound):
     """wildcard scalar interval"""
     return Interval(bound)
 
 
-@wc_interval.register(list)
-def _arraylike(bound: list):
-    return Interval(bound)
+@wc_scalar_interval.register(list)
+def _list(bound: list):
+    return Interval(*bound)
 
 
-@wc_interval.register(Interval)
+@wc_scalar_interval.register(tuple)
+def _tuple(bound: tuple):
+    return Interval(*bound)
+
+
+@wc_scalar_interval.register(Interval)
 def _marco_interval_like(bound: Interval):
     return bound
+
+
+@wc_scalar_interval.register(Number)
+def _scalar(bound: Number):
+    return Interval(bound, bound)
 
 
 # * ---------------------make vector interval object --------------------- *#

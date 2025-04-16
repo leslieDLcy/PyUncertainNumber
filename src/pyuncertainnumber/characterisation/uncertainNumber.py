@@ -637,11 +637,11 @@ class UncertainNumber:
 def makeUNPbox(func):
 
     from ..pba.pbox import _bound_pcdf
-    from ..pba.intervalOperators import wc_interval
+    from ..pba.intervalOperators import wc_scalar_interval
 
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-        i_args = [wc_interval(arg) for arg in args]
+        i_args = [wc_scalar_interval(arg) for arg in args]
         shape_value = func(*args, **kwargs)
         p = _bound_pcdf(shape_value, *i_args)
         return UncertainNumber.fromConstruct(p)

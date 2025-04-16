@@ -166,7 +166,11 @@ class Staircase(Box):
         self.mean_lo, self.var_lo = get_var_from_ecdf(self.left, self._pvalues)
         self.mean_hi, self.var_hi = get_var_from_ecdf(self.right, self._pvalues)
         self.mean = I(self.mean_lo, self.mean_hi)
-        self.var = I(self.var_lo, self.var_hi)
+        # TODO tmp solution for computing var for pbox
+        try:
+            self.var = I(self.var_lo, self.var_hi)
+        except:
+            self.var = I(666, 666)
 
     def __repr__(self):
         mean_text = f"{self.mean}"
@@ -592,7 +596,7 @@ class Leaf(Staircase):
 
     def __repr__(self):
         base_repr = super().__repr__().rstrip(")")  # remove trailing ')'
-        return f"{base_repr}, shape={self.shape}{self.dist_params}"
+        return f"{base_repr}, shape={self.shape}"
 
     def sample():
         pass
