@@ -6,7 +6,7 @@ import matplotlib as mpl
 from .intervalOperators import wc_scalar_interval, make_vec_interval
 from collections import namedtuple
 from dataclasses import dataclass
-from .intervals import Interval
+from .intervals.number import Interval
 
 cdf_bundle = namedtuple("cdf_bundle", ["quantiles", "probabilities"])
 """ a handy composition object for a c.d.f which is a tuple of quantile and probability 
@@ -127,7 +127,7 @@ def find_nearest(array, value):
 
 
 @mpl.rc_context({"text.usetex": True})
-def plot_intervals(vec_interval: list[nInterval | Interval], ax=None, **kwargs):
+def plot_intervals(vec_interval: list[Interval], ax=None, **kwargs):
     """plot the intervals in a vectorised form
     args:
         vec_interval: vectorised interval objects
