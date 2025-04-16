@@ -683,13 +683,10 @@ def min_max_mean_var(
 
 
 def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
-    """
-    Generates a distribution-free p-box based upon percentiles of the variable
+    """yields a distribution-free p-box based on specified percentiles of the variable
 
-    **Parameters**
-
+    args:
         ``percentiles`` : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: nInterval(3,4), 1:5})
-
         ``steps`` : number of steps to use in the p-box
 
     .. important::
@@ -722,12 +719,6 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
             0.75: pba.I(1.5,2.5),
             1: 3}
         ).show()
-
-    .. image:: https://github.com/Institute-for-Risk-and-Uncertainty/pba-for-python/blob/master/docs/images/from_percentiles.png?raw=true
-        :scale: 35 %
-        :align: center
-        :alt: Pbox generated from percentiles
-
     """
     # check if 0 and 1 are in the dictionary
     if 0 not in percentiles.keys():
@@ -742,8 +733,8 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
 
     # transform values to intervals
     for k, v in percentiles.items():
-        if not isinstance(v, nInterval):
-            percentiles[k] = nInterval(v)
+        if not isinstance(v, I):
+            percentiles[k] = I(v, v)
 
     if any([p < 0 or p > 1 for p in percentiles.keys()]):
         raise ValueError("Percentiles must be between 0 and 1")
@@ -758,7 +749,7 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
 
     try:
         # return Pbox(left, right, steps=steps, interpolation="outer")  # backup
-        return Pbox(left, right, steps=steps)
+        return Staircase(left=left, right=right, steps=steps)
     except NotIncreasingError:
         warn("Percentiles are not increasing. Will take intersection of percentiles.")
 
@@ -779,6 +770,6 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
             right.append(percentiles[smallest_key].right)
 
         # return Pbox(left, right, steps=steps, interpolation="outer")  # backup
-        return Pbox(left, right, steps=steps)
+        return Staircase(left=left, right=right, steps=steps)
     except:
         raise Exception("Unable to generate p-box")

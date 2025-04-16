@@ -144,6 +144,14 @@ class Interval:
     # return self.__hi # return transpose(transpose(self.__val)[1])
 
     @property
+    def left(self):
+        return self.lo
+
+    @property
+    def right(self):
+        return self.hi
+
+    @property
     def width(self):
         return width(self)
 
