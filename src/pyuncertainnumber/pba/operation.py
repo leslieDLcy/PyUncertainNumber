@@ -83,6 +83,9 @@ def adec(a, c):
     """
     Additive deconvolution: returns b such that a + b ≈ c
     Assumes a, b, c are instances of RandomNbr.
+
+    note:
+        implmentation from Scott
     """
     from .intervals.number import Interval as I
     from .pbox_abc import convert_pbox, Staircase
