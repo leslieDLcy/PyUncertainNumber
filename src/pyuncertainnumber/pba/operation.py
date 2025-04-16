@@ -15,13 +15,10 @@ def convert(un):
     """
 
     from .pbox_base import Pbox
-    from .interval import Interval as nInterval
     from .ds import DempsterShafer
     from .distributions import Distribution
 
-    if isinstance(un, nInterval):
-        return Pbox(un.left, un.right)
-    elif isinstance(un, Pbox):
+    if isinstance(un, Pbox):
         return un
     elif isinstance(un, Distribution):
         return un.to_pbox()

@@ -63,19 +63,13 @@ def make_vec_interval(vec):
 
     if isinstance(vec, Interval):
         return vec
-    elif isinstance(vec[0], nInterval):
-        lo_endpoints = [un.left for un in vec]
-        hi_endpoints = [un.right for un in vec]
-        return Interval(lo_endpoints, hi_endpoints)
     elif isinstance(vec[0], Interval | list | tuple | np.ndarray):
-        # lo_endpoints = [un[0] for un in vec]
-        # hi_endpoints = [un[1] for un in vec]
-        # return Interval(lo_endpoints, hi_endpoints)
         return intervalise(vec)
     else:
-        print("not implemented yet")
+        raise NotImplementedError
 
-    # * ---------------------mean func --------------------- *#
+
+# * ---------------------mean func --------------------- *#
 
 
 @singledispatch
@@ -91,23 +85,3 @@ def _arraylike(x):
 @mean.register(Interval)
 def _intervallike(x):
     return sum(x) / len(x)
-
-
-# * ---------------------std func --------------------- *#
-
-
-def std():
-    pass
-
-
-# * ---------------------var func --------------------- *#
-
-
-def var():
-    pass
-
-
-# * ---------------------round func --------------------- *#
-def roundInt():
-    """outward rounding to integer"""
-    pass

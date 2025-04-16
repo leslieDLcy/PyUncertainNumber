@@ -122,13 +122,24 @@ class Interval:
     def __getitem__(self, i: Union[int, slice]):  # make class indexable
         return Interval(lo=self.__lo[i], hi=self.__hi[i])
 
-    # -------------- METHODS -------------- #
+    # * -------------- METHODS -------------- *#
     def to_numpy(self) -> np.ndarray:
         """transform interval objects to numpy arrays"""
         if self.scalar:
             return [self.lo.item(), self.hi.item()]
         else:
             return list(zip(self.lo.item(), self.hi.item()))
+
+    def to_pbox(self):
+        from ..pbox_abc import Staircase
+        from ..params import Params
+
+        return Staircase(
+            left=np.repeat(self.lo, Params.steps),
+            right=np.repeat(self.hi, Params.steps),
+            mean=self,
+            var=Interval(0, (self.hi - self.lo) * (self.hi - self.lo) / 4),
+        )
 
     @property
     def lo(self) -> Union[ndarray, float]:
@@ -189,7 +200,7 @@ class Interval:
     def naked_value(self):
         return self.mid
 
-    # -------------- ARITHMETIC -------------- #
+    # * -------------- ARITHMETIC -------------- *#
     # unary operators #
     def __neg__(self):
         return Interval(-self.hi, -self.lo)

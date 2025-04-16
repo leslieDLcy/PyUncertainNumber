@@ -271,11 +271,6 @@ class UncertainNumber:
 
     # * ---------------------other constructors--------------------- *#
 
-    # @classmethod
-    # def I(cls, i: list[float | int]):
-    #     """create a shorcut an interval-type UN object"""
-    #     return cls(essence="interval", bounds=i)
-
     @classmethod
     def from_hedge(cls, hedged_language):
         """create an Uncertain Number from hedged language
@@ -333,16 +328,6 @@ class UncertainNumber:
                 _samples=D.sample_data,
             )
 
-    # @classmethod
-    # def from_constraints(cls, min, max, mean, median, variance, **kwargs):
-    #     """to construct a pbox given the properties of the distribution
-
-    #     returns:
-    #         - a pbox-type UN object
-    #     note:
-    #         - whether differentiate explicitly if free/parametric pbox
-    #     """
-    #     pass
     @classmethod
     def from_Interval(cls, u):
         return cls(essence="interval", bounds=u)
