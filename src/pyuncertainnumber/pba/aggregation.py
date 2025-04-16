@@ -149,65 +149,19 @@ def imposition(l_un: list[Staircase | float | int]) -> Staircase:
     xs = [convert_pbox(x) for x in l_un]
     return functools.reduce(binary_imp, xs)
 
-    # p = xs[0]
-    # for i in range(1, len(xs)):
-    #     p = p.imp(xs[i])
-    # return p
 
+def envelope(l_un):
+    """calculates the envelope of uncertain number objects
 
-def envelope():
-    pass
+    args:
+        ``*args``: The components on which the envelope operation applied on.
 
+    returns:
+        ``Pbox|Interval``: The envelope of the given arguments, which can be an interval or a p-box.
+    """
 
-# def envelope(*args: Pbox | float) -> Pbox:
-#     """
-#     .. _core.envelope:
+    def binary_env(p1, p2):
+        return p1.env(p2)
 
-#     Allows the envelope to be calculated for intervals and p-boxes.
-
-#     The envelope is the smallest interval/pbox that contains all values within the arguments.
-
-#     **Parameters**:
-#         ``*args``: The arguments for which the envelope needs to be calculated. The arguments can be intervals, p-boxes, or floats.
-
-#     **Returns**:
-#         ``Pbox|Interval``: The envelope of the given arguments, which can be an interval or a p-box.
-
-#     .. error::
-
-#         ``ValueError``: If less than two arguments are given.
-
-#         ``TypeError``: If none of the arguments are intervals or p-boxes.
-
-#     """
-#     # Raise error if <2 arguments are given
-#     assert len(args) >= 2, "At least two arguments are required"
-
-#     # get the type of all arguments
-#     types = [arg.__class__.__name__ for arg in args]
-
-#     # check if all arguments are intervals or pboxes
-#     if "Interval" not in types and "Pbox" not in types:
-#         raise TypeError("At least one argument needs to be an Interval or Pbox")
-#     # check if there is a p-box in the arguments
-#     elif "Pbox" in types:
-#         # find first p-box
-#         i = types.index("Pbox")
-#         # move previous values to the end
-#         args = args[i:] + args[:i]
-
-#         e = args[0].env(args[1])
-#         for arg in args[2:]:
-#             e = e.env(arg)
-
-#     else:  # Intervals only
-
-#         left = np.min([arg.left if isinstance(arg, nInterval) else arg for arg in args])
-
-#         right = np.max(
-#             [arg.right if isinstance(arg, nInterval) else arg for arg in args]
-#         )
-
-#         e = nInterval(left, right)
-
-#     return e
+    xs = [convert_pbox(x) for x in l_un]
+    return functools.reduce(binary_env, xs)
