@@ -1,6 +1,6 @@
 from __future__ import annotations
 import functools
-from .interval import Interval as nInterval
+
 from .pbox_base import Pbox
 import scipy.stats as sps
 import numpy as np
@@ -13,7 +13,7 @@ from .intervalOperators import wc_interval
 
 if TYPE_CHECKING:
     from .pbox_base import Pbox
-    from .interval import Interval as nInterval
+
 
 """ parametric pboxes"""
 

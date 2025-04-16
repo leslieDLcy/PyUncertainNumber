@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from .intervalOperators import wc_interval, make_vec_interval
 from collections import namedtuple
-from .interval import Interval as nInterval
 from dataclasses import dataclass
 from .intervals import Interval
 

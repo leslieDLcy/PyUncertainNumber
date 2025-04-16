@@ -3,11 +3,11 @@ from numbers import Number
 import numpy as np
 
 from .pbox_base import Pbox
-from .interval import Interval
+from .intervals import Interval
 
 
 class Logical(Interval):
-    '''
+    """
     Represents a logical value that can be either True or False or dunno ([False,True]).
 
     Inherits from the Interval class.
@@ -18,7 +18,7 @@ class Logical(Interval):
 
         ``right`` (``bool``): The right endpoint of the logical value.
 
-    '''
+    """
 
     def __init__(self, left: bool, right: bool = None):
         super().__init__(left, right)
@@ -30,16 +30,17 @@ class Logical(Interval):
             return True
         else:
             print(
-                'WARNING: Truth value of Logical is ambiguous, use pba.sometime or pba.always')
+                "WARNING: Truth value of Logical is ambiguous, use pba.sometime or pba.always"
+            )
             return True
 
     def __repr__(self):
         if self.left == 0 and self.right == 0:
-            return 'False'
+            return "False"
         elif self.left == 1 and self.right == 1:
-            return 'True'
+            return "True"
         else:
-            return 'Dunno [False,True]'
+            return "Dunno [False,True]"
 
     __str__ = __repr__
 
@@ -52,7 +53,12 @@ class Logical(Interval):
             return self
 
 
-def is_same_as(a: Union['Pbox', 'Interval'], b: Union['Pbox', 'Interval'], deep=False, exact_pbox=True):
+def is_same_as(
+    a: Union["Pbox", "Interval"],
+    b: Union["Pbox", "Interval"],
+    deep=False,
+    exact_pbox=True,
+):
     """
     Check if two objects of type 'Pbox' or 'Interval' are equal.
 
@@ -112,33 +118,27 @@ def is_same_as(a: Union['Pbox', 'Interval'], b: Union['Pbox', 'Interval'], deep=
         elif isinstance(a, Pbox):
 
             if exact_pbox:
-                if (
-                    np.array_equal(a.left, b.left) and
-                    np.array_equal(a.right, b.right)
-                ):
+                if np.array_equal(a.left, b.left) and np.array_equal(a.right, b.right):
                     return True
                 else:
                     return False
 
             if (
-                np.array_equal(a.left, b.left) and
-                np.array_equal(a.right, b.right) and
-                a.steps == b.steps and
-                a.shape == b.shape and
-                a.mean_left == b.mean_left and
-                a.mean_right == b.mean_right and
-                a.var_left == b.var_left and
-                a.var_right == b.var_right
+                np.array_equal(a.left, b.left)
+                and np.array_equal(a.right, b.right)
+                and a.steps == b.steps
+                and a.shape == b.shape
+                and a.mean_left == b.mean_left
+                and a.mean_right == b.mean_right
+                and a.var_left == b.var_left
+                and a.var_right == b.var_right
             ):
                 return True
             else:
                 return False
 
         elif isinstance(a, Interval):
-            if (
-                a.left == b.left and
-                a.right == b.right
-            ):
+            if a.left == b.left and a.right == b.right:
                 return True
             else:
                 return False
@@ -186,7 +186,8 @@ def always(logical: Union[Logical, Interval, Number, bool]) -> bool:
     elif isinstance(logical, Interval):
         if logical.left < 0 or logical.right > 1:
             raise ValueError(
-                "If interval values needs to be between 0 and 1 (inclusive)")
+                "If interval values needs to be between 0 and 1 (inclusive)"
+            )
         if logical.left == 1 and logical.right == 1:
             return True
         else:
@@ -195,16 +196,14 @@ def always(logical: Union[Logical, Interval, Number, bool]) -> bool:
     elif isinstance(logical, (bool, Number)):
 
         if logical < 0 or logical > 1:
-            raise ValueError(
-                "If numeric input needs to be between 0 and 1 (inclusive)")
+            raise ValueError("If numeric input needs to be between 0 and 1 (inclusive)")
         if logical == 1:
             return True
         else:
             False
 
     else:
-        raise TypeError(
-            "Input must be a Logical, Interval or a numeric value.")
+        raise TypeError("Input must be a Logical, Interval or a numeric value.")
 
 
 def never(logical: Logical) -> bool:
@@ -252,7 +251,8 @@ def never(logical: Logical) -> bool:
     elif isinstance(logical, Interval):
         if logical.left < 0 or logical.right > 1:
             raise ValueError(
-                "If interval values needs to be between 0 and 1 (inclusive)")
+                "If interval values needs to be between 0 and 1 (inclusive)"
+            )
         if logical.left == 0 and logical.right == 0:
             return True
         else:
@@ -261,16 +261,14 @@ def never(logical: Logical) -> bool:
     elif isinstance(logical, (bool, Number)):
 
         if logical < 0 or logical > 1:
-            raise ValueError(
-                "If numeric input needs to be between 0 and 1 (inclusive)")
+            raise ValueError("If numeric input needs to be between 0 and 1 (inclusive)")
         if logical == 0:
             return True
         else:
             False
 
     else:
-        raise TypeError(
-            "Input must be a Logical, Interval or a numeric value.")
+        raise TypeError("Input must be a Logical, Interval or a numeric value.")
 
 
 def sometimes(logical: Logical) -> bool:
@@ -320,7 +318,8 @@ def sometimes(logical: Logical) -> bool:
     elif isinstance(logical, Interval):
         if logical.left < 0 or logical.right > 1:
             raise ValueError(
-                "If interval values needs to be between 0 and 1 (inclusive)")
+                "If interval values needs to be between 0 and 1 (inclusive)"
+            )
         if logical.left != 0 or logical.right != 0:
             return True
         else:
@@ -333,12 +332,10 @@ def sometimes(logical: Logical) -> bool:
         elif logical == 0:
             return False
         else:
-            raise ValueError(
-                "If numeric input needs to be between 0 and 1 (inclusive)")
+            raise ValueError("If numeric input needs to be between 0 and 1 (inclusive)")
 
     else:
-        raise TypeError(
-            "Input must be a Logical, Interval or a numeric value.")
+        raise TypeError("Input must be a Logical, Interval or a numeric value.")
 
 
 def xtimes(logical: Logical) -> bool:
@@ -387,7 +384,8 @@ def xtimes(logical: Logical) -> bool:
     elif isinstance(logical, Interval):
         if logical.left < 0 or logical.right > 1:
             raise ValueError(
-                "If interval values needs to be between 0 and 1 (inclusive)")
+                "If interval values needs to be between 0 and 1 (inclusive)"
+            )
         if logical.left != 0 and logical.right != 1:
             return True
         else:
@@ -400,9 +398,7 @@ def xtimes(logical: Logical) -> bool:
         elif logical == 0 or logical == 1:
             return False
         else:
-            raise ValueError(
-                "If numeric input needs to be between 0 and 1 (inclusive)")
+            raise ValueError("If numeric input needs to be between 0 and 1 (inclusive)")
 
     else:
-        raise TypeError(
-            "Input must be a Logical, Interval or a numeric value.")
+        raise TypeError("Input must be a Logical, Interval or a numeric value.")

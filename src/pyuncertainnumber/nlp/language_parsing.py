@@ -6,8 +6,7 @@ from typing import TYPE_CHECKING
 import re
 import math
 from decimal import Decimal
-from ..pba.interval import PM
-from ..pba.interval import Interval as I
+from ..pba.intervals import Interval as I
 import numpy as np
 from ..characterisation.utils import (
     PlusMinus_parser,

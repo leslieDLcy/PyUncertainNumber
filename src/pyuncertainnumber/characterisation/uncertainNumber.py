@@ -6,7 +6,6 @@ import functools
 # from .variability import Variability
 from .uncertainty_types import Uncertainty_types
 from .ensemble import Ensemble
-from ..pba.interval import Interval as nInterval
 from .utils import *
 from ..pba.params import Params
 from pint import UnitRegistry
@@ -20,6 +19,7 @@ from typing import Sequence
 from ..pba.distributions import Distribution, named_dists
 from ..pba.operation import convert
 from ..pba.intervalOperators import parse_bounds
+from ..pba.intervals.number import Interval
 
 """ Uncertain Number class """
 
@@ -52,7 +52,7 @@ class UncertainNumber:
     masses: list[float] = field(default=None, repr=False)
     bounds: Union[List[float], str] = field(default=None)
     distribution_parameters: list[str, float | int] = field(default=None)
-    pbox_parameters: list[str, Sequence[nInterval]] = field(default=None, repr=False)
+    pbox_parameters: list[str, Sequence[Interval]] = field(default=None, repr=False)
     hedge: str = field(default=None, repr=False)
     _construct: Type[any] = field(default=None, repr=False)
     # this is the deterministic numeric representation of the
@@ -288,13 +288,13 @@ class UncertainNumber:
     def fromConstruct(cls, construct):
         """create an Uncertain Number from a construct object"""
         from ..pba.pbox_base import Pbox
-        from ..pba.interval import Interval as nInterval
+        from ..pba.interval import Interval as Interval
         from ..pba.ds import DempsterShafer
         from ..pba.distributions import Distribution
 
         if isinstance(construct, Pbox):
             return cls.from_pbox(construct)
-        if isinstance(construct, nInterval):
+        if isinstance(construct, Interval):
             return cls.from_Interval(construct)
         if isinstance(construct, DempsterShafer):
             return cls.from_ds(construct)
@@ -365,9 +365,9 @@ class UncertainNumber:
     def __add__(self, other):
         """add two uncertain numbers"""
         if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(nInterval(other))
+            other = UncertainNumber.from_Interval(Interval(other))
         a, b = self._construct, other._construct
-        if isinstance(a, nInterval) and isinstance(b, nInterval):
+        if isinstance(a, Interval) and isinstance(b, Interval):
             r = a + b
             return UncertainNumber.from_Interval(r)
         else:
@@ -383,10 +383,10 @@ class UncertainNumber:
     def __sub__(self, other):
 
         if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(nInterval(other))
+            other = UncertainNumber.from_Interval(Interval(other))
         a, b = self._construct, other._construct
 
-        if isinstance(a, nInterval) and isinstance(b, nInterval):
+        if isinstance(a, Interval) and isinstance(b, Interval):
             r = a - b
             return UncertainNumber.from_Interval(r)
         else:
@@ -397,9 +397,9 @@ class UncertainNumber:
         """multiply two uncertain numbers"""
 
         if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(nInterval(other))
+            other = UncertainNumber.from_Interval(Interval(other))
         a, b = self._construct, other._construct
-        if isinstance(a, nInterval) and isinstance(b, nInterval):
+        if isinstance(a, Interval) and isinstance(b, Interval):
             r = a * b
             return UncertainNumber.from_Interval(r)
         else:
@@ -413,10 +413,10 @@ class UncertainNumber:
         """divide two uncertain numbers"""
 
         if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(nInterval(other))
+            other = UncertainNumber.from_Interval(Interval(other))
 
         a, b = self._construct, other._construct
-        if isinstance(a, nInterval) and isinstance(b, nInterval):
+        if isinstance(a, Interval) and isinstance(b, Interval):
             r = a / b
             return UncertainNumber.from_Interval(r)
         else:
@@ -430,9 +430,9 @@ class UncertainNumber:
         """power of two uncertain numbers"""
 
         if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(nInterval(other))
+            other = UncertainNumber.from_Interval(Interval(other))
         a, b = self._construct, other._construct
-        if isinstance(a, nInterval) and isinstance(b, nInterval):
+        if isinstance(a, Interval) and isinstance(b, Interval):
             r = a**b
             return UncertainNumber.from_Interval(r)
         else:

@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from .intervalOperators import make_vec_interval
 from collections import namedtuple
 from .aggregation import stacking
-from .interval import Interval as nInterval
 from .intervals import Interval
 
 dempstershafer_element = namedtuple("dempstershafer_element", ["interval", "mass"])
@@ -79,7 +78,7 @@ class DempsterShafer:
 
 @mpl.rc_context({"text.usetex": True})
 def plot_DS_structure(
-    vec_interval: list[nInterval | Interval],
+    vec_interval: list[Interval],
     weights=None,
     offset=0.3,
     ax=None,

@@ -1,6 +1,5 @@
 from functools import singledispatch
 import numpy as np
-from .interval import Interval as nInterval
 from .intervals import intervalise, Interval
 from ..nlp.language_parsing import parse_interval_expression, hedge_interpret
 
@@ -35,21 +34,16 @@ def _str(bounds: str):
 @singledispatch
 def wc_interval(bound):
     """wildcard scalar interval"""
-    return nInterval(bound)
+    return Interval(bound)
 
 
 @wc_interval.register(list)
 def _arraylike(bound: list):
-    return nInterval(bound)
+    return Interval(bound)
 
 
 @wc_interval.register(Interval)
 def _marco_interval_like(bound: Interval):
-    return nInterval(np.ndarray.item(bound.lo), np.ndarray.item(bound.hi))
-
-
-@wc_interval.register(nInterval)
-def _nick_interval_like(bound: nInterval):
     return bound
 
 

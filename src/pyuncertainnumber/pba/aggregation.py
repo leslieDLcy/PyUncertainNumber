@@ -1,19 +1,19 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 import numpy as np
 import itertools
 import numpy as np
-from .operation import convert
 from .intervalOperators import make_vec_interval
 from .utils import weighted_ecdf, CDF_bundle, reweighting
 import matplotlib.pyplot as plt
-from typing import TYPE_CHECKING
 from .intervals import Interval
 import importlib
+import functools
 
+from .pbox_abc import Staircase, convert_pbox
 
 if TYPE_CHECKING:
     from .pbox_base import Pbox
-    from .interval import nInterval
     from .ds import DempsterShafer
 
 makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
@@ -35,11 +35,10 @@ def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
     """
 
     from .pbox_base import Pbox
-    from .interval import Interval as nInterval
     from .ds import DempsterShafer
     from .intervals import Interval
 
-    if isinstance(l_uns[0], nInterval | Interval | list):
+    if isinstance(l_uns[0], Interval | list):
         return stacking(l_uns, weights, display=display, **kwargs)
     elif isinstance(l_uns[0], Pbox):
         return mixture_pbox(l_uns, weights, display=display)
@@ -48,7 +47,7 @@ def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
 
 
 def stacking(
-    vec_interval: nInterval | Interval | list[Interval],
+    vec_interval: Interval | list[Interval],
     weights=None,
     display=False,
     ax=None,
@@ -131,15 +130,11 @@ def mixture_ds(l_ds, display=False):
     # return stacking(intervals, masses, display=display)
 
 
-def mixture_cdf():
-    pass
-
-
-def imposition(*args: Pbox | nInterval | float | int):
-    """Returns the imposition/intersection of the p-boxes in *args
+def imposition(l_un: list[Staircase | float | int]) -> Staircase:
+    """Returns the imposition/intersection of the list of p-boxes
 
     args:
-        - UN objects to be mixed
+        - l_un (list): a list of UN objects to be mixed
 
     returns:
         - Pbox
@@ -148,11 +143,11 @@ def imposition(*args: Pbox | nInterval | float | int):
         - #TODO verfication needed for the base function `p1.imp(p2)`
     """
 
-    def binary_imp(p1: Pbox, p2: Pbox) -> Pbox:
+    def binary_imp(p1, p2):
         return p1.imp(p2)
 
-    xs = [convert(x) for x in args]
-    return list(itertools.accumulate(xs, func=binary_imp))[-1]
+    xs = [convert_pbox(x) for x in l_un]
+    return functools.reduce(binary_imp, xs)
 
     # p = xs[0]
     # for i in range(1, len(xs)):
@@ -160,55 +155,59 @@ def imposition(*args: Pbox | nInterval | float | int):
     # return p
 
 
-def envelope(*args: nInterval | Pbox | float) -> nInterval | Pbox:
-    """
-    .. _core.envelope:
+def envelope():
+    pass
 
-    Allows the envelope to be calculated for intervals and p-boxes.
 
-    The envelope is the smallest interval/pbox that contains all values within the arguments.
+# def envelope(*args: Pbox | float) -> Pbox:
+#     """
+#     .. _core.envelope:
 
-    **Parameters**:
-        ``*args``: The arguments for which the envelope needs to be calculated. The arguments can be intervals, p-boxes, or floats.
+#     Allows the envelope to be calculated for intervals and p-boxes.
 
-    **Returns**:
-        ``Pbox|Interval``: The envelope of the given arguments, which can be an interval or a p-box.
+#     The envelope is the smallest interval/pbox that contains all values within the arguments.
 
-    .. error::
+#     **Parameters**:
+#         ``*args``: The arguments for which the envelope needs to be calculated. The arguments can be intervals, p-boxes, or floats.
 
-        ``ValueError``: If less than two arguments are given.
+#     **Returns**:
+#         ``Pbox|Interval``: The envelope of the given arguments, which can be an interval or a p-box.
 
-        ``TypeError``: If none of the arguments are intervals or p-boxes.
+#     .. error::
 
-    """
-    # Raise error if <2 arguments are given
-    assert len(args) >= 2, "At least two arguments are required"
+#         ``ValueError``: If less than two arguments are given.
 
-    # get the type of all arguments
-    types = [arg.__class__.__name__ for arg in args]
+#         ``TypeError``: If none of the arguments are intervals or p-boxes.
 
-    # check if all arguments are intervals or pboxes
-    if "Interval" not in types and "Pbox" not in types:
-        raise TypeError("At least one argument needs to be an Interval or Pbox")
-    # check if there is a p-box in the arguments
-    elif "Pbox" in types:
-        # find first p-box
-        i = types.index("Pbox")
-        # move previous values to the end
-        args = args[i:] + args[:i]
+#     """
+#     # Raise error if <2 arguments are given
+#     assert len(args) >= 2, "At least two arguments are required"
 
-        e = args[0].env(args[1])
-        for arg in args[2:]:
-            e = e.env(arg)
+#     # get the type of all arguments
+#     types = [arg.__class__.__name__ for arg in args]
 
-    else:  # Intervals only
+#     # check if all arguments are intervals or pboxes
+#     if "Interval" not in types and "Pbox" not in types:
+#         raise TypeError("At least one argument needs to be an Interval or Pbox")
+#     # check if there is a p-box in the arguments
+#     elif "Pbox" in types:
+#         # find first p-box
+#         i = types.index("Pbox")
+#         # move previous values to the end
+#         args = args[i:] + args[:i]
 
-        left = np.min([arg.left if isinstance(arg, nInterval) else arg for arg in args])
+#         e = args[0].env(args[1])
+#         for arg in args[2:]:
+#             e = e.env(arg)
 
-        right = np.max(
-            [arg.right if isinstance(arg, nInterval) else arg for arg in args]
-        )
+#     else:  # Intervals only
 
-        e = nInterval(left, right)
+#         left = np.min([arg.left if isinstance(arg, nInterval) else arg for arg in args])
 
-    return e
+#         right = np.max(
+#             [arg.right if isinstance(arg, nInterval) else arg for arg in args]
+#         )
+
+#         e = nInterval(left, right)
+
+#     return e

@@ -4,7 +4,7 @@ from typing import Self
 from warnings import *
 import numpy as np
 from matplotlib import pyplot as plt
-from .interval import Interval as nInterval
+
 from .utils import (
     find_nearest,
     is_increasing,
@@ -39,7 +39,7 @@ class Pbox:
     ):
         """
         args:
-            - left (list, NumPy array, nInterval or numeric type): Left bound of the p-box.
+            - left (list, NumPy array,   or numeric type): Left bound of the p-box.
 
         note:
             - If left is None, the left bound is set to -inf.
@@ -69,20 +69,6 @@ class Pbox:
             if left is None and right is None:
                 left = np.array([-np.inf] * steps)
                 right = np.array([np.inf] * steps)
-
-            if isinstance(left, nInterval):
-                left = np.array([left.left] * steps)
-            elif isinstance(left, list):
-                left = _interval_list_to_array(left)
-            elif not isinstance(left, np.ndarray):
-                left = np.array([left] * steps)
-
-            if isinstance(right, nInterval):
-                right = np.array([right.right] * steps)
-            elif isinstance(right, list):
-                right = _interval_list_to_array(right, left=False)
-            elif not isinstance(right, np.ndarray):
-                right = np.array([right] * steps)
 
             # if len(left) == len(right) and len(left) != steps:
             #     print("WARNING: The left and right arrays have the same length which is inconsistent with steps.")
@@ -306,7 +292,7 @@ class Pbox:
 
     def _checkmoments(self):
 
-        a = nInterval(self.mean_left, self.mean_right)  # mean(x)
+        a = (self.mean_left, self.mean_right)  # mean(x)
         b = _dwMean(self)
 
         self.mean_left = np.max([left(a), left(b)])
@@ -317,7 +303,7 @@ class Pbox:
             self.mean_left = left(b)
             self.mean_right = right(b)
 
-        a = nInterval(self.var_left, self.var_right)  # var(x)
+        a = (self.var_left, self.var_right)  # var(x)
         b = _dwMean(self)
 
         self.var_left = np.max([left(a), left(b)])
@@ -334,13 +320,13 @@ class Pbox:
         """get the bounds on the cumulative probability associated with any x-value"""
         lo_ind = find_nearest(self.right, x)
         hi_ind = find_nearest(self.left, x)
-        return nInterval(Params.p_values[lo_ind], Params.p_values[hi_ind])
+        return (Params.p_values[lo_ind], Params.p_values[hi_ind])
 
     def cuth(self, p=0.5):
         """get the bounds on the quantile at any particular probability level"""
         # TODO have a conservative cut.
         ind = find_nearest(Params.p_values, p)
-        return nInterval(self.left[ind], self.right[ind])
+        return (self.left[ind], self.right[ind])
 
     def outer_approximate(self, n=100):
         """outer approximation of a p-box
@@ -366,7 +352,7 @@ class Pbox:
     def _unary(self, *args, function=lambda x: x):
         """for monotonic unary functions only"""
 
-        ints = [function(nInterval(l, r), *args) for l, r in zip(self.left, self.right)]
+        ints = [function((l, r), *args) for l, r in zip(self.left, self.right)]
         return Pbox(
             left=np.array([i.left for i in ints]),
             right=np.array([i.right for i in ints]),
@@ -407,7 +393,7 @@ class Pbox:
         if self.steps != other.steps:
             raise ArithmeticError("Both Pboxes must have the same number of steps")
 
-    def add(self, other: Self | nInterval | float | int, method="f") -> Self:
+    def add(self, other: Self | float | int, method="f") -> Self:
         """addtion of uncertain numbers with the defined dependency method"""
 
         self.check_dependency(method)
@@ -463,7 +449,7 @@ class Pbox:
 
             return Pbox(left=nleft, right=nright, steps=self.steps)
 
-    def pow(self, other: Self | nInterval | float | int, method="f") -> Self:
+    def pow(self, other: Self | float | int, method="f") -> Self:
         """Raises a p-box to the power of other using the defined dependency method"""
 
         self.check_dependency(method)
@@ -817,13 +803,13 @@ class Pbox:
         else:
             return self.env(self.max(other, method), min(self.add(other, method), 1))
 
-    def get_interval(self, *args) -> nInterval:
+    def get_interval(self, *args):
 
         if len(args) == 1:
 
             if args[0] == 1:
                 # asking for whole pbox bounds
-                return nInterval(min(self.left), max(self.right))
+                return (min(self.left), max(self.right))
 
             p1 = (1 - args[0]) / 2
             p2 = 1 - p1
@@ -848,9 +834,9 @@ class Pbox:
 
         x1 = self.left[y1]
         x2 = self.right[y2]
-        return nInterval(x1, x2)
+        return (x1, x2)
 
-    def get_probability(self, val) -> nInterval:
+    def get_probability(self, val):
         p = np.append(np.insert(np.linspace(0, 1, self.steps), 0, 0), 1)
 
         i = 0
@@ -866,26 +852,26 @@ class Pbox:
 
         lb = p[j]
 
-        return nInterval(lb, ub)
+        return (lb, ub)
 
     def summary(self) -> str:
 
         return self.__repr__()
 
-    def mean(self) -> nInterval:
+    def mean(self):
         """
         Returns the mean of the pbox
         """
-        return nInterval(self.mean_left, self.mean_right)
+        return (self.mean_left, self.mean_right)
 
-    def median(self) -> nInterval:
+    def median(self):
         """
         Returns the median of the distribution
         """
-        return nInterval(np.median(self.left), np.median(self.right))
+        return (np.median(self.left), np.median(self.right))
 
-    def support(self) -> nInterval:
-        return nInterval(min(self.left), max(self.right))
+    def support(self):
+        return (min(self.left), max(self.right))
 
     def get_x(self):
         """returns the x values for plotting"""
@@ -1079,11 +1065,13 @@ class Pbox:
 def env_int(*args):
     left = min([min(i) if hasattr(i, "__iter__") else i for i in args])
     right = max([max(i) if hasattr(i, "__iter__") else i for i in args])
-    return nInterval(left, right)
+    return (left, right)
 
 
 def left(imp):
-    if isinstance(imp, nInterval) or isinstance(
+    if isinstance(
+        imp,
+    ) or isinstance(
         imp, Pbox
     ):  # neither "pba.pbox.Pbox" nor "pbox.Pbox" works (with or without quotemarks), even though type(b) is <class 'pba.pbox.Pbox' and isinstance(pba.norm(5,1),pba.pbox.Pbox) is True
         return imp.left
@@ -1094,7 +1082,9 @@ def left(imp):
 
 
 def right(imp):
-    if isinstance(imp, nInterval) or isinstance(imp, Pbox):
+    if isinstance(
+        imp,
+    ) or isinstance(imp, Pbox):
         return imp.right
     elif hasattr(imp, "__iter__"):
         return max(imp)
@@ -1200,15 +1190,15 @@ def _sideVariance(w, mu=None):
 
 
 def _dwMean(pbox):
-    return nInterval(np.mean(pbox.right), np.mean(pbox.left))
+    return (np.mean(pbox.right), np.mean(pbox.left))
 
 
 def _dwMean(pbox):
     if np.any(np.isinf(pbox.left)) or np.any(np.isinf(pbox.right)):
-        return nInterval(0, np.inf)
+        return (0, np.inf)
 
     if np.all(pbox.right[0] == pbox.right) and np.all(pbox.left[0] == pbox.left):
-        return nInterval(0, (pbox.right[0] - pbox.left[0]) ** (2 / 4))
+        return (0, (pbox.right[0] - pbox.left[0]) ** (2 / 4))
 
     vr = _sideVariance(pbox.left, np.mean(pbox.left))
     w = np.copy(pbox.left)
@@ -1245,7 +1235,7 @@ def _dwMean(pbox):
             elif v < vl:
                 vl = v
 
-    return nInterval(vl, vr)
+    return (vl, vr)
 
 
 def _DivByZeroCheck(bound):

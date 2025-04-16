@@ -624,22 +624,20 @@ def convert_pbox(un):
     """
 
     from .pbox_base import Pbox
-    from .interval import Interval as nInterval
     from .ds import DempsterShafer
     from .distributions import Distribution
     from .intervals.number import Interval as I
 
     if isinstance(un, Box):
         return un
-    elif isinstance(un, nInterval):
-        return Pbox(un.left, un.right)
     elif isinstance(un, I):
-        return Staircase(
-            left=np.repeat(un.lo, Params.steps),
-            right=np.repeat(un.hi, Params.steps),
-            mean=un,
-            var=I(0, (un.hi - un.lo) * (un.hi - un.lo) / 4),
-        )
+        return un.to_pbox()
+        # return Staircase(
+        #     left=np.repeat(un.lo, Params.steps),
+        #     right=np.repeat(un.hi, Params.steps),
+        #     mean=un,
+        #     var=I(0, (un.hi - un.lo) * (un.hi - un.lo) / 4),
+        # )
     elif isinstance(un, Pbox):
         return un
     elif isinstance(un, Distribution):
