@@ -51,7 +51,7 @@ def aleatory_propagation(
     fun: Callable = None,
     n_sam: int = 500,
     method: str = "monte_carlo",
-    save_raw_data="no",
+    save_raw_data=False,
     *,  # Keyword-only arguments start here
     base_path=np.nan,
     **kwargs,
@@ -93,11 +93,7 @@ def aleatory_propagation(
     """
     # Input validation
 
-    if save_raw_data not in ("yes", "no"):  # Input validation
-        raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
-
     match method:
-
         case "monte_carlo" | "latin_hypercube":
             assert n_sam is not None, "number of samples) is required for sampling "
 

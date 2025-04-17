@@ -3,10 +3,12 @@ import tqdm
 from typing import Callable
 from scipy.stats import qmc  # Import Latin Hypercube Sampling from SciPy
 from pyuncertainnumber.propagation.utils import Propagation_results
+from pyuncertainnumber import UncertainNumber
+from ...pba.distributions import Distribution
 
 
 def sampling_aleatory_method(
-    x: list,
+    xs: list[Distribution | UncertainNumber],
     f: Callable,
     method: str = "monte_carlo",
     n_sam: int = 1_000,
@@ -18,9 +20,8 @@ def sampling_aleatory_method(
         when its inputs are uncertain and described by probability distributions.
 
     args:
-        x (list): A list of `UncertainNumber` objects, each representing an input
-                 variable with its associated uncertainty.
-        f (Callable): A callable function that takes a 1D NumPy array of input
+        xs (list): A list of `UncertainNumber` or `Distribution` objects;
+        f (Callable): A callable function that takes input
                   values and returns the corresponding output(s). Can be None,
                   in which case only samples are generated.
         results (Propagation_results, optional): An object to store propagation results.
@@ -34,7 +35,7 @@ def sampling_aleatory_method(
                                                   sampling for better space coverage)
                             Defaults to 'monte_carlo'.
         n_sam (int): The number of samples to generate for the chosen sampling method.
-                Defaults to 500.
+                Defaults to 1000.
         save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw
           input data when a function (f) is not provided.
           - 'no': Returns an error that no function is provided.
@@ -67,21 +68,30 @@ def sampling_aleatory_method(
     if results is None:
         results = Propagation_results()
 
-    assert callable(f), "The function f must be callable."
+    assert callable(f), "The function f must be a callable."
 
     print(f"Total number of input combinations for the {method} method: {n_sam}")
 
     match method:
         case "monte_carlo":
-            samples = np.array([un.random(size=n_sam) for un in x])
+            if isinstance(xs[0], Distribution):
+                samples = [d.sample(n_sam) for d in xs]
+            elif isinstance(xs[0], UncertainNumber):
+                samples = [un.construct.sample(n_sam) for un in xs]
+            else:
+                raise ValueError(
+                    "The input must be a list of UncertainNumber or Distribution objects."
+                )
+            # samples = np.stack(samples, axis=1)
+            # samples = np.array([un.random(size=n_sam) for un in x])
         case "latin_hypercube":
-            sampler = qmc.LatinHypercube(d=len(x))
+            sampler = qmc.LatinHypercube(d=len(xs))
             lhd_samples = sampler.random(n=n_sam)
 
             samples = []  # Initialize an empty list to store the samples
 
             for i, un in enumerate(
-                x
+                xs
             ):  # Iterate over each UncertainNumber in the list 'x'
                 # Get the entire column of quantiles for this UncertainNumber
                 q_values = lhd_samples[:, i]
@@ -135,4 +145,4 @@ def sampling_aleatory_method(
         return results
     else:
         # simpler logic
-        return f(samples)
+        return f(*samples)
