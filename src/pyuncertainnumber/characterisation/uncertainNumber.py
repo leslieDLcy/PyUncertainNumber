@@ -24,6 +24,8 @@ from numbers import Number
 from ..pba.distributions import Distribution
 from ..pba.intervalOperators import wc_scalar_interval
 from ..pba.pbox_abc import Leaf
+import operator
+
 
 """ Uncertain Number class """
 
@@ -63,14 +65,14 @@ class UncertainNumber:
         >>> UncertainNumber(name="velocity", symbol="v", units="m/s", bounds=[1, 2])
     """
 
-    # ---------------------Basic---------------------#
+    # * ---------------------Basic---------------------*#
     name: str = field(default=None)
     symbol: str = field(default=None)
     # string input of units, e.g. 'm/s'
     units: Type[any] = field(default=None, repr=False)
     _Q: Type[any] = field(default=None, repr=False)
 
-    # ---------------------Value---------------------#
+    # * ---------------------Value---------------------*#
     # ensemble: Type[Ensemble] = field(default=None)
     uncertainty_type: Type[Uncertainty_types] = field(default=None, repr=False)
     essence: str = field(default=None)  # [interval, distribution, pbox, ds]
@@ -389,24 +391,24 @@ class UncertainNumber:
 
     # * ---------------------binary operations---------------------#
 
+    def bin_ops(self, other, ops):
+        from ..pba.intervalOperators import convert_pbox
+
+        try:
+            return ops(self._construct, other._construct)
+        except:
+            a = convert_pbox(self._construct)
+            b = convert_pbox(other._construct)
+            return UncertainNumber.fromConstruct(ops(a, b, ops))
+
     def __add__(self, other):
         """add two uncertain numbers"""
-        if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(Interval(other))
-        a, b = self._construct, other._construct
-        if isinstance(a, Interval) and isinstance(b, Interval):
-            r = a + b
-            return UncertainNumber.from_Interval(r)
-        else:
-            r = convert(a) + convert(b)
-        # TODO unit handling for arithmetic operations not implemented
-        # TODO due to the stupid multi Registry error
-        # newQ = self._Q + other._Q
-        return UncertainNumber.from_pbox(r)
+        return self.bin_ops(self, other, operator.add)
 
     def __radd__(self, other):
         return self.__add__(other)
 
+    ## TODO for later on ops
     def __sub__(self, other):
 
         if isinstance(other, float | int | np.number):
@@ -912,63 +914,6 @@ def foldcauchy(*args):
     return "foldcauchy"
 
 
-# def foldnorm(mu, s, steps=Params.steps):
-
-#     x = np.linspace(0.0001, 0.9999, steps)
-#     if mu.__class__.__name__ != "wc_scalar_interval":
-#         mu = wc_scalar_interval(mu)
-#     if s.__class__.__name__ != "wc_scalar_interval":
-#         s = wc_scalar_interval(s)
-
-#     new_args = [
-#         [mu.lo() / s.lo(), 0, s.lo()],
-#         [mu.hi() / s.lo(), 0, s.lo()],
-#         [mu.lo() / s.hi(), 0, s.hi()],
-#         [mu.hi() / s.hi(), 0, s.hi()],
-#     ]
-
-#     bounds = []
-
-#     mean_hi = -np.inf
-#     mean_lo = np.inf
-#     var_lo = np.inf
-#     var_hi = 0
-
-#     for a in new_args:
-
-#         bounds.append(sps.foldnorm.ppf(x, *a))
-#         bmean, bvar = sps.foldnorm.stats(*a, moments="mv")
-
-#         if bmean < mean_lo:
-#             mean_lo = bmean
-#         if bmean > mean_hi:
-#             mean_hi = bmean
-#         if bvar > var_hi:
-#             var_hi = bvar
-#         if bvar < var_lo:
-#             var_lo = bvar
-
-#     Left = [min([b[i] for b in bounds]) for i in range(steps)]
-#     Right = [max([b[i] for b in bounds]) for i in range(steps)]
-
-#     var = wc_scalar_interval(np.float64(var_lo), np.float64(var_hi))
-#     mean = wc_scalar_interval(np.float64(mean_lo), np.float64(mean_hi))
-
-#     Left = np.array(Left)
-#     Right = np.array(Right)
-
-#     return Pbox(
-#         Left,
-#         Right,
-#         steps=steps,
-#         shape="foldnorm",
-#         mean_left=mean.left,
-#         mean_right=mean.right,
-#         var_left=var.left,
-#         var_right=var.right,
-#     )
-
-
 @makeUNPbox
 def genlogistic(*args):
     return "genlogistic"
@@ -1360,58 +1305,3 @@ from ..pba.pbox_parametric import lognormal, uniform
 
 uniform = constructUN(uniform)
 lognormal = constructUN(lognormal)
-
-# def trapz(a, b, c, d, steps=Params.steps):
-#     if a.__class__.__name__ != "wc_scalar_interval":
-#         a = wc_scalar_interval(a)
-#     if b.__class__.__name__ != "wc_scalar_interval":
-#         b = wc_scalar_interval(b)
-#     if c.__class__.__name__ != "wc_scalar_interval":
-#         c = wc_scalar_interval(c)
-#     if d.__class__.__name__ != "wc_scalar_interval":
-#         d = wc_scalar_interval(d)
-
-#     x = np.linspace(0.0001, 0.9999, steps)
-#     left = sps.trapz.ppf(
-#         x, *sorted([b.lo() / d.lo(), c.lo() / d.lo(), a.lo(), d.lo() - a.lo()])
-#     )
-#     right = sps.trapz.ppf(
-#         x, *sorted([b.hi() / d.hi(), c.hi() / d.hi(), a.hi(), d.hi() - a.hi()])
-#     )
-
-#     return Pbox(left, right, steps=steps, shape="trapz")
-
-
-# def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
-
-#     if left.__class__.__name__ != "wc_scalar_interval":
-#         left = wc_scalar_interval(left)
-#     if right.__class__.__name__ != "wc_scalar_interval":
-#         right = wc_scalar_interval(right)
-#     if mean.__class__.__name__ != "wc_scalar_interval":
-#         mean = wc_scalar_interval(mean)
-#     if stddev.__class__.__name__ != "wc_scalar_interval":
-#         stddev = wc_scalar_interval(stddev)
-
-#     a, b = (left - mean) / stddev, (right - mean) / stddev
-
-#     Left, Right, mean, var = _get_bounds("truncnorm", steps, a, b, mean, stddev)
-
-#     return Pbox(
-#         Left,
-#         Right,
-#         steps=steps,
-#         shape="truncnorm",
-#         mean_left=mean.left,
-#         mean_right=mean.right,
-#         var_left=var.left,
-#         var_right=var.right,
-#     )
-
-
-# def weibull(*args, steps=Params.steps):
-
-#     wm = weibull_max(*args)
-#     wl = weibull_min(*args)
-
-#     return Pbox(left=wl.left, right=wm.right)
