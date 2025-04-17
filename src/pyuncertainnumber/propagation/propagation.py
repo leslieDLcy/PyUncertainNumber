@@ -18,8 +18,10 @@ from abc import ABC, abstractmethod
 
 
 class P(ABC):
-    def __init__(self, save_results: bool = False):
+    def __init__(self, vars, save_results: bool = False):
+        self.vars = vars
         self.save_results = save_results
+        self.type_check()
 
     @abstractmethod
     def type_check(self):
@@ -36,7 +38,11 @@ class AleatoryPropagation(P):
 
     def type_check(self):
         """only distributions"""
-        return super().type_check()
+        from ..pba.distributions import Distribution
+
+        assert all(
+            [isinstance(v, Distribution) for v in self.vars]
+        ), "Not all variables are distributions"
 
     def __call__(self):
         """doing the propagation"""
@@ -49,7 +55,16 @@ class EpistemicPropagation(P):
 
     def type_check(self):
         """only intervals"""
-        return super().type_check()
+
+        from ..pba.intervals.number import Interval
+
+        assert all(
+            [isinstance(v, Interval) for v in self.vars]
+        ), "Not all variables are intervals"
+
+    def __call__(self):
+        """doing the propagation"""
+        pass
 
 
 class Propagation:

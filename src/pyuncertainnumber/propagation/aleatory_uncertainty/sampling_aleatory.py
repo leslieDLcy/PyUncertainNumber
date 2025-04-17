@@ -11,8 +11,9 @@ def sampling_aleatory_method(
     method: str = "monte_carlo",
     n_sam: int = 1_000,
     results: Propagation_results = None,
-    save_raw_data: str = "no",
+    save_raw_data=False,
 ) -> Propagation_results:  # Specify return type
+    #! leslie: I prefer returning the raw output sample
     """Performs aleatory uncertainty propagation using Monte Carlo or Latin Hypercube sampling,
         when its inputs are uncertain and described by probability distributions.
 
@@ -47,7 +48,9 @@ def sampling_aleatory_method(
         This fuction allows only for the propagation of independent variables.
 
     returns:
-        Returns `Propagation_results` object(s) containing:
+        Returns response samples or a `Propagation_results` object:
+
+        `Propagation_results` object(s) containing:
             - 'un': UncertainNumber object(s) to represent the empirical distribution(s) of the output(s).
             - 'raw_data' (dict): Dictionary containing raw data shared across output(s):
                     - 'x' (np.ndarray): Input values.
@@ -64,18 +67,18 @@ def sampling_aleatory_method(
     if results is None:
         results = Propagation_results()
 
-    if save_raw_data not in ("yes", "no"):
-        raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
+    assert callable(f), "The function f must be callable."
 
     print(f"Total number of input combinations for the {method} method: {n_sam}")
+
     match method:
         case "monte_carlo":
-            parameter_samples = np.array([un.random(size=n_sam) for un in x])
+            samples = np.array([un.random(size=n_sam) for un in x])
         case "latin_hypercube":
             sampler = qmc.LatinHypercube(d=len(x))
             lhd_samples = sampler.random(n=n_sam)
 
-            parameter_samples = []  # Initialize an empty list to store the samples
+            samples = []  # Initialize an empty list to store the samples
 
             for i, un in enumerate(
                 x
@@ -93,41 +96,43 @@ def sampling_aleatory_method(
                     ppf_values.append(ppf_value)
 
                 # Add the list of ppf values to the main list
-                parameter_samples.append(ppf_values)
+                samples.append(ppf_values)
 
             # Convert the list of lists to a NumPy array
-            parameter_samples = np.array(parameter_samples)
+            samples = np.array(samples)
 
         case _:
             raise ValueError("Invalid UP method!")
 
-    # Transpose to have each row as a sample
-    parameter_samples = parameter_samples.T
+    # TODO discuss how to save verbose raw data
 
-    if f is not None:  # Only evaluate if f is provided
-        all_output = np.array(
-            [
-                f(xi)
-                for xi in tqdm.tqdm(
-                    parameter_samples, desc="function evaluations for samples"
-                )
-            ]
-        )
+    if save_raw_data:
+        # Transpose to have each row as a sample
+        samples = samples.T
 
-        if all_output.ndim == 1:  # If f returns a single output
-            # Reshape to a column vector
-            all_output = all_output.reshape(-1, 1)
+        if f is not None:  # Only evaluate if f is provided
+            all_output = np.array(
+                [
+                    f(xi)
+                    for xi in tqdm.tqdm(
+                        samples, desc="function evaluations for samples"
+                    )
+                ]
+            )
 
-        # if save_raw_data == 'yes':
-        results.add_raw_data(x=parameter_samples)
-        results.add_raw_data(f=all_output)
+            if all_output.ndim == 1:  # If f returns a single output
+                # Reshape to a column vector
+                all_output = all_output.reshape(-1, 1)
 
-    elif save_raw_data == "yes":  # If f is None and save_raw_data is 'yes'
-        results.add_raw_data(x=parameter_samples)
+            # if save_raw_data == 'yes':
+            results.add_raw_data(x=samples)
+            results.add_raw_data(f=all_output)
+        else:
+            raise ValueError(
+                "No function is provided. Select save_raw_data = 'yes' to save the input combinations."
+            )
 
+        return results
     else:
-        raise ValueError(
-            "No function is provided. Select save_raw_data = 'yes' to save the input combinations."
-        )
-
-    return results
+        # simpler logic
+        return f(samples)

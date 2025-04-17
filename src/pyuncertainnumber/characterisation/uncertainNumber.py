@@ -299,6 +299,10 @@ class UncertainNumber:
     def construct(self):
         return self._construct
 
+    @property
+    def construct_type(self):
+        type(self._construct)
+
     # * ---------------------other constructors--------------------- *#
 
     @classmethod
