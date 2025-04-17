@@ -408,65 +408,26 @@ class UncertainNumber:
     def __radd__(self, other):
         return self.__add__(other)
 
-    ## TODO for later on ops
     def __sub__(self, other):
-
-        if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(Interval(other))
-        a, b = self._construct, other._construct
-
-        if isinstance(a, Interval) and isinstance(b, Interval):
-            r = a - b
-            return UncertainNumber.from_Interval(r)
-        else:
-            r = convert(a) - convert(b)
-        return UncertainNumber.from_pbox(r)
+        return self.bin_ops(self, other, operator.sub)
 
     def __mul__(self, other):
         """multiply two uncertain numbers"""
-
-        if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(Interval(other))
-        a, b = self._construct, other._construct
-        if isinstance(a, Interval) and isinstance(b, Interval):
-            r = a * b
-            return UncertainNumber.from_Interval(r)
-        else:
-            r = convert(a) * convert(b)
-        return UncertainNumber.from_pbox(r)
+        return self.bin_ops(self, other, operator.mul)
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
         """divide two uncertain numbers"""
-
-        if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(Interval(other))
-
-        a, b = self._construct, other._construct
-        if isinstance(a, Interval) and isinstance(b, Interval):
-            r = a / b
-            return UncertainNumber.from_Interval(r)
-        else:
-            r = convert(a) / convert(b)
-        return UncertainNumber.from_pbox(r)
+        return self.bin_ops(self, other, operator.truediv)
 
     def __rtruediv__(self, other):
         return self.__truediv__(other)
 
     def __pow__(self, other):
         """power of two uncertain numbers"""
-
-        if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(Interval(other))
-        a, b = self._construct, other._construct
-        if isinstance(a, Interval) and isinstance(b, Interval):
-            r = a**b
-            return UncertainNumber.from_Interval(r)
-        else:
-            r = convert(a) ** convert(b)
-        return UncertainNumber.from_pbox(r)
+        return self.bin_ops(self, other, operator.pow)
 
     @classmethod
     def _toIntervalBackend(cls, vars=None) -> np.array:
