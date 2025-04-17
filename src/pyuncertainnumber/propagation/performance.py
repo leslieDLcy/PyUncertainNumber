@@ -1,6 +1,6 @@
 import numpy as np
 
-""" This module contains the performance functions  """
+""" This module contains the some examplar performance/response functions  """
 
 
 def cb_func(x):
@@ -15,7 +15,7 @@ def cb_func(x):
             x[4]: Young's modulus (MPa)
 
     Returns:
-        np.array([deflection (m), stress (MPa)]) 
+        np.array([deflection (m), stress (MPa)])
                Returns np.array([np.nan, np.nan]) if calculation error occurs.
     """
 
@@ -25,8 +25,7 @@ def cb_func(x):
     F = x[3]
     E = x[4]
     try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
-        deflection = F * beam_length**3 / \
-            (3 * E * 10**6 * I)  # deflection in m
+        deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
         stress = F * beam_length * y / I / 1000  # stress in MPa
 
     except:
@@ -56,8 +55,7 @@ def cb_deflection(x):
     F = x[2]
     E = x[3]
     try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
-        deflection = F * beam_length**3 / \
-            (3 * E * 10**6 * I)  # deflection in m
+        deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
 
     except:
         deflection = np.nan
@@ -66,6 +64,7 @@ def cb_deflection(x):
 
 
 # --------------------- by Leslie ---------------------#
+
 
 def cb_deflection(beam_length, I, F, E):
     """compute the deflection in the cantilever beam example
@@ -82,8 +81,7 @@ def cb_deflection(beam_length, I, F, E):
                Returns np.nan if calculation error occurs.
     """
 
-    deflection = F * beam_length**3 / \
-        (3 * E * 10**6 * I)  # deflection in m
+    deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
     return deflection
 
 

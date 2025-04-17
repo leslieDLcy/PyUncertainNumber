@@ -18,7 +18,11 @@ from .epistemic_uncertainty.genetic_optimisation import genetic_optimisation_met
 from .epistemic_uncertainty.local_optimisation import local_optimisation_method
 from .epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
 from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
-
+from .mixed_uncertainty.mixed_up import (
+    interval_monte_carlo,
+    slicing,
+    double_monte_carlo,
+)
 
 if TYPE_CHECKING:
     from ..characterisation.uncertainNumber import UncertainNumber
@@ -62,8 +66,8 @@ class AleatoryPropagation(P):
         """only distributions"""
         from ..pba.distributions import Distribution
 
-        assert all(
-            [isinstance(v, Distribution) for v in self.vars]
+        assert all(isinstance(v, Distribution) for v in self.vars) or all(
+            isinstance(v.construct, Distribution) for v in self.vars
         ), "Not all variables are distributions"
 
     def method_check(self):
@@ -86,8 +90,8 @@ class EpistemicPropagation(P):
 
         from ..pba.intervals.number import Interval
 
-        assert all(
-            [isinstance(v, Interval) for v in self.vars]
+        assert all(isinstance(v.construct, Interval) for v in self.vars) or all(
+            isinstance(v, Interval) for v in self.vars
         ), "Not all variables are intervals"
 
     def method_check(self):
@@ -148,14 +152,18 @@ class MixedPropagation(P):
     def __init__(self, vars, func, method, save_results: bool = False):
         super().__init__(vars, func, method, save_results)
 
+    # assume striped UM classes
     def type_check(self):
-        """only intervals"""
-
+        """mixed UM"""
+        from ..pba.pbox_abc import Box
         from ..pba.intervals.number import Interval
+        from ..pba.distributions import Distribution
 
-        assert all(
-            [isinstance(v, Interval) for v in self.vars]
-        ), "Not all variables are intervals"
+        has_I = any(isinstance(item, Interval) for item in self.vars)
+        has_D = any(isinstance(item, Distribution) for item in self.vars)
+        has_P = any(isinstance(item, Box) for item in self.vars)
+
+        assert (has_I and has_D) or has_P, "Not a mixed uncertainty problem"
 
     def method_check(self):
         assert self.method in [
@@ -166,12 +174,25 @@ class MixedPropagation(P):
 
     def __call__(self, **kwargs):
         """doing the propagation"""
-        pass
+        match self.method:
+            case "interval_monte_carlo":
+                handler = interval_monte_carlo
+            case "slicing":
+                handler = slicing
+            case "double_monte_carlo":
+                handler = double_monte_carlo
+            case _:
+                raise ValueError("Unknown method")
+
+        results = handler(
+            self.vars, self.func, self.method, self._save_results, **kwargs
+        )
+        return results
 
 
 # top-level
 class Propagation:
-
+    # TODO I'd like to strip UN classes into construct classes herein
     def __init__(
         self,
         vars: list[UncertainNumber],
