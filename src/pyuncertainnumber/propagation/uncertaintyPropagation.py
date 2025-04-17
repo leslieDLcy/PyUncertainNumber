@@ -96,71 +96,11 @@ def aleatory_propagation(
     if save_raw_data not in ("yes", "no"):  # Input validation
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
 
-    def process_alea_results(results):
-        """
-        args:
-            - results (Propagation_results): A `Propagation_results` object containing raw
-                                    epistemic propagation results. This object is
-                                    modified in-place.
-
-        signature:
-            - process_alea_results(results: Propagation_results) -> Propagation_results
-
-        notes:
-            - Processes the results of aleatory uncertainty propagation.
-
-            - This function takes a `Propagation_results` object containing raw aleatory
-              propagation results and performs the following actions:
-
-                1. Creates `Distribution` objects:
-                    - If output data exists in `results.raw_data['f']`, it creates an 'UncertainNumber'
-                      object  for each output dimension using the sample data.
-                    - These `UncertainNumber` objects are stored in `results.un`.
-                    - They have essense = 'distribution'
-
-                2. Saves raw data (optional):
-                    - If `save_raw_data` is set to 'yes', it saves the raw propagation data
-                      (input samples and corresponding output values) to a file.
-
-        returns:
-            - Propagation_results: The modified `Propagation_results` object with
-                          `UncertainNumber` objects added to `results.un` and
-                          potentially with raw data saved to a file.
-
-        raises:
-            - ValueError: If the shape of `results.raw_data['f']` is invalid
-
-        examples:
-            >>> a = mixed_propagation(vars= [y, L, I, F, E],
-            >>>                 fun= cantilever_beam_func,
-            >>>                 method= 'monte_carlo',
-            >>>                 n_disc=8,
-            >>>                 save_raw_data= "no"
-            >>>             )
-        """
-        if results.raw_data["f"] is None:  # Access raw_data from results object
-            # UncertainNumber(essence="distribution", distribution_parameters=None, **kwargs)
-            results.un = None
-        else:
-            results.un = []
-            # Access raw_data from results object
-            for sample_data in results.raw_data["f"].T:
-                # results.un.append(UncertainNumber(essence="distribution", distribution_parameters=sample_data, **kwargs))
-                results.un.append(Distribution(sample_data=sample_data))
-
-        if save_raw_data == "yes":
-            res_path = create_folder(base_path, method)
-            save_results(results.raw_data, method=method, res_path=res_path, fun=fun)
-
-        return results
-
     match method:
 
         case "monte_carlo" | "latin_hypercube":
-            if n_sam is None:
-                raise ValueError(
-                    "n (number of samples) is required for sampling methods."
-                )
+            assert n_sam is not None, "number of samples) is required for sampling "
+
             results = sampling_aleatory_method(
                 vars,
                 fun,
@@ -247,54 +187,6 @@ def mixed_propagation(
 
     if save_raw_data not in ("yes", "no"):  # Input validation
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
-
-    def process_mixed_results(results: Propagation_results):
-        """
-        args:
-            - results (Propagation_results): A `Propagation_results` object containing raw
-                                    epistemic propagation results. This object is
-                                    modified in-place.
-
-        signature:
-            - process_mixed_results(results: Propagation_results) -> Propagation_results
-
-        notes:
-            - Processes the results of mixed uncertainty propagation.
-
-            - This function takes a `Propagation_results` object containing raw aleatory
-              propagation results and performs the following actions:
-
-                1. Creates `UncertainNumber` objects:
-                    - If output data exists in `results.raw_data['bounds']`, it creates an 'UncertainNumber'
-                      object  for each output dimension using the sample data.
-                    - These `UncertainNumber` objects are stored in `results.un`.
-                    - The `UncertainNumber` has essense = 'pbox'.
-
-                2. Saves raw data (optional):
-                    - If `save_raw_data` is set to 'yes', it saves the raw propagation data
-                      (input samples and corresponding output values) to a file.
-
-        returns:
-            - Propagation_results: The modified `Propagation_results` object with
-                          `UncertainNumber` objects added to `results.un` and
-                          potentially with raw data saved to a file.
-
-        """
-        # if results.raw_data['bounds'] is None or results.raw_data['bounds'].size == 0:
-        #     results.un = None
-        # else:
-        #     if results.raw_data['bounds'].ndim == 4:  # 2D array
-        #         results.un = UncertainNumber( essence='interval', bounds=[1, 2])  #[UncertainNumber(essence="pbox", pbox_parameters = bound, **kwargs) for bound in results.raw_data['bounds']]
-        #     elif results.raw_data['bounds'].ndim == 3:  # 1D array
-        #         results.un =  UncertainNumber( essence='interval', bounds=[1, 2]) #UncertainNumber(essence="pbox",  pbox_parameters=results.raw_data['bounds'], **kwargs)
-        #     else:
-        #         raise ValueError("Invalid shape for 'bounds'. Expected 2D array or 1D array with two values.")
-
-        # if save_raw_data == "yes":
-        # res_path = create_folder(base_path, method)
-        # save_results(results.raw_data, method=method, res_path=res_path, fun=fun)
-
-        return results
 
     match method:
         case "second_order_endpoints" | "second_order_vertex" | "endpoints" | "vertex":
@@ -469,70 +361,6 @@ def epistemic_propagation(
     if save_raw_data not in ("yes", "no"):  # Input validation
         raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
 
-    def process_results(results: Propagation_results):
-        """
-        args:
-            - results (Propagation_results): A `Propagation_results` object containing raw
-                                    epistemic propagation results. This object is
-                                    modified in-place.
-
-        notes:
-            - Processes the results of epistemic uncertainty propagation.
-
-            - This function takes a `Propagation_results` object containing raw epistemic
-              propagation results and performs the following actions:
-
-                1. Creates `UncertainNumber` objects:
-                    - If output bounds exist in `results.raw_data['bounds']`, it creates
-                     `UncertainNumber` objects with "interval" essence, representing the
-                     resulting interval uncertainty.
-                    - It handles both single-output (1D array of bounds) and multi-output
-                     (2D array of bounds) cases.
-                    - These `UncertainNumber` objects are stored in `results.un`.
-
-                2. Saves raw data (optional):
-                    - If `save_raw_data` is set to 'yes', it saves the raw propagation data
-                      to a file.
-
-        signature:
-            - process_results(results: Propagation_results) -> Propagation_results
-
-        returns:
-            - Propagation_results: The modified `Propagation_results` object with
-                          `UncertainNumber` objects added to `results.un` and
-                          potentially with raw data saved to a file.
-
-        raises:
-            - ValueError: If the shape of `results.raw_data['bounds']` is invalid.
-
-        """
-        if results.raw_data["bounds"] is None or results.raw_data["bounds"].size == 0:
-            results.un = UncertainNumber(essence="interval", bounds=None, **kwargs)
-        else:
-            if results.raw_data["bounds"].ndim == 2:  # 2D array
-                results.un = [
-                    UncertainNumber(essence="interval", bounds=bound, **kwargs)
-                    for bound in results.raw_data["bounds"]
-                ]
-            # 1D array
-            elif (
-                results.raw_data["bounds"].ndim == 1
-                and len(results.raw_data["bounds"]) == 2
-            ):
-                results.un = UncertainNumber(
-                    essence="interval", bounds=results.raw_data["bounds"], **kwargs
-                )
-            else:
-                raise ValueError(
-                    "Invalid shape for 'bounds'. Expected 2D array or 1D array with two values."
-                )
-
-        if save_raw_data == "yes":
-            res_path = create_folder(base_path, method)
-            save_results(results.raw_data, method=method, res_path=res_path, fun=fun)
-
-        return results
-
     match method:
 
         case "endpoint" | "endpoints" | "vertex":
@@ -554,6 +382,7 @@ def epistemic_propagation(
             results = subinterval_method(x, fun, results, n_sub, save_raw_data)
             return process_results(results)
 
+        # keep it for double-loop MC
         case "monte_carlo" | "latin_hypercube":
             if n_sam is None:
                 raise ValueError(

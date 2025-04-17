@@ -4,16 +4,18 @@ from typing import Callable
 from scipy.stats import qmc  # Import Latin Hypercube Sampling from SciPy
 from pyuncertainnumber.propagation.utils import Propagation_results
 
+
 def sampling_aleatory_method(
     x: list,
     f: Callable,
-    method: str ="monte_carlo",
+    method: str = "monte_carlo",
+    n_sam: int = 1_000,
     results: Propagation_results = None,
-    n_sam: int = 500,
-    save_raw_data: str ="no") -> Propagation_results:  # Specify return type
+    save_raw_data: str = "no",
+) -> Propagation_results:  # Specify return type
     """Performs aleatory uncertainty propagation using Monte Carlo or Latin Hypercube sampling,
-        when its inputs are uncertain and described by probability distributions. 
-       
+        when its inputs are uncertain and described by probability distributions.
+
     args:
         x (list): A list of `UncertainNumber` objects, each representing an input
                  variable with its associated uncertainty.
@@ -32,7 +34,7 @@ def sampling_aleatory_method(
                             Defaults to 'monte_carlo'.
         n_sam (int): The number of samples to generate for the chosen sampling method.
                 Defaults to 500.
-        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw 
+        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw
           input data when a function (f) is not provided.
           - 'no': Returns an error that no function is provided.
           - 'yes': Returns the full arrays of unique input combinations.
@@ -41,7 +43,7 @@ def sampling_aleatory_method(
         sampling_aleatory_method(x: list, f: Callable, ...) -> propagation_results
 
     note:
-        If the `f` function returns multiple outputs, the code can accomodate. 
+        If the `f` function returns multiple outputs, the code can accomodate.
         This fuction allows only for the propagation of independent variables.
 
     returns:
@@ -75,7 +77,9 @@ def sampling_aleatory_method(
 
             parameter_samples = []  # Initialize an empty list to store the samples
 
-            for i, un in enumerate(x):  # Iterate over each UncertainNumber in the list 'x'
+            for i, un in enumerate(
+                x
+            ):  # Iterate over each UncertainNumber in the list 'x'
                 # Get the entire column of quantiles for this UncertainNumber
                 q_values = lhd_samples[:, i]
 
@@ -93,16 +97,21 @@ def sampling_aleatory_method(
 
             # Convert the list of lists to a NumPy array
             parameter_samples = np.array(parameter_samples)
-        
-        case _: raise ValueError(
-                     "Invalid UP method!")
+
+        case _:
+            raise ValueError("Invalid UP method!")
 
     # Transpose to have each row as a sample
     parameter_samples = parameter_samples.T
 
     if f is not None:  # Only evaluate if f is provided
         all_output = np.array(
-            [f(xi) for xi in tqdm.tqdm(parameter_samples, desc="function evaluations for samples")]
+            [
+                f(xi)
+                for xi in tqdm.tqdm(
+                    parameter_samples, desc="function evaluations for samples"
+                )
+            ]
         )
 
         if all_output.ndim == 1:  # If f returns a single output
