@@ -14,14 +14,39 @@ import itertools
 from ..nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
-from ..pba.pbox import named_pbox
+from ..pba.pbox_parametric import named_pbox
 from typing import Sequence
 from ..pba.distributions import Distribution, named_dists
 from ..pba.operation import convert
 from ..pba.intervalOperators import parse_bounds
 from ..pba.intervals.number import Interval
+from numbers import Number
+from ..pba.distributions import Distribution
+from ..pba.intervalOperators import wc_scalar_interval
+from ..pba.pbox_abc import Leaf
 
 """ Uncertain Number class """
+
+__all__ = [
+    "UncertainNumber",
+    "I",
+    "norm",
+    "alpha",
+    "anglit",
+    "argus",
+    "arcsine",
+    "beta",
+    "betaprime",
+    "bradford",
+    "burr",
+    "burr12",
+    "cauchy",
+    "chi",
+    "chi2",
+    "cosine",
+    "uniform",
+    "lognormal",
+]
 
 
 @dataclass
@@ -59,6 +84,7 @@ class UncertainNumber:
     # UN object, which shall be linked with the 'pba' or `Intervals` package
     naked_value: float = field(default=None)
     p_flag: bool = field(default=True, repr=False)  # parameterised flag
+    _skip_post_init: bool = field(default=False, repr=False, compare=False)
 
     # * ---------------------auxlliary information---------------------*#
     # some simple boiler plates
@@ -102,6 +128,8 @@ class UncertainNumber:
             user needs to by themselves figure out the correct
             shape of the 'distribution_parameters', such as ['uniform', [1,2]]
         """
+        if self._skip_post_init:
+            return  # Exit early if we're skipping __post_init__
 
         if not self.essence:
             check_initialisation_list = [
@@ -168,7 +196,7 @@ class UncertainNumber:
         """
         pass
 
-    ##### object representations #####
+    # * ---------------------object representation---------------------* #
 
     def __str__(self):
         """the verbose user-friendly string representation
@@ -233,7 +261,7 @@ class UncertainNumber:
                         )
                         self._construct.quick_plot()
 
-    # ---------------------some class methods---------------------#
+    # * ---------------------some class methods---------------------* #
 
     def _get_concise_representation(self):
         """get a concise representation of the UN object"""
@@ -287,12 +315,11 @@ class UncertainNumber:
     @classmethod
     def fromConstruct(cls, construct):
         """create an Uncertain Number from a construct object"""
-        from ..pba.pbox_base import Pbox
-        from ..pba.interval import Interval as Interval
+        from ..pba.pbox_abc import Leaf, Staircase
         from ..pba.ds import DempsterShafer
         from ..pba.distributions import Distribution
 
-        if isinstance(construct, Pbox):
+        if isinstance(construct, Leaf | Staircase):
             return cls.from_pbox(construct)
         if isinstance(construct, Interval):
             return cls.from_Interval(construct)
@@ -336,7 +363,7 @@ class UncertainNumber:
     def from_pbox(cls, p):
         """genenal from  pbox"""
         # passPboxParameters()
-        return cls(essence="pbox", p_flag=False, _construct=p)
+        return cls(essence="pbox", p_flag=False, _construct=p, _skip_post_init=True)
 
     @classmethod
     def from_ds(cls, ds):
@@ -636,14 +663,23 @@ class UncertainNumber:
 # * ---------------------shortcuts --------------------- *#
 def makeUNPbox(func):
 
-    from ..pba.pbox import _bound_pcdf
-    from ..pba.intervalOperators import wc_scalar_interval
+    from ..pba.pbox_parametric import _bound_pcdf
 
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-        i_args = [wc_scalar_interval(arg) for arg in args]
-        shape_value = func(*args, **kwargs)
-        p = _bound_pcdf(shape_value, *i_args)
+        family_str = func(*args, **kwargs)
+        p = _bound_pcdf(family_str, *args)
+        return UncertainNumber.fromConstruct(p)
+
+    return wrapper_decorator
+
+
+def constructUN(func):
+    """from a construct to create a UN"""
+
+    @functools.wraps(func)
+    def wrapper_decorator(*args, **kwargs):
+        p = func(*args, **kwargs)
         return UncertainNumber.fromConstruct(p)
 
     return wrapper_decorator
@@ -652,21 +688,6 @@ def makeUNPbox(func):
 def I(i: str | list[float | int]) -> UncertainNumber:
     """a shortcut for the interval-type UN object"""
     return UncertainNumber.fromConstruct(parse_bounds(i))
-
-
-@makeUNPbox
-def norm(*args):
-    return "norm"
-
-
-@makeUNPbox
-def expon(*args):
-    return "expon"
-
-
-@makeUNPbox
-def gamma(*args):
-    return "gamma"
 
 
 # * ---------------------parse inputs for UN only  --------------------- *#
@@ -702,10 +723,6 @@ def match_pbox(keyword, parameters):
     if isinstance(obj, str):
         print(obj)  # print the error message
     return obj(*parameters)
-
-
-from numbers import Number
-from ..pba.distributions import Distribution
 
 
 class Parameterisation:
@@ -760,3 +777,641 @@ class ParamSpecification:
             self._true_type = "distribution"
         else:
             self._true_type = "pbox"
+
+
+# * ---------------------parametric shortcuts  --------------------- *#
+
+
+@makeUNPbox
+def norm(*args):
+    return "norm"
+
+
+@makeUNPbox
+def alpha(*args):
+    return "alpha"
+
+
+@makeUNPbox
+def anglit(*args):
+    return "anglit"
+
+
+@makeUNPbox
+def argus(*args):
+    return "argus"
+
+
+@makeUNPbox
+def arcsine(*args):
+    return "arcsine"
+
+
+@makeUNPbox
+def beta(*args):
+    return "beta"
+
+
+@makeUNPbox
+def betaprime(*args):
+    return "betaprime"
+
+
+@makeUNPbox
+def bradford(*args):
+    return "bradford"
+
+
+@makeUNPbox
+def burr(*args):
+    return "burr"
+
+
+@makeUNPbox
+def burr12(*args):
+    return "burr12"
+
+
+@makeUNPbox
+def cauchy(*args):
+    return "cauchy"
+
+
+@makeUNPbox
+def chi(*args):
+    return "chi"
+
+
+@makeUNPbox
+def chi2(*args):
+    return "chi2"
+
+
+@makeUNPbox
+def cosine(*args):
+    return "cosine"
+
+
+@makeUNPbox
+def crystalball(*args):
+    return "crystalball"
+
+
+@makeUNPbox
+def dgamma(*args):
+    return "dgamma"
+
+
+@makeUNPbox
+def dweibull(*args):
+    return "dweibull"
+
+
+@makeUNPbox
+def erlang(*args):
+    return "erlang"
+
+
+@makeUNPbox
+def expon(*args):
+    return "expon"
+
+
+@makeUNPbox
+def exponnorm(*args):
+    return "exponnorm"
+
+
+@makeUNPbox
+def exponweib(*args):
+    return "exponweib"
+
+
+@makeUNPbox
+def exponpow(*args):
+    return "exponpow"
+
+
+@makeUNPbox
+def f(*args):
+    return "f"
+
+
+@makeUNPbox
+def fatiguelife(*args):
+    return "fatiguelife"
+
+
+@makeUNPbox
+def fisk(*args):
+    return "fisk"
+
+
+@makeUNPbox
+def foldcauchy(*args):
+    return "foldcauchy"
+
+
+# def foldnorm(mu, s, steps=Params.steps):
+
+#     x = np.linspace(0.0001, 0.9999, steps)
+#     if mu.__class__.__name__ != "wc_scalar_interval":
+#         mu = wc_scalar_interval(mu)
+#     if s.__class__.__name__ != "wc_scalar_interval":
+#         s = wc_scalar_interval(s)
+
+#     new_args = [
+#         [mu.lo() / s.lo(), 0, s.lo()],
+#         [mu.hi() / s.lo(), 0, s.lo()],
+#         [mu.lo() / s.hi(), 0, s.hi()],
+#         [mu.hi() / s.hi(), 0, s.hi()],
+#     ]
+
+#     bounds = []
+
+#     mean_hi = -np.inf
+#     mean_lo = np.inf
+#     var_lo = np.inf
+#     var_hi = 0
+
+#     for a in new_args:
+
+#         bounds.append(sps.foldnorm.ppf(x, *a))
+#         bmean, bvar = sps.foldnorm.stats(*a, moments="mv")
+
+#         if bmean < mean_lo:
+#             mean_lo = bmean
+#         if bmean > mean_hi:
+#             mean_hi = bmean
+#         if bvar > var_hi:
+#             var_hi = bvar
+#         if bvar < var_lo:
+#             var_lo = bvar
+
+#     Left = [min([b[i] for b in bounds]) for i in range(steps)]
+#     Right = [max([b[i] for b in bounds]) for i in range(steps)]
+
+#     var = wc_scalar_interval(np.float64(var_lo), np.float64(var_hi))
+#     mean = wc_scalar_interval(np.float64(mean_lo), np.float64(mean_hi))
+
+#     Left = np.array(Left)
+#     Right = np.array(Right)
+
+#     return Pbox(
+#         Left,
+#         Right,
+#         steps=steps,
+#         shape="foldnorm",
+#         mean_left=mean.left,
+#         mean_right=mean.right,
+#         var_left=var.left,
+#         var_right=var.right,
+#     )
+
+
+@makeUNPbox
+def genlogistic(*args):
+    return "genlogistic"
+
+
+@makeUNPbox
+def gennorm(*args):
+    return "gennorm"
+
+
+@makeUNPbox
+def genpareto(*args):
+    return "genpareto"
+
+
+@makeUNPbox
+def genexpon(*args):
+    return "genexpon"
+
+
+@makeUNPbox
+def genextreme(*args):
+    return "genextreme"
+
+
+@makeUNPbox
+def gausshyper(*args):
+    return "gausshyper"
+
+
+@makeUNPbox
+def gamma(*args):
+    return "gamma"
+
+
+@makeUNPbox
+def gengamma(*args):
+    return "gengamma"
+
+
+@makeUNPbox
+def genhalflogistic(*args):
+    return "genhalflogistic"
+
+
+@makeUNPbox
+def geninvgauss(*args):
+    return "geninvgauss"
+
+
+@makeUNPbox
+def gompertz(*args):
+    return "gompertz"
+
+
+@makeUNPbox
+def gumbel_r(*args):
+    return "gumbel_r"
+
+
+@makeUNPbox
+def gumbel_l(*args):
+    return "gumbel_l"
+
+
+@makeUNPbox
+def halfcauchy(*args):
+    return "halfcauchy"
+
+
+@makeUNPbox
+def halflogistic(*args):
+    return "halflogistic"
+
+
+@makeUNPbox
+def halfnorm(*args):
+    return "halfnorm"
+
+
+@makeUNPbox
+def halfgennorm(*args):
+    return "halfgennorm"
+
+
+@makeUNPbox
+def hypsecant(*args):
+    return "hypsecant"
+
+
+@makeUNPbox
+def invgamma(*args):
+    return "invgamma"
+
+
+@makeUNPbox
+def invgauss(*args):
+    return "invgauss"
+
+
+@makeUNPbox
+def invweibull(*args):
+    return "invweibull"
+
+
+@makeUNPbox
+def irwinhall(*args):
+    return "irwinhall"
+
+
+@makeUNPbox
+def jf_skew_t(*args):
+    return "jf_skew_t"
+
+
+@makeUNPbox
+def johnsonsb(*args):
+    return "johnsonsb"
+
+
+@makeUNPbox
+def johnsonsu(*args):
+    return "johnsonsu"
+
+
+@makeUNPbox
+def kappa4(*args):
+    return "kappa4"
+
+
+@makeUNPbox
+def kappa3(*args):
+    return "kappa3"
+
+
+@makeUNPbox
+def ksone(*args):
+    return "ksone"
+
+
+@makeUNPbox
+def kstwo(*args):
+    return "kstwo"
+
+
+@makeUNPbox
+def kstwobign(*args):
+    return "kstwobign"
+
+
+@makeUNPbox
+def laplace(*args):
+
+    return "laplace"
+
+
+@makeUNPbox
+def laplace_asymmetric(*args):
+    return "laplace_asymmetric"
+
+
+@makeUNPbox
+def levy(*args):
+    return "levy"
+
+
+@makeUNPbox
+def levy_l(*args):
+    return "levy_l"
+
+
+@makeUNPbox
+def levy_stable(*args):
+    return "levy_stable"
+
+
+@makeUNPbox
+def logistic(*args):
+    return "logistic"
+
+
+@makeUNPbox
+def loggamma(*args):
+    return "loggamma"
+
+
+@makeUNPbox
+def loglaplace(*args):
+    return "loglaplace"
+
+
+@makeUNPbox
+def loguniform(*args):
+    return "loguniform"
+
+
+@makeUNPbox
+def lomax(*args):
+    return "lomax"
+
+
+@makeUNPbox
+def maxwell(*args):
+    return "maxwell"
+
+
+@makeUNPbox
+def mielke(*args):
+    return "mielke"
+
+
+@makeUNPbox
+def moyal(*args):
+    return "moyal"
+
+
+@makeUNPbox
+def nakagami(*args):
+    return "nakagami"
+
+
+@makeUNPbox
+def ncx2(*args):
+    return "ncx2"
+
+
+@makeUNPbox
+def ncf(*args):
+    return "ncf"
+
+
+@makeUNPbox
+def nct(*args):
+    return "nct"
+
+
+@makeUNPbox
+def norminvgauss(*args):
+    return "norminvgauss"
+
+
+@makeUNPbox
+def pareto(*args):
+    return "pareto"
+
+
+@makeUNPbox
+def pearson3(*args):
+    return "pearson3"
+
+
+@makeUNPbox
+def powerlaw(*args):
+    return "powerlaw"
+
+
+@makeUNPbox
+def powerlognorm(*args):
+    return "powerlognorm"
+
+
+@makeUNPbox
+def powernorm(*args):
+    return "powernorm"
+
+
+@makeUNPbox
+def rdist(*args):
+    return "rdist"
+
+
+@makeUNPbox
+def rayleigh(*args):
+    return "rayleigh"
+
+
+@makeUNPbox
+def rel_breitwigner(*args):
+    return "rel_breitwigner"
+
+
+@makeUNPbox
+def rice(*args):
+    return "rice"
+
+
+@makeUNPbox
+def recipinvgauss(*args):
+    return "recipinvgauss"
+
+
+@makeUNPbox
+def semicircular(*args):
+    return "semicircular"
+
+
+@makeUNPbox
+def skewcauchy(*args):
+    return "skewcauchy"
+
+
+@makeUNPbox
+def skewnorm(*args):
+    return "skewnorm"
+
+
+@makeUNPbox
+def studentized_range(*args):
+    return "studentized_range"
+
+
+@makeUNPbox
+def t(*args):
+    return "t"
+
+
+@makeUNPbox
+def trapezoid(*args):
+    return "trapezoid"
+
+
+@makeUNPbox
+def triang(*args):
+    return "triang"
+
+
+@makeUNPbox
+def truncexpon(*args):
+    return "truncexpon"
+
+
+@makeUNPbox
+def truncnorm(*args):
+    return "truncnorm"
+
+
+@makeUNPbox
+def truncpareto(*args):
+    return "truncpareto"
+
+
+@makeUNPbox
+def truncweibull_min(*args):
+    return "truncweibull_min"
+
+
+@makeUNPbox
+def tukeylambda(*args):
+    return "tukeylambda"
+
+
+def uniform_sps(*args):
+    return "uniform"
+
+
+@makeUNPbox
+def vonmises(*args):
+    return "vonmises"
+
+
+@makeUNPbox
+def vonmises_line(*args):
+    return "vonmises_line"
+
+
+@makeUNPbox
+def wald(*args):
+    return "wald"
+
+
+@makeUNPbox
+def weibull_min(*args):
+    return "weibull_min"
+
+
+@makeUNPbox
+def weibull_max(*args):
+    return "weibull_max"
+
+
+@makeUNPbox
+def wrapcauchy(*args):
+    return "wrapcauchy"
+
+
+# *---------------------some special ones ---------------------*#
+
+from ..pba.pbox_parametric import lognormal, uniform
+
+uniform = constructUN(uniform)
+lognormal = constructUN(lognormal)
+
+# def trapz(a, b, c, d, steps=Params.steps):
+#     if a.__class__.__name__ != "wc_scalar_interval":
+#         a = wc_scalar_interval(a)
+#     if b.__class__.__name__ != "wc_scalar_interval":
+#         b = wc_scalar_interval(b)
+#     if c.__class__.__name__ != "wc_scalar_interval":
+#         c = wc_scalar_interval(c)
+#     if d.__class__.__name__ != "wc_scalar_interval":
+#         d = wc_scalar_interval(d)
+
+#     x = np.linspace(0.0001, 0.9999, steps)
+#     left = sps.trapz.ppf(
+#         x, *sorted([b.lo() / d.lo(), c.lo() / d.lo(), a.lo(), d.lo() - a.lo()])
+#     )
+#     right = sps.trapz.ppf(
+#         x, *sorted([b.hi() / d.hi(), c.hi() / d.hi(), a.hi(), d.hi() - a.hi()])
+#     )
+
+#     return Pbox(left, right, steps=steps, shape="trapz")
+
+
+# def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
+
+#     if left.__class__.__name__ != "wc_scalar_interval":
+#         left = wc_scalar_interval(left)
+#     if right.__class__.__name__ != "wc_scalar_interval":
+#         right = wc_scalar_interval(right)
+#     if mean.__class__.__name__ != "wc_scalar_interval":
+#         mean = wc_scalar_interval(mean)
+#     if stddev.__class__.__name__ != "wc_scalar_interval":
+#         stddev = wc_scalar_interval(stddev)
+
+#     a, b = (left - mean) / stddev, (right - mean) / stddev
+
+#     Left, Right, mean, var = _get_bounds("truncnorm", steps, a, b, mean, stddev)
+
+#     return Pbox(
+#         Left,
+#         Right,
+#         steps=steps,
+#         shape="truncnorm",
+#         mean_left=mean.left,
+#         mean_right=mean.right,
+#         var_left=var.left,
+#         var_right=var.right,
+#     )
+
+
+# def weibull(*args, steps=Params.steps):
+
+#     wm = weibull_max(*args)
+#     wl = weibull_min(*args)
+
+#     return Pbox(left=wl.left, right=wm.right)

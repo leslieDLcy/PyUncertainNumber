@@ -1,5 +1,5 @@
-# from pyuncertainnumber.characterisation.uncertainNumber import UncertainNumber as UN
-
+from pyuncertainnumber.characterisation.uncertainNumber import UncertainNumber as UN
+from pyuncertainnumber.characterisation.uncertainNumber import *
 
 # * --------------------- pba ---------------------*#
 import pyuncertainnumber.pba as pba

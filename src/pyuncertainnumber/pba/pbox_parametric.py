@@ -671,15 +671,15 @@ def wrapcauchy(*args):
 # *---------------------some special ones ---------------------*#
 
 
-def lognormal(
+def lognormal_weird(
     mean,
     var,
     steps=Params.steps,
 ):
-    """
-    Creates a p-box for the lognormal distribution
+    """p-box for the lognormal distribution
 
     *Note: the parameters used are the mean and variance of the lognormal distribution
+
     not the mean and variance of the underlying normal*
     See:
     `[1]<https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters>`
@@ -694,25 +694,17 @@ def lognormal(
         variance of the lognormal distribution
 
     Returns
-    ----------
+    -------
     Pbox
 
     """
-    if steps > 1000:
-        x = np.linspace(1 / steps, 1 - 1 / steps, steps)
-    else:
-        x = np.linspace(0.001, 0.999, Params.steps)
 
-    if mean.__class__.__name__ != "wc_scalar_interval":
-        mean = wc_scalar_interval(mean, mean)
-    if var.__class__.__name__ != "wc_scalar_interval":
-        var = wc_scalar_interval(var, var)
+    x = np.linspace(0.001, 0.999, Params.steps)
+    mean, var = wc_scalar_interval(mean), wc_scalar_interval(var)
 
     def __lognorm(mean, var):
-
         sigma = np.sqrt(np.log1p(var / mean**2))
         mu = np.log(mean) - 0.5 * sigma * sigma
-
         return sps.lognorm(sigma, loc=0, scale=np.exp(mu))
 
     bound0 = __lognorm(mean.left, var.left).ppf(x)
@@ -725,7 +717,37 @@ def lognormal(
 
     Left = np.array(Left)
     Right = np.array(Right)
-    return Pbox(Left, Right, steps=steps, shape="lognormal")
+    return Leaf(left=Left, right=Right, steps=steps, shape="lognormal")
+
+
+# @makePbox
+# def lognormal(*args):
+#     return "lognormal"
+
+
+def uniform(a, b, steps=Params.steps):
+    """special case of Uniform distribution as
+    Scipy has an unbelivably strange parameterisation than common sense
+
+    args:
+        - a: (float) lower endpoint
+        - b: (float) upper endpoints
+    """
+
+    # loc, scale = uniform_reparameterisation(a,  b)
+    # return uniform_sps(loc, scale)
+
+    a, b = [wc_scalar_interval(arg) for arg in [a, b]]
+
+    Left = np.linspace(a.left, b.left, steps)
+    Right = np.linspace(a.right, b.right, steps)
+
+    return Leaf(
+        left=Left,
+        right=Right,
+        steps=steps,
+        shape="uniform",
+    )
 
 
 def trapz(a, b, c, d, steps=Params.steps):
@@ -773,31 +795,6 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
         mean_right=mean.right,
         var_left=var.left,
         var_right=var.right,
-    )
-
-
-def uniform(a, b, steps=Params.steps):
-    """special case of Uniform distribution as
-    Scipy has an unbelivably strange parameterisation than common sense
-
-    args:
-        - a: (float) lower endpoint
-        - b: (float) upper endpoints
-    """
-
-    # loc, scale = uniform_reparameterisation(a,  b)
-    # return uniform_sps(loc, scale)
-
-    a, b = [wc_scalar_interval(arg) for arg in [a, b]]
-
-    Left = np.linspace(a.left, b.left, steps)
-    Right = np.linspace(a.right, b.right, steps)
-
-    return Leaf(
-        left=Left,
-        right=Right,
-        steps=steps,
-        shape="uniform",
     )
 
 
@@ -930,8 +927,7 @@ normal = norm
 N = normal
 gaussian = norm
 U = uniform
-lognorm = lognormal
-
+lognormal = lognormal_weird
 
 # *---------------------named pboxes for UN ---------------------*#
 named_pbox = {
@@ -998,7 +994,7 @@ named_pbox = {
     "logistic": logistic,
     "loggamma": loggamma,
     "loglaplace": loglaplace,
-    "lognormal": lognormal,
+    "lognormal": lognormal_weird,
     "loguniform": loguniform,
     "lomax": lomax,
     "maxwell": maxwell,

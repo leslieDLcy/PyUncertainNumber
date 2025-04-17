@@ -28,7 +28,7 @@ from ..pba.intervals import Interval
 from pyuncertainnumber import pba
 from ..pba.distributions import Distribution as D
 from ..pba.distributions import named_dists
-from ..pba.pbox import named_pbox
+from ..pba.pbox_parametric import named_pbox
 import functools
 from .core import makeUN
 

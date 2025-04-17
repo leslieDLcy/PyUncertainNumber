@@ -1,4 +1,4 @@
-"""distribution constructs """
+"""distribution constructs"""
 
 import numpy as np
 import scipy.stats as sps
@@ -9,7 +9,7 @@ from typing import *
 from ..characterisation.utils import pl_pcdf, pl_ecdf
 import scipy
 from .params import Params
-from .pbox import named_pbox
+from .pbox_parametric import named_pbox
 
 
 @dataclass
@@ -215,16 +215,32 @@ def logistic(loc, scale):
     return scipy.stats.logistic.rvs(loc, scale, size=Params.many)
 
 
-def lognormal(m, s):
-    m2 = m**2
-    s2 = s**2
-    mlog = np.log(m2 / np.sqrt(m2 + s2))
-    slog = np.sqrt(np.log((m2 + s2) / m2))
-    return scipy.stats.lognorm.rvs(s=slog, scale=np.exp(mlog), size=Params.many)
+def lognormal_sane(mu, sigma):
+    """The sane lognormal which creates a lognormal distribution object based on the mean (mu) and standard deviation (sigma)
+    of the underlying normal distribution.
+
+    args:
+        - mu (float): Mean of the underlying normal distribution
+        - sigma (float): Standard deviation of the underlying normal distribution
+
+    Returns:
+        - A scipy.stats.lognorm frozen distribution object
+    """
+    shape = sigma  # shape parameter for lognorm
+    scale = np.exp(mu)  # scale parameter is exp(mu)
+    return sps.lognorm(s=shape, scale=scale)
 
 
-def lognormal2(mlog, slog):
-    return scipy.stats.lognorm.rvs(s=slog, scale=np.exp(mlog), size=Params.many)
+# def lognormal(m, s):
+#     m2 = m**2
+#     s2 = s**2
+#     mlog = np.log(m2 / np.sqrt(m2 + s2))
+#     slog = np.sqrt(np.log((m2 + s2) / m2))
+#     return scipy.stats.lognorm.rvs(s=slog, scale=np.exp(mlog), size=Params.many)
+
+
+# def lognormal2(mlog, slog):
+#     return scipy.stats.lognorm.rvs(s=slog, scale=np.exp(mlog), size=Params.many)
 
 
 # lognormal = function(mean=NULL, std=NULL, meanlog=NULL, stdlog=NULL, median=NULL, cv=NULL, name='', ...){
@@ -462,7 +478,8 @@ named_dists = {
     "logistic": sps.logistic,
     "loggamma": sps.loggamma,
     "loglaplace": sps.loglaplace,
-    "lognorm": sps.lognorm,
+    # "lognorm": sps.lognorm,
+    "lognormal": lognormal_sane,
     "loguniform": sps.loguniform,
     "lomax": sps.lomax,
     "maxwell": sps.maxwell,

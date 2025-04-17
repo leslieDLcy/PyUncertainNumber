@@ -1,2 +1,2 @@
 from .intervals.number import Interval as I
-from .pbox import *
+from .pbox_parametric import *
