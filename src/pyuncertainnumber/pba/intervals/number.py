@@ -335,7 +335,7 @@ class Interval:
                 lo = numpy.min([a, b], axis=0)
                 hi = numpy.max([a, b], axis=0)
         else:
-            raise NotImplemented
+            raise NotImplementedError("Not implemented yet")
         return Interval(lo, hi)
 
     def __lt__(self, other):
