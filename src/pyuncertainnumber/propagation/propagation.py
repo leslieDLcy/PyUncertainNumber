@@ -45,6 +45,11 @@ class P(ABC):
         """if the nature of the UN suitable for the method"""
         pass
 
+    @abstractmethod
+    def method_check(self):
+        """if the method is suitable for the nature of the UN"""
+        pass
+
 
 class AleatoryPropagation(P):
 
@@ -60,6 +65,12 @@ class AleatoryPropagation(P):
         assert all(
             [isinstance(v, Distribution) for v in self.vars]
         ), "Not all variables are distributions"
+
+    def method_check(self):
+        assert self.method in [
+            "monte_carlo",
+            "latin_hypercube",
+        ], "Method not supported for aleatory uncertainty propagation"
 
     def __call__(self):
         """doing the propagation"""
@@ -78,6 +89,26 @@ class EpistemicPropagation(P):
         assert all(
             [isinstance(v, Interval) for v in self.vars]
         ), "Not all variables are intervals"
+
+    def method_check(self):
+        assert self.method in [
+            "endpoint",
+            "endpoints",
+            "vertex",
+            "extremepoints",
+            "subinterval",
+            "subinterval_reconstitution",
+            "cauchy",
+            "endpoint_cauchy",
+            "endpoints_cauchy",
+            "local_optimisation",
+            "local_optimization",
+            "local optimisation",
+            "genetic_optimisation",
+            "genetic_optimization",
+            "genetic optimization",
+            "genetic optimisation",
+        ], f"Method {self.method} not supported for epistemic uncertainty propagation"
 
     def __call__(self, **kwargs):
         """doing the propagation"""
@@ -113,6 +144,32 @@ class EpistemicPropagation(P):
         return results
 
 
+class MixedPropagation(P):
+    def __init__(self, vars, func, method, save_results: bool = False):
+        super().__init__(vars, func, method, save_results)
+
+    def type_check(self):
+        """only intervals"""
+
+        from ..pba.intervals.number import Interval
+
+        assert all(
+            [isinstance(v, Interval) for v in self.vars]
+        ), "Not all variables are intervals"
+
+    def method_check(self):
+        assert self.method in [
+            "interval_monte_carlo",
+            "slicing",
+            "double_monte_carlo",
+        ], f"Method {self.method} not supported for mixed uncertainty propagation"
+
+    def __call__(self, **kwargs):
+        """doing the propagation"""
+        pass
+
+
+# top-level
 class Propagation:
 
     def __init__(
