@@ -1,35 +1,18 @@
 import numpy as np
 from typing import Callable, Union
 import matplotlib.pyplot as plt
-from pyuncertainnumber.propagation.epistemic_uncertainty.endpoints import (
-    endpoints_method,
-)
-from pyuncertainnumber.propagation.epistemic_uncertainty.extremepoints import (
-    extremepoints_method,
-)
-from pyuncertainnumber.propagation.epistemic_uncertainty.subinterval import (
-    subinterval_method,
-)
-from pyuncertainnumber.propagation.epistemic_uncertainty.sampling import sampling_method
-from pyuncertainnumber.propagation.epistemic_uncertainty.genetic_optimisation import (
-    genetic_optimisation_method,
-)
-from pyuncertainnumber.propagation.epistemic_uncertainty.local_optimisation import (
-    local_optimisation_method,
-)
-from pyuncertainnumber.propagation.epistemic_uncertainty.endpoints_cauchy import (
-    cauchydeviates_method,
-)
-from pyuncertainnumber.propagation.aleatory_uncertainty.sampling_aleatory import (
-    sampling_aleatory_method,
-)
-from pyuncertainnumber.propagation.mixed_uncertainty.second_order_propagation import (
-    second_order_propagation_method,
-)
-from pyuncertainnumber.propagation.mixed_uncertainty.first_order_propagation import (
-    first_order_propagation_method,
-)
-from pyuncertainnumber.propagation.utils import (
+
+from .epistemic_uncertainty.endpoints import endpoints_method
+from .epistemic_uncertainty.extremepoints import extremepoints_method
+from .epistemic_uncertainty.subinterval import subinterval_method
+from .epistemic_uncertainty.sampling import sampling_method
+from .epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
+from .epistemic_uncertainty.local_optimisation import local_optimisation_method
+from .epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
+from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
+from .mixed_uncertainty.second_order_propagation import second_order_propagation_method
+from .mixed_uncertainty.first_order_propagation import first_order_propagation_method
+from .utils import (
     create_folder,
     save_results,
     Propagation_results,
@@ -48,7 +31,7 @@ from pyuncertainnumber.characterisation.uncertainNumber import (
 def aleatory_propagation(
     vars: list = None,
     results: Propagation_results = None,
-    fun: Callable = None,
+    func: Callable = None,
     n_sam: int = 500,
     method: str = "monte_carlo",
     save_raw_data=False,
@@ -56,11 +39,11 @@ def aleatory_propagation(
     base_path=np.nan,
     **kwargs,
 ):
-    """This function propagates aleatory uncertainty through a given function (`fun`) using either Monte Carlo or Latin Hypercube sampling, considering the aleatory uncertainty represented by a list of `UncertainNumber` objects (`vars`).
+    """This function propagates aleatory uncertainty through a given function (`func`) using either Monte Carlo or Latin Hypercube sampling, considering the aleatory uncertainty represented by a list of `UncertainNumber` objects (`vars`).
     args:
         - vars (list): A list of UncertainNumber objects, each representing an input
                     variable with its associated uncertainty.
-        - fun (Callable): The function to propagate uncertainty through.
+        - func (Callable): The function to propagate uncertainty through.
         - n_sam (int): The number of samples to generate.
                     Default is 500.
         - method (str, optional): The sampling method ('monte_carlo' or 'latin_hypercube').
@@ -99,7 +82,7 @@ def aleatory_propagation(
 
             results = sampling_aleatory_method(
                 vars,
-                fun,
+                func,
                 results,
                 n_sam,
                 method=method.lower(),
@@ -114,7 +97,7 @@ def aleatory_propagation(
 
 def mixed_propagation(
     vars: list,
-    fun: Callable = None,
+    func: Callable = None,
     results: Propagation_results = None,
     method="second_order_extremepoints",
     n_disc: Union[int, np.ndarray] = 10,
@@ -132,7 +115,7 @@ def mixed_propagation(
     args:
         - vars (list): A list of uncertain variables, which can be a mix of different
                  uncertainty types (e.g., intervals, distributions).
-        - fun (Callable): The function to propagate uncertainty through.
+        - func (Callable): The function to propagate uncertainty through.
         - results (Propagation_results, optional): An object to store propagation results.
                                 Defaults to None, in which case a new
                                 `Propagation_results` object is created.
@@ -157,7 +140,7 @@ def mixed_propagation(
         - **kwargs: Additional keyword arguments passed to the underlying propagation methods.
 
     signature:
-       mixed_propagation(vars: list, fun: Callable, results: Propagation_results = None, ...) -> Propagation_results
+       mixed_propagation(vars: list, func: Callable, results: Propagation_results = None, ...) -> Propagation_results
 
     notes:
         - It can be used if each uncertain number is exrpessed in terms of precise distributions.
@@ -172,7 +155,7 @@ def mixed_propagation(
 
     examples:
         >>> a = mixed_propagation(vars= [y, L, I, F, E],
-                            fun= cantilever_beam_func,
+                            func= cantilever_beam_func,
                             method= 'second_order_extremepoints',
                             n_disc=8,
                             #save_raw_data= "no"#,
@@ -188,7 +171,7 @@ def mixed_propagation(
         case "second_order_endpoints" | "second_order_vertex" | "endpoints" | "vertex":
             results = second_order_propagation_method(
                 vars,
-                fun,
+                func,
                 results,
                 method="endpoints",
                 n_disc=n_disc,
@@ -203,7 +186,7 @@ def mixed_propagation(
         case "second_order_extremepoints" | "extremepoints":
             results = second_order_propagation_method(
                 vars,
-                fun,
+                func,
                 results,
                 method="extremepoints",
                 n_disc=n_disc,
@@ -218,7 +201,7 @@ def mixed_propagation(
         case "first_order" | "first_order_extremepoints":
             results = first_order_propagation_method(
                 vars,
-                fun,
+                func,
                 results,
                 # method = 'extremepoints',
                 n_disc=n_disc,
@@ -235,14 +218,14 @@ def mixed_propagation(
 
 def epistemic_propagation(
     vars,
-    fun,
+    func,
+    method: str = None,
+    save_raw_data=False,
+    *,
     results: Propagation_results = None,
     n_sub: np.integer = None,
     n_sam: np.integer = None,
     x0: np.ndarray = None,
-    method: str = None,
-    save_raw_data="no",
-    *,  # Keyword-nly arguments start here
     base_path=np.nan,
     tol_loc: np.ndarray = None,
     options_loc: dict = None,
@@ -260,7 +243,7 @@ def epistemic_propagation(
     args:
         - vars (list): A list of `UncertainNumber` objects representing the input variables
                  with their associated interval uncertainty.
-        - fun (Callable): The function to propagate uncertainty through.
+        - func (Callable): The function to propagate uncertainty through.
         - results (Propagation_results, optional): An object to store propagation results.
                         Defaults to None, in which case a new
                         `Propagation_results` object is created.
@@ -294,7 +277,7 @@ def epistemic_propagation(
         - **kwargs: Additional keyword arguments passed to the `UncertainNumber` constructor.
 
     signature:
-        epistemic_propagation(vars: list, fun: Callable, results: Propagation_results = None, ...) -> Propagation_results
+        epistemic_propagation(vars: list, func: Callable, results: Propagation_results = None, ...) -> Propagation_results
 
     notes:
         -  It supports a wide range of techniques, including:
@@ -330,11 +313,11 @@ def epistemic_propagation(
 
     raises:
         - ValueError: For invalid `method`, `save_raw_data`, or missing arguments.
-        - TypeError: If `fun` is not callable for optimization methods.
+        - TypeError: If `func` is not callable for optimization methods.
 
     example:
         >>> a = epistemic_propagation(vars= [ y, L, I, F, E],
-                                fun= cantilever_beam_func,
+                                func= cantilever_beam_func,
                                 method= 'extremepoints',
                                 n_disc=8,
                                 save_raw_data= "no"
@@ -345,29 +328,14 @@ def epistemic_propagation(
     for i, un in enumerate(vars):
         x[i, :] = un.bounds  # Get an np.array of bounds for all vars
 
-    if method in (
-        "local_optimisation",
-        "genetic_optimisation",
-    ):  # Check for optimisation methods
-        if not callable(fun):
-            raise TypeError(
-                "fun must be a callable function for optimisation methods. fun cannot be None."
-            )
-
-    if save_raw_data not in ("yes", "no"):  # Input validation
-        raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
-
     match method:
-
         case "endpoint" | "endpoints" | "vertex":
             # Pass save_raw_data directly
-            results = endpoints_method(x, fun, results, save_raw_data)
-            return process_results(results)
+            results = endpoints_method(x, func, results, save_raw_data)
 
         case "extremepoints":
             # Pass save_raw_data directly
-            results = extremepoints_method(x, fun, results, save_raw_data)
-            return process_results(results)
+            results = extremepoints_method(x, func, results, save_raw_data)
 
         case "subinterval" | "subinterval_reconstitution":
             if n_sub is None:
@@ -375,65 +343,59 @@ def epistemic_propagation(
                     "n (number of subintervals) is required for subinterval methods."
                 )
             # Pass save_raw_data directly
-            results = subinterval_method(x, fun, results, n_sub, save_raw_data)
-            return process_results(results)
+            results = subinterval_method(x, func, results, n_sub, save_raw_data)
 
-        # keep it for double-loop MC
-        case "monte_carlo" | "latin_hypercube":
-            if n_sam is None:
-                raise ValueError(
-                    "n (number of samples) is required for sampling methods."
-                )
-            results = sampling_method(
-                x,
-                fun,
-                results,
-                n_sam,
-                method=method.lower(),
-                endpoints=False,
-                save_raw_data=save_raw_data,
-            )
-            return process_results(results)
+        # case "monte_carlo" | "latin_hypercube":
+        #     if n_sam is None:
+        #         raise ValueError(
+        #             "n (number of samples) is required for sampling methods."
+        #         )
+        #     results = sampling_method(
+        #         x,
+        #         func,
+        #         results,
+        #         n_sam,
+        #         method=method.lower(),
+        #         endpoints=False,
+        #         save_raw_data=save_raw_data,
+        #     )
 
-        case "monte_carlo_endpoints":
-            if n_sam is None:
-                raise ValueError(
-                    "n (number of samples) is required for sampling methods."
-                )
-            results = sampling_method(
-                x,
-                fun,
-                results,
-                n_sam,
-                method="monte_carlo",
-                endpoints=True,
-                save_raw_data=save_raw_data,
-            )
-            return process_results(results)
+        # case "monte_carlo_endpoints":
+        #     if n_sam is None:
+        #         raise ValueError(
+        #             "n (number of samples) is required for sampling methods."
+        #         )
+        #     results = sampling_method(
+        #         x,
+        #         func,
+        #         results,
+        #         n_sam,
+        #         method="monte_carlo",
+        #         endpoints=True,
+        #         save_raw_data=save_raw_data,
+        #     )
 
-        case "latin_hypercube_endpoints":
-            if n_sam is None:
-                raise ValueError(
-                    "n (number of samples) is required for sampling methods."
-                )
-            results = sampling_method(
-                x,
-                fun,
-                results,
-                n_sam,
-                method="latin_hypercube",
-                endpoints=True,
-                save_raw_data=save_raw_data,
-            )
-            return process_results(results)
+        # case "latin_hypercube_endpoints":
+        #     if n_sam is None:
+        #         raise ValueError(
+        #             "n (number of samples) is required for sampling methods."
+        #         )
+        #     results = sampling_method(
+        #         x,
+        #         func,
+        #         results,
+        #         n_sam,
+        #         method="latin_hypercube",
+        #         endpoints=True,
+        #         save_raw_data=save_raw_data,
+        #     )
 
         case "cauchy" | "endpoint_cauchy" | "endpoints_cauchy":
             if n_sam is None:
                 raise ValueError(
                     "n (number of samples) is required for sampling methods."
                 )
-            results = cauchydeviates_method(x, fun, results, n_sam, save_raw_data)
-            return process_results(results)
+            results = cauchydeviates_method(x, func, results, n_sam, save_raw_data)
 
         case (
             "local_optimization"
@@ -446,14 +408,13 @@ def epistemic_propagation(
                 print("The intermediate steps cannot be saved for local optimisation")
             results = local_optimisation_method(
                 x,
-                fun,
+                func,
                 results,
                 x0,
                 tol_loc=tol_loc,
                 options_loc=options_loc,
                 method_loc=method_loc,
             )
-            return process_results(results)
 
         case (
             "genetic_optimisation"
@@ -464,17 +425,18 @@ def epistemic_propagation(
             if save_raw_data == "yes":
                 print("The intermediate steps cannot be saved for genetic optimisation")
             results = genetic_optimisation_method(
-                x, fun, results, pop_size, n_gen, tol, n_gen_last, algorithm_type
+                x, func, results, pop_size, n_gen, tol, n_gen_last, algorithm_type
             )
-            return process_results(results)
 
         case _:
             raise ValueError("Invalid UP method.")
 
+    return process_results(results)
+
 
 def Propagation(
     vars: list,
-    fun: Callable,
+    func: Callable,
     results: Propagation_results = None,
     n_sub: np.integer = 3,
     n_sam: np.integer = 500,
@@ -501,7 +463,7 @@ def Propagation(
 
     args:
         - vars (list): A list of uncertain variables.
-        - fun (Callable): The function through which to propagate uncertainty.
+        - func (Callable): The function through which to propagate uncertainty.
         - results (Propagation_results, optional): An object to store propagation results.
                                 Defaults to None, in which case a new
                                 `Propagation_results` object is created.
@@ -542,7 +504,7 @@ def Propagation(
         **kwargs: Additional keyword arguments passed to the underlying propagation methods.
 
     signature:
-       - Propagation(vars: list, fun: Callable, results: Propagation_results = None, ...) -> Propagation_results
+       - Propagation(vars: list, func: Callable, results: Propagation_results = None, ...) -> Propagation_results
 
 
     return:
@@ -554,7 +516,7 @@ def Propagation(
     example:
 
         >>> a = Propagation(vars= [ y, L, I, F, E],
-                            fun= cantilever_beam_func,
+                            func= cantilever_beam_func,
                             method= 'extremepoints',
                             n_disc=8,
                             save_raw_data= "no"
@@ -570,7 +532,7 @@ def Propagation(
 
         y = epistemic_propagation(
             vars=vars,
-            fun=fun,
+            func=func,
             results=results,
             n_sub=n_sub,
             n_sam=n_sam,
@@ -597,7 +559,7 @@ def Propagation(
         ):
             y = mixed_propagation(
                 vars=vars,
-                fun=fun,
+                func=func,
                 results=results,
                 n_disc=n_disc,
                 condensation=condensation,
@@ -610,7 +572,7 @@ def Propagation(
         else:  # Use aleatory propagation if method is not in the list above
             y = aleatory_propagation(
                 vars=vars,
-                fun=fun,
+                func=func,
                 results=results,
                 n_sam=n_sam,
                 method=method,
@@ -621,7 +583,7 @@ def Propagation(
     else:  # Mixed case or at least one p-box
         y = mixed_propagation(
             vars=vars,
-            fun=fun,
+            func=func,
             results=results,
             n_disc=n_disc,
             condensation=condensation,
@@ -710,7 +672,7 @@ def main():
         I = x[1]
         F = x[2]
         E = x[3]
-        try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
+        try:  # try is used to account for cases where the input combinations leads to error in func due to bugs
             deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
 
         except:
@@ -725,7 +687,7 @@ def main():
         I = x[2]
         F = x[3]
         E = x[4]
-        try:  # try is used to account for cases where the input combinations leads to error in fun due to bugs
+        try:  # try is used to account for cases where the input combinations leads to error in func due to bugs
             deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
             stress = F * beam_length * y / I / 1000  # stress in MPa
 
@@ -785,7 +747,7 @@ def main():
 
     a = Propagation(
         vars=[L, I, F, E],
-        fun=cantilever_beam_deflection,
+        func=cantilever_beam_deflection,
         method="extremepoints",
         n_disc=8,
         # save_raw_data= "no"#,
