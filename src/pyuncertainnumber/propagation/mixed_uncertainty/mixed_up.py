@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import numpy as np
 from functools import partial
+import itertools
 
 if TYPE_CHECKING:
     from ...pba.intervals import Interval
@@ -9,6 +10,8 @@ if TYPE_CHECKING:
     from ...pba.pbox_abc import Pbox
 
 """leslie's implementation on mixed uncertainty propagation
+
+#! - [ ] ongoing
 
 design signature hint:
     - treat `vars` as the construct classes
@@ -35,20 +38,50 @@ def interval_monte_carlo(
     pass
 
 
-def bi_imc(vars, func, method, dependency):
+def bi_imc(x, y, func, dependency):
     """bivariate interval monte carlo
 
     args:
         dependency: dependency structure (regular copula)
+    func: callable
+    x, y (Pbox) : Pbox
     """
-    pass
+    from scipy.stats import qmc
+    from pyuncertainnumber.pba.intervalOperators import make_vec_interval
+    from pyuncertainnumber.pba.aggregation import stacking
+
+    alpha = qmc.LatinHypercube(d=1).random(n=1000)
+    x_i = make_vec_interval([x.cuth(p_v) for p_v in alpha])
+    y_i = make_vec_interval([y.cuth(p_v) for p_v in alpha])
+
+    container = []
+    for _item in itertools.product(x_i, y_i):
+        container.append(func(*_item))
+    arr_interval = make_vec_interval(container)
+    return stacking(arr_interval)
 
 
 def slicing(
-    vars,
+    vars: list[Distribution | Interval | Pbox],
+    func,
 ):
     """independence assumption by now"""
-    pass
+
+    from ...pba.pbox_abc import convert_pbox
+    from ...pba.intervalOperators import make_vec_interval
+    from ...pba.aggregation import stacking
+
+    p_vars = [convert_pbox(v) for v in vars]
+
+    itvs = [p.outer_approximate[1] for p in p_vars]
+
+    container = []
+    for _item in itertools.product(itvs):
+        container.append(func(*_item))
+
+    # print(len(container))  # shall be 40_000  # checkedout
+    arr_interval = make_vec_interval(container)
+    return stacking(arr_interval)
 
 
 def double_monte_carlo(

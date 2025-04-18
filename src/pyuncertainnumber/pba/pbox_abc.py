@@ -325,9 +325,6 @@ class Staircase(Pbox):
         q_l = [self.alpha_cut(p).left for p in p_leftend]
         q_r = [self.alpha_cut(p).right for p in p_rightend]
 
-        # get the interval list
-        # # TODO streamline below the interval list into Marco interval vector
-        # the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
         interval_vec = I(lo=q_l, hi=q_r)
         return p_values, interval_vec
 
