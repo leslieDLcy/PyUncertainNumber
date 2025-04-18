@@ -1,5 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import numpy as np
+
 
 if TYPE_CHECKING:
     from ...pba.intervals import Interval
@@ -66,4 +68,28 @@ def double_monte_carlo(
         n_a: number of aleatory samples
         n_e: number of epistemic samples
     """
-    pass
+
+    # lhs sample on epistemic variables
+    epistemic_points = epis_vars.endpoints_lhs_sample(n_e)
+
+    def evaluate_func_on_e(e, n_a, func):
+        """propagate wrt one point in the epistemic space
+
+        args:
+            e: one point in the epistemic space
+            n_a: number of aleatory samples
+            func: function to be evaluated
+
+        note:
+            by default, aleatory variable are put in front of the epistemic ones
+        """
+        xa_samples = joint_distribution.sample(n_a)
+
+        E = np.tile(e, (n_a, 1))
+        X_input = np.concatenate((xa_samples, E), axis=1)
+        return func(X_input)
+
+    container = map(evaluate_func_on_e, epistemic_points)
+    response = np.squeeze(np.stack(container, axis=0))
+    # TODO : envelope CDFs into a pbox
+    return response
