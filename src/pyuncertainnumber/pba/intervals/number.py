@@ -126,9 +126,9 @@ class Interval:
     def to_numpy(self) -> np.ndarray:
         """transform interval objects to numpy arrays"""
         if self.scalar:
-            return [self.lo.item(), self.hi.item()]
+            return np.array([self.lo.item(), self.hi.item()])
         else:
-            return list(zip(self.lo.item(), self.hi.item()))
+            return np.asarray((self.lo, self.hi)).T
 
     def to_pbox(self):
         from ..pbox_abc import Staircase

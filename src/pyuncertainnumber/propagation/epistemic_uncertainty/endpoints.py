@@ -1,3 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ...pba.intervals.number import Interval
+
 import numpy as np
 import tqdm
 from typing import Callable
@@ -8,10 +14,10 @@ from pyuncertainnumber.propagation.utils import Propagation_results
 
 
 def endpoints_method(
-    x: np.ndarray, f: Callable, results: Propagation_results = None, save_raw_data="no"
-) -> Propagation_results:  # Specify return type
+    x: np.ndarray, f: Callable, results: Propagation_results = None, save_raw_data=False
+) -> Propagation_results:
     """
-        Performs uncertainty propagation using the endpoints or vertex method. 
+        Performs uncertainty propagation using the endpoints or vertex method.
 
     args:
         x (np.ndarray): A 2D NumPy array where each row represents an input variable and
@@ -19,17 +25,17 @@ def endpoints_method(
         f (Callable): A callable function that takes a 1D NumPy array of input values and
           returns the corresponding output(s).
         results (Propagation_results): The class to use for storing results (defaults to Propagation_results).
-        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw input data when a function (f) 
+        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw input data when a function (f)
           is not provided.
           - 'no': Returns an error that no function is provided.
           - 'yes': Returns the full arrays of unique input combinations.
 
     signature:
         endpoints_method(x:np.ndarray, f:Callable, save_raw_data = 'no') -> Propagation_results
-    
+
     notes:
-        The function assumes that the intervals in `x` represent uncertainties and aims to provide conservative bounds on the output 
-        uncertainty. 
+        The function assumes that the intervals in `x` represent uncertainties and aims to provide conservative bounds on the output
+        uncertainty.
         If the `f` function returns multiple outputs, the `bounds` array will be 2-dimensional.
 
     return:
@@ -70,7 +76,9 @@ def endpoints_method(
 
     # propagates the epistemic uncertainty through subinterval reconstitution
     if f is not None:
-        all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Function evaluations")])
+        all_output = np.array(
+            [f(xi) for xi in tqdm.tqdm(X, desc="Function evaluations")]
+        )
 
         try:
             num_outputs = len(all_output[0])
@@ -113,7 +121,7 @@ def endpoints_method(
         results.raw_data["f"] = all_output
         results.raw_data["x"] = X
 
-    elif save_raw_data == "yes":  # If f is None and save_raw_data is 'yes'
+    elif save_raw_data:  # If f is None and save_raw_data is 'yes'
         # Store X in raw_data['x'] even if f is None
         results.add_raw_data(x=X)
 

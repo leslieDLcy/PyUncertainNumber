@@ -1,3 +1,7 @@
+class Pbox:
+    pass
+
+
 # from .operation import convert
 # from decimal import DivisionByZero
 # from typing import Self
