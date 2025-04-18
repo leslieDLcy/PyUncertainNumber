@@ -4,6 +4,7 @@ from ...pba.intervals.number import Interval
 
 import numpy as np
 import tqdm
+from rich.progress import track
 from typing import Callable
 from .cartesian_product import cartesian
 from ..utils import Propagation_results
@@ -103,7 +104,7 @@ def subinterval_method(
     # propagates the epistemic uncertainty through subinterval reconstitution
     if f is not None:
         all_output = np.array(
-            [f(xi) for xi in tqdm.tqdm(X, desc="Function evaluations")]
+            [f(xi) for xi in track(X, description="Function evaluations")]
         )
 
         try:
