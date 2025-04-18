@@ -285,16 +285,23 @@ class Staircase(Box):
     # * --------------------- methods ---------------------*#
 
     def cdf(self, x):
-        """get the bounds on the cdf w.r.t x value"""
+        """get the bounds on the cdf w.r.t x value
 
+        args:
+            x (array-like): x values
+        """
         lo_ind = find_nearest(self.right, x)
         hi_ind = find_nearest(self.left, x)
-        return I(Params.p_values[lo_ind], Params.p_values[hi_ind])
+        return I(lo=Params.p_values[lo_ind], hi=Params.p_values[hi_ind])
 
-    def cuth(self, alpha=0.5):
-        """get the bounds on the quantile at any particular probability level"""
+    def alpha_cut(self, alpha=0.5):
+        """get the bounds on the quantile at any particular probability level
+
+        args:
+            alpha (array-like): probability levels
+        """
         ind = find_nearest(Params.p_values, alpha)
-        return I(self.left[ind], self.right[ind])
+        return I(lo=self.left[ind], hi=self.right[ind])
 
     def outer_approximate(self, n=100) -> tuple:
         """outer approximation of a p-box

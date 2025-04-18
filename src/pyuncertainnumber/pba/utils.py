@@ -113,17 +113,66 @@ def uniform_reparameterisation(a, b):
     return a, b - a
 
 
+# def find_nearest(array, value):
+#     """find the index of the nearest value in the array to the given value
+
+#     note:
+#         it works both for quantiles and probabilities
+
+#     return: scalar or vector.
+#     """
+
+#     array = np.asarray(array)
+#     # find the nearest value
+#     ind = (np.abs(array - value)).argmin()
+#     return ind
+
+
+import numpy as np
+
+
 def find_nearest(array, value):
-    """find the index of the nearest value in the array to the given value
+    """Find the index of the nearest value in the array to the given value(s).
 
-    note:
-        it works both for quantiles and probabilities
+    Works with both scalar and array inputs for `value`.
+
+    Parameters:
+        array (np.ndarray): The array to search.
+        value (float or np.ndarray): The value(s) to find the nearest to.
+
+    Returns:
+        int or np.ndarray: Index or array of indices of nearest values.
     """
-
     array = np.asarray(array)
-    # find the nearest value
-    ind = (np.abs(array - value)).argmin()
-    return ind
+
+    if np.isscalar(value):
+        # scalar case
+        ind = (np.abs(array - value)).argmin()
+        return ind
+    else:
+        # vectorized version for array input
+        value = np.asarray(value)
+        indices = np.array([np.abs(array - v).argmin() for v in value])
+        return indices
+
+
+# TODO to test this high-performance version below
+def find_nearest_vectorised(array, value):
+    """Find index/indices of nearest value(s) in `array` to each `value`.
+
+    Efficient for both scalar and array inputs.
+    """
+    array = np.asarray(array)
+    value = np.atleast_1d(value)
+
+    # Compute distances using broadcasting
+    diff = np.abs(array[None, :] - value[:, None])
+
+    # Find index of minimum difference along axis 1
+    indices = np.argmin(diff, axis=1)
+
+    # Return scalar if input was scalar
+    return indices[0] if np.isscalar(value) else indices
 
 
 @mpl.rc_context({"text.usetex": True})

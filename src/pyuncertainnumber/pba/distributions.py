@@ -66,6 +66,10 @@ class Distribution:
                 "Sampling not supported for sample-approximated distributions"
             )
 
+    def alpha_cut(self, alpha):
+        """alpha cut interface"""
+        pass
+
     def make_naked_value(self):
         """one value representation of the distribution
         note:
