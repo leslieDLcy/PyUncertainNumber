@@ -1,10 +1,12 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+from ...pba.intervals.number import Interval
+
 import numpy as np
 import tqdm
 from typing import Callable
-from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product import (
-    cartesian,
-)
-from pyuncertainnumber.propagation.utils import Propagation_results
+from .cartesian_product import cartesian
+from ..utils import Propagation_results
 
 
 def subinterval_method(
@@ -12,7 +14,7 @@ def subinterval_method(
     f: Callable,
     results: Propagation_results = None,
     n_sub: np.array = 10,
-    save_raw_data="no",
+    save_raw_data=False,
 ) -> Propagation_results:  # Specify return type
     """The subinterval reconstitution method.
 
@@ -68,8 +70,10 @@ def subinterval_method(
         >>> y = subinterval_method(x, f, n_sub, save_raw_data = 'yes')
         >>> # Print the results
         >>> y.print()
-
     """
+    if isinstance(x, Interval):
+        x = x.to_numpy()
+
     if results is None:
         results = Propagation_results()  # Create an instance of Propagation_results
 
@@ -150,7 +154,7 @@ def subinterval_method(
         results.raw_data["f"] = all_output
         results.raw_data["x"] = X
 
-    elif save_raw_data == "yes":  # If f is None and save_raw_data is 'yes'
+    elif save_raw_data:  # If f is None and save_raw_data is 'yes'
         results.add_raw_data(x=X)
     else:
         print(
