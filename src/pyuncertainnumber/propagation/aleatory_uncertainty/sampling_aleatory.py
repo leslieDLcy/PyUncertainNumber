@@ -9,7 +9,7 @@ from ...pba.distributions import Distribution
 
 
 def sampling_aleatory_method(
-    xs: list[Distribution | UncertainNumber],
+    xs: list[Distribution],
     f: Callable,
     method: str = "monte_carlo",
     n_sam: int = 1_000,
@@ -87,31 +87,11 @@ def sampling_aleatory_method(
             # samples = np.array([un.random(size=n_sam) for un in x])
         case "latin_hypercube":
             sampler = qmc.LatinHypercube(d=len(xs))
-            lhd_samples = sampler.random(n=n_sam)
+            lhs_samples = sampler.random(n=n_sam)  # u-space (n, d)
 
-            samples = []  # Initialize an empty list to store the samples
-
-            for i, un in enumerate(
-                xs
-            ):  # Iterate over each UncertainNumber in the list 'x'
-                # Get the entire column of quantiles for this UncertainNumber
-                q_values = lhd_samples[:, i]
-
-                # Now we need to calculate the ppf for each q value in the q_values array
-                ppf_values = (
-                    []
-                )  # Initialize an empty list to store the ppf values for this UncertainNumber
-                for q in q_values:  # Iterate over each individual q value
-                    ppf_value = un.ppf(q)  # Calculate the ppf value for this q
-                    # Add the calculated ppf value to the list
-                    ppf_values.append(ppf_value)
-
-                # Add the list of ppf values to the main list
-                samples.append(ppf_values)
-
-            # Convert the list of lists to a NumPy array
-            samples = np.array(samples)
-
+            samples = np.concatenate(
+                [d.alpha_cut(lhs_samples[:, i]) for i, d in enumerate(xs)], axis=1
+            )
         case _:
             raise ValueError("Invalid UP method!")
 

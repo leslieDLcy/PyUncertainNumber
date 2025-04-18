@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import numpy as np
-
+from functools import partial
 
 if TYPE_CHECKING:
     from ...pba.intervals import Interval
@@ -52,7 +52,6 @@ def slicing(
 
 
 def double_monte_carlo(
-    vars,
     joint_distribution,
     epis_vars,
     n_a,
@@ -89,7 +88,9 @@ def double_monte_carlo(
         X_input = np.concatenate((xa_samples, E), axis=1)
         return func(X_input)
 
-    container = map(evaluate_func_on_e, epistemic_points)
+    p_func = partial(evaluate_func_on_e, n_a=n_a, func=func)
+
+    container = map(p_func, epistemic_points)
     response = np.squeeze(np.stack(container, axis=0))
     # TODO : envelope CDFs into a pbox
     return response
