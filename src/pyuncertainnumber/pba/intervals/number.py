@@ -141,6 +141,19 @@ class Interval:
             var=Interval(0, (self.hi - self.lo) * (self.hi - self.lo) / 4),
         )
 
+    def lhs_sample(self, n) -> np.ndarray:
+        """LHS sampling within the interval
+
+        args:
+            n: number of samples
+        """
+        from scipy.stats import qmc
+
+        sampler = qmc.LatinHypercube(d=self.__len__())
+        sample = sampler.random(n=n)
+        sample = qmc.scale(sample, self.lo, self.hi)
+        return sample
+
     @property
     def lo(self) -> Union[ndarray, float]:
         return self.__lo

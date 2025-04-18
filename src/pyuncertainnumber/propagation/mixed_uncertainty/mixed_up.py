@@ -13,6 +13,9 @@ design signature hint:
     - share the same interface with minimal arguments set (vars, func, method)
     - all these funcs will have the possibilities to return some verbose results
     - where these verbose results can be saved to disk using a decorator
+
+note:
+    - a univariate func case is considered
 """
 
 
@@ -25,7 +28,16 @@ def interval_monte_carlo(
     """
     Args:
         vars (list): list of uncertain variables
-        dependency: dependency structure
+        dependency: dependency structure (e.g. vine copula or archimedean copula)
+    """
+    pass
+
+
+def bi_imc(vars, func, method, dependency):
+    """bivariate interval monte carlo
+
+    args:
+        dependency: dependency structure (regular copula)
     """
     pass
 
@@ -33,10 +45,25 @@ def interval_monte_carlo(
 def slicing(
     vars,
 ):
+    """independence assumption by now"""
     pass
 
 
 def double_monte_carlo(
     vars,
+    joint_distribution,
+    epis_vars,
+    n_a,
+    n_e,
+    func,
 ):
+    # X in R5. (1000, 5) -> f(X)
+    # samples: (n_ep, n_alea) e.g. (10, 1000)
+    """
+    args:
+        joint_distribution,: a sampler based on joint distribution of aleatory variables
+        epis_vars: epistemic variables
+        n_a: number of aleatory samples
+        n_e: number of epistemic samples
+    """
     pass

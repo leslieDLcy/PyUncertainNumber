@@ -16,9 +16,12 @@ def b2b(xs, func, *args, **kwargs) -> Interval:
 
     args:
         xs: list of intervals
-        func: performance or response function
+        func: performance or response function or a black-box model as in subprocess.
         *args: additional arguments to be passed to the function
         **kwargs: additional keyword arguments to be passed to the function
+
+    signature:
+        This shall be a top-level func as `epistemic_propagation()`.
 
     returns:
         Interval: the low and upper bound of the response

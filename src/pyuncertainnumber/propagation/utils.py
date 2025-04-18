@@ -3,6 +3,9 @@ import csv
 import pandas as pd
 import numpy as np
 
+# TODO Not quite sure if data saving behavior will be consistent across all aleatory, epistemic, mixed methods
+# TODO what will be saved for aleatory case? what will be saved for mixed case?
+
 
 class Propagation_results:
     """Stores the results of uncertainty propagation with multiple outputs, sharing raw_data x and f.
