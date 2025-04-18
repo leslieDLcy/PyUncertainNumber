@@ -41,7 +41,7 @@ def bound_steps_check(bound):
     return bound
 
 
-class Box(ABC):
+class Pbox(ABC):
     """a base class for Pbox"""
 
     def __init__(
@@ -144,7 +144,7 @@ class Box(ABC):
         return I(lo=self.left, hi=self.right)
 
 
-class Staircase(Box):
+class Staircase(Pbox):
     """distribution free p-box"""
 
     def __init__(
@@ -609,7 +609,7 @@ class Leaf(Staircase):
         pass
 
 
-class Cbox(Box):
+class Cbox(Pbox):
     def __init__(self, left, right, steps=200):
         super().__init__(left, right, steps)
 
@@ -624,7 +624,7 @@ def is_un(un):
     from .ds import DempsterShafer
     from .distributions import Distribution
 
-    return isinstance(un, Box | Interval | DempsterShafer | Distribution)
+    return isinstance(un, Pbox | Interval | DempsterShafer | Distribution)
 
 
 def convert_pbox(un):
@@ -639,7 +639,7 @@ def convert_pbox(un):
     from .distributions import Distribution
     from .intervals.number import Interval as I
 
-    if isinstance(un, Box):
+    if isinstance(un, Pbox):
         return un
     elif isinstance(un, I):
         return un.to_pbox()
