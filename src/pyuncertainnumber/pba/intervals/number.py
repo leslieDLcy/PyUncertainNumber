@@ -154,6 +154,16 @@ class Interval:
         sample = qmc.scale(sample, self.lo, self.hi)
         return sample
 
+    def endpoints_lhs_sample(self, n) -> np.ndarray:
+        """LHS sampling within the interval plus the endpoints
+
+        args:
+            n: number of samples
+        """
+        lhs_sample = self.lhs_sample(n)
+        endpoints = np.array([self.lo, self.hi])
+        return np.vstack((endpoints, lhs_sample))
+
     @property
     def lo(self) -> Union[ndarray, float]:
         return self.__lo
