@@ -1,5 +1,6 @@
 import numpy as np
 import tqdm
+from rich.progress import track
 from typing import Callable
 from scipy.stats import qmc  # Import Latin Hypercube Sampling from SciPy
 from pyuncertainnumber.propagation.utils import Propagation_results
@@ -114,7 +115,8 @@ def sampling_aleatory_method(
         case _:
             raise ValueError("Invalid UP method!")
 
-    # TODO discuss how to save verbose raw data
+    # TODO discuss the logic to save verbose raw data @ioannaioan
+    # TODO seems to be different behaviors between aleatory and epistemic methods
 
     if save_raw_data:
         # Transpose to have each row as a sample
@@ -124,8 +126,8 @@ def sampling_aleatory_method(
             all_output = np.array(
                 [
                     f(xi)
-                    for xi in tqdm.tqdm(
-                        samples, desc="function evaluations for samples"
+                    for xi in track(
+                        samples, description="function evaluations for samples"
                     )
                 ]
             )
