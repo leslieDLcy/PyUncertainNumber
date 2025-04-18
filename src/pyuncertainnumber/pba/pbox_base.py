@@ -332,13 +332,19 @@ class Pbox:
 #         ind = find_nearest(Params.p_values, p)
 #         return (self.left[ind], self.right[ind])
 
-#     def outer_approximate(self, n=100):
+#     def outer_approximate(self, n=None):
 #         """outer approximation of a p-box
 
+#         args:
+#             - n: number of steps to be used in the approximation
 #         note:
 #             - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
 #         """
-#         p_values = np.arange(0, n) / n
+#         if n is not None:
+#             p_values = np.arange(0, n) / n
+#         else:
+#             p_values = self.p_values
+
 #         p_leftend = p_values[0:-1]
 #         p_rightend = p_values[1:]
 

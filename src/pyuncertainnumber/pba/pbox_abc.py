@@ -303,26 +303,33 @@ class Staircase(Pbox):
         ind = find_nearest(Params.p_values, alpha)
         return I(lo=self.left[ind], hi=self.right[ind])
 
-    def outer_approximate(self, n=100) -> tuple:
+    def outer_approximate(self, n=None):
         """outer approximation of a p-box
 
+        args:
+            - n: number of steps to be used in the approximation
         note:
             - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
-
-        return:
-            all sliced slivers
         """
-        p_values = np.arange(0, n) / n
+
+        from .intervals.number import Interval as I
+
+        if n is not None:
+            p_values = np.arange(0, n) / n
+        else:
+            p_values = self.p_values
+
         p_leftend = p_values[0:-1]
         p_rightend = p_values[1:]
 
-        q_l = [self.cuth(p).left for p in p_leftend]
-        q_r = [self.cuth(p).right for p in p_rightend]
+        q_l = [self.alpha_cut(p).left for p in p_leftend]
+        q_r = [self.alpha_cut(p).right for p in p_rightend]
 
         # get the interval list
-        # TODO streamline below the interval list into Marco interval vector
-        the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
-        return p_values, the_interval_list
+        # # TODO streamline below the interval list into Marco interval vector
+        # the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
+        interval_vec = I(lo=q_l, hi=q_r)
+        return p_values, interval_vec
 
     def truncate(self, a, b, method="f"):
         """Equivalent to self.min(a,method).max(b,method)"""
