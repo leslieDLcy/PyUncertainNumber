@@ -132,6 +132,12 @@ class Pbox(ABC):
     def naked_value(self):
         return self.mean.mid
 
+    @property
+    def area_metric(self):
+        return np.trapezoid(y=self.left, x=self._pvalues) - np.trapezoid(
+            y=self.right, x=self._pvalues
+        )
+
     # * --------------------- operators ---------------------*#
 
     def __iter__(self):
@@ -327,6 +333,11 @@ class Staircase(Pbox):
 
         interval_vec = I(lo=q_l, hi=q_r)
         return p_values, interval_vec
+
+    def area_metric(self):
+        return np.trapezoid(y=self.left, x=self._pvalues) - np.trapezoid(
+            y=self.right, x=self._pvalues
+        )
 
     def truncate(self, a, b, method="f"):
         """Equivalent to self.min(a,method).max(b,method)"""
@@ -638,7 +649,7 @@ def convert_pbox(un):
         - theorically 'un' can be {Interval, DempsterShafer, Distribution, float, int}
     """
 
-    from .pbox_base import Pbox
+    from .pbox_abc import Pbox
     from .ds import DempsterShafer
     from .distributions import Distribution
     from .intervals.number import Interval as I
