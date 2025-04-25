@@ -134,8 +134,8 @@ class Pbox(ABC):
 
     @property
     def area_metric(self):
-        return np.trapezoid(y=self.left, x=self._pvalues) - np.trapezoid(
-            y=self.right, x=self._pvalues
+        return np.trapezoid(y=self._pvalues, x=self.left) - np.trapezoid(
+            y=self._pvalues, x=self.right
         )
 
     # * --------------------- operators ---------------------*#
@@ -323,7 +323,7 @@ class Staircase(Pbox):
         if n is not None:
             p_values = np.arange(0, n) / n
         else:
-            p_values = self.p_values
+            p_values = self._pvalues
 
         p_leftend = p_values[0:-1]
         p_rightend = p_values[1:]

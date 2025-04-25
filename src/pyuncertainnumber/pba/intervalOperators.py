@@ -62,7 +62,7 @@ def _scalar(bound: Number):
 
 
 def make_vec_interval(vec):
-    """vector interval implementation tmp"""
+    """transform the argument into a vector interval tmp"""
 
     assert len(vec) > 1, "Interval must have more than one element"
 
