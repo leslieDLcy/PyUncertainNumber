@@ -84,12 +84,17 @@ def weighted_ecdf(s, w=None, display=False) -> tuple:
         # weights
         N = len(s)
         w = np.repeat(1 / N, N)
+    else:
+        w = np.array(w)
 
-    s, w = sorting(s, w)
-    p = np.cumsum(w)
+    # s, w = sorting(s, w)
+    arr = np.stack((s, w), axis=1)
+    arr = arr[np.argsort(arr[:, 0])]
+
+    p = np.cumsum(arr[:, 1])
 
     # for box plotting
-    q = np.insert(s, 0, s[0], axis=0)
+    q = np.insert(arr[:, 0], 0, arr[0, 0], axis=0)
     p = np.insert(p, 0, 0.0, axis=0)
 
     if display == True:
