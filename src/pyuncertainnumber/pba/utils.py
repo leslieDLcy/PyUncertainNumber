@@ -136,34 +136,34 @@ def uniform_reparameterisation(a, b):
 import numpy as np
 
 
-def find_nearest(array, value):
-    """Find the index of the nearest value in the array to the given value(s).
+# def find_nearest(array, value):
+#     """Find the index of the nearest value in the array to the given value(s).
 
-    Works with both scalar and array inputs for `value`.
+#     Works with both scalar and array inputs for `value`.
 
-    Parameters:
-        array (np.ndarray): The array to search.
-        value (float or np.ndarray): The value(s) to find the nearest to.
+#     Parameters:
+#         array (np.ndarray): The array to search.
+#         value (float or np.ndarray): The value(s) to find the nearest to.
 
-    Returns:
-        int or np.ndarray: Index or array of indices of nearest values.
-    """
-    array = np.asarray(array)
+#     Returns:
+#         int or np.ndarray: Index or array of indices of nearest values.
+#     """
+#     array = np.asarray(array)
 
-    if np.isscalar(value):
-        # scalar case
-        ind = (np.abs(array - value)).argmin()
-        return ind
-    else:
-        # vectorized version for array input
-        value = np.asarray(value)
-        diff = np.abs(array[:, None] - value[None, :])
-        indices = np.argmin(diff, axis=0)
-        return indices
+#     if np.isscalar(value):
+#         # scalar case
+#         ind = (np.abs(array - value)).argmin()
+#         return ind
+#     else:
+#         # vectorized version for array input
+#         value = np.asarray(value)
+#         diff = np.abs(array[:, None] - value[None, :])
+#         indices = np.argmin(diff, axis=0)
+#         return indices
 
 
 # TODO to test this high-performance version below
-def find_nearest_vectorised(array, value):
+def find_nearest(array, value):
     """Find index/indices of nearest value(s) in `array` to each `value`.
 
     Efficient for both scalar and array inputs.

@@ -38,31 +38,7 @@ def interval_monte_carlo(
     pass
 
 
-# backup
-# def bi_imc(x, y, func, dependency=None, n=200):
-#     """bivariate interval monte carlo
-
-#     args:
-#         dependency: dependency structure (regular copula)
-#     func: callable
-#     x, y (Pbox) : Pbox
-#     """
-#     from scipy.stats import qmc
-#     from pyuncertainnumber.pba.intervalOperators import make_vec_interval
-#     from pyuncertainnumber.pba.aggregation import stacking
-
-#     alpha = qmc.LatinHypercube(d=1).random(n=n)
-#     x_i = make_vec_interval([x.alpha_cut(alpha) for p_v in alpha])
-#     y_i = make_vec_interval([y.alpha_cut(p_v) for p_v in alpha])
-
-#     container = []
-#     for _item in itertools.product(x_i, y_i):
-#         container.append(func(*_item))
-#     arr_interval = make_vec_interval(container)
-#     return stacking(arr_interval)
-
-
-def bi_imc(x, y, func, dependency=None, n=200):
+def bi_imc(x, y, func, dependency=None, n_sam=200):
     """bivariate interval monte carlo
 
     args:
@@ -71,16 +47,14 @@ def bi_imc(x, y, func, dependency=None, n=200):
     x, y (Pbox) : Pbox
     """
     from scipy.stats import qmc
-    from pyuncertainnumber.pba.intervalOperators import make_vec_interval
     from pyuncertainnumber.pba.aggregation import stacking
 
-    alpha = qmc.LatinHypercube(d=1).random(n=n)
+    alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
     x_i = x.alpha_cut(alpha)
     y_i = y.alpha_cut(alpha)
 
     container = [func(*_item) for _item in itertools.product(x_i, y_i)]
-    arr_interval = make_vec_interval(container)
-    return stacking(arr_interval)
+    return stacking(container)
 
 
 def slicing(
