@@ -38,7 +38,7 @@ def interval_monte_carlo(
     pass
 
 
-def bi_imc(x, y, func, dependency=None, n_sam=200):
+def bi_imc(x, y, func, dependency=None, n_sam=100):
     """bivariate interval monte carlo
 
     args:

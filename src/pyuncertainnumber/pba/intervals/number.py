@@ -392,6 +392,38 @@ class Interval:
         return not (self == other)
 
 
+# * -------------- lightweight Interval
+
+import numpy as np
+
+
+class LightweightInterval(Interval):
+    def __init__(
+        self,
+        lo: Union[float, np.ndarray],
+        hi: Optional[Union[float, np.ndarray]] = None,
+    ) -> None:
+        # Directly assign values without checks
+        self.__lo = lo
+        self.__hi = hi if hi is not None else lo
+
+        # Store the shape (this is just lo.shape, because they have the same shape)
+        self.__shape = ()
+
+    def __repr__(self):
+        return f"[{self.__lo},{self.__hi}]"
+
+    @property
+    def lo(self) -> Union[ndarray, float]:
+        return self.__lo
+
+    # if len(self.shape)==0: return self.__lo
+    # return self.__lo # return transpose(transpose(self.__val)[0]) # from shape (3,7,2) to (2,7,3) to (3,7)
+    @property
+    def hi(self) -> Union[ndarray, float]:
+        return self.__hi
+
+
 # Properties or maybe attributes of the interval class. These apply to all interval-like objects.
 
 #####################################################################################
