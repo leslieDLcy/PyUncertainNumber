@@ -78,10 +78,6 @@ def bi_imc(x, y, func, dependency=None, n=200):
     x_i = x.alpha_cut(alpha)
     y_i = y.alpha_cut(alpha)
 
-    # container = []
-    # for _item in itertools.product(x_i, y_i):
-    #     container.append(func(*_item))
-
     container = [func(*_item) for _item in itertools.product(x_i, y_i)]
     arr_interval = make_vec_interval(container)
     return stacking(arr_interval)

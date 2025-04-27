@@ -152,7 +152,8 @@ def find_nearest(array, value):
     else:
         # vectorized version for array input
         value = np.asarray(value)
-        indices = np.array([np.abs(array - v).argmin() for v in value])
+        diff = np.abs(array[:, None] - value[None, :])
+        indices = np.argmin(diff, axis=0)
         return indices
 
 
