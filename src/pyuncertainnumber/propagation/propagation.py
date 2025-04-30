@@ -15,6 +15,8 @@ from .mixed_uncertainty.mixed_up import (
     double_monte_carlo,
 )
 from ..pba.intervalOperators import make_vec_interval
+import numpy as np
+from scipy.stats import qmc
 
 """the new top-level module for the propagation of uncertain numbers"""
 
@@ -77,9 +79,28 @@ class AleatoryPropagation(P):
             "latin_hypercube",
         ], "Method not supported for aleatory uncertainty propagation"
 
-    def __call__(self):
+    def __call__(self, n_sam: int = 1000):
         """doing the propagation"""
-        pass
+        match self.method:
+            case "monte_carlo":
+                input_samples = np.array(
+                    [v.sample(n_sam) for v in self.vars]
+                )  # (n_vars, n_sam)
+                output_samples = self.func(input_samples)
+            case "latin_hypercube":
+                sampler = qmc.LatinHypercube(d=len(self.vars))
+                lhs_samples = sampler.random(n=n_sam)  # u-space (n, d)
+
+                input_samples = np.concatenate(
+                    [d.alpha_cut(lhs_samples[:, i]) for i, d in enumerate(self.vars)],
+                    axis=1,
+                )
+                # ! a shape check
+                print("shape check of input samples", input_samples.shape)
+                output_samples = self.func(input_samples)
+            case _:
+                raise ValueError("method not yet supported")
+        return output_samples
 
 
 class EpistemicPropagation(P):

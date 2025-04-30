@@ -1,5 +1,4 @@
 import numpy as np
-import tqdm
 from rich.progress import track
 from typing import Callable
 from scipy.stats import qmc  # Import Latin Hypercube Sampling from SciPy
