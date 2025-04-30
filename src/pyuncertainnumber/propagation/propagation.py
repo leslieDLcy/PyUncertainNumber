@@ -1,12 +1,3 @@
-"""the new top-level module for the propagation of uncertain numbers"""
-
-"""crossover logic
-
-UncertainNumber: ops are indeed the ops for the underlying constructs
-
-"""
-
-
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -23,6 +14,16 @@ from .mixed_uncertainty.mixed_up import (
     slicing,
     double_monte_carlo,
 )
+from ..pba.intervalOperators import make_vec_interval
+
+"""the new top-level module for the propagation of uncertain numbers"""
+
+"""crossover logic
+
+UncertainNumber: ops are indeed the ops for the underlying constructs
+
+"""
+
 
 if TYPE_CHECKING:
     from ..characterisation.uncertainNumber import UncertainNumber
@@ -32,11 +33,11 @@ from abc import ABC, abstractmethod
 
 
 class P(ABC):
-    def __init__(self, vars, func, method, save_results: bool = False):
+    def __init__(self, vars, func, method, save_raw_data: bool = False):
         self.vars = vars
         self.func = func
         self.method = method
-        self.save_results = save_results
+        self.save_raw_data = save_raw_data
 
     def _post_init(self):
         """some checks"""
@@ -59,8 +60,8 @@ class AleatoryPropagation(P):
 
     from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
 
-    def __init__(self, vars, func, method, save_results: bool = False):
-        super().__init__(vars, func, method, save_results)
+    def __init__(self, vars, func, method, save_raw_data: bool = False):
+        super().__init__(vars, func, method, save_raw_data)
 
     def type_check(self):
         """only distributions"""
@@ -82,8 +83,8 @@ class AleatoryPropagation(P):
 
 
 class EpistemicPropagation(P):
-    def __init__(self, vars, func, method, save_results: bool = False):
-        super().__init__(vars, func, method, save_results)
+    def __init__(self, vars, func, method, save_raw_data: bool = False):
+        super().__init__(vars, func, method, save_raw_data)
 
     def type_check(self):
         """only intervals"""
@@ -115,6 +116,7 @@ class EpistemicPropagation(P):
         ], f"Method {self.method} not supported for epistemic uncertainty propagation"
 
     def __call__(self, **kwargs):
+        #! caveat: possibly requires more kwargs for some methods
         """doing the propagation"""
         match self.method:
             case "endpoint" | "endpoints" | "vertex":
@@ -142,15 +144,20 @@ class EpistemicPropagation(P):
             case _:
                 raise ValueError("Unknown method")
 
+        # TODO: make the methods signature consistent
+        # TODO: ONLY an response interval needed to be returned
         results = handler(
-            self.vars, self.func, self.method, self._save_results, **kwargs
+            make_vec_interval(self.vars),
+            self.func,
+            self.save_raw_data,
+            **kwargs,
         )
         return results
 
 
 class MixedPropagation(P):
-    def __init__(self, vars, func, method, save_results: bool = False):
-        super().__init__(vars, func, method, save_results)
+    def __init__(self, vars, func, method, save_raw_data: bool = False):
+        super().__init__(vars, func, method, save_raw_data)
 
     # assume striped UM classes
     def type_check(self):
@@ -185,7 +192,7 @@ class MixedPropagation(P):
                 raise ValueError("Unknown method")
 
         results = handler(
-            self.vars, self.func, self.method, self._save_results, **kwargs
+            self.vars, self.func, self.method, self.save_raw_data, **kwargs
         )
         return results
 
@@ -198,13 +205,13 @@ class Propagation:
         vars: list[UncertainNumber],
         function: callable,
         method,
-        save_results: bool = False,
+        save_raw_data: bool = False,
         **kwargs,
     ):
         self._vars = vars
         self._func = function
         self.method = method
-        self._save_results = save_results
+        self.save_raw_data = save_raw_data
 
     def _post_init_check(self):
 

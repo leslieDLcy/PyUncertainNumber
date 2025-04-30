@@ -205,8 +205,8 @@ class Staircase(Pbox):
             """display two F curves plus the top-bottom horizontal lines"""
             ax.step(self.left, p_axis, c=plot_bound_colors[0], where="post")
             ax.step(self.right, p_axis, c=plot_bound_colors[1], where="post")
-            ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[0])
-            ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[1])
+            ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
+            ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
 
         if title is not None:
             ax.set_title(title)

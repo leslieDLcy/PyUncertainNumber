@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 from ...pba.intervals.number import Interval
 
 import numpy as np
-import tqdm
 from rich.progress import track
 from typing import Callable
 from .cartesian_product import cartesian
@@ -13,9 +12,9 @@ from ..utils import Propagation_results
 def subinterval_method(
     x: np.ndarray,
     f: Callable,
-    results: Propagation_results = None,
-    n_sub: np.array = 10,
     save_raw_data=False,
+    n_sub: np.array = 10,
+    results: Propagation_results = None,
 ) -> Propagation_results:  # Specify return type
     """The subinterval reconstitution method.
 

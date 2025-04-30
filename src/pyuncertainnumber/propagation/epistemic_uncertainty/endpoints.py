@@ -3,18 +3,18 @@ from typing import TYPE_CHECKING
 from ...pba.intervals.number import Interval
 
 import numpy as np
-import tqdm
 from rich.progress import track
 from typing import Callable
 from .cartesian_product import cartesian
 from ..utils import Propagation_results
 
 
+# TODO it currently takes 2D numpy array as input
 def endpoints_method(
     x: Interval | np.ndarray,
     f: Callable,
-    results: Propagation_results = None,
     save_raw_data=False,
+    results: Propagation_results = None,
 ) -> Propagation_results:
     """
         Performs uncertainty propagation using the endpoints or vertex method.
