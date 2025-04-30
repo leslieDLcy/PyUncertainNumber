@@ -76,8 +76,7 @@ def slicing(
         container.append(func(*_item))
 
     # print(len(container))  # shall be 40_000  # checkedout
-    arr_interval = make_vec_interval(container)
-    return stacking(arr_interval)
+    return stacking(container)
 
 
 def double_monte_carlo(

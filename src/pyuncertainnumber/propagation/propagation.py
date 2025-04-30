@@ -98,6 +98,8 @@ class AleatoryPropagation(P):
                 # ! a shape check
                 print("shape check of input samples", input_samples.shape)
                 output_samples = self.func(input_samples)
+            case "taylor_expansion":
+                pass
             case _:
                 raise ValueError("method not yet supported")
         return output_samples
