@@ -168,7 +168,7 @@ class EpistemicPropagation(P):
         # TODO: make the methods signature consistent
         # TODO: ONLY an response interval needed to be returned
         results = handler(
-            make_vec_interval(self._vars),
+            make_vec_interval(self._vars),  # pass down vec interval
             self.func,
             self.save_raw_data,
             **kwargs,

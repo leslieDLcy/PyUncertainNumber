@@ -220,6 +220,10 @@ class Interval:
         return self.__shape
 
     @property
+    def ndim(self):
+        return len(self.__shape)
+
+    @property
     def naked_value(self):
         return self.mid
 

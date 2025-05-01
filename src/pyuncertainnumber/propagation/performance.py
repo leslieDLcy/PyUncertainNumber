@@ -77,8 +77,11 @@ def cb_deflection_vectorised(x: np.ndarray | Interval):
         x (Interval or np.ndarray) : 2D inputs of  matrix shape, x.shape = (N, 4)
     """
 
-    #! works great for np arrays but not for interval objects
+    #! code below works great for np arrays but not for interval objects
     # x = np.atleast_2d(x)  # Ensures x is at least 2D: (N, 4)
+
+    if x.ndim == 1:
+        return cb_deflection(x)
 
     beam_length = x[:, 0]
     I = x[:, 1]
