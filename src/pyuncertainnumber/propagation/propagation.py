@@ -4,11 +4,9 @@ from typing import TYPE_CHECKING
 from .epistemic_uncertainty.endpoints import endpoints_method
 from .epistemic_uncertainty.extremepoints import extremepoints_method
 from .epistemic_uncertainty.subinterval import subinterval_method
-from .epistemic_uncertainty.sampling import sampling_method
 from .epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
 from .epistemic_uncertainty.local_optimisation import local_optimisation_method
 from .epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
-from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
 from .mixed_uncertainty.mixed_up import (
     interval_monte_carlo,
     slicing,

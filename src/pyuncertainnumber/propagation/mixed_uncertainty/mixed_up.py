@@ -52,7 +52,9 @@ def interval_monte_carlo(
     vars: list[Interval | Distribution | Pbox],
     func: callable,
     dependency=None,
+    method: str = None,
     n_sam: int = 100,
+    **kwargs,
 ):
     """
     Args:
@@ -60,13 +62,18 @@ def interval_monte_carlo(
         dependency: dependency structure (e.g. vine copula or archimedean copula)
     """
     from scipy.stats import qmc
+    from ..epistemic_uncertainty.b2b import b2b
 
     p_vars = [convert_pbox(v) for v in vars]
 
     # this change when there's specified dependency structure
     alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
     itvs = [v.alpha_cut(alpha) for v in p_vars]
-    container = [func(_item) for _item in itertools.product(*itvs)]
+
+    # b2b
+    b2b_f = partial(b2b, func=func, method=method, **kwargs)
+    container = [b2b_f(_item) for _item in itertools.product(*itvs)]
+    # container = [func(_item) for _item in itertools.product(*itvs)]  # backup
     return stacking(container)
 
 
@@ -79,10 +86,6 @@ def slicing(
     p_vars = [convert_pbox(v) for v in vars]
 
     itvs = [p.outer_approximate()[1] for p in p_vars]
-
-    # container = []
-    # for _item in itertools.product(itvs):
-    #     container.append(func(_item))
 
     container = [func(_item) for _item in itertools.product(*itvs)]
     # print(len(container))  # shall be 40_000  # checkedout
