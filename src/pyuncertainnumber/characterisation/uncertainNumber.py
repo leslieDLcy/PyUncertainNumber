@@ -10,20 +10,16 @@ from .utils import *
 from ..pba.params import Params
 from pint import UnitRegistry
 from pathlib import Path
-import itertools
 from ..nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
 from ..pba.pbox_parametric import named_pbox
 from typing import Sequence
-from ..pba.distributions import Distribution, named_dists
-from ..pba.operation import convert
+from ..pba.distributions import Distribution
 from ..pba.intervalOperators import parse_bounds
 from ..pba.intervals.number import Interval
 from numbers import Number
 from ..pba.distributions import Distribution
-from ..pba.intervalOperators import wc_scalar_interval
-from ..pba.pbox_abc import Leaf
 import operator
 
 
@@ -485,64 +481,6 @@ class UncertainNumber:
         _intervals = [all_objs[k].bounds for k in all_objs if k in vars]
         _UNintervals = np.array(_intervals).reshape(-1, 2)
         return _UNintervals
-
-    # ---------------------Uncertainty propatation methods---------------------#
-
-    # @classmethod
-    # def vertexMethod(cls, vars, func):
-    #     """implementation of the endpoints method for the uncertain number
-
-    #     args:
-    #         vars: list
-    #             the selected list of the symbols of UN or a list of arrays
-    #         func: function
-    #             the function to be applied to the uncertain number
-    #     """
-
-    #     if isinstance(vars[0], str):
-    #         # _UNintervals = UncertainNumber._IntervaltoCompBackend(vars) # bp
-    #         _UNintervals = UncertainNumber._toIntervalBackend(vars)
-    #         df = vM(_UNintervals, func)
-    #         return df
-    #     elif isinstance(vars[0], int | float):
-    #         # create a list of UN objects using hedge interpretation
-    #         def get_hedgedUN(a_num_list):
-    #             return [cls.from_hedge(f"{i}") for i in a_num_list]
-
-    #         UN_list = get_hedgedUN(vars)
-    #         _UNintervals = [k.bounds for k in UN_list]
-    #         _UNintervals = np.array(_UNintervals).reshape(-1, 2)
-
-    #         df = vM(_UNintervals, func)
-
-    #         return df
-
-    # @classmethod
-    # def endpointsMethod(cls, vars, func, **kwargs):
-    #     """implementation of the endpoints method for the uncertain number using
-    #     Marco's implementation
-
-    #     note:
-    #         `vars` shall be consistent with the signature of `func`. This means that
-    #         only a selected list of uncertain numbers will be used according to the func provided.
-
-    #     args:
-    #         vars: list
-    #             the chosen list of uncertain numbers
-    #         func: function
-    #             the function to be applied to the uncertain number
-    #     """
-    #     # _UNintervals = UncertainNumber._IntervaltoCompBackend(vars) # bp
-    #     _UNintervals = UncertainNumber._toIntervalBackend(vars)
-    #     output_bounds_lo, output_bounds_hi, _, _ = endpoints_propagation_2n(
-    #         _UNintervals, func
-    #     )
-    #     return cls(
-    #         essence="interval",
-    #         bounds=(output_bounds_lo, output_bounds_hi),
-    #         **kwargs,
-    #     )
-    #     # return endpoints_propagation_2n(_UNintervals, func)
 
     # ---------------------serialisation functions---------------------#
 
