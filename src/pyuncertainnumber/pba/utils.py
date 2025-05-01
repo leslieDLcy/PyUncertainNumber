@@ -301,3 +301,10 @@ def smooth_condensation(bounds, number=200):
     l_smooth = smooth_ecdf(bounds[0], number)
     r_smooth = smooth_ecdf(bounds[1], number)
     return l_smooth, r_smooth
+
+
+def equi_selection(arr, n):
+    """draw n equidistant points from the array"""
+    indices = np.linspace(0, len(arr) - 1, n, dtype=int)
+    selected = arr[indices]
+    return selected

@@ -51,15 +51,23 @@ def bi_imc(x, y, func, dependency=None, n_sam=100):
 def interval_monte_carlo(
     vars: list[Interval | Distribution | Pbox],
     func: callable,
-    method: str,
     dependency=None,
+    n_sam: int = 100,
 ):
     """
     Args:
         vars (list): list of uncertain variables
         dependency: dependency structure (e.g. vine copula or archimedean copula)
     """
-    pass
+    from scipy.stats import qmc
+
+    p_vars = [convert_pbox(v) for v in vars]
+
+    # this change when there's specified dependency structure
+    alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
+    itvs = [v.alpha_cut(alpha) for v in p_vars]
+    container = [func(_item) for _item in itertools.product(*itvs)]
+    return stacking(container)
 
 
 def slicing(
@@ -72,15 +80,16 @@ def slicing(
 
     itvs = [p.outer_approximate()[1] for p in p_vars]
 
-    container = []
-    for _item in itertools.product(itvs):
-        container.append(func(_item))
+    # container = []
+    # for _item in itertools.product(itvs):
+    #     container.append(func(_item))
 
+    container = [func(_item) for _item in itertools.product(*itvs)]
     # print(len(container))  # shall be 40_000  # checkedout
     return stacking(container)
 
 
-def equi_cutting(vars, func):
+def equi_cutting(vars, func, n_sam=100):
     """equid-probaility discretisation and alpha cutting
 
     args:
@@ -90,7 +99,7 @@ def equi_cutting(vars, func):
     p_vars = [convert_pbox(v) for v in vars]
 
     # get a lot of intervals
-    itvs = [v.discretise() for v in p_vars]
+    itvs = [v.discretise(n_sam) for v in p_vars]
 
     container = [func(_item) for _item in itertools.product(*itvs)]
     return stacking(container)

@@ -457,68 +457,68 @@ class Pbox:
 
     #             return Pbox(left=nleft, right=nright, steps=self.steps)
 
-    def pow(self, other: Self | float | int, method="f") -> Self:
-        """Raises a p-box to the power of other using the defined dependency method"""
+    # def pow(self, other: Self | float | int, method="f") -> Self:
+    #     """Raises a p-box to the power of other using the defined dependency method"""
 
-        self.check_dependency(method)
-        if isinstance(other, (float, int)):
-            # case with constant
-            try:
-                s = self.constant_shape_check()
-                return Pbox(
-                    left=self.left**other,
-                    right=self.right**other,
-                    shape=s,
-                    mean_left=self.mean_left**other,
-                    mean_right=self.mean_right**other,
-                    var_left=self.var_left,
-                    var_right=self.var_right,
-                    steps=self.steps,
-                )
-            except:
-                return NotImplemented
-        else:
-            other = convert(other)
-            self.steps_check(other)
+    #     self.check_dependency(method)
+    #     if isinstance(other, (float, int)):
+    #         # case with constant
+    #         try:
+    #             s = self.constant_shape_check()
+    #             return Pbox(
+    #                 left=self.left**other,
+    #                 right=self.right**other,
+    #                 shape=s,
+    #                 mean_left=self.mean_left**other,
+    #                 mean_right=self.mean_right**other,
+    #                 var_left=self.var_left,
+    #                 var_right=self.var_right,
+    #                 steps=self.steps,
+    #             )
+    #         except:
+    #             return NotImplemented
+    #     else:
+    #         other = convert(other)
+    #         self.steps_check(other)
 
-            match method:
-                case "f":
-                    nleft = np.empty(self.steps)
-                    nright = np.empty(self.steps)
+    #         match method:
+    #             case "f":
+    #                 nleft = np.empty(self.steps)
+    #                 nright = np.empty(self.steps)
 
-                    for i in range(0, self.steps):
-                        j = np.array(range(i, self.steps))
-                        k = np.array(range(self.steps - 1, i - 1, -1))
+    #                 for i in range(0, self.steps):
+    #                     j = np.array(range(i, self.steps))
+    #                     k = np.array(range(self.steps - 1, i - 1, -1))
 
-                        nright[i] = np.min(self.right[j] ** other.right[k])
+    #                     nright[i] = np.min(self.right[j] ** other.right[k])
 
-                        jj = np.array(range(0, i + 1))
-                        kk = np.array(range(i, -1, -1))
+    #                     jj = np.array(range(0, i + 1))
+    #                     kk = np.array(range(i, -1, -1))
 
-                        nleft[i] = np.max(self.left[jj] ** other.left[kk])
-                case "p":
+    #                     nleft[i] = np.max(self.left[jj] ** other.left[kk])
+    #             case "p":
 
-                    nleft = self.left**other.left
-                    nright = self.right**other.right
-                case "o":
+    #                 nleft = self.left**other.left
+    #                 nright = self.right**other.right
+    #             case "o":
 
-                    nleft = self.left ** np.flip(other.right)
-                    nright = self.right ** np.flip(other.left)
-                case "i":
+    #                 nleft = self.left ** np.flip(other.right)
+    #                 nright = self.right ** np.flip(other.left)
+    #             case "i":
 
-                    nleft = []
-                    nright = []
-                    for i in self.left:
-                        for j in other.left:
-                            nleft.append(i + j)
-                    for ii in self.right:
-                        for jj in other.right:
-                            nright.append(ii + jj)
+    #                 nleft = []
+    #                 nright = []
+    #                 for i in self.left:
+    #                     for j in other.left:
+    #                         nleft.append(i + j)
+    #                 for ii in self.right:
+    #                     for jj in other.right:
+    #                         nright.append(ii + jj)
 
-            nleft.sort()
-            nright.sort()
+    #         nleft.sort()
+    #         nright.sort()
 
-            return Pbox(left=nleft, right=nright, steps=self.steps)
+    #         return Pbox(left=nleft, right=nright, steps=self.steps)
 
 
 #     def sub(self, other, method="f"):
