@@ -1,6 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+from numbers import Number
 import numpy as np
 
 """ This module contains the some examplar performance/response functions  """
+
+
+if TYPE_CHECKING:
+    from ..pba.intervals.number import Interval
 
 
 def cb_func(x):
@@ -35,7 +42,7 @@ def cb_func(x):
     return np.array([deflection, stress])
 
 
-def cb_deflection(x):
+def cb_deflection(x: list[Number] | np.ndarray | Interval | list[Interval]):
     """Calculates deflection and stress for a cantilever beam.
 
     Args:
@@ -63,12 +70,15 @@ def cb_deflection(x):
     return deflection
 
 
-def cb_deflection_vectorised(x):
+def cb_deflection_vectorised(x: np.ndarray | Interval):
+    """Vectorised version for calculating cantilever beam deflection over multiple inputs.
+
+    args:
+        x (Interval or np.ndarray) : 2D inputs of  matrix shape, x.shape = (N, 4)
     """
-    Vectorized version for calculating cantilever beam deflection over multiple inputs.
-    x.shape = (N, 4)
-    """
-    x = np.atleast_2d(x)  # Ensures x is at least 2D: (N, 4)
+
+    #! works great for np arrays but not for interval objects
+    # x = np.atleast_2d(x)  # Ensures x is at least 2D: (N, 4)
 
     beam_length = x[:, 0]
     I = x[:, 1]
