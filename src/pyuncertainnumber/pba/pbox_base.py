@@ -1,526 +1,525 @@
 class Pbox:
     pass
 
+    # from .operation import convert
+    # from decimal import DivisionByZero
+    # from typing import Self
+    # from warnings import *
+    # import numpy as np
+    # from matplotlib import pyplot as plt
+
+    # from .utils import (
+    #     find_nearest,
+    #     is_increasing,
+    #     _interval_list_to_array,
+    # )
+    # from .params import Params
+    # import importlib
+
+    # __all__ = [
+    #     "Pbox",
+    #     "truncate",
+    #     "NotIncreasingError",
+    # ]
+
+    # class Pbox:
+    #     """
+    #     A probability distribution is a mathematical function that gives the probabilities of occurrence for diﬀerent possible values of a variable. Probability boxes (p-boxes) represent interval bounds on probability distributions. The left and right quantiles are each stored as a NumPy array containing the percent point function (the inverse of the cumulative distribution function) for `steps` evenly spaced values between 0 and 1. P-boxes can be defined using all the probability distributions that are available through SciPy's statistics library. Naturally, precis probability distributions can be defined by defining a p-box with precise inputs. This means that within probability bounds analysis probability distributions are considered a special case of a p-box with zero width. Distribution-free p-boxes can also be generated when the underlying distribution is unknown but parameters such as the mean, variance or minimum/maximum bounds are known. Such p-boxes make no assumption about the shape of the distribution and instead return bounds expressing all possible distributions that are valid given the known information. Such p-boxes can be constructed making use of Chebyshev, Markov and Cantelli inequalities from probability theory.
+    #     """
+
+    #     def __init__(
+    #         self,
+    #         left=None,
+    #         right=None,
+    #         steps=None,
+    #         shape=None,
+    #         mean_left=None,
+    #         mean_right=None,
+    #         var_left=None,
+    #         var_right=None,
+    #         interpolation="linear",
+    #     ):
+    #         """
+    #         args:
+    #             - left (list, NumPy array,   or numeric type): Left bound of the p-box.
+
+    #         note:
+    #             - If left is None, the left bound is set to -inf.
+    #         """
+    #         self.shape = shape
+
+    #         def init_check(left, right, steps):
+    #             """initialisation logic"""
+
+    #             if isinstance(left, np.ndarray) and isinstance(right, np.ndarray):
+    #                 if len(left) != len(right):
+    #                     raise Exception("Left and right arrays must be the same length")
+    #                 else:
+    #                     steps = len(left)
+
+    #             if steps is None:
+    #                 if hasattr(left, "__len__"):
+    #                     steps = len(left)
+    #                 elif hasattr(right, "__len__"):
+    #                     steps = len(right)
+    #                 else:
+    #                     steps = Params.steps
+
+    #             if (left is not None) and (right is None):
+    #                 right = left
+
+    #             if left is None and right is None:
+    #                 left = np.array([-np.inf] * steps)
+    #                 right = np.array([np.inf] * steps)
+
+    #             # if len(left) == len(right) and len(left) != steps:
+    #             #     print("WARNING: The left and right arrays have the same length which is inconsistent with steps.")
+
+    #             if len(left) != steps:
+    #                 left = _interpolate(
+    #                     left, interpolation=interpolation, left=False, steps=steps
+    #                 )
+
+    #             if len(right) != steps:
+    #                 right = _interpolate(
+    #                     right, interpolation=interpolation, left=True, steps=steps
+    #                 )
+
+    #             if not is_increasing(left) or not is_increasing(right):
+    #                 raise Exception("Left and right arrays must be increasing")
+
+    #             l, r = zip(*[(min(i), max(i)) for i in zip(left, right)])
+    #             self.left = np.array(l)
+    #             self.right = np.array(r)
+    #             self.steps = steps
+    #             self.mean_left = -np.inf
+    #             self.mean_right = np.inf
+    #             self.var_left = 0
+    #             self.var_right = np.inf
+
+    #         init_check(left, right, steps)
+
+    #         if mean_left is not None:
+    #             self.mean_left = np.max([mean_left, self.mean_left])
+    #         if mean_right is not None:
+    #             self.mean_right = np.min([mean_right, self.mean_right])
+    #         if var_left is not None:
+    #             self.var_left = np.max([var_left, self.var_left])
+    #         if var_right is not None:
+    #             self.var_right = np.min([var_right, self.var_right])
+
+    #         self._computemoments()
+    #         self._checkmoments()
+    #         self.get_range()
+
+    #     def __repr__(self):
+    #         # * migrated
+    #         if self.mean_left == self.mean_right:
+    #             mean_text = f"{round(self.mean_left, 4)}"
+    #         else:
+    #             mean_text = f"[{round(self.mean_left, 4)}, {round(self.mean_right, 4)}]"
 
-# from .operation import convert
-# from decimal import DivisionByZero
-# from typing import Self
-# from warnings import *
-# import numpy as np
-# from matplotlib import pyplot as plt
-
-# from .utils import (
-#     find_nearest,
-#     is_increasing,
-#     _interval_list_to_array,
-# )
-# from .params import Params
-# import importlib
-
-# __all__ = [
-#     "Pbox",
-#     "truncate",
-#     "NotIncreasingError",
-# ]
-
-
-# class Pbox:
-#     """
-#     A probability distribution is a mathematical function that gives the probabilities of occurrence for diﬀerent possible values of a variable. Probability boxes (p-boxes) represent interval bounds on probability distributions. The left and right quantiles are each stored as a NumPy array containing the percent point function (the inverse of the cumulative distribution function) for `steps` evenly spaced values between 0 and 1. P-boxes can be defined using all the probability distributions that are available through SciPy's statistics library. Naturally, precis probability distributions can be defined by defining a p-box with precise inputs. This means that within probability bounds analysis probability distributions are considered a special case of a p-box with zero width. Distribution-free p-boxes can also be generated when the underlying distribution is unknown but parameters such as the mean, variance or minimum/maximum bounds are known. Such p-boxes make no assumption about the shape of the distribution and instead return bounds expressing all possible distributions that are valid given the known information. Such p-boxes can be constructed making use of Chebyshev, Markov and Cantelli inequalities from probability theory.
-#     """
-
-#     def __init__(
-#         self,
-#         left=None,
-#         right=None,
-#         steps=None,
-#         shape=None,
-#         mean_left=None,
-#         mean_right=None,
-#         var_left=None,
-#         var_right=None,
-#         interpolation="linear",
-#     ):
-#         """
-#         args:
-#             - left (list, NumPy array,   or numeric type): Left bound of the p-box.
-
-#         note:
-#             - If left is None, the left bound is set to -inf.
-#         """
-#         self.shape = shape
-
-#         def init_check(left, right, steps):
-#             """initialisation logic"""
-
-#             if isinstance(left, np.ndarray) and isinstance(right, np.ndarray):
-#                 if len(left) != len(right):
-#                     raise Exception("Left and right arrays must be the same length")
-#                 else:
-#                     steps = len(left)
-
-#             if steps is None:
-#                 if hasattr(left, "__len__"):
-#                     steps = len(left)
-#                 elif hasattr(right, "__len__"):
-#                     steps = len(right)
-#                 else:
-#                     steps = Params.steps
-
-#             if (left is not None) and (right is None):
-#                 right = left
-
-#             if left is None and right is None:
-#                 left = np.array([-np.inf] * steps)
-#                 right = np.array([np.inf] * steps)
-
-#             # if len(left) == len(right) and len(left) != steps:
-#             #     print("WARNING: The left and right arrays have the same length which is inconsistent with steps.")
-
-#             if len(left) != steps:
-#                 left = _interpolate(
-#                     left, interpolation=interpolation, left=False, steps=steps
-#                 )
-
-#             if len(right) != steps:
-#                 right = _interpolate(
-#                     right, interpolation=interpolation, left=True, steps=steps
-#                 )
-
-#             if not is_increasing(left) or not is_increasing(right):
-#                 raise Exception("Left and right arrays must be increasing")
-
-#             l, r = zip(*[(min(i), max(i)) for i in zip(left, right)])
-#             self.left = np.array(l)
-#             self.right = np.array(r)
-#             self.steps = steps
-#             self.mean_left = -np.inf
-#             self.mean_right = np.inf
-#             self.var_left = 0
-#             self.var_right = np.inf
-
-#         init_check(left, right, steps)
-
-#         if mean_left is not None:
-#             self.mean_left = np.max([mean_left, self.mean_left])
-#         if mean_right is not None:
-#             self.mean_right = np.min([mean_right, self.mean_right])
-#         if var_left is not None:
-#             self.var_left = np.max([var_left, self.var_left])
-#         if var_right is not None:
-#             self.var_right = np.min([var_right, self.var_right])
-
-#         self._computemoments()
-#         self._checkmoments()
-#         self.get_range()
-
-#     def __repr__(self):
-#         # * migrated
-#         if self.mean_left == self.mean_right:
-#             mean_text = f"{round(self.mean_left, 4)}"
-#         else:
-#             mean_text = f"[{round(self.mean_left, 4)}, {round(self.mean_right, 4)}]"
+    #         if self.var_left == self.var_right:
+    #             var_text = f"{round(self.var_left, 4)}"
+    #         else:
+    #             var_text = f"[{round(self.var_left, 4)}, {round(self.var_right, 4)}]"
 
-#         if self.var_left == self.var_right:
-#             var_text = f"{round(self.var_left, 4)}"
-#         else:
-#             var_text = f"[{round(self.var_left, 4)}, {round(self.var_right, 4)}]"
+    #         range_text = [f"{val:.2f}" for val in self._range_list]
 
-#         range_text = [f"{val:.2f}" for val in self._range_list]
+    #         if self.shape is None:
+    #             shape_text = " "
+    #         else:
+    #             # space to start; see below lacking space
+    #             shape_text = f" {self.shape}"
 
-#         if self.shape is None:
-#             shape_text = " "
-#         else:
-#             # space to start; see below lacking space
-#             shape_text = f" {self.shape}"
+    #         return (
+    #             f"Pbox: ~{shape_text}(range={range_text}, mean={mean_text}, var={var_text})"
+    #         )
 
-#         return (
-#             f"Pbox: ~{shape_text}(range={range_text}, mean={mean_text}, var={var_text})"
-#         )
+    #     __str__ = __repr__
 
-#     __str__ = __repr__
+    #     def __iter__(self):
+    #         for val in np.array([self.left, self.right]).flatten():
+    #             yield val
 
-#     def __iter__(self):
-#         for val in np.array([self.left, self.right]).flatten():
-#             yield val
+    #     # * ---------------------Basic arithmetics---------------------*#
 
-#     # * ---------------------Basic arithmetics---------------------*#
+    #     def __neg__(self):
+    #         if self.shape in ["uniform", "normal", "cauchy", "triangular", "skew-normal"]:
+    #             s = self.shape
+    #         else:
+    #             s = ""
 
-#     def __neg__(self):
-#         if self.shape in ["uniform", "normal", "cauchy", "triangular", "skew-normal"]:
-#             s = self.shape
-#         else:
-#             s = ""
+    #         return Pbox(
+    #             left=sorted(-np.flip(self.right)),
+    #             right=sorted(-np.flip(self.left)),
+    #             steps=len(self.left),
+    #             shape=s,
+    #             mean_left=-self.mean_right,
+    #             mean_right=-self.mean_left,
+    #             var_left=self.var_left,
+    #             var_right=self.var_right,
+    #         )
 
-#         return Pbox(
-#             left=sorted(-np.flip(self.right)),
-#             right=sorted(-np.flip(self.left)),
-#             steps=len(self.left),
-#             shape=s,
-#             mean_left=-self.mean_right,
-#             mean_right=-self.mean_left,
-#             var_left=self.var_left,
-#             var_right=self.var_right,
-#         )
-
-#     def __lt__(self, other):
-#         return self.lt(other, method="f")
+    #     def __lt__(self, other):
+    #         return self.lt(other, method="f")
 
-#     def __rlt__(self, other):
-#         return self.ge(other, method="f")
-
-#     def __le__(self, other):
-#         return self.le(other, method="f")
-
-#     def __rle__(self, other):
-#         return self.gt(other, method="f")
-
-#     def __gt__(self, other):
-#         return self.gt(other, method="f")
+    #     def __rlt__(self, other):
+    #         return self.ge(other, method="f")
+
+    #     def __le__(self, other):
+    #         return self.le(other, method="f")
 
-#     def __rgt__(self, other):
-#         return self.le(other, method="f")
-
-#     def __ge__(self, other):
-#         return self.ge(other, method="f")
-
-#     def __rge__(self, other):
-#         return self.lt(other, method="f")
-
-#     # * --------------- bitwise --------------- *#
-#     def __and__(self, other):
-#         return self.logicaland(other, method="f")
-
-#     def __rand__(self, other):
-#         return self.logicaland(other, method="f")
-
-#     def __or__(self, other):
-#         return self.logicalor(other, method="f")
+    #     def __rle__(self, other):
+    #         return self.gt(other, method="f")
 
-#     def __ror__(self, other):
-#         return self.logicalor(other, method="f")
+    #     def __gt__(self, other):
+    #         return self.gt(other, method="f")
 
-#     # * --------------- arithmetic --------------- *#
-#     def __add__(self, other):
-#         return self.add(other, method="f")
+    #     def __rgt__(self, other):
+    #         return self.le(other, method="f")
+
+    #     def __ge__(self, other):
+    #         return self.ge(other, method="f")
+
+    #     def __rge__(self, other):
+    #         return self.lt(other, method="f")
+
+    #     # * --------------- bitwise --------------- *#
+    #     def __and__(self, other):
+    #         return self.logicaland(other, method="f")
+
+    #     def __rand__(self, other):
+    #         return self.logicaland(other, method="f")
+
+    #     def __or__(self, other):
+    #         return self.logicalor(other, method="f")
 
-#     def __radd__(self, other):
-#         return self.add(other, method="f")
-
-#     def __sub__(self, other):
-#         return self.sub(other, method="f")
+    #     def __ror__(self, other):
+    #         return self.logicalor(other, method="f")
 
-#     def __rsub__(self, other):
-#         self = -self
-#         return self.add(other, method="f")
+    #     # * --------------- arithmetic --------------- *#
+    #     def __add__(self, other):
+    #         return self.add(other, method="f")
 
-#     def __mul__(self, other):
-#         return self.mul(other, method="f")
+    #     def __radd__(self, other):
+    #         return self.add(other, method="f")
 
-#     def __rmul__(self, other):
-#         return self.mul(other, method="f")
+    #     def __sub__(self, other):
+    #         return self.sub(other, method="f")
 
-#     def __pow__(self, other):
-#         return self.pow(other, method="f")
+    #     def __rsub__(self, other):
+    #         self = -self
+    #         return self.add(other, method="f")
 
-#     def __rpow__(self, other):
-#         if not hasattr(other, "__iter__"):
-#             other = np.array((other))
+    #     def __mul__(self, other):
+    #         return self.mul(other, method="f")
 
-#         b = Pbox(other)
-#         return b.pow(self, method="f")
+    #     def __rmul__(self, other):
+    #         return self.mul(other, method="f")
 
-#     def __truediv__(self, other):
-
-#         return self.div(other, method="f")
+    #     def __pow__(self, other):
+    #         return self.pow(other, method="f")
 
-#     def __rtruediv__(self, other):
+    #     def __rpow__(self, other):
+    #         if not hasattr(other, "__iter__"):
+    #             other = np.array((other))
 
-#         try:
-#             return other * self.recip()
-#         except:
-#             return NotImplemented
-
-#     # * ---------------------properties---------------------*#
-#     @property
-#     def range(self):
-#         """leslie defined range property"""
-#         return self._range_list
-
-#     @property
-#     def lo(self):
-#         """
-#         Returns the left-most value in the interval
-#         """
-#         return self.left[0]
-
-#     @property
-#     def hi(self):
-#         """
-#         Returns the right-most value in the interval
-#         """
-#         return self.right[-1]
-
-#     # * --------------------- methods---------------------*#
-
-#     def get_range(self):
-#         """get the quantile range of either a pbox or a distribution"""
-#         self._range_list = [
-#             np.min([self.left, self.right]).tolist(),
-#             np.max([self.left, self.right]).tolist(),
-#         ]
-
-#     def _computemoments(self):
-#         # * migrated
-
-#         #   # should we compute mean if it is a Cauchy, var if it's a t distribution?
-#         self.mean_left = np.max([self.mean_left, np.mean(self.left)])
-#         self.mean_right = np.min([self.mean_right, np.mean(self.right)])
-
-#         if not (
-#             np.any(np.array(self.left) <= -np.inf)
-#             or np.any(np.inf <= np.array(self.right))
-#         ):
-#             V, JJ = 0, 0
-#             j = np.array(range(self.steps))
-
-#             for J in np.array(range(self.steps)) - 1:
-#                 ud = [*self.left[j < J], *self.right[J <= j]]
-#                 v = _sideVariance(ud)
-
-#                 if V < v:
-#                     JJ = J
-#                     V = v
-
-#             self.var_right = V
-
-#     def _checkmoments(self):
-
-#         a = (self.mean_left, self.mean_right)  # mean(x)
-#         b = _dwMean(self)
-
-#         self.mean_left = np.max([left(a), left(b)])
-#         self.mean_right = np.min([right(a), right(b)])
-
-#         if self.mean_right < self.mean_left:
-#             # use the observed mean
-#             self.mean_left = left(b)
-#             self.mean_right = right(b)
-
-#         a = (self.var_left, self.var_right)  # var(x)
-#         b = _dwMean(self)
-
-#         self.var_left = np.max([left(a), left(b)])
-#         self.var_right = np.min([right(a), right(b)])
-
-#         if self.var_right < self.var_left:
-#             # use the observed variance
-#             self.var_left = left(b)
-#             self.var_right = right(b)
-
-#     # * ---------------------dual interpretation ---------------------#
-
-#     def cutv(self, x):
-#         """get the bounds on the cumulative probability associated with any x-value"""
-#         lo_ind = find_nearest(self.right, x)
-#         hi_ind = find_nearest(self.left, x)
-#         return (Params.p_values[lo_ind], Params.p_values[hi_ind])
-
-#     def cuth(self, p=0.5):
-#         """get the bounds on the quantile at any particular probability level"""
-#         # TODO have a conservative cut.
-#         ind = find_nearest(Params.p_values, p)
-#         return (self.left[ind], self.right[ind])
-
-#     def outer_approximate(self, n=None):
-#         """outer approximation of a p-box
-
-#         args:
-#             - n: number of steps to be used in the approximation
-#         note:
-#             - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
-#         """
-#         if n is not None:
-#             p_values = np.arange(0, n) / n
-#         else:
-#             p_values = self.p_values
-
-#         p_leftend = p_values[0:-1]
-#         p_rightend = p_values[1:]
-
-#         q_l = [self.cuth(p).left for p in p_leftend]
-#         q_r = [self.cuth(p).right for p in p_rightend]
-
-#         # get the interval list
-#         # TODO streamline below the interval list into Marco interval vector
-#         the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
-#         return p_values, the_interval_list
-
-#     # * ---------------------unary operations--------------------- *#
-#     ##### the top-level functions for unary operations #####
-
-#     def _unary(self, *args, function=lambda x: x):
-#         """for monotonic unary functions only"""
-
-#         ints = [function((l, r), *args) for l, r in zip(self.left, self.right)]
-#         return Pbox(
-#             left=np.array([i.left for i in ints]),
-#             right=np.array([i.right for i in ints]),
-#         )
-
-#     def exp(self):
-#         return self._unary(function=lambda x: x.exp())
-
-#     def sqrt(self):
-#         return self._unary(function=lambda x: x.sqrt())
-
-#     def recip(self):
-#         return Pbox(
-#             left=1 / np.flip(self.right), right=1 / np.flip(self.left), steps=self.steps
-#         )
-
-#     # * ---------------------binary operations--------------------- *#
-#     @staticmethod
-#     def check_dependency(method):
-#         if method not in ["f", "p", "o", "i"]:
-#             raise ArithmeticError("dependency not registered")
-
-#     def constant_shape_check(self):
-#         """a helper drop in for define binary ops"""
-#         if self.shape in [
-#             "uniform",
-#             "normal",
-#             "cauchy",
-#             "triangular",
-#             "skew-normal",
-#         ]:
-#             s = self.shape
-#         else:
-#             s = ""
-#         return s
-
-#     def steps_check(self, other):
-#         if self.steps != other.steps:
-#             raise ArithmeticError("Both Pboxes must have the same number of steps")
-
-#     def add(self, other: Self | float | int, method="f") -> Self:
-#         """addtion of uncertain numbers with the defined dependency method"""
-
-#         self.check_dependency(method)
-#         if isinstance(other, (float, int)):
-#             # case with constant
-#             try:
-#                 s = self.constant_shape_check()
-#                 return Pbox(
-#                     left=self.left + other,
-#                     right=self.right + other,
-#                     shape=s,
-#                     mean_left=self.mean_left + other,
-#                     mean_right=self.mean_right + other,
-#                     var_left=self.var_left,
-#                     var_right=self.var_right,
-#                     steps=self.steps,
-#                 )
-#             except:
-#                 return NotImplemented
-
-#         else:
-#             other = convert(other)
-#             self.steps_check(other)
-
-#             match method:
-#                 case "f":
-#                     nleft = np.empty(self.steps)
-#                     nright = np.empty(self.steps)
-#                     for i in range(0, self.steps):
-#                         j = np.array(range(i, self.steps))
-#                         k = np.array(range(self.steps - 1, i - 1, -1))
-#                         nright[i] = np.min(self.right[j] + other.right[k])
-#                         jj = np.array(range(0, i + 1))
-#                         kk = np.array(range(i, -1, -1))
-#                         nleft[i] = np.max(self.left[jj] + other.left[kk])
-#                 case "p":
-#                     nleft = self.left + other.left
-#                     nright = self.right + other.right
-#                 case "o":
-#                     nleft = self.left + np.flip(other.right)
-#                     nright = self.right + np.flip(other.left)
-#                 case "i":
-#                     nleft = []
-#                     nright = []
-#                     for i in self.left:
-#                         for j in other.left:
-#                             nleft.append(i + j)
-#                     for ii in self.right:
-#                         for jj in other.right:
-#                             nright.append(ii + jj)
-#             nleft.sort()
-#             nright.sort()
-
-#             return Pbox(left=nleft, right=nright, steps=self.steps)
-
-#     def pow(self, other: Self | float | int, method="f") -> Self:
-#         """Raises a p-box to the power of other using the defined dependency method"""
-
-#         self.check_dependency(method)
-#         if isinstance(other, (float, int)):
-#             # case with constant
-#             try:
-#                 s = self.constant_shape_check()
-#                 return Pbox(
-#                     left=self.left**other,
-#                     right=self.right**other,
-#                     shape=s,
-#                     mean_left=self.mean_left**other,
-#                     mean_right=self.mean_right**other,
-#                     var_left=self.var_left,
-#                     var_right=self.var_right,
-#                     steps=self.steps,
-#                 )
-#             except:
-#                 return NotImplemented
-#         else:
-#             other = convert(other)
-#             self.steps_check(other)
-
-#             match method:
-#                 case "f":
-#                     nleft = np.empty(self.steps)
-#                     nright = np.empty(self.steps)
-
-#                     for i in range(0, self.steps):
-#                         j = np.array(range(i, self.steps))
-#                         k = np.array(range(self.steps - 1, i - 1, -1))
-
-#                         nright[i] = np.min(self.right[j] ** other.right[k])
-
-#                         jj = np.array(range(0, i + 1))
-#                         kk = np.array(range(i, -1, -1))
-
-#                         nleft[i] = np.max(self.left[jj] ** other.left[kk])
-#                 case "p":
-
-#                     nleft = self.left**other.left
-#                     nright = self.right**other.right
-#                 case "o":
-
-#                     nleft = self.left ** np.flip(other.right)
-#                     nright = self.right ** np.flip(other.left)
-#                 case "i":
-
-#                     nleft = []
-#                     nright = []
-#                     for i in self.left:
-#                         for j in other.left:
-#                             nleft.append(i + j)
-#                     for ii in self.right:
-#                         for jj in other.right:
-#                             nright.append(ii + jj)
-
-#             nleft.sort()
-#             nright.sort()
-
-#             return Pbox(left=nleft, right=nright, steps=self.steps)
+    #         b = Pbox(other)
+    #         return b.pow(self, method="f")
+
+    #     def __truediv__(self, other):
+
+    #         return self.div(other, method="f")
+
+    #     def __rtruediv__(self, other):
+
+    #         try:
+    #             return other * self.recip()
+    #         except:
+    #             return NotImplemented
+
+    #     # * ---------------------properties---------------------*#
+    #     @property
+    #     def range(self):
+    #         """leslie defined range property"""
+    #         return self._range_list
+
+    #     @property
+    #     def lo(self):
+    #         """
+    #         Returns the left-most value in the interval
+    #         """
+    #         return self.left[0]
+
+    #     @property
+    #     def hi(self):
+    #         """
+    #         Returns the right-most value in the interval
+    #         """
+    #         return self.right[-1]
+
+    #     # * --------------------- methods---------------------*#
+
+    #     def get_range(self):
+    #         """get the quantile range of either a pbox or a distribution"""
+    #         self._range_list = [
+    #             np.min([self.left, self.right]).tolist(),
+    #             np.max([self.left, self.right]).tolist(),
+    #         ]
+
+    #     def _computemoments(self):
+    #         # * migrated
+
+    #         #   # should we compute mean if it is a Cauchy, var if it's a t distribution?
+    #         self.mean_left = np.max([self.mean_left, np.mean(self.left)])
+    #         self.mean_right = np.min([self.mean_right, np.mean(self.right)])
+
+    #         if not (
+    #             np.any(np.array(self.left) <= -np.inf)
+    #             or np.any(np.inf <= np.array(self.right))
+    #         ):
+    #             V, JJ = 0, 0
+    #             j = np.array(range(self.steps))
+
+    #             for J in np.array(range(self.steps)) - 1:
+    #                 ud = [*self.left[j < J], *self.right[J <= j]]
+    #                 v = _sideVariance(ud)
+
+    #                 if V < v:
+    #                     JJ = J
+    #                     V = v
+
+    #             self.var_right = V
+
+    #     def _checkmoments(self):
+
+    #         a = (self.mean_left, self.mean_right)  # mean(x)
+    #         b = _dwMean(self)
+
+    #         self.mean_left = np.max([left(a), left(b)])
+    #         self.mean_right = np.min([right(a), right(b)])
+
+    #         if self.mean_right < self.mean_left:
+    #             # use the observed mean
+    #             self.mean_left = left(b)
+    #             self.mean_right = right(b)
+
+    #         a = (self.var_left, self.var_right)  # var(x)
+    #         b = _dwMean(self)
+
+    #         self.var_left = np.max([left(a), left(b)])
+    #         self.var_right = np.min([right(a), right(b)])
+
+    #         if self.var_right < self.var_left:
+    #             # use the observed variance
+    #             self.var_left = left(b)
+    #             self.var_right = right(b)
+
+    #     # * ---------------------dual interpretation ---------------------#
+
+    #     def cutv(self, x):
+    #         """get the bounds on the cumulative probability associated with any x-value"""
+    #         lo_ind = find_nearest(self.right, x)
+    #         hi_ind = find_nearest(self.left, x)
+    #         return (Params.p_values[lo_ind], Params.p_values[hi_ind])
+
+    #     def cuth(self, p=0.5):
+    #         """get the bounds on the quantile at any particular probability level"""
+    #         # TODO have a conservative cut.
+    #         ind = find_nearest(Params.p_values, p)
+    #         return (self.left[ind], self.right[ind])
+
+    #     def outer_approximate(self, n=None):
+    #         """outer approximation of a p-box
+
+    #         args:
+    #             - n: number of steps to be used in the approximation
+    #         note:
+    #             - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
+    #         """
+    #         if n is not None:
+    #             p_values = np.arange(0, n) / n
+    #         else:
+    #             p_values = self.p_values
+
+    #         p_leftend = p_values[0:-1]
+    #         p_rightend = p_values[1:]
+
+    #         q_l = [self.cuth(p).left for p in p_leftend]
+    #         q_r = [self.cuth(p).right for p in p_rightend]
+
+    #         # get the interval list
+    #         # TODO streamline below the interval list into Marco interval vector
+    #         the_interval_list = [(l, r) for l, r in zip(q_l, q_r)]
+    #         return p_values, the_interval_list
+
+    #     # * ---------------------unary operations--------------------- *#
+    #     ##### the top-level functions for unary operations #####
+
+    #     def _unary(self, *args, function=lambda x: x):
+    #         """for monotonic unary functions only"""
+
+    #         ints = [function((l, r), *args) for l, r in zip(self.left, self.right)]
+    #         return Pbox(
+    #             left=np.array([i.left for i in ints]),
+    #             right=np.array([i.right for i in ints]),
+    #         )
+
+    #     def exp(self):
+    #         return self._unary(function=lambda x: x.exp())
+
+    #     def sqrt(self):
+    #         return self._unary(function=lambda x: x.sqrt())
+
+    #     def recip(self):
+    #         return Pbox(
+    #             left=1 / np.flip(self.right), right=1 / np.flip(self.left), steps=self.steps
+    #         )
+
+    #     # * ---------------------binary operations--------------------- *#
+    #     @staticmethod
+    #     def check_dependency(method):
+    #         if method not in ["f", "p", "o", "i"]:
+    #             raise ArithmeticError("dependency not registered")
+
+    #     def constant_shape_check(self):
+    #         """a helper drop in for define binary ops"""
+    #         if self.shape in [
+    #             "uniform",
+    #             "normal",
+    #             "cauchy",
+    #             "triangular",
+    #             "skew-normal",
+    #         ]:
+    #             s = self.shape
+    #         else:
+    #             s = ""
+    #         return s
+
+    #     def steps_check(self, other):
+    #         if self.steps != other.steps:
+    #             raise ArithmeticError("Both Pboxes must have the same number of steps")
+
+    #     def add(self, other: Self | float | int, method="f") -> Self:
+    #         """addtion of uncertain numbers with the defined dependency method"""
+
+    #         self.check_dependency(method)
+    #         if isinstance(other, (float, int)):
+    #             # case with constant
+    #             try:
+    #                 s = self.constant_shape_check()
+    #                 return Pbox(
+    #                     left=self.left + other,
+    #                     right=self.right + other,
+    #                     shape=s,
+    #                     mean_left=self.mean_left + other,
+    #                     mean_right=self.mean_right + other,
+    #                     var_left=self.var_left,
+    #                     var_right=self.var_right,
+    #                     steps=self.steps,
+    #                 )
+    #             except:
+    #                 return NotImplemented
+
+    #         else:
+    #             other = convert(other)
+    #             self.steps_check(other)
+
+    #             match method:
+    #                 case "f":
+    #                     nleft = np.empty(self.steps)
+    #                     nright = np.empty(self.steps)
+    #                     for i in range(0, self.steps):
+    #                         j = np.array(range(i, self.steps))
+    #                         k = np.array(range(self.steps - 1, i - 1, -1))
+    #                         nright[i] = np.min(self.right[j] + other.right[k])
+    #                         jj = np.array(range(0, i + 1))
+    #                         kk = np.array(range(i, -1, -1))
+    #                         nleft[i] = np.max(self.left[jj] + other.left[kk])
+    #                 case "p":
+    #                     nleft = self.left + other.left
+    #                     nright = self.right + other.right
+    #                 case "o":
+    #                     nleft = self.left + np.flip(other.right)
+    #                     nright = self.right + np.flip(other.left)
+    #                 case "i":
+    #                     nleft = []
+    #                     nright = []
+    #                     for i in self.left:
+    #                         for j in other.left:
+    #                             nleft.append(i + j)
+    #                     for ii in self.right:
+    #                         for jj in other.right:
+    #                             nright.append(ii + jj)
+    #             nleft.sort()
+    #             nright.sort()
+
+    #             return Pbox(left=nleft, right=nright, steps=self.steps)
+
+    def pow(self, other: Self | float | int, method="f") -> Self:
+        """Raises a p-box to the power of other using the defined dependency method"""
+
+        self.check_dependency(method)
+        if isinstance(other, (float, int)):
+            # case with constant
+            try:
+                s = self.constant_shape_check()
+                return Pbox(
+                    left=self.left**other,
+                    right=self.right**other,
+                    shape=s,
+                    mean_left=self.mean_left**other,
+                    mean_right=self.mean_right**other,
+                    var_left=self.var_left,
+                    var_right=self.var_right,
+                    steps=self.steps,
+                )
+            except:
+                return NotImplemented
+        else:
+            other = convert(other)
+            self.steps_check(other)
+
+            match method:
+                case "f":
+                    nleft = np.empty(self.steps)
+                    nright = np.empty(self.steps)
+
+                    for i in range(0, self.steps):
+                        j = np.array(range(i, self.steps))
+                        k = np.array(range(self.steps - 1, i - 1, -1))
+
+                        nright[i] = np.min(self.right[j] ** other.right[k])
+
+                        jj = np.array(range(0, i + 1))
+                        kk = np.array(range(i, -1, -1))
+
+                        nleft[i] = np.max(self.left[jj] ** other.left[kk])
+                case "p":
+
+                    nleft = self.left**other.left
+                    nright = self.right**other.right
+                case "o":
+
+                    nleft = self.left ** np.flip(other.right)
+                    nright = self.right ** np.flip(other.left)
+                case "i":
+
+                    nleft = []
+                    nright = []
+                    for i in self.left:
+                        for j in other.left:
+                            nleft.append(i + j)
+                    for ii in self.right:
+                        for jj in other.right:
+                            nright.append(ii + jj)
+
+            nleft.sort()
+            nright.sort()
+
+            return Pbox(left=nleft, right=nright, steps=self.steps)
+
 
 #     def sub(self, other, method="f"):
 

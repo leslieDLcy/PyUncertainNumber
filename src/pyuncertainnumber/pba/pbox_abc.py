@@ -288,6 +288,16 @@ class Staircase(Pbox):
         except:
             return NotImplemented
 
+    def __pow__(self, other):
+        return self.pow(other, dependency="f")
+
+    def __rpow__(self, other):
+        if not hasattr(other, "__iter__"):
+            other = np.array((other))
+
+        b = Pbox(other)
+        return b.pow(self, dependency="f")
+
     # * --------------------- methods ---------------------*#
 
     def cdf(self, x):
