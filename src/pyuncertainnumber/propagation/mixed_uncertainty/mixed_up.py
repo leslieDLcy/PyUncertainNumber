@@ -24,11 +24,12 @@ note:
 """
 
 
+# TODO: add vine copula
 def interval_monte_carlo(
     vars: list[Interval | Distribution | Pbox],
     func: callable,
     method: str,
-    dependency,
+    dependency=None,
 ):
     """
     Args:
@@ -77,6 +78,16 @@ def slicing(
 
     # print(len(container))  # shall be 40_000  # checkedout
     return stacking(container)
+
+
+def equi_cutting():
+    """equid-probaility discretisation and alpha cutting
+
+    args:
+        func: callable
+        x: uncertain variable
+    """
+    pass
 
 
 def double_monte_carlo(
