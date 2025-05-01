@@ -3,6 +3,9 @@ from typing import TYPE_CHECKING
 import numpy as np
 from functools import partial
 import itertools
+from ...pba.pbox_abc import convert_pbox
+from ...pba.aggregation import stacking
+from ...pba.intervalOperators import make_vec_interval
 
 if TYPE_CHECKING:
     from ...pba.intervals import Interval
@@ -24,6 +27,26 @@ note:
 """
 
 
+def bi_imc(x, y, func, dependency=None, n_sam=100):
+    """bivariate interval monte carlo
+
+    args:
+        x, y (Pbox) : Pbox
+        func: callable which takes vector-type of inputs
+        dependency: dependency structure (regular copula)
+    """
+    from scipy.stats import qmc
+
+    # from pyuncertainnumber.pba.aggregation import stacking
+
+    alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
+    x_i = x.alpha_cut(alpha)
+    y_i = y.alpha_cut(alpha)
+
+    container = [func(_item) for _item in itertools.product(x_i, y_i)]
+    return stacking(container)
+
+
 # TODO: add vine copula
 def interval_monte_carlo(
     vars: list[Interval | Distribution | Pbox],
@@ -39,34 +62,11 @@ def interval_monte_carlo(
     pass
 
 
-def bi_imc(x, y, func, dependency=None, n_sam=100):
-    """bivariate interval monte carlo
-
-    args:
-        dependency: dependency structure (regular copula)
-    func: callable
-    x, y (Pbox) : Pbox
-    """
-    from scipy.stats import qmc
-    from pyuncertainnumber.pba.aggregation import stacking
-
-    alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
-    x_i = x.alpha_cut(alpha)
-    y_i = y.alpha_cut(alpha)
-
-    container = [func(*_item) for _item in itertools.product(x_i, y_i)]
-    return stacking(container)
-
-
 def slicing(
     vars: list[Distribution | Interval | Pbox],
     func,
 ):
     """independence assumption by now"""
-
-    from ...pba.pbox_abc import convert_pbox
-    from ...pba.intervalOperators import make_vec_interval
-    from ...pba.aggregation import stacking
 
     p_vars = [convert_pbox(v) for v in vars]
 
@@ -74,20 +74,26 @@ def slicing(
 
     container = []
     for _item in itertools.product(itvs):
-        container.append(func(*_item))
+        container.append(func(_item))
 
     # print(len(container))  # shall be 40_000  # checkedout
     return stacking(container)
 
 
-def equi_cutting():
+def equi_cutting(vars, func):
     """equid-probaility discretisation and alpha cutting
 
     args:
         func: callable
         x: uncertain variable
     """
-    pass
+    p_vars = [convert_pbox(v) for v in vars]
+
+    # get a lot of intervals
+    itvs = [v.discretise() for v in p_vars]
+
+    container = [func(_item) for _item in itertools.product(*itvs)]
+    return stacking(container)
 
 
 def double_monte_carlo(

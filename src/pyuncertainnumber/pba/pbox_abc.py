@@ -309,6 +309,9 @@ class Staircase(Pbox):
         ind = find_nearest(Params.p_values, alpha)
         return I(lo=self.left[ind], hi=self.right[ind])
 
+    def discretize(self):
+        return I(lo=self.left, hi=self.right)
+
     def outer_approximate(self, n=None):
         """outer approximation of a p-box
 
