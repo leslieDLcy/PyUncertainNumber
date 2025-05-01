@@ -22,10 +22,12 @@ from pyuncertainnumber.characterisation.uncertainNumber import (
     Distribution,
 )
 
+
 # TODO the cauchy with save_raw_data = 'yes' raises issues.
 # TODO update the descriptions and code for process_results once more.
+""" the old top-level UP implementation """
 
-# ---------------------the top level UP function ---------------------#
+# * ---------------------the top level UP function ---------------------*#
 
 
 def aleatory_propagation(

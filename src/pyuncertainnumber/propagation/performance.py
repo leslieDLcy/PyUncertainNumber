@@ -63,10 +63,25 @@ def cb_deflection(x):
     return deflection
 
 
-# --------------------- by Leslie ---------------------#
+def cb_deflection_vectorised(x):
+    """
+    Vectorized version for calculating cantilever beam deflection over multiple inputs.
+    x.shape = (N, 4)
+    """
+    x = np.atleast_2d(x)  # Ensures x is at least 2D: (N, 4)
+
+    beam_length = x[:, 0]
+    I = x[:, 1]
+    F = x[:, 2]
+    E = x[:, 3]
+    deflection = F * beam_length**3 / (3 * E * 10**6 * I)
+
+    if deflection.shape[0] == 1:
+        return deflection[0]  # Return scalar
+    return deflection
 
 
-def cb_deflection(beam_length, I, F, E):
+def cb_deflection_separate(beam_length, I, F, E):
     """compute the deflection in the cantilever beam example
 
     # TODO add typing for UncertainNumber

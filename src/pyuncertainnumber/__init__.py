@@ -14,6 +14,10 @@ from .pba.aggregation import *
 from pyuncertainnumber.pba.intervalOperators import make_vec_interval
 from pyuncertainnumber.pba.intervals import intervalise
 
+
+# * --------------------- Distribution ---------------------*#
+from pyuncertainnumber.pba.distributions import Distribution
+
 # * --------------------- hedge---------------------*#
 from pyuncertainnumber.nlp.language_parsing import hedge_interpret
 

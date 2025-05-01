@@ -36,7 +36,7 @@ from abc import ABC, abstractmethod
 
 class P(ABC):
     def __init__(self, vars, func, method, save_raw_data: bool = False):
-        self.vars = vars
+        self._vars = vars
         self.func = func
         self.method = method
         self.save_raw_data = save_raw_data
@@ -69,8 +69,8 @@ class AleatoryPropagation(P):
         """only distributions"""
         from ..pba.distributions import Distribution
 
-        assert all(isinstance(v, Distribution) for v in self.vars) or all(
-            isinstance(v.construct, Distribution) for v in self.vars
+        assert all(isinstance(v, Distribution) for v in self._vars) or all(
+            isinstance(v.construct, Distribution) for v in self._vars
         ), "Not all variables are distributions"
 
     def method_check(self):
@@ -84,19 +84,17 @@ class AleatoryPropagation(P):
         match self.method:
             case "monte_carlo":
                 input_samples = np.array(
-                    [v.sample(n_sam) for v in self.vars]
-                )  # (n_vars, n_sam)
+                    [v.sample(n_sam) for v in self._vars]
+                ).T  # (n_sam, n_vars) == (n, d)
                 output_samples = self.func(input_samples)
-            case "latin_hypercube":
-                sampler = qmc.LatinHypercube(d=len(self.vars))
+            case "latin_hypercube" | "lhs":
+                sampler = qmc.LatinHypercube(d=len(self._vars))
                 lhs_samples = sampler.random(n=n_sam)  # u-space (n, d)
-
-                input_samples = np.concatenate(
-                    [d.alpha_cut(lhs_samples[:, i]) for i, d in enumerate(self.vars)],
-                    axis=1,
-                )
+                input_samples = np.array(
+                    [v.alpha_cut(lhs_samples[:, i]) for i, v in enumerate(self._vars)]
+                ).T
                 # ! a shape check
-                print("shape check of input samples", input_samples.shape)
+                # print("shape check of input samples", input_samples.shape)
                 output_samples = self.func(input_samples)
             case "taylor_expansion":
                 pass
@@ -114,8 +112,8 @@ class EpistemicPropagation(P):
 
         from ..pba.intervals.number import Interval
 
-        assert all(isinstance(v.construct, Interval) for v in self.vars) or all(
-            isinstance(v, Interval) for v in self.vars
+        assert all(isinstance(v.construct, Interval) for v in self._vars) or all(
+            isinstance(v, Interval) for v in self._vars
         ), "Not all variables are intervals"
 
     def method_check(self):
@@ -170,7 +168,7 @@ class EpistemicPropagation(P):
         # TODO: make the methods signature consistent
         # TODO: ONLY an response interval needed to be returned
         results = handler(
-            make_vec_interval(self.vars),
+            make_vec_interval(self._vars),
             self.func,
             self.save_raw_data,
             **kwargs,
@@ -189,9 +187,9 @@ class MixedPropagation(P):
         from ..pba.intervals.number import Interval
         from ..pba.distributions import Distribution
 
-        has_I = any(isinstance(item, Interval) for item in self.vars)
-        has_D = any(isinstance(item, Distribution) for item in self.vars)
-        has_P = any(isinstance(item, Box) for item in self.vars)
+        has_I = any(isinstance(item, Interval) for item in self._vars)
+        has_D = any(isinstance(item, Distribution) for item in self._vars)
+        has_P = any(isinstance(item, Box) for item in self._vars)
 
         assert (has_I and has_D) or has_P, "Not a mixed uncertainty problem"
 
@@ -215,7 +213,7 @@ class MixedPropagation(P):
                 raise ValueError("Unknown method")
 
         results = handler(
-            self.vars, self.func, self.method, self.save_raw_data, **kwargs
+            self._vars, self.func, self.method, self.save_raw_data, **kwargs
         )
         return results
 
