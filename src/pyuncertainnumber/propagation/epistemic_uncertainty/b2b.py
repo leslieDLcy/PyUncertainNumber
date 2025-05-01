@@ -55,3 +55,41 @@ def vec_cartesian_product(*arrays):
     grids = np.meshgrid(*arrays, indexing="ij")
     stacked = np.stack(grids, axis=-1)
     return stacked.reshape(-1, len(arrays))
+
+
+def i_cartesian_product(a, b):
+    """a vectorisation of the interval cartesian product
+
+    todo:
+        extend to multiple input arguments
+    """
+    from pyuncertainnumber import pba
+
+    # Extract bounds
+    a_lower = a.lo[:, np.newaxis]  # (2, 1)
+    a_upper = a.hi[:, np.newaxis]  # (2, 1)
+    b_lower = b.lo[np.newaxis, :]  # (1, 2)
+    b_upper = b.hi[np.newaxis, :]  # (1, 2)
+
+    # Broadcast to shape (2, 2)
+    cart_lower = np.stack(
+        [
+            a_lower.repeat(b_lower.shape[1], axis=1),
+            np.tile(b_lower, (a_lower.shape[0], 1)),
+        ],
+        axis=-1,
+    )  # shape (2, 2, 2)
+
+    cart_upper = np.stack(
+        [
+            a_upper.repeat(b_upper.shape[1], axis=1),
+            np.tile(b_upper, (a_upper.shape[0], 1)),
+        ],
+        axis=-1,
+    )  # shape (2, 2, 2)
+
+    # Reshape to flat list of interval pairs
+    flat_lower = cart_lower.reshape(-1, 2)  # shape (4, 2)
+    flat_upper = cart_upper.reshape(-1, 2)  # shape (4, 2)
+
+    return pba.I(lo=flat_lower, hi=flat_upper)
