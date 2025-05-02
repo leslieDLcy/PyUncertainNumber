@@ -69,7 +69,10 @@ def make_vec_interval(vec):
     if isinstance(vec, Interval):
         return vec
     elif isinstance(vec[0], Interval | list | tuple | np.ndarray):
-        return intervalise(vec)
+        try:
+            return intervalise(vec)
+        except Exception:
+            return intervalise(list(vec))
     else:
         raise NotImplementedError
 

@@ -127,6 +127,11 @@ class Distribution:
 
 
 class JointDistribution:
+
+    def __init__(self, marginals, copula):
+        self.marginals = marginals
+        self.copula = copula
+
     pass
 
 

@@ -114,6 +114,7 @@ def double_monte_carlo(
     n_a,
     n_e,
     func,
+    parallel=False,
 ):
     # X in R5. (1000, 5) -> f(X)
     # samples: (n_ep, n_alea) e.g. (10, 1000)
@@ -123,9 +124,10 @@ def double_monte_carlo(
         epis_vars: epistemic variables
         n_a: number of aleatory samples
         n_e: number of epistemic samples
+        parallel (Boolean): parallel processing. Only use it for heavy computation (black-box) due to overhead
     """
 
-    # lhs sample on epistemic variables
+    # lhs sample array on epistemic variables
     epistemic_points = epis_vars.endpoints_lhs_sample(n_e)
 
     def evaluate_func_on_e(e, n_a, func):
