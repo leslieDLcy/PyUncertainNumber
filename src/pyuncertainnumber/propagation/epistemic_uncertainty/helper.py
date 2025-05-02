@@ -13,7 +13,7 @@ class EpistemicDomain:
     """
 
     def __init__(self, *vars):
-        from ..intervalOperators import make_vec_interval
+        from ...pba.intervalOperators import make_vec_interval
 
         self.vec_interval = make_vec_interval(list(vars))
 
@@ -25,6 +25,13 @@ class EpistemicDomain:
 
         base_sample = Xc_sampler.random(n=n_samples)
         return qmc.scale(base_sample, l_bounds, u_bounds)
+
+    def lhs_plus_endpoints(self, n_samples: int):
+        """perform lhs sampling on the epistemic space and add endpoints"""
+        sample = self.lhs_sampling(n_samples)
+        endpoints = self.to_OptBounds().T
+        combined_sample = np.vstack((sample, endpoints))
+        return combined_sample
 
     def bound_rep(self):
         """return the bounds of the epistemic space"""
