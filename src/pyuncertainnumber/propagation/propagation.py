@@ -31,6 +31,9 @@ if TYPE_CHECKING:
 
 
 from abc import ABC, abstractmethod
+from ..pba.pbox_abc import Pbox
+from ..pba.intervals.number import Interval
+from ..pba.distributions import Distribution
 
 
 class P(ABC):
@@ -195,9 +198,6 @@ class MixedPropagation(P):
     # assume striped UM classes
     def type_check(self):
         """mixed UM"""
-        from ..pba.pbox_abc import Pbox
-        from ..pba.intervals.number import Interval
-        from ..pba.distributions import Distribution
 
         has_I = any(isinstance(item, Interval) for item in self._vars)
         has_D = any(isinstance(item, Distribution) for item in self._vars)
@@ -236,21 +236,67 @@ class Propagation:
     def __init__(
         self,
         vars: list[UncertainNumber],
-        function: callable,
+        func: callable,
         method,
         save_raw_data: bool = False,
-        **kwargs,
     ):
+        """top-level class for the propagation of uncertain numbers
+
+        args:
+            vars: a list of uncertain numbers objects
+        """
         self._vars = vars
-        self._func = function
+        self._func = func
         self.method = method
         self.save_raw_data = save_raw_data
 
     def _post_init_check(self):
 
         # supported methods check
+
+        # assign method herein
+
+        # strip the UN classes into the underlying constructs
         pass
 
-    def __call__(self, **kwargs):
+    def assign_method(self):
+        # created an underlying propagation `self.p` object
+
+        # all
+        all_I = all(isinstance(item, Interval) for item in self._vars)
+        all_D = all(isinstance(item, Distribution) for item in self._vars)
+        # any
+        has_I = any(isinstance(item, Interval) for item in self._vars)
+        has_D = any(isinstance(item, Distribution) for item in self._vars)
+        has_P = any(isinstance(item, Pbox) for item in self._vars)
+
+        if all_I:
+            # all intervals
+            self.p = EpistemicPropagation(
+                self._vars, self._func, self.method, self.save_raw_data
+            )
+        elif all_D:
+            # all distributions
+            self.p = AleatoryPropagation(
+                self._vars, self._func, self.method, self.save_raw_data
+            )
+        elif (has_I and has_D) or has_P:
+            # mixed uncertainty
+            self.p = MixedPropagation(
+                self._vars,
+                self._func,
+                self.method,
+                self.save_raw_data,
+                interval_strategy=self.kwargs.get("interval_strategy", None),
+            )
+        else:
+            raise ValueError(
+                "Not a valid combination of uncertainty types. "
+                "Please check the input variables."
+            )
+
+    def propagate(self, **kwargs):
         """doing the propagation"""
-        pass
+
+        # choose the method accordingly
+        return self.p(**kwargs)
