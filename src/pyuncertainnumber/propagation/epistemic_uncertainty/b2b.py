@@ -46,6 +46,8 @@ def b2b(vecs, func, method=None, **kwargs) -> Interval:
             pass
         case "bo":
             pass
+        case None:
+            return func(vecs)
         case _:
             raise NotImplementedError(f"Method {method} is not supported yet.")
 

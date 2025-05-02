@@ -11,6 +11,7 @@ from .mixed_uncertainty.mixed_up import (
     interval_monte_carlo,
     slicing,
     double_monte_carlo,
+    equi_cutting,
 )
 from ..pba.intervalOperators import make_vec_interval
 import numpy as np
@@ -175,19 +176,28 @@ class EpistemicPropagation(P):
 
 
 class MixedPropagation(P):
-    def __init__(self, vars, func, method, save_raw_data: bool = False):
+    def __init__(
+        self, vars, func, method, save_raw_data: bool = False, interval_strategy=None
+    ):
+        """initialisation
+
+        args:
+            interval_strategy: a certain strategy used for the interval propagation
+                such as endpoints, subinterval, etc. By default, it is set to None
+        """
         super().__init__(vars, func, method, save_raw_data)
+        self.interval_strategy = interval_strategy
 
     # assume striped UM classes
     def type_check(self):
         """mixed UM"""
-        from ..pba.pbox_abc import Box
+        from ..pba.pbox_abc import Pbox
         from ..pba.intervals.number import Interval
         from ..pba.distributions import Distribution
 
         has_I = any(isinstance(item, Interval) for item in self._vars)
         has_D = any(isinstance(item, Distribution) for item in self._vars)
-        has_P = any(isinstance(item, Box) for item in self._vars)
+        has_P = any(isinstance(item, Pbox) for item in self._vars)
 
         assert (has_I and has_D) or has_P, "Not a mixed uncertainty problem"
 
@@ -207,12 +217,12 @@ class MixedPropagation(P):
                 handler = slicing
             case "double_monte_carlo":
                 handler = double_monte_carlo
+            case None:
+                handler = equi_cutting
             case _:
                 raise ValueError("Unknown method")
 
-        results = handler(
-            self._vars, self.func, self.method, self.save_raw_data, **kwargs
-        )
+        results = handler(self._vars, self.func, **kwargs)
         return results
 
 
