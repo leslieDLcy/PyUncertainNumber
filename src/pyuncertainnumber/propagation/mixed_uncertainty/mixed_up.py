@@ -119,7 +119,7 @@ def double_monte_carlo(
     # samples: (n_ep, n_alea) e.g. (10, 1000)
     """
     args:
-        joint_distribution,: a sampler based on joint distribution of aleatory variables
+        joint_distribution: an aleatoric sampler based on joint distribution of aleatory variables (or marginal one in 1d case)
         epis_vars: epistemic variables
         n_a: number of aleatory samples
         n_e: number of epistemic samples

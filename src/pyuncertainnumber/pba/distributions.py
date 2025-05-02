@@ -126,6 +126,10 @@ class Distribution:
             return named_pbox.get(self.dist_family)(*self.dist_params)
 
 
+class JointDistribution:
+    pass
+
+
 # * ------------------ special sane cases ------------------ *#
 def uniform_sane(a, b):
     return sps.uniform(loc=a, scale=b - a)
