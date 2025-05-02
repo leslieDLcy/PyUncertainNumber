@@ -19,7 +19,7 @@ note:
 
 @dataclass
 class CDF_bundle:
-    """a handy tuple of q and p for a CDF"""
+    """a handy tuple of CDF function q and p"""
 
     quantiles: np.ndarray
     probabilities: np.ndarray
@@ -308,3 +308,19 @@ def equi_selection(arr, n):
     indices = np.linspace(0, len(arr) - 1, n, dtype=int)
     selected = arr[indices]
     return selected
+
+
+def ecdf(d):
+    """return the quantile and probability of a ecdf
+
+    note:
+        Scott's version which leads to doubling the length of quantiles and probabilities
+        to make it a step function
+    """
+    d = np.array(d)
+    N = d.size
+    pp = np.concatenate((np.arange(N), np.arange(1, N + 1))) / N
+    dd = np.concatenate((d, d))
+    dd.sort()
+    pp.sort()
+    return dd, pp

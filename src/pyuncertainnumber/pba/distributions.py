@@ -2,7 +2,7 @@
 
 import numpy as np
 import scipy.stats as sps
-import matplotlib as mpl
+import matplotlib.pyplot as plt
 from warnings import *
 from dataclasses import dataclass
 from typing import *
@@ -80,11 +80,15 @@ class Distribution:
         else:
             self._naked_value = np.mean(self.sample_data)
 
-    def display(self, **kwargs):
+    def plot(self, **kwargs):
         """display the distribution"""
         if self.sample_data is not None:
             return pl_ecdf(self.sample_data, **kwargs)
         pl_pcdf(self._dist, **kwargs)
+
+    def display(self, **kwargs):
+        self.plot(**kwargs)
+        plt.show()
 
     def _get_hint(self):
         pass
@@ -120,6 +124,11 @@ class Distribution:
         if self._flag:
             # pass
             return named_pbox.get(self.dist_family)(*self.dist_params)
+
+
+# * ------------------ special sane cases ------------------ *#
+def uniform_sane(a, b):
+    return sps.uniform(loc=a, scale=b - a)
 
 
 # * ------------------ sample-approximated dist representation  ------------------ *#
@@ -513,7 +522,7 @@ named_dists = {
     "truncexpon": sps.truncexpon,
     "truncnorm": sps.truncnorm,
     "tukeylambda": sps.tukeylambda,
-    "uniform": sps.uniform,
+    "uniform": uniform_sane,
     "vonmises": sps.vonmises,
     "vonmises_line": sps.vonmises_line,
     "wald": sps.wald,

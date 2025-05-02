@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
 
-__all__ = ["stochastic_mixture", "envelope", "imposition", "stacking"]
+__all__ = ["stochastic_mixture", "envelope", "imposition", "stacking", "env_ecdf"]
 
 
 @makeUN
@@ -151,13 +151,13 @@ def imposition(l_un: list[Staircase | float | int]) -> Staircase:
 
 
 def envelope(l_un):
-    """calculates the envelope of uncertain number objects
+    """calculates the envelope of uncertain number constructs
 
     args:
-        ``*args``: The components on which the envelope operation applied on.
+        l_un (array like): the components, uncertain number constructs only, on which the envelope operation applied on.
 
     returns:
-        ``Pbox|Interval``: The envelope of the given arguments, which can be an interval or a p-box.
+        the envelope of the given arguments,  either a p-box or an interval.
     """
 
     def binary_env(p1, p2):
@@ -165,3 +165,37 @@ def envelope(l_un):
 
     xs = [convert_pbox(x) for x in l_un]
     return functools.reduce(binary_env, xs)
+
+
+def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
+    """nonparametric envelope function
+
+    arrgs:
+        data (array-like): the components, uncertain number constructs only, on which the envelope operation applied on.
+        ret_type (str): {'pbox' or 'cdf'}
+            - default is pbox
+            - cdf is the CDF bundle
+        ecdf_choice (str): {'canonical' or 'staircase'}
+
+    note:
+        envelope on a set of empirical CDFs
+    """
+    from .utils import ecdf, weighted_ecdf
+
+    ecdf_func = weighted_ecdf if ecdf_choice == "canonical" else ecdf
+
+    # assume each row as a sample and eCDF
+    q_list = []
+    for l in range(data.shape[0]):
+        dd, pp = ecdf_func(np.squeeze(data[l]))
+        q_list.append(dd)
+
+    # return the q lower bound which is the upper probability bound
+    q_arr = np.array(q_list)
+    l_bound = np.min(q_arr, axis=0)
+    u_bound = np.max(q_arr, axis=0)
+
+    if ret_type == "pbox":
+        return Staircase(left=l_bound, right=u_bound)
+    elif ret_type == "cdf":
+        return CDF_bundle(l_bound, pp), CDF_bundle(u_bound, pp)

@@ -40,11 +40,12 @@ class P(ABC):
         self.method = method
         self.save_raw_data = save_raw_data
 
-    def _post_init(self):
+    def post_init_check(self):
         """some checks"""
 
         assert callable(self.func), "function is not callable"
         self.type_check()
+        self.method_check()
 
     @abstractmethod
     def type_check(self):
@@ -63,6 +64,7 @@ class AleatoryPropagation(P):
 
     def __init__(self, vars, func, method, save_raw_data: bool = False):
         super().__init__(vars, func, method, save_raw_data)
+        self.post_init_check()
 
     def type_check(self):
         """only distributions"""
@@ -105,6 +107,7 @@ class AleatoryPropagation(P):
 class EpistemicPropagation(P):
     def __init__(self, vars, func, method, save_raw_data: bool = False):
         super().__init__(vars, func, method, save_raw_data)
+        self.post_init_check()
 
     def type_check(self):
         """only intervals"""
@@ -187,6 +190,7 @@ class MixedPropagation(P):
         """
         super().__init__(vars, func, method, save_raw_data)
         self.interval_strategy = interval_strategy
+        self.post_init_check()
 
     # assume striped UM classes
     def type_check(self):

@@ -153,6 +153,7 @@ class Pbox(ABC):
 class Staircase(Pbox):
     """distribution free p-box"""
 
+    # TODO with the automatic interpolation, there is no point still aving the `p_values` as a parameter
     def __init__(
         self,
         left,
