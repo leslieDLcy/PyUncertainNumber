@@ -230,6 +230,14 @@ class MixedPropagation(P):
         return results
 
 
+"""
+hint: 
+For A, E, M, use construct classes
+
+For P, use the UN level
+"""
+
+
 # top-level
 class Propagation:
     # TODO I'd like to strip UN classes into construct classes herein
