@@ -6,7 +6,7 @@ from ...pba.intervalOperators import make_vec_interval
 import numpy as np
 
 
-def b2b(vecs, func, method=None, **kwargs) -> Interval:
+def b2b(vecs, func, method=None, style=None, n=None, **kwargs) -> Interval:
     """
     General implementation of a function:
 
@@ -19,7 +19,7 @@ def b2b(vecs, func, method=None, **kwargs) -> Interval:
 
     args:
         vecs: list or tuple of scalar intervals
-        func: performance or response function or a black-box model as in subprocess.
+        func: performance or response function or a black-box model as in subprocess. Expect 2D inputs.
         method: the method used for interval propagation
             - 'endpoints': only the endpoints
             - 'ga': genetic algorithm
@@ -33,14 +33,13 @@ def b2b(vecs, func, method=None, **kwargs) -> Interval:
     returns:
         Interval: the low and upper bound of the response
     """
-    from pyuncertainnumber.pba.intervals.methods import subintervalise
 
+    vec_itvl = make_vec_interval(vecs)
     match method:
         case "endpoints":
-            vec_itvl = make_vec_interval(vecs)
             return endpoints(vec_itvl, func)
         case "subinterval":
-            pass
+            return subinterval_method(vec_itvl, func, style=style, n=n, **kwargs)
         case "ga":
             pass
         case "bo":
@@ -52,8 +51,13 @@ def b2b(vecs, func, method=None, **kwargs) -> Interval:
 
 
 def vec_cartesian_product(*arrays):
-    """a vectorised version of the cartesian product"""
+    """a vectorised version of the cartesian product
+
+    args:
+        arrays: a couple of 1D np.ndarray objects
+    """
     grids = np.meshgrid(*arrays, indexing="ij")
+    # TODO nice imple but not directrly working with vec Interval object yet
     stacked = np.stack(grids, axis=-1)
     return stacked.reshape(-1, len(arrays))
 
@@ -103,9 +107,50 @@ def endpoints(vec_itvl, func):
         vec_itvl: a vector type Interval object
         func: the function to be evaluated
     """
-    lo, hi = vec_itvl.lo, vec_itvl.hi
-    arr = vec_cartesian_product(lo, hi)
-    response = func(arr)
+
+    v_np = vec_itvl.to_numpy()
+    rows = np.vsplit(v_np, v_np.shape[0])
+    arr = vec_cartesian_product(*rows)
+    # print(arr.shape)
+    # return arr
+    response = func(arr)  # func on each row of combination of endpoints
     min_response = np.min(response)
     max_response = np.max(response)
     return Interval(min_response, max_response)
+
+
+def subinterval_method(vec_itvl, func, style=None, n=None, parallel=False):
+    # TODO parallel subinterval
+    """leslie's implmentation of subinterval method
+
+    args:
+        vec_itvl: a vector type Interval object
+        func: the function to be evaluated
+        n: number of subintervals
+        style: the style used for interval propagation
+            - 'direct': direct apply function
+            - 'endpoints': only the endpoints
+    """
+    from pyuncertainnumber.pba.intervals.methods import subintervalise, reconstitute
+
+    if style is None:
+        raise ValueError("style must be chosen within {'direct', 'endpoints'}.")
+    if n is None:
+        raise ValueError("Number of subintervals n must be provided.")
+
+    sub = subintervalise(vec_itvl, n)
+    if style == "direct":
+        return reconstitute(func(sub))
+    elif style == "endpoints":
+        return reconstitute([endpoints(sub[i], func) for i in range(len(sub))])
+
+
+"""
+POOL:
+            except IndexError as e:
+                if "too many indices for array" in str(e):
+                    print("2D inputs expected but 1D presented:", e)
+                    return endpoints(vec_itvl[None, :], func)
+                else:
+                    raise  # Re-raise if it's a different IndexError
+"""
