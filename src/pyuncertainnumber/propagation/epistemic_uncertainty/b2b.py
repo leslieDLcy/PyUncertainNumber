@@ -33,15 +33,14 @@ def b2b(vecs, func, method=None, **kwargs) -> Interval:
     returns:
         Interval: the low and upper bound of the response
     """
+    from pyuncertainnumber.pba.intervals.methods import subintervalise
+
     match method:
         case "endpoints":
             vec_itvl = make_vec_interval(vecs)
-            lo, hi = vec_itvl.lo, vec_itvl.hi
-            arr = vec_cartesian_product(lo, hi)
-            response = func(arr)
-            min_response = np.min(response)
-            max_response = np.max(response)
-            return Interval(min_response, max_response)
+            return endpoints(vec_itvl, func)
+        case "subinterval":
+            pass
         case "ga":
             pass
         case "bo":
@@ -95,3 +94,18 @@ def i_cartesian_product(a, b):
     flat_upper = cart_upper.reshape(-1, 2)  # shape (4, 2)
 
     return pba.I(lo=flat_lower, hi=flat_upper)
+
+
+def endpoints(vec_itvl, func):
+    """leslie's implementation of endpoints method
+
+    args:
+        vec_itvl: a vector type Interval object
+        func: the function to be evaluated
+    """
+    lo, hi = vec_itvl.lo, vec_itvl.hi
+    arr = vec_cartesian_product(lo, hi)
+    response = func(arr)
+    min_response = np.min(response)
+    max_response = np.max(response)
+    return Interval(min_response, max_response)
