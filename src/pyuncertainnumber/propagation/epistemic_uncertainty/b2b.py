@@ -6,7 +6,14 @@ from ...pba.intervalOperators import make_vec_interval
 import numpy as np
 
 
-def b2b(vecs, func, method=None, style=None, n=None, **kwargs) -> Interval:
+def b2b(
+    vecs: Interval | list[Interval],
+    func,
+    interval_strategy=None,
+    style=None,
+    n=None,
+    **kwargs,
+) -> Interval:
     """
     General implementation of a function:
 
@@ -18,13 +25,14 @@ def b2b(vecs, func, method=None, style=None, n=None, **kwargs) -> Interval:
     Optimisation to the rescue and two of them particularly: GA and BO.
 
     args:
-        vecs: list or tuple of scalar intervals
+        vecs: a vector Interval or a list or tuple of scalar Interval
         func: performance or response function or a black-box model as in subprocess. Expect 2D inputs.
-        method: the method used for interval propagation
+        interval_strategy: the interval_strategy used for interval propagation
             - 'endpoints': only the endpoints
             - 'ga': genetic algorithm
             - 'bo': bayesian optimisation
-        *args: additional arguments to be passed to the function
+            - 'diret': direct apply function (the default)
+            - None: the deault which is 'direct'
         **kwargs: additional keyword arguments to be passed to the function
 
     signature:
@@ -35,7 +43,7 @@ def b2b(vecs, func, method=None, style=None, n=None, **kwargs) -> Interval:
     """
 
     vec_itvl = make_vec_interval(vecs)
-    match method:
+    match interval_strategy:
         case "endpoints":
             return endpoints(vec_itvl, func)
         case "subinterval":
@@ -44,10 +52,10 @@ def b2b(vecs, func, method=None, style=None, n=None, **kwargs) -> Interval:
             pass
         case "bo":
             pass
-        case None:
-            return func(vecs)
         case _:
-            raise NotImplementedError(f"Method {method} is not supported yet.")
+            raise NotImplementedError(
+                f"Method {interval_strategy} is not supported yet."
+            )
 
 
 def vec_cartesian_product(*arrays):

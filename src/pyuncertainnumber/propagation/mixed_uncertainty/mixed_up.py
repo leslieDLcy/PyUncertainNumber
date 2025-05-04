@@ -48,6 +48,7 @@ def bi_imc(x, y, func, dependency=None, n_sam=100):
 
 
 # TODO: add vine copula
+#! interval_strategu
 def interval_monte_carlo(
     vars: list[Interval | Distribution | Pbox],
     func: callable,
