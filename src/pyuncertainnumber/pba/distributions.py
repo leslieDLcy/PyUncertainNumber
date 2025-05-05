@@ -10,6 +10,9 @@ from ..characterisation.utils import pl_pcdf, pl_ecdf
 import scipy
 from .params import Params
 from .pbox_parametric import named_pbox
+import statsmodels.distributions.copula as Copula
+from .dependency import Dependency
+from statsmodels.distributions.copula.api import CopulaDistribution
 
 
 @dataclass
@@ -128,11 +131,29 @@ class Distribution:
 
 class JointDistribution:
 
-    def __init__(self, marginals, copula):
+    def __init__(
+        self,
+        copula: Dependency,
+        marginals: list[Distribution],
+    ):
         self.marginals = marginals
         self.copula = copula
+        self._joint_dist = CopulaDistribution(
+            copula=self.copula._copula, marginals=[m._dist for m in self.marginals]
+        )
+        self.ndim = len(self.marginals)
 
-    pass
+    @staticmethod
+    def from_sps(copula: Copula, marginals: list[sps.rv_continuous]):
+        return CopulaDistribution(copula=copula, marginals=marginals)
+
+    def sample(self, size):
+        """generate orginal-space samples from the joint distribution"""
+        return self._joint_dist.rvs(size)
+
+    def u_sample(self, size):
+        """generate copula-space samples from the joint distribution"""
+        return self.copula.rvs(size)
 
 
 # * ------------------ special sane cases ------------------ *#

@@ -1,4 +1,6 @@
 from numbers import Number
+import numpy as np
+import matplotlib.pyplot as plt
 from statsmodels.distributions.copula.api import (
     FrankCopula,
     ClaytonCopula,
@@ -32,7 +34,7 @@ class Dependency:
         supported_family_check(self.family)
 
     def __repr__(self):
-        return f"copula: {self.family}({self.params})"
+        return f"copula: {self.family} with parameter {self.params}"
 
     def pdf(self, u):
         return self._copula.pdf(u)
@@ -43,9 +45,26 @@ class Dependency:
     def sample(self, n: int):
         return self._copula.rvs(n)
 
-    def display(self, ax=None):
+    def display(self, style="3d", ax=None):
         """show the PDF in the u space"""
-        self._copula.plot_pdf(ax=ax)
+        if style == "2d_pdf":
+            self._copula.plot_pdf(ax=ax)
+        elif style == "3d_cdf":
+            grid_size = 100
+            U, V = np.meshgrid(
+                np.linspace(0, 1, grid_size), np.linspace(0, 1, grid_size)
+            )
+            Z = np.array(
+                [
+                    self._copula.cdf([U[i, j], V[i, j]])
+                    for i in range(grid_size)
+                    for j in range(grid_size)
+                ]
+            )
+            Z = Z.reshape(grid_size, grid_size)
+            pl_3d_copula(U, V, Z)
+        else:
+            raise ValueError("style must be '2d_pdf' or '3d_cdf'")
 
     def fit(self, data):
         return self._copula.fit_corr_param(data)
@@ -55,3 +74,14 @@ def supported_family_check(c):
     """check if copula family is supported"""
     if c not in {"gaussian", "t", "frank", "gumbel", "clayton", "independence"}:
         raise Exception("This copula model is not yet implemented")
+
+
+def pl_3d_copula(U, V, Z):
+
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.plot_surface(U, V, Z, cmap="viridis", edgecolor="none")
+    ax.set_xlabel("u")
+    ax.set_ylabel("v")
+    ax.set_zlabel("C(u, v)")
+    plt.show()
