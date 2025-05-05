@@ -11,7 +11,7 @@ def b2b(
     func,
     interval_strategy=None,
     style=None,
-    n=None,
+    n_sub=None,
     **kwargs,
 ) -> Interval:
     """
@@ -32,8 +32,10 @@ def b2b(
             - 'ga': genetic algorithm
             - 'bo': bayesian optimisation
             - 'diret': direct apply function (the default)
-            - None: the deault which is 'direct'
         **kwargs: additional keyword arguments to be passed to the function
+
+    note:
+        'direct' method is not meant to be called directly but to keep as an option during pbox propagation.
 
     signature:
         This shall be a top-level func as `epistemic_propagation()`.
@@ -47,11 +49,15 @@ def b2b(
         case "endpoints":
             return endpoints(vec_itvl, func)
         case "subinterval":
-            return subinterval_method(vec_itvl, func, style=style, n=n, **kwargs)
+            return subinterval_method(
+                vec_itvl, func, style=style, n_sub=n_sub, **kwargs
+            )
         case "ga":
             pass
         case "bo":
             pass
+        case "direct":
+            return func(vec_itvl)
         case _:
             raise NotImplementedError(
                 f"Method {interval_strategy} is not supported yet."
@@ -127,14 +133,14 @@ def endpoints(vec_itvl, func):
     return Interval(min_response, max_response)
 
 
-def subinterval_method(vec_itvl, func, style=None, n=None, parallel=False):
+def subinterval_method(vec_itvl, func, style=None, n_sub=None, parallel=False):
     # TODO parallel subinterval
     """leslie's implmentation of subinterval method
 
     args:
         vec_itvl: a vector type Interval object
         func: the function to be evaluated
-        n: number of subintervals
+        n_sub: number of subintervals
         style: the style used for interval propagation
             - 'direct': direct apply function
             - 'endpoints': only the endpoints
@@ -143,10 +149,10 @@ def subinterval_method(vec_itvl, func, style=None, n=None, parallel=False):
 
     if style is None:
         raise ValueError("style must be chosen within {'direct', 'endpoints'}.")
-    if n is None:
-        raise ValueError("Number of subintervals n must be provided.")
+    if n_sub is None:
+        raise ValueError("Number of subintervals n_sub must be provided.")
 
-    sub = subintervalise(vec_itvl, n)
+    sub = subintervalise(vec_itvl, n_sub)
     if style == "direct":
         return reconstitute(func(sub))
     elif style == "endpoints":

@@ -226,7 +226,7 @@ class MixedPropagation(P):
             case _:
                 raise ValueError("Unknown method")
 
-        results = handler(self._vars, self.func, **kwargs)
+        results = handler(self._vars, self.func, self.interval_strategy, **kwargs)
         return results
 
 

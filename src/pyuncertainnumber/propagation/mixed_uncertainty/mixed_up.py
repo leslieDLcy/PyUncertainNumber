@@ -14,11 +14,10 @@ if TYPE_CHECKING:
 
 """leslie's implementation on mixed uncertainty propagation
 
-#! - [ ] ongoing
 
 design signature hint:
     - treat `vars` as the construct classes
-    - share the same interface with minimal arguments set (vars, func, method)
+    - share the same interface with minimal arguments set (vars, func, interval_strategy)
     - all these funcs will have the possibilities to return some verbose results
     - where these verbose results can be saved to disk using a decorator
 
@@ -48,13 +47,12 @@ def bi_imc(x, y, func, dependency=None, n_sam=100):
 
 
 # TODO: add vine copula
-#! interval_strategu
 def interval_monte_carlo(
     vars: list[Interval | Distribution | Pbox],
     func: callable,
+    interval_strategy,
+    n_sam,
     dependency=None,
-    method: str = None,
-    n_sam: int = 100,
     **kwargs,
 ):
     """
@@ -62,6 +60,7 @@ def interval_monte_carlo(
         vars (list): list of uncertain variables
         dependency: dependency structure (e.g. vine copula or archimedean copula)
     """
+    # TODO: add a warning here when n_sam is not explicitly set
     from scipy.stats import qmc
     from ..epistemic_uncertainty.b2b import b2b
 
@@ -72,7 +71,9 @@ def interval_monte_carlo(
     itvs = [v.alpha_cut(alpha) for v in p_vars]
 
     # b2b
-    b2b_f = partial(b2b, func=func, method=method, **kwargs)
+    #! func must expect 2D inputs
+    b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
+    # TODO add parallel logic herein
     container = [b2b_f(_item) for _item in itertools.product(*itvs)]
     # container = [func(_item) for _item in itertools.product(*itvs)]  # backup
     return stacking(container)
@@ -89,7 +90,6 @@ def slicing(
     itvs = [p.outer_approximate()[1] for p in p_vars]
 
     container = [func(_item) for _item in itertools.product(*itvs)]
-    # print(len(container))  # shall be 40_000  # checkedout
     return stacking(container)
 
 

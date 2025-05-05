@@ -6,10 +6,16 @@ import numpy as np
 """ This module contains the some examplar performance/response functions  """
 
 
+def func_inspect():
+    """inspect the formatting of the user-defined function"""
+    pass
+
+
 if TYPE_CHECKING:
     from ..pba.intervals.number import Interval
 
 
+#! 'func' needs to take 2D inputs for maxmising the potential for array computation
 def cb_func(x):
     """Calculates deflection and stress for a cantilever beam.
 
