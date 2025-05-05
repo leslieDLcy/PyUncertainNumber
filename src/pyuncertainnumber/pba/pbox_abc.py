@@ -322,12 +322,13 @@ class Staircase(Pbox):
 
     def discretise(self, n=None):
         from .utils import equi_selection
+        from .intervals.number import LightInterval as LI
 
         if n is None:
-            return I(lo=self.left, hi=self.right)
+            return LI(lo=self.left, hi=self.right)
         else:
             l, r = equi_selection(self.left, n), equi_selection(self.right, n)
-            return I(lo=l, hi=r)
+            return LI(lo=l, hi=r)
 
     def outer_approximate(self, n=None):
         """outer approximation of a p-box

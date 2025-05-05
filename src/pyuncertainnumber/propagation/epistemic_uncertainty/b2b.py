@@ -1,6 +1,7 @@
 """leslie's general bound to bound implementation"""
 
 from ...pba.intervals.number import Interval
+from ...pba.intervals.number import LightInterval as LI
 from ...pba.intervalOperators import make_vec_interval
 
 import numpy as np
@@ -130,7 +131,8 @@ def endpoints(vec_itvl, func):
     response = func(arr)  # func on each row of combination of endpoints
     min_response = np.min(response)
     max_response = np.max(response)
-    return Interval(min_response, max_response)
+    # return Interval(min_response, max_response)
+    return LI(min_response, max_response)
 
 
 def subinterval_method(vec_itvl, func, style=None, n_sub=None, parallel=False):
