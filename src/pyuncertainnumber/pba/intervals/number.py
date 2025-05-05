@@ -86,26 +86,32 @@ class Interval:
         return show(self)
 
     def __init__(
-        self, lo: Union[float, ndarray], hi: Optional[Union[float, ndarray]] = None
+        self,
+        lo: Union[float, ndarray],
+        hi: Optional[Union[float, ndarray]] = None,
+        run_setup=True,
     ) -> None:
-        self.__lo = asarray(lo, dtype=float)
+        self._lo = asarray(lo, dtype=float)
+        self._hi = asarray(hi, dtype=float)  # check lo and hi have same shape
+        self._shape = self._lo.shape
+
+        if run_setup:
+            self.__post_init__()
+
+    def __post_init__(self):
+
         if hi is None:
-            hi = self.__lo.copy()
-        # self.__unsized = True
-        self.__hi = asarray(hi, dtype=float)  # check lo and hi have same shape
-        # if (len(self.__hi.shape)>0) | (len(self.__hi.shape)>0): self.__unsized = False
-        # check lo, hi order
+            self._hi = self._lo.copy()
+
         assert np.all(
-            self.__lo <= self.__hi
+            self._lo <= self._hi
         ), "low larger than high, needed to invert the interval"
-        self.__shape = self.__lo.shape
-        # self.__scalar = (self.__shape==()) | (self.__shape==(1,))
 
     def __len__(self):
         if self.unsized:
             return 0  # interval object is not sized, perhaps return an error: TypeError: len() of unsized object
         else:
-            return self.__lo.shape[0]
+            return self._lo.shape[0]
 
     def __iter__(self):  # https://realpython.com/introduction-to-python-generators/
         lo_iter, hi_iter = numpy.nditer(self.lo), numpy.nditer(self.hi)
@@ -120,7 +126,7 @@ class Interval:
         pass
 
     def __getitem__(self, i: Union[int, slice]):  # make class indexable
-        return Interval(lo=self.__lo[i], hi=self.__hi[i])
+        return Interval(lo=self._lo[i], hi=self._hi[i])
 
     # * -------------- METHODS -------------- *#
     def to_numpy(self) -> np.ndarray:
@@ -166,16 +172,16 @@ class Interval:
 
     @property
     def lo(self) -> Union[ndarray, float]:
-        return self.__lo
+        return self._lo
 
-    # if len(self.shape)==0: return self.__lo
-    # return self.__lo # return transpose(transpose(self.__val)[0]) # from shape (3,7,2) to (2,7,3) to (3,7)
+    # if len(self.shape)==0: return self._lo
+    # return self._lo # return transpose(transpose(self.__val)[0]) # from shape (3,7,2) to (2,7,3) to (3,7)
     @property
     def hi(self) -> Union[ndarray, float]:
-        return self.__hi
+        return self._hi
 
-    # if len(self.shape)==0: return self.__hi
-    # return self.__hi # return transpose(transpose(self.__val)[1])
+    # if len(self.shape)==0: return self._hi
+    # return self._hi # return transpose(transpose(self.__val)[1])
 
     @property
     def left(self):
@@ -199,7 +205,7 @@ class Interval:
 
     @property
     def unsized(self):
-        if (len(self.__hi.shape) > 0) | (len(self.__hi.shape) > 0):
+        if (len(self._hi.shape) > 0) | (len(self._hi.shape) > 0):
             return False
         else:
             return True
@@ -207,9 +213,9 @@ class Interval:
     @property
     def val(self):
         if self.unsized:
-            return asarray([self.__lo, self.__hi], dtype=float)
+            return asarray([self._lo, self._hi], dtype=float)
         else:
-            return transpose(stack((self.__lo, self.__hi)))
+            return transpose(stack((self._lo, self._hi)))
 
     @property
     def scalar(self):
@@ -217,11 +223,11 @@ class Interval:
 
     @property
     def shape(self):
-        return self.__shape
+        return self._shape
 
     @property
     def ndim(self):
-        return len(self.__shape)
+        return len(self._shape)
 
     @property
     def naked_value(self):
@@ -279,7 +285,7 @@ class Interval:
             else:
                 lo, hi = self.hi * other, self.lo * other
         elif otherType == "ndarray":  # check self and other have same shape
-            lo, hi = numpy.empty(self.__lo.shape), numpy.empty(self.__lo.shape)
+            lo, hi = numpy.empty(self._lo.shape), numpy.empty(self._lo.shape)
             if len(other.shape) == 0:
                 self.__mul__(float(other))  # safety net for ndarrays with no shape
             other_positive = other >= 0
@@ -311,7 +317,7 @@ class Interval:
             else:
                 lo, hi = self.hi / other, self.lo / other
         elif otherType == "ndarray":
-            lo, hi = numpy.empty(self.__lo.shape), numpy.empty(self.__lo.shape)
+            lo, hi = numpy.empty(self._lo.shape), numpy.empty(self._lo.shape)
             if any(other.flatten() == 0):
                 raise ZeroDivisionError
             other_positive = other > 0
@@ -329,7 +335,7 @@ class Interval:
 
     def __rtruediv__(self, left):
         leftType = left.__class__.__name__
-        # lo,hi = numpy.empty(self.__lo.shape),numpy.empty(self.__hi.shape)
+        # lo,hi = numpy.empty(self._lo.shape),numpy.empty(self._hi.shape)
         self_lo, self_hi = self.lo, self.hi
         self_straddle_zero = numpy.any(
             (self_lo.flatten() <= 0) & (self_hi.flatten() >= 0)
@@ -401,31 +407,13 @@ class Interval:
 import numpy as np
 
 
-class LightweightInterval(Interval):
-    def __init__(
-        self,
-        lo: Union[float, np.ndarray],
-        hi: Optional[Union[float, np.ndarray]] = None,
-    ) -> None:
+class LightInterval(Interval):
+    def __init__(self, lo, hi):
         # Directly assign values without checks
-        self.__lo = lo
-        self.__hi = hi if hi is not None else lo
-
-        # Store the shape (this is just lo.shape, because they have the same shape)
-        self.__shape = ()
+        super().__init__(lo, hi, run_setup=False)
 
     def __repr__(self):
-        return f"[{self.__lo},{self.__hi}]"
-
-    @property
-    def lo(self) -> Union[ndarray, float]:
-        return self.__lo
-
-    # if len(self.shape)==0: return self.__lo
-    # return self.__lo # return transpose(transpose(self.__val)[0]) # from shape (3,7,2) to (2,7,3) to (3,7)
-    @property
-    def hi(self) -> Union[ndarray, float]:
-        return self.__hi
+        return f"Lighter [{self._lo},{self._hi}]"
 
 
 # Properties or maybe attributes of the interval class. These apply to all interval-like objects.
