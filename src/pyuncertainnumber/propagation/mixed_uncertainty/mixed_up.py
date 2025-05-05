@@ -6,6 +6,7 @@ import itertools
 from ...pba.pbox_abc import convert_pbox
 from ...pba.aggregation import stacking
 from ...pba.intervalOperators import make_vec_interval
+from ..epistemic_uncertainty.b2b import b2b
 
 if TYPE_CHECKING:
     from ...pba.intervals import Interval
@@ -54,15 +55,13 @@ def interval_monte_carlo(
     n_sam,
     dependency=None,
     **kwargs,
-):
+) -> Pbox:
     """
     Args:
         vars (list): list of uncertain variables
         dependency: dependency structure (e.g. vine copula or archimedean copula)
     """
-    # TODO: add a warning here when n_sam is not explicitly set
     from scipy.stats import qmc
-    from ..epistemic_uncertainty.b2b import b2b
 
     p_vars = [convert_pbox(v) for v in vars]
 
@@ -70,30 +69,34 @@ def interval_monte_carlo(
     alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
     itvs = [v.alpha_cut(alpha) for v in p_vars]
 
-    # b2b
     #! func must expect 2D inputs
-    b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
     # TODO add parallel logic herein
+    b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
     container = [b2b_f(_item) for _item in itertools.product(*itvs)]
-    # container = [func(_item) for _item in itertools.product(*itvs)]  # backup
     return stacking(container)
 
 
 def slicing(
     vars: list[Distribution | Interval | Pbox],
     func,
-):
+    interval_strategy,
+    n_sam,
+    dependency=None,
+    **kwargs,
+) -> Pbox:
     """independence assumption by now"""
 
     p_vars = [convert_pbox(v) for v in vars]
 
     itvs = [p.outer_approximate()[1] for p in p_vars]
-
-    container = [func(_item) for _item in itertools.product(*itvs)]
+    b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
+    container = [b2b_f(_item) for _item in itertools.product(*itvs)]
     return stacking(container)
 
 
-def equi_cutting(vars, func, n_sam=100):
+def equi_cutting(
+    vars, func, interval_strategy, n_sam, dependency=None, **kwargs
+) -> Pbox:
     """equid-probaility discretisation and alpha cutting
 
     args:
@@ -104,8 +107,8 @@ def equi_cutting(vars, func, n_sam=100):
 
     # get a lot of intervals
     itvs = [v.discretise(n_sam) for v in p_vars]
-
-    container = [func(_item) for _item in itertools.product(*itvs)]
+    b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
+    container = [b2b_f(_item) for _item in itertools.product(*itvs)]
     return stacking(container)
 
 
@@ -116,7 +119,7 @@ def double_monte_carlo(
     n_e,
     func,
     parallel=False,
-):
+) -> Pbox:
     # X in R5. (1000, 5) -> f(X)
     # samples: (n_ep, n_alea) e.g. (10, 1000)
     """

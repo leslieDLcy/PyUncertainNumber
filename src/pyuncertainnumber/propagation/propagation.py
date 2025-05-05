@@ -209,6 +209,7 @@ class MixedPropagation(P):
         assert self.method in [
             "interval_monte_carlo",
             "slicing",
+            "equi_cutting",
             "double_monte_carlo",
         ], f"Method {self.method} not supported for mixed uncertainty propagation"
 
@@ -219,6 +220,8 @@ class MixedPropagation(P):
                 handler = interval_monte_carlo
             case "slicing":
                 handler = slicing
+            case "equi_cutting":
+                handler = equi_cutting
             case "double_monte_carlo":
                 handler = double_monte_carlo
             case None:
