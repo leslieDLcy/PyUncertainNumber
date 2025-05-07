@@ -5,7 +5,6 @@ from statsmodels.distributions.copula.api import (
     FrankCopula,
     ClaytonCopula,
     GumbelCopula,
-    CopulaDistribution,
     GaussianCopula,
     StudentTCopula,
     IndependenceCopula,
@@ -74,6 +73,11 @@ def supported_family_check(c):
     """check if copula family is supported"""
     if c not in {"gaussian", "t", "frank", "gumbel", "clayton", "independence"}:
         raise Exception("This copula model is not yet implemented")
+
+
+def empirical_copula(data):
+    """compute the empirical copula"""
+    pass
 
 
 def pl_3d_copula(U, V, Z):
