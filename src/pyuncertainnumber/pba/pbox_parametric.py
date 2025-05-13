@@ -1,7 +1,7 @@
 from __future__ import annotations
 import functools
 
-from .pbox_base import Pbox
+from .pbox_abc import Pbox, Leaf
 import scipy.stats as sps
 import numpy as np
 import itertools
@@ -9,8 +9,6 @@ from .params import Params
 from typing import *
 from warnings import *
 from .intervalOperators import wc_scalar_interval
-from .intervals.number import Interval
-from .pbox_abc import Leaf
 
 if TYPE_CHECKING:
     from .pbox_abc import Pbox

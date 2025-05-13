@@ -1,16 +1,14 @@
 from __future__ import annotations
 from .intervals import Interval as I
-from .pbox_base import Pbox
+from .pbox_abc import Pbox, Staircase
 from .utils import NotIncreasingError
 from typing import *
 from warnings import warn
 import numpy as np
 import matplotlib.pyplot as plt
 from .params import Params
-from .logical import sometimes
 from .utils import pl_ecdf_bounding_bundles, weighted_ecdf, CDF_bundle
 from .imprecise import imprecise_ecdf
-from .pbox_abc import Staircase
 from numbers import Number
 
 """ non-parametric pbox  """
@@ -332,8 +330,8 @@ def min_max_mean(
 
 
 def pos_mean_std(
-    mean: Union[nInterval, float, int],
-    std: Union[nInterval, float, int],
+    mean: Union[float, int],
+    std: Union[float, int],
     steps=Params.steps,
 ) -> Pbox:
     """
@@ -399,9 +397,9 @@ def min_max_mode(
 
 
 def min_max_median(
-    minimum: Union[nInterval, float, int],
-    maximum: Union[nInterval, float, int],
-    median: Union[nInterval, float, int],
+    minimum: Union[float, int],
+    maximum: Union[float, int],
+    median: Union[float, int],
     steps: int = Params.steps,
 ) -> Pbox:
     # TODO error in function
@@ -438,9 +436,9 @@ def min_max_median(
 
 # TODO not updated yet
 # def min_max_median_is_mode(
-#     minimum: Union[nInterval, float, int],
-#     maximum: Union[nInterval, float, int],
-#     m: Union[nInterval, float, int],
+#     minimum: Union[I, float, int],
+#     maximum: Union[I, float, int],
+#     m: Union[I, float, int],
 #     steps: int = Params.steps,
 # ) -> Pbox:
 #
@@ -479,8 +477,8 @@ def min_max_median(
 
 # TODO not updated yet
 # def symmetric_mean_std(
-#     mean: Union[nInterval, float, int],
-#     std: Union[nInterval, float, int],
+#     mean: Union[I, float, int],
+#     std: Union[I, float, int],
 #     steps: int = Params.steps,
 # ) -> Pbox:
 #     """
@@ -561,10 +559,10 @@ def min_max_mean_std(
             return max(x.right)
 
     def _imp(a, b):
-        return nInterval(max(_left(a), _left(b)), min(_right(a), _right(b)))
+        return I(max(_left(a), _left(b)), min(_right(a), _right(b)))
 
     def _env(a, b):
-        return nInterval(min(_left(a), _left(b)), max(_right(a), _right(b)))
+        return I(min(_left(a), _left(b)), max(_right(a), _right(b)))
 
     def _constrain(a, b, msg):
         if (_right(a) < _left(b)) or (_right(b) < _left(a)):
@@ -574,11 +572,11 @@ def min_max_mean_std(
     zero = 0.0
     one = 1.0
     ran = maximum - minimum
-    m = _constrain(mean, nInterval(minimum, maximum), "(mean)")
+    m = _constrain(mean, I(minimum, maximum), "(mean)")
     s = _constrain(
         std,
         _env(
-            nInterval(0.0),
+            I(0.0),
             (abs(ran * ran / 4.0 - (maximum - mean - ran / 2.0) ** 2)) ** 0.5,
         ),
         " (dispersion)",
@@ -685,12 +683,12 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
     """yields a distribution-free p-box based on specified percentiles of the variable
 
     args:
-        ``percentiles`` : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: nInterval(3,4), 1:5})
+        ``percentiles`` : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: I(3,4), 1:5})
         ``steps`` : number of steps to use in the p-box
 
     .. important::
 
-        The percentiles dictionary is of the form {percentile: value}. Where value can either be a number or an nInterval. If value is a number, the percentile is assumed to be a point percentile. If value is an nInterval, the percentile is assumed to be an interval percentile.
+        The percentiles dictionary is of the form {percentile: value}. Where value can either be a number or an I. If value is a number, the percentile is assumed to be a point percentile. If value is an I, the percentile is assumed to be an interval percentile.
 
     .. warning::
 
@@ -755,11 +753,16 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
         left = []
         right = []
         p = list(percentiles.keys())
+
+        def sometimes(condition):
+            """dummy"""
+            pass
+
         for i, j, k in zip(p, p[1:], p[2:]):
             if sometimes(percentiles[j] < percentiles[i]):
-                percentiles[j] = nInterval(percentiles[i].right, percentiles[j].right)
+                percentiles[j] = I(percentiles[i].right, percentiles[j].right)
             if sometimes(percentiles[j] > percentiles[k]):
-                percentiles[j] = nInterval(percentiles[j].left, percentiles[k].left)
+                percentiles[j] = I(percentiles[j].left, percentiles[k].left)
 
         left = []
         right = []

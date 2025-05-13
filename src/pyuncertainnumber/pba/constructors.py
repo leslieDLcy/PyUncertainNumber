@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from scipy.interpolate import interp1d
 import numpy as np
-from .pbox_base import Pbox
+from .pbox_abc import Pbox
 from .params import Params
 from ..characterisation.utils import tranform_ecdf
 
