@@ -13,9 +13,9 @@ class BayesOpt:
     def __init__(
         self,
         f,
+        xc_bounds,
+        dimension,
         task="maximisation",
-        xc_bounds=None,
-        dimension=None,
         num_explorations=100,
         num_iterations=100,
         acquisition_function=None,

@@ -23,6 +23,8 @@ class GA:
             self._f = self.flip_f
         elif self.task == "minimisation":
             self._f = self.f
+        else:
+            raise ValueError("task should be either 'maximisation' or 'minimisation'")
 
     def get_results(self):
         """display the results of the optimization"""
@@ -40,7 +42,7 @@ class GA:
         self._all_results = self.output
         # hint: self.model.output_dict["variable"], self.model.output_dict["function"]
 
-    def run(self, algorithm_param=None):
+    def run(self, algorithm_param=None, **kwargs):
         """run the genetic algorithm"""
         if algorithm_param is not None:
             self.model = ga(
@@ -50,6 +52,7 @@ class GA:
                 variable_boundaries=self.varbound,
                 algorithm_parameters=self.algorithm_param,
                 function_timeout=int(1e6),
+                **kwargs,
             )
         else:
             self.model = ga(
@@ -58,6 +61,7 @@ class GA:
                 variable_type="real",
                 variable_boundaries=self.varbound,
                 function_timeout=int(1e6),
+                **kwargs,
             )
         self.model.run()
         self.get_results()
