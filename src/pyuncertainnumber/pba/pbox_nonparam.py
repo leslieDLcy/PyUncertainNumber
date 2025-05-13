@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     from .pbox_base import Pbox
 
 
-def KS_bounds(s, alpha: float, display=True) -> CDF_bundle:
+def KS_bounds(s, alpha: float, display=True) -> tuple[CDF_bundle]:
     """construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
 
     args:
@@ -98,8 +98,7 @@ def KS_bounds(s, alpha: float, display=True) -> CDF_bundle:
             pl_ecdf_bounding_bundles(
                 b_l,
                 b_r,
-                alpha,
-                ax,
+                ax=ax,
                 title=f"Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level",
             )
     else:

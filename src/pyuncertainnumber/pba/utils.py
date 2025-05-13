@@ -7,14 +7,16 @@ from .intervalOperators import wc_scalar_interval, make_vec_interval
 from collections import namedtuple
 from dataclasses import dataclass
 from .intervals.number import Interval
+import numpy as np
 
-cdf_bundle = namedtuple("cdf_bundle", ["quantiles", "probabilities"])
-""" a handy composition object for a c.d.f which is a tuple of quantile and probability 
-#TODO I mean `ecdf_bundle` essentially, but changing name may introduce compatibility issues now
-#TODO to be deprecated
-note:
-    - handy to represent bounding c.d.fs for pbox, especially for free-form pbox
-"""
+
+# cdf_bundle = namedtuple("cdf_bundle", ["quantiles", "probabilities"])
+# """ a handy composition object for a c.d.f which is a tuple of quantile and probability
+# #TODO I mean `ecdf_bundle` essentially, but changing name may introduce compatibility issues now
+# #TODO to be deprecated
+# note:
+#     - handy to represent bounding c.d.fs for pbox, especially for free-form pbox
+# """
 
 
 @dataclass
@@ -131,35 +133,6 @@ def uniform_reparameterisation(a, b):
 #     # find the nearest value
 #     ind = (np.abs(array - value)).argmin()
 #     return ind
-
-
-import numpy as np
-
-
-# def find_nearest(array, value):
-#     """Find the index of the nearest value in the array to the given value(s).
-
-#     Works with both scalar and array inputs for `value`.
-
-#     Parameters:
-#         array (np.ndarray): The array to search.
-#         value (float or np.ndarray): The value(s) to find the nearest to.
-
-#     Returns:
-#         int or np.ndarray: Index or array of indices of nearest values.
-#     """
-#     array = np.asarray(array)
-
-#     if np.isscalar(value):
-#         # scalar case
-#         ind = (np.abs(array - value)).argmin()
-#         return ind
-#     else:
-#         # vectorized version for array input
-#         value = np.asarray(value)
-#         diff = np.abs(array[:, None] - value[None, :])
-#         indices = np.argmin(diff, axis=0)
-#         return indices
 
 
 # TODO to test this high-performance version below
