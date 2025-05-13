@@ -13,7 +13,7 @@ from .intervals.number import Interval
 from .pbox_abc import Leaf
 
 if TYPE_CHECKING:
-    from .pbox_base import Pbox
+    from .pbox_abc import Pbox
 
 
 """ parametric pboxes"""
@@ -924,9 +924,7 @@ def zipfian(*args):
 
 # *---------------------aliases---------------------*#
 normal = norm
-N = normal
 gaussian = norm
-U = uniform
 lognormal = lognormal_weird
 
 # *---------------------named pboxes for UN ---------------------*#

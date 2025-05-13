@@ -15,7 +15,7 @@ from typing import Sequence, Sized, Iterable, Optional, Any, Tuple, Union
 import numpy as np
 import numpy
 from numpy import ndarray, asarray, stack, transpose, ascontiguousarray, zeros
-
+import matplotlib.pyplot as plt
 
 # float32=numpy.float32
 
@@ -163,6 +163,16 @@ class Interval:
         lhs_sample = self.lhs_sample(n)
         endpoints = np.array([self.lo, self.hi])
         return np.vstack((endpoints, lhs_sample))
+
+    def plot(self, ax=None, **kwargs):
+        p = self.to_pbox()
+        if ax is None:
+            fig, ax = plt.subplots()
+        p.plot(ax=ax, **kwargs)
+
+    def display(self):
+        self.plot()
+        plt.show()
 
     @property
     def lo(self) -> Union[ndarray, float]:

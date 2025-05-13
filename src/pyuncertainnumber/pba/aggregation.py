@@ -13,7 +13,7 @@ import functools
 from .pbox_abc import Staircase, convert_pbox
 
 if TYPE_CHECKING:
-    from .pbox_base import Pbox
+    from .pbox_abc import Pbox
     from .ds import DempsterShafer
 
 makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
@@ -21,12 +21,13 @@ makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").make
 __all__ = ["stochastic_mixture", "envelope", "imposition", "stacking", "env_ecdf"]
 
 
-@makeUN
+# TODO: if adding the decorator to make UN class
+# @makeUN
 def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
     """it could work for either Pbox, distribution, DS structure or Intervals
 
     args:
-        - l_un (list): list of uncertain numbers
+        - l_un (list): list of uncertain numbers constructs
         - weights (list): list of weights
         - display (Boolean): boolean for plotting
     # TODO mix types later
@@ -34,7 +35,7 @@ def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
         - currently only accepts same type objects
     """
 
-    from .pbox_base import Pbox
+    from .pbox_abc import Pbox
     from .ds import DempsterShafer
     from .intervals import Interval
 
@@ -76,6 +77,7 @@ def stacking(
     q2, p2 = weighted_ecdf(vec_interval.hi, weights)
 
     if display:
+        # display the two cdf bounds by default
         if ax is None:
             fig, ax = plt.subplots()
         ax.step(q1, p1, marker="+", c="g", where="post")
