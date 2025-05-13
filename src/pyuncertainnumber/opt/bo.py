@@ -87,13 +87,15 @@ class BayesOpt:
         self._optimal_dict["target"] = bo_all_dict["optimal_target"]
         self._all_results = bo_all_dict
 
-    def run(self):
+    def run(self, **kwargs):
 
         self.optimizer = BayesianOptimization(
             f=self.f,
             pbounds=self.xc_bounds,
             acquisition_function=self.acquisition_function,
             random_state=42,
+            allow_duplicate_points=True,
+            **kwargs,
         )
         # initial exploration of the design space
         self.optimizer.maximize(
