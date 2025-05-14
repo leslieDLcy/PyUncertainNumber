@@ -21,7 +21,7 @@ from ..pba.intervals.number import Interval
 from numbers import Number
 from ..pba.distributions import Distribution
 import operator
-
+from pint import Quantity
 
 """ Uncertain Number class """
 
@@ -66,7 +66,10 @@ class UncertainNumber:
     symbol: str = field(default=None)
     # string input of units, e.g. 'm/s'
     units: Type[any] = field(default=None, repr=False)
-    _Q: Type[any] = field(default=None, repr=False)
+    # _Q: Type[any] = field(default=None, repr=False)
+
+    # * ---------------------Units---------------------*#
+    Q_ = Quantity
 
     # * ---------------------Value---------------------*#
     # ensemble: Type[Ensemble] = field(default=None)
@@ -82,7 +85,6 @@ class UncertainNumber:
     # UN object, which shall be linked with the 'pba' or `Intervals` package
     naked_value: float = field(default=None)
     p_flag: bool = field(default=True, repr=False)  # parameterised flag
-    _skip_post_init: bool = field(default=False, repr=False, compare=False)
 
     # * ---------------------auxlliary information---------------------*#
     # some simple boiler plates
@@ -120,14 +122,12 @@ class UncertainNumber:
             self.naked_value = self._construct.mean().midpoint()
 
     def __post_init__(self):
-        """the de facto initialisation method for the core math objects of the UN class
+        """the de facto initialisation method for the core constructs of the UN class
 
         caveat:
             user needs to by themselves figure out the correct
             shape of the 'distribution_parameters', such as ['uniform', [1,2]]
         """
-        if self._skip_post_init:
-            return  # Exit early if we're skipping __post_init__
 
         if not self.essence:
             check_initialisation_list = [
@@ -146,7 +146,7 @@ class UncertainNumber:
 
         UncertainNumber.instances.append(self)
 
-        ### create the underlying construct ###
+        # * ------------------------ create the underlying construct
         match self.essence:
             case "interval":
                 self._construct = parse_bounds(self.bounds)
@@ -158,15 +158,8 @@ class UncertainNumber:
 
         self.naked_value = self._construct.naked_value
 
-        ### 'unit' representation of the un ###
-        ureg = UnitRegistry()
-        Q_ = ureg.Quantity
-        # I can use the following logic to double check the arithmetic operations of the UN object
-        if isinstance(self.naked_value, float | int):
-            self._Q = Q_(self.naked_value, self.units)
-            # self.naked_value * ureg(self.units)  # Quantity object
-        else:
-            self._Q = Q_(1, self.units)
+        # * ------------------------ 'unit' representation of the un
+        self.physical_quantity = self.Q_(self.naked_value, self.units)
 
     @staticmethod
     def match_pbox(keyword, parameters):

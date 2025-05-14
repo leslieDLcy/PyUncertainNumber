@@ -46,9 +46,7 @@ class DempsterShafer:
     def masses(self):
         return self._masses
 
-    def disassemble(
-        self,
-    ):
+    def disassemble(self):
         return self._intrep, self._masses
 
     def display(self, style="box", ax=None, **kwargs):
