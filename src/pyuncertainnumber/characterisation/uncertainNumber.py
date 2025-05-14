@@ -47,7 +47,6 @@ __all__ = [
 ]
 
 
-@dataclass
 class UncertainNumber:
     """Uncertain Number class
 
@@ -61,76 +60,73 @@ class UncertainNumber:
         >>> UncertainNumber(name="velocity", symbol="v", units="m/s", bounds=[1, 2])
     """
 
-    # * ---------------------Basic---------------------*#
-    name: str = field(default=None)
-    symbol: str = field(default=None)
-    units: Type[any] = field(
-        default=None, repr=False
-    )  # string input of units, e.g. 'm/s'
-
-    # * ---------------------Units---------------------*#
     Q_ = Quantity
+    instances = []
 
-    # * ---------------------Value---------------------*#
-    # ensemble: Type[Ensemble] = field(default=None)
-    uncertainty_type: Type[Uncertainty_types] = field(default=None, repr=False)
-    essence: str = field(default=None)  # [interval, distribution, pbox, ds]
-    masses: list[float] = field(default=None, repr=False)
-    bounds: Union[List[float], str] = field(default=None, repr=False)
-    distribution_parameters: list[str, float | int] = field(default=None, repr=False)
-    pbox_parameters: list[str, Sequence[Interval]] = field(default=None, repr=False)
-    hedge: str = field(default=None, repr=False)
-    _construct: Type[any] = field(default=None, repr=False)
-    # this is the deterministic numeric representation of the
-    # UN object, which shall be linked with the 'pba' or `Intervals` package
-    naked_value: float = field(default=None)
-    p_flag: bool = field(default=True, repr=False)  # parameterised flag
-    _skip_construct_init: bool = field(
-        default=False, repr=False, compare=False
-    )  # skip the instantiation for construct
-
-    # * ---------------------auxlliary information---------------------*#
-    # some simple boiler plates
-    # lat: float = field(default=0.0, metadata={'unit': 'degrees'})
-    # ensemble: Type[Ensemble] = field(default=None)
-
-    measurand: str = field(default=None, repr=False)
-    nature: str = field(default=None, repr=False)
-    provenence: str = field(default=None, repr=False)
-    justification: str = field(default=None, repr=False)
-    structure: str = field(default=None, repr=False)
-    security: str = field(default=None, repr=False)
-
-    # * ---------------------aleatoric component--------------------- *#
-    ensemble: Type[Ensemble] = field(default=None, repr=False)
-    variability: str = field(default=None, repr=False)
-    dependence: str = field(default=None, repr=False)
-
-    # * ---------------------epistemic component---------------------*#
-    uncertainty: str = field(default=None, repr=False)
-
-    # class variable
-    instances = []  # TODO named as registry later on
-
-    # * --------------------- additional ---------------------*#
-    _samples: np.ndarray | list = field(default=None, repr=False)
+    def __init__(
+        self,
+        name=None,
+        symbol=None,
+        units=None,
+        uncertainty_type=None,
+        essence=None,
+        masses=None,
+        bounds=None,
+        distribution_parameters=None,
+        pbox_parameters=None,
+        hedge=None,
+        _construct=None,
+        naked_value=1.0,
+        p_flag=True,
+        _skip_construct_init=False,
+        measurand=None,
+        nature=None,
+        provenence=None,
+        justification=None,
+        structure=None,
+        security=None,
+        ensemble=None,
+        variability=None,
+        dependence=None,
+        uncertainty=None,
+        _physical_quantity=None,
+        _samples=None,
+        **kwargs,
+    ):
+        self.name = name
+        self.symbol = symbol
+        self.uncertainty_type = uncertainty_type
+        self.essence = essence
+        self.masses = masses
+        self.bounds = bounds
+        self.distribution_parameters = distribution_parameters
+        self.pbox_parameters = pbox_parameters
+        self.hedge = hedge
+        self._construct = _construct
+        self.naked_value = naked_value
+        self.p_flag = p_flag
+        self._skip_construct_init = _skip_construct_init
+        self.measurand = measurand
+        self.nature = nature
+        self.provenence = provenence
+        self.justification = justification
+        self.structure = structure
+        self.security = security
+        self.ensemble = ensemble
+        self.variability = variability
+        self.dependence = dependence
+        self.uncertainty = uncertainty
+        self._physical_quantity = _physical_quantity
+        self._samples = _samples
+        self.__init_check()
+        self.__init_construct()
+        self.naked_value = self._construct.naked_value
+        self.units = units
 
     # *  ---------------------more on initialisation---------------------*#
-    def parameterised_pbox_specification(self):
-        if self.p_flag:
-            self._construct = self.match_pbox(
-                self.distribution_parameters[0],
-                self.distribution_parameters[1],
-            )
-            self.naked_value = self._construct.mean().midpoint()
 
-    def __post_init__(self):
-        """the de facto parameterisation/instantiation procedure for the core constructs of the UN class
-
-        caveat:
-            user needs to by themselves figure out the correct
-            shape of the 'distribution_parameters', such as ['uniform', [1,2]]
-        """
+    def __init_check(self):
+        UncertainNumber.instances.append(self)
 
         if not self.essence:
             check_initialisation_list = [
@@ -147,7 +143,13 @@ class UncertainNumber:
                 self.essence = "interval"
                 self.bounds = [-np.inf, np.inf]
 
-        UncertainNumber.instances.append(self)
+    def __init_construct(self):
+        """the de facto parameterisation/instantiation procedure for the core constructs of the UN class
+
+        caveat:
+            user needs to by themselves figure out the correct
+            shape of the 'distribution_parameters', such as ['uniform', [1,2]]
+        """
 
         # * ------------------------ create the underlying construct
 
@@ -172,10 +174,16 @@ class UncertainNumber:
                         intervals=parse_bounds(self.bounds), masses=self.masses
                     )
 
-        self.naked_value = self._construct.naked_value
+    def parameterised_pbox_specification(self):
+        if self.p_flag:
+            self._construct = self.match_pbox(
+                self.distribution_parameters[0],
+                self.distribution_parameters[1],
+            )
+            self.naked_value = self._construct.mean().midpoint()
 
-        # * ------------------------ 'unit' representation of the un
-        self.physical_quantity = self.Q_(self.naked_value, self.units)
+    def _update_physical_quantity(self):
+        self._physical_quantity = self.Q_(self.naked_value, self.units)
 
     @staticmethod
     def match_pbox(keyword, parameters):
@@ -274,7 +282,7 @@ class UncertainNumber:
         """get a concise representation of the UN object"""
 
         field_values = get_concise_repr(self.__dict__)
-        return ", ".join(f"{k}={str(v)}" for k, v in field_values.items())
+        return ", ".join(f"{k}={v!r}" for k, v in field_values.items())
 
     def ci(self):
         """get 95% range confidence interval"""
@@ -307,6 +315,17 @@ class UncertainNumber:
     @property
     def construct_type(self):
         type(self._construct)
+
+    @property
+    def units(self):
+        """get the physical quantity of the uncertain number"""
+        return self._units
+
+    @units.setter
+    def units(self, value):
+        """set the physical quantity of the uncertain number"""
+        self._units = value
+        self._update_physical_quantity()
 
     # * ---------------------other constructors--------------------- *#
 
