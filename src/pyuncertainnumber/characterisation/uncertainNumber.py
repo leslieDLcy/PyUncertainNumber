@@ -122,7 +122,7 @@ class UncertainNumber:
             self.naked_value = self._construct.mean().midpoint()
 
     def __post_init__(self):
-        """the de facto initialisation method for the core constructs of the UN class
+        """the de facto parameterisation/instantiation procedure for the core constructs of the UN class
 
         caveat:
             user needs to by themselves figure out the correct
@@ -394,95 +394,97 @@ class UncertainNumber:
     # * ---------------------binary operations---------------------#
 
     def bin_ops(self, other, ops):
-        from ..pba.intervals.intervalOperators import convert_pbox
+        from ..pba.pbox_abc import convert_pbox
 
         try:
             return ops(self._construct, other._construct)
         except:
             a = convert_pbox(self._construct)
             b = convert_pbox(other._construct)
-            return UncertainNumber.fromConstruct(ops(a, b, ops))
+            return UncertainNumber.fromConstruct(ops(a, b))
 
     def __add__(self, other):
         """add two uncertain numbers"""
-        return self.bin_ops(self, other, operator.add)
+        return self.bin_ops(other, operator.add)
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
-        return self.bin_ops(self, other, operator.sub)
+        return self.bin_ops(other, operator.sub)
 
     def __mul__(self, other):
         """multiply two uncertain numbers"""
-        return self.bin_ops(self, other, operator.mul)
+        return self.bin_ops(other, operator.mul)
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
         """divide two uncertain numbers"""
-        return self.bin_ops(self, other, operator.truediv)
+        return self.bin_ops(other, operator.truediv)
 
     def __rtruediv__(self, other):
         return self.__truediv__(other)
 
     def __pow__(self, other):
         """power of two uncertain numbers"""
-        return self.bin_ops(self, other, operator.pow)
+        return self.bin_ops(other, operator.pow)
 
-    @classmethod
-    def _toIntervalBackend(cls, vars=None) -> np.array:
-        """transform any UN object to an `interval`
-        #! currently in use
-        # TODO think if use Marco's Interval Vector object
+    """ deprecated for now"""
 
-        question:
-            - what is the `interval` representation: list, nd.array or Interval object?
+    # @classmethod
+    # def _toIntervalBackend(cls, vars=None) -> np.array:
+    #     """transform any UN object to an `interval`
+    #     #! currently in use
+    #     # TODO think if use Marco's Interval Vector object
 
-        returns:
-            - 2D np.array representation for all the interval-typed UNs
-        """
-        all_objs = {instance.symbol: instance for instance in cls.instances}
+    #     question:
+    #         - what is the `interval` representation: list, nd.array or Interval object?
 
-        if vars is not None:
-            selected_objs = [all_objs[k] for k in all_objs if k in vars]
-        else:
-            selected_objs = [all_objs[k] for k in all_objs]
+    #     returns:
+    #         - 2D np.array representation for all the interval-typed UNs
+    #     """
+    #     all_objs = {instance.symbol: instance for instance in cls.instances}
 
-        # keep the order of the vars ....
-        def as_interval(sth):
-            """a helper function to convert to intervals"""
-            if sth.essence == "interval":
-                return sth.bounds
-            else:
-                return sth._construct.rangel
+    #     if vars is not None:
+    #         selected_objs = [all_objs[k] for k in all_objs if k in vars]
+    #     else:
+    #         selected_objs = [all_objs[k] for k in all_objs]
 
-        _UNintervals_list = [as_interval(k) for k in selected_objs]
-        _UNintervals = np.array(_UNintervals_list).reshape(-1, 2)
-        return _UNintervals
+    #     # keep the order of the vars ....
+    #     def as_interval(sth):
+    #         """a helper function to convert to intervals"""
+    #         if sth.essence == "interval":
+    #             return sth.bounds
+    #         else:
+    #             return sth._construct.rangel
 
-    @classmethod
-    def _IntervaltoCompBackend(cls, vars):
-        """convert the interval-tupe UNs instantiated to the computational backend
+    #     _UNintervals_list = [as_interval(k) for k in selected_objs]
+    #     _UNintervals = np.array(_UNintervals_list).reshape(-1, 2)
+    #     return _UNintervals
 
-        note:
-            - it will automatically convert all the UN objects in array-like to the computational backend
-            - essentially vars shall be all interval-typed UNs by now
+    # @classmethod
+    # def _IntervaltoCompBackend(cls, vars):
+    #     """convert the interval-tupe UNs instantiated to the computational backend
 
-        returns:
-            - nd.array or Marco's Interval object
+    #     note:
+    #         - it will automatically convert all the UN objects in array-like to the computational backend
+    #         - essentially vars shall be all interval-typed UNs by now
 
-        thoughts:
-            - if Marco's, then we'd use `intervalise` func to get all interval objects
-            and then to create another func to convert the interval objects to np.array to do endpoints method
-        """
+    #     returns:
+    #         - nd.array or Marco's Interval object
 
-        # from augument list to intervals list
-        all_objs = {instance.symbol: instance for instance in cls.instances}
-        _intervals = [all_objs[k].bounds for k in all_objs if k in vars]
-        _UNintervals = np.array(_intervals).reshape(-1, 2)
-        return _UNintervals
+    #     thoughts:
+    #         - if Marco's, then we'd use `intervalise` func to get all interval objects
+    #         and then to create another func to convert the interval objects to np.array to do endpoints method
+    #     """
+
+    #     # from augument list to intervals list
+    #     all_objs = {instance.symbol: instance for instance in cls.instances}
+    #     _intervals = [all_objs[k].bounds for k in all_objs if k in vars]
+    #     _UNintervals = np.array(_intervals).reshape(-1, 2)
+    #     return _UNintervals
 
     # ---------------------serialisation functions---------------------#
 
