@@ -72,9 +72,10 @@ class AleatoryPropagation(P):
     def type_check(self):
         """only distributions"""
         from ..pba.distributions import Distribution
+        from ..pba.pbox_abc import Pbox
 
-        assert all(isinstance(v, Distribution) for v in self._vars) or all(
-            isinstance(v.construct, Distribution) for v in self._vars
+        assert all(
+            isinstance(v, Distribution | Pbox) for v in self._vars
         ), "Not all variables are distributions"
 
     def method_check(self):
@@ -241,7 +242,7 @@ For P, use the UN level
 """
 
 
-# top-level
+# top-level Uncertain Number class propagation
 class Propagation:
     # TODO I'd like to strip UN classes into construct classes herein
     def __init__(
@@ -249,7 +250,7 @@ class Propagation:
         vars: list[UncertainNumber],
         func: callable,
         method,
-        save_raw_data: bool = False,
+        interval_strategy=None,
     ):
         """top-level class for the propagation of uncertain numbers
 
@@ -259,7 +260,7 @@ class Propagation:
         self._vars = vars
         self._func = func
         self.method = method
-        self.save_raw_data = save_raw_data
+        self.interval_strategy = interval_strategy
 
     def _post_init_check(self):
 
@@ -274,12 +275,12 @@ class Propagation:
         # created an underlying propagation `self.p` object
 
         # all
-        all_I = all(isinstance(item, Interval) for item in self._vars)
-        all_D = all(isinstance(item, Distribution) for item in self._vars)
+        all_I = all(isinstance(item._construct, Interval) for item in self._vars)
+        all_D = all(isinstance(item._construct, Distribution) for item in self._vars)
         # any
-        has_I = any(isinstance(item, Interval) for item in self._vars)
-        has_D = any(isinstance(item, Distribution) for item in self._vars)
-        has_P = any(isinstance(item, Pbox) for item in self._vars)
+        has_I = any(isinstance(item._construct, Interval) for item in self._vars)
+        has_D = any(isinstance(item._construct, Distribution) for item in self._vars)
+        has_P = any(isinstance(item._construct, Pbox) for item in self._vars)
 
         if all_I:
             # all intervals
@@ -306,7 +307,7 @@ class Propagation:
                 "Please check the input variables."
             )
 
-    def propagate(self, **kwargs):
+    def run(self, **kwargs):
         """doing the propagation"""
 
         # choose the method accordingly

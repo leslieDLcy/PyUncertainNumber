@@ -15,6 +15,24 @@ if TYPE_CHECKING:
     from ..pba.intervals.number import Interval
 
 
+# * ------------- some of the function for testing APIs
+def foo(x):
+    return x[0] ** 3 + x[1] + x[2]
+
+
+def foo_vec(x):
+    return x[:, 0] ** 3 + x[:, 1] + x[:, 2]
+
+
+def foo_universal(x):
+    if isinstance(x, list | tuple):
+        return x[0] ** 3 + x[1] + x[2]
+    elif isinstance(x, np.ndarray):
+        if x.ndim == 1:
+            x = x[None, :]
+        return x[:, 0] ** 3 + x[:, 1] + x[:, 2]
+
+
 #! 'func' needs to take 2D inputs for maxmising the potential for array computation
 def cb_func(x):
     """Calculates deflection and stress for a cantilever beam.

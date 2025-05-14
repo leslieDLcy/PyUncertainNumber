@@ -8,6 +8,14 @@ import operator
 import itertools
 from .utils import condensation, smooth_condensation, find_nearest, is_increasing
 
+import logging
+
+# Configure the logging system with a simple format
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s: %(message)s",
+)
+
 
 def get_var_from_ecdf(q, p):
     """leslie implementation
@@ -319,6 +327,12 @@ class Staircase(Pbox):
         """
         ind = find_nearest(Params.p_values, alpha)
         return I(lo=self.left[ind], hi=self.right[ind])
+
+    def sample(self, n_sam):
+        from scipy.stats import qmc
+
+        alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
+        return self.alpha_cut(alpha)
 
     def discretise(self, n=None):
         from .utils import equi_selection
@@ -640,8 +654,15 @@ class Leaf(Staircase):
         base_repr = super().__repr__().rstrip(")")  # remove trailing ')'
         return f"{base_repr}, shape={self.shape}"
 
-    def sample():
-        pass
+    def sample(self, n_sam):
+        """sample from a parametric pbox or distribution"""
+
+        s_i = super().sample(n_sam)
+        if np.all(s_i.lo == s_i.hi):
+            logging.info("samples generated from a precise distribution")
+            return s_i.lo
+        else:
+            return s_i
 
 
 class Cbox(Pbox):

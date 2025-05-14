@@ -8,7 +8,6 @@ from .uncertainty_types import Uncertainty_types
 from .ensemble import Ensemble
 from .utils import *
 from ..pba.params import Params
-from pint import UnitRegistry
 from pathlib import Path
 from ..nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
