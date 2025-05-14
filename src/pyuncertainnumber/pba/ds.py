@@ -57,8 +57,6 @@ class DempsterShafer:
             # TODO the to_pbox() interpolation is not perfect
             case "box":
                 stacking(intervals, masses, display=True, ax=ax, return_type="pbox")
-                # _ = self.to_pbox()
-                # _.display(**kwargs)
             case "interval":
                 plot_DS_structure(intervals, masses, ax=ax, **kwargs)
 

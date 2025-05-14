@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from .pbox_abc import Pbox
     from .ds import DempsterShafer
 
-makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
+# makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
 
 __all__ = ["stochastic_mixture", "envelope", "imposition", "stacking", "env_ecdf"]
 
