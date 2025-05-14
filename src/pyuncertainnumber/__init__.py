@@ -27,4 +27,4 @@ from pyuncertainnumber.pba.cbox import infer_cbox, infer_predictive_distribution
 
 
 # * --------------------- DempsterShafer ---------------------*#
-from pyuncertainnumber.pba.ds import dempstershafer_element, DempsterShafer
+from pyuncertainnumber.pba.dss import dempstershafer_element, DempsterShafer

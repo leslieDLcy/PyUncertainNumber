@@ -656,7 +656,7 @@ def is_un(un):
     """if the `un` is modelled by accepted constructs"""
 
     from .intervals.number import Interval
-    from .ds import DempsterShafer
+    from .dss import DempsterShafer
     from .distributions import Distribution
 
     return isinstance(un, Pbox | Interval | DempsterShafer | Distribution)
@@ -670,7 +670,7 @@ def convert_pbox(un):
     """
 
     from .pbox_abc import Pbox
-    from .ds import DempsterShafer
+    from .dss import DempsterShafer
     from .distributions import Distribution
     from .intervals.number import Interval as I
 

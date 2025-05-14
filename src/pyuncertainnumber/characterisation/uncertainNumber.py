@@ -314,7 +314,7 @@ class UncertainNumber:
     def fromConstruct(cls, construct):
         """create an Uncertain Number from a construct object"""
         from ..pba.pbox_abc import Leaf, Staircase
-        from ..pba.ds import DempsterShafer
+        from ..pba.dss import DempsterShafer
         from ..pba.distributions import Distribution
 
         if isinstance(construct, Leaf | Staircase):

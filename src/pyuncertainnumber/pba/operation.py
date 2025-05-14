@@ -15,7 +15,7 @@ def convert(un):
     """
 
     from .pbox_base import Pbox
-    from .ds import DempsterShafer
+    from .dss import DempsterShafer
     from .distributions import Distribution
 
     if isinstance(un, Pbox):

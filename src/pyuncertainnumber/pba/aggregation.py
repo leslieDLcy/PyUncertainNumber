@@ -14,7 +14,7 @@ from .pbox_abc import Staircase, convert_pbox
 
 if TYPE_CHECKING:
     from .pbox_abc import Pbox
-    from .ds import DempsterShafer
+    from .dss import DempsterShafer
 
 # makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
 
@@ -36,7 +36,7 @@ def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
     """
 
     from .pbox_abc import Pbox
-    from .ds import DempsterShafer
+    from .dss import DempsterShafer
     from .intervals import Interval
 
     if isinstance(l_uns[0], Interval | list):
@@ -121,7 +121,7 @@ def mixture_pbox(l_pboxes, weights=None, display=False):
 def mixture_ds(l_ds, display=False):
     """mixture operation for DS structure"""
 
-    from .ds import DempsterShafer
+    from .dss import DempsterShafer
 
     intervals = np.concatenate([ds.disassemble()[0] for ds in l_ds], axis=0)
     # TODO check the duplicate intervals
