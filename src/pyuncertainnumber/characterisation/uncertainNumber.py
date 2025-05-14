@@ -282,14 +282,7 @@ class UncertainNumber:
                         )
                         self._construct.quick_plot()
 
-    # * ---------------------some class methods---------------------* #
-
-    # def _get_concise_representation(self):
-    #     """get a concise representation of the UN object"""
-
-    #     # stripped dict for __repr__
-    #     field_values = get_concise_repr(self.__dict__)
-    #     return ", ".join(f"{k}={v!r}" for k, v in field_values.items())
+    # * ---------------------some methods---------------------* #
 
     def ci(self):
         """get 95% range confidence interval"""
@@ -343,9 +336,8 @@ class UncertainNumber:
     def physical_quantity(self, value):
         """set the physical quantity of the uncertain number"""
         self._physical_quantity = value
-        # self.unit = str(self._physical_quantity.unit)
 
-    # * ---------------------other constructors--------------------- *#
+    # * --------------------- constructors--------------------- *#
 
     @classmethod
     def from_hedge(cls, hedged_language):
@@ -442,12 +434,17 @@ class UncertainNumber:
     def bin_ops(self, other, ops):
         from ..pba.pbox_abc import convert_pbox
 
-        try:
-            new_cons = ops(self._construct, other._construct)
-        except:
+        # new_cons = ops(self._construct, other._construct)
+        if is_un(other) == 0:
+            new_cons = ops(self._construct, other)
+        elif is_un(other) == 1:
             a = convert_pbox(self._construct)
             b = convert_pbox(other._construct)
             new_cons = ops(a, b)
+        elif is_un(other) == 2:
+            raise ValueError(
+                "construct object entered. propagation can be done but units won't be passed down"
+            )
 
         new_un = UncertainNumber.fromConstruct(new_cons)
         return pass_down_units(self, other, ops, new_un)
@@ -480,62 +477,7 @@ class UncertainNumber:
         """power of two uncertain numbers"""
         return self.bin_ops(other, operator.pow)
 
-    """ deprecated for now"""
-
-    # @classmethod
-    # def _toIntervalBackend(cls, vars=None) -> np.array:
-    #     """transform any UN object to an `interval`
-    #     #! currently in use
-    #     # TODO think if use Marco's Interval Vector object
-
-    #     question:
-    #         - what is the `interval` representation: list, nd.array or Interval object?
-
-    #     returns:
-    #         - 2D np.array representation for all the interval-typed UNs
-    #     """
-    #     all_objs = {instance.symbol: instance for instance in cls.instances}
-
-    #     if vars is not None:
-    #         selected_objs = [all_objs[k] for k in all_objs if k in vars]
-    #     else:
-    #         selected_objs = [all_objs[k] for k in all_objs]
-
-    #     # keep the order of the vars ....
-    #     def as_interval(sth):
-    #         """a helper function to convert to intervals"""
-    #         if sth.essence == "interval":
-    #             return sth.bounds
-    #         else:
-    #             return sth._construct.rangel
-
-    #     _UNintervals_list = [as_interval(k) for k in selected_objs]
-    #     _UNintervals = np.array(_UNintervals_list).reshape(-1, 2)
-    #     return _UNintervals
-
-    # @classmethod
-    # def _IntervaltoCompBackend(cls, vars):
-    #     """convert the interval-tupe UNs instantiated to the computational backend
-
-    #     note:
-    #         - it will automatically convert all the UN objects in array-like to the computational backend
-    #         - essentially vars shall be all interval-typed UNs by now
-
-    #     returns:
-    #         - nd.array or Marco's Interval object
-
-    #     thoughts:
-    #         - if Marco's, then we'd use `intervalise` func to get all interval objects
-    #         and then to create another func to convert the interval objects to np.array to do endpoints method
-    #     """
-
-    #     # from augument list to intervals list
-    #     all_objs = {instance.symbol: instance for instance in cls.instances}
-    #     _intervals = [all_objs[k].bounds for k in all_objs if k in vars]
-    #     _UNintervals = np.array(_intervals).reshape(-1, 2)
-    #     return _UNintervals
-
-    # ---------------------serialisation functions---------------------#
+    # * ---------------------serialisation functions---------------------*#
 
     def JSON_dump(self, filename="UN_data.json"):
         """the JSON serialisation of the UN object into the filesystem"""
@@ -645,6 +587,9 @@ class ParamSpecification:
             self._true_type = "pbox"
 
 
+# * ---------------------helper functions  --------------------- *#
+
+
 def pass_down_units(a, b, ops, t):
     """pass down the unit of the uncertain number
 
@@ -654,9 +599,28 @@ def pass_down_units(a, b, ops, t):
         - ops: the operation to be performed
         - t: the result uncertain number of the operation
     """
-    new_q = ops(a._physical_quantity, b._physical_quantity)
+    if is_un(b) == 0:
+        try:
+            new_q = ops(a._physical_quantity, b * a._physical_quantity.units)
+        except Exception:
+            new_q = ops(a._physical_quantity, b)
+    elif is_un(b) == 1:
+        new_q = ops(a._physical_quantity, b._physical_quantity)
+
     t.physical_quantity = new_q
     return t
+
+
+def is_un(sth):
+
+    from pyuncertainnumber import Interval, Pbox, Distribution, DempsterShafer
+
+    if isinstance(sth, Number):
+        return 0
+    elif isinstance(sth, UncertainNumber):
+        return 1
+    elif isinstance(sth, Interval | Pbox | DempsterShafer | Distribution):
+        return 2
 
 
 # * ---------------------parametric shortcuts  --------------------- *#
