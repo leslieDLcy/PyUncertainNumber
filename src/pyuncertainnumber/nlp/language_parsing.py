@@ -118,23 +118,23 @@ def parse_interval_expression(expression):
     if initial_list_checking(expression):
         an_int = initial_list_checking(expression)
         if len(an_int) == 1:
-            return PM(an_int[0], hw=Params.hw)
+            return I.from_meanform(an_int[0], hw=Params.hw)
         elif len(an_int) > 1:
             return I(*an_int)
     ### type 2 ###
     elif bad_list_checking(expression):
         if PlusMinus_parser(expression) & (not percentage_finder(expression)):
             parsed_list = parser4(expression)
-            return PM(*parsed_list)
+            return I.from_meanform(*parsed_list)
         elif PlusMinus_parser(expression) & percentage_finder(expression):
             # parse the percentage first
             mid_range = percentage_converter(expression)
             parsed_mid_value = parser4(expression)[0]
 
             # if we take the percentage literally
-            # return PM(parsed_mid_value, hw=mid_range)
+            # return I.from_meanform(parsed_mid_value, hw=mid_range)
             # if we take the percentage based on the context
-            return PM(parsed_mid_value, hw=parsed_mid_value * mid_range)
+            return I.from_meanform(parsed_mid_value, hw=parsed_mid_value * mid_range)
     else:
         return "not a valid expression"
 

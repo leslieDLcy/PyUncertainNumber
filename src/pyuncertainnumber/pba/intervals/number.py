@@ -520,8 +520,8 @@ def mid(x: Interval) -> Union[float, ndarray]:
 
 
 def mig(x):
-    return numpy_max(numpy_abs(x.lo), numpy_abs(x.hi))  # mignitude
+    return np.max(np.abs(x.lo), np.abs(x.hi))  # mignitude
 
 
 def mag(x):
-    return numpy_min(numpy_abs(x.lo), numpy_abs(x.hi))  # magnitude
+    return np.min(np.abs(x.lo), np.abs(x.hi))  # magnitude

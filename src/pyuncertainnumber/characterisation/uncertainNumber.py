@@ -64,9 +64,9 @@ class UncertainNumber:
     # * ---------------------Basic---------------------*#
     name: str = field(default=None)
     symbol: str = field(default=None)
-    # string input of units, e.g. 'm/s'
-    units: Type[any] = field(default=None, repr=False)
-    # _Q: Type[any] = field(default=None, repr=False)
+    units: Type[any] = field(
+        default=None, repr=False
+    )  # string input of units, e.g. 'm/s'
 
     # * ---------------------Units---------------------*#
     Q_ = Quantity
