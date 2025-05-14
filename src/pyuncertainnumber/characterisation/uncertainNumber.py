@@ -57,7 +57,7 @@ class UncertainNumber:
         -  naked_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
 
     Example:
-        >>> UncertainNumber(name="velocity", symbol="v", units="m/s", bounds=[1, 2])
+        >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", bounds=[1, 2])
     """
 
     Q_ = Quantity
@@ -67,7 +67,7 @@ class UncertainNumber:
         self,
         name=None,
         symbol=None,
-        units=None,
+        unit=None,
         uncertainty_type=None,
         essence=None,
         masses=None,
@@ -121,7 +121,7 @@ class UncertainNumber:
         self.__init_check()
         self.__init_construct()
         self.naked_value = self._construct.naked_value
-        self.units = units
+        self.unit = unit
 
     # *  ---------------------more on initialisation---------------------*#
 
@@ -183,7 +183,7 @@ class UncertainNumber:
             self.naked_value = self._construct.mean().midpoint()
 
     def _update_physical_quantity(self):
-        self._physical_quantity = self.Q_(self.naked_value, self.units)
+        self._physical_quantity = self.Q_(self.naked_value, self.unit)
 
     @staticmethod
     def match_pbox(keyword, parameters):
@@ -229,7 +229,7 @@ class UncertainNumber:
         field_values = get_concise_repr(self.__dict__)
         self._field_str = ", ".join(f"{k}={v!r}" for k, v in field_values.items())
 
-        # fancy string formatting of units
+        # fancy string formatting of unit
         u_str = f", physical_quantity={self._physical_quantity:~P}"
         self._field_str += u_str
         return f"{self.__class__.__name__}({self._field_str})"
@@ -324,12 +324,12 @@ class UncertainNumber:
         type(self._construct)
 
     @property
-    def units(self):
+    def unit(self):
         """get the physical quantity of the uncertain number"""
         return self._units
 
-    @units.setter
-    def units(self, value):
+    @unit.setter
+    def unit(self, value):
         """set the physical quantity of the uncertain number"""
         self._units = value
         self._update_physical_quantity()
@@ -343,7 +343,7 @@ class UncertainNumber:
     def physical_quantity(self, value):
         """set the physical quantity of the uncertain number"""
         self._physical_quantity = value
-        # self.units = str(self._physical_quantity.units)
+        # self.unit = str(self._physical_quantity.unit)
 
     # * ---------------------other constructors--------------------- *#
 
@@ -646,7 +646,7 @@ class ParamSpecification:
 
 
 def pass_down_units(a, b, ops, t):
-    """pass down the units of the uncertain number
+    """pass down the unit of the uncertain number
 
     args:
         - a: the first uncertain number
