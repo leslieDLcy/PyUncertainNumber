@@ -5,7 +5,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from .intervals.intervalOperators import make_vec_interval
 from collections import namedtuple
-from .aggregation import stacking
+import pyuncertainnumber.pba.aggregation as agg
 from .intervals import Interval
 
 dempstershafer_element = namedtuple("dempstershafer_element", ["interval", "mass"])
@@ -68,14 +68,14 @@ class DempsterShafer:
         match style:
             # TODO the to_pbox() interpolation is not perfect
             case "box":
-                stacking(intervals, masses, display=True, ax=ax, return_type="pbox")
+                agg.stacking(intervals, masses, display=True, ax=ax, return_type="pbox")
             case "interval":
                 plot_DS_structure(intervals, masses, ax=ax, **kwargs)
 
     def to_pbox(self):
         # TODO: add re-ordering
         intervals, masses = self.disassemble()
-        return stacking(intervals, masses, return_type="pbox")
+        return agg.stacking(intervals, masses, return_type="pbox")
 
     @classmethod
     def from_dsElements(cls, *ds_elements: dempstershafer_element):

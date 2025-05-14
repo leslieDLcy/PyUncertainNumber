@@ -22,6 +22,7 @@ from scipy.stats import (
     loguniform,
     f as F,
 )
+import scipy
 import scipy.stats as sps
 from ..pba.intervals.intervalOperators import mean
 from ..pba.intervals import Interval

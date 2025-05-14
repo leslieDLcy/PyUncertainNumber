@@ -1,13 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import numpy as np
-import numpy as np
 from .intervals.intervalOperators import make_vec_interval
 from .utils import weighted_ecdf, CDF_bundle, reweighting
 import matplotlib.pyplot as plt
 from .intervals import Interval
 import functools
-from .dss import DempsterShafer
+
 
 from .pbox_abc import Staircase, convert_pbox
 
@@ -71,6 +70,7 @@ def stacking(
         required is jointly a DS structure
     """
     from .pbox_abc import Staircase
+    from .dss import DempsterShafer
 
     vec_interval = make_vec_interval(vec_interval)
     q1, p1 = weighted_ecdf(vec_interval.lo, weights)
