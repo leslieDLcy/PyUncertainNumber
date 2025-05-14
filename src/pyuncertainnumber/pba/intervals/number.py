@@ -405,6 +405,10 @@ class Interval:
     def __ne__(self, other):
         return not (self == other)
 
+    @classmethod
+    def from_meanform(cls, x, half_width):
+        return cls(x - half_width, x + half_width)
+
 
 # * -------------- lightweight Interval
 

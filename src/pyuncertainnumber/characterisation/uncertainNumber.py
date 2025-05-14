@@ -76,8 +76,8 @@ class UncertainNumber:
     uncertainty_type: Type[Uncertainty_types] = field(default=None, repr=False)
     essence: str = field(default=None)  # [interval, distribution, pbox, ds]
     masses: list[float] = field(default=None, repr=False)
-    bounds: Union[List[float], str] = field(default=None)
-    distribution_parameters: list[str, float | int] = field(default=None)
+    bounds: Union[List[float], str] = field(default=None, repr=False)
+    distribution_parameters: list[str, float | int] = field(default=None, repr=False)
     pbox_parameters: list[str, Sequence[Interval]] = field(default=None, repr=False)
     hedge: str = field(default=None, repr=False)
     _construct: Type[any] = field(default=None, repr=False)
@@ -151,9 +151,12 @@ class UncertainNumber:
             case "interval":
                 self._construct = parse_bounds(self.bounds)
             case "distribution" | "pbox":
-                par = Parameterisation(
-                    self.distribution_parameters, essence=self.essence
-                )
+                if self.pbox_parameters is not None:
+                    par = Parameterisation(self.pbox_parameters, essence=self.essence)
+                else:
+                    par = Parameterisation(
+                        self.distribution_parameters, essence=self.essence
+                    )
                 self._construct = par.yield_construct()
 
         self.naked_value = self._construct.naked_value
@@ -258,7 +261,7 @@ class UncertainNumber:
         """get a concise representation of the UN object"""
 
         field_values = get_concise_repr(self.__dict__)
-        return ", ".join(f"{k}={repr(v)}" for k, v in field_values.items())
+        return ", ".join(f"{k}={str(v)}" for k, v in field_values.items())
 
     def ci(self):
         """get 95% range confidence interval"""
@@ -283,7 +286,7 @@ class UncertainNumber:
 
         return self._construct.display(**kwargs)
 
-    # * ---------------------getters --------------------- *#
+    # * ---------------------properties --------------------- *#
     @property
     def construct(self):
         return self._construct

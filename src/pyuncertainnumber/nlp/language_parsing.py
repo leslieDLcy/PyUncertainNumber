@@ -19,7 +19,7 @@ from ..characterisation.utils import (
 from ..pba.params import Params
 
 if TYPE_CHECKING:
-    from ..pba.pbox_base import Pbox
+    from ..pba.pbox_abc import Pbox
 
 __all__ = ["hedge_interpret"]
 
@@ -65,15 +65,15 @@ def hedge_interpret(hedge: str, return_type="interval") -> I | Pbox:
         # return the interval object
         match kwd:
             case "exactly":
-                return PM(x, 10 ** (-(d + 1)))
+                return I.from_meanform(x, 10 ** (-(d + 1)))
             case "":
-                return PM(x, 0.5 * 10 ** (-d))
+                return I.from_meanform(x, 0.5 * 10 ** (-d))
             case "about":
-                return PM(x, 2 * 10 ** (-d))
+                return I.from_meanform(x, 2 * 10 ** (-d))
             case "around":
-                return PM(x, 10 * 10 ** (-d))
+                return I.from_meanform(x, 10 * 10 ** (-d))
             case "count":
-                return PM(x, np.sqrt(np.abs(x)))
+                return I.from_meanform(x, np.sqrt(np.abs(x)))
             case "almost":
                 return I(x - 0.5 * (10 ** (-d)), x)
             case "over":
@@ -165,7 +165,7 @@ class ApproximatorRegCoefficients:
         return sps.lognorm.rvs(s=slog, scale=np.exp(mlog), size=2000)
 
     def _cp(self, z, r, f):
-        from ..pba.pbox_base import Pbox
+        from ..pba.pbox_abc import Pbox
 
         self.L = (
             self.A
