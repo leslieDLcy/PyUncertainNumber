@@ -130,7 +130,7 @@ class Pbox(ABC):
 
     @property
     def naked_value(self):
-        return self.mean.mid
+        return np.round(self.mean.mid, 3)
 
     @property
     def area_metric(self):

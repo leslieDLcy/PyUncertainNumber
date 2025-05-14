@@ -102,7 +102,7 @@ class Distribution:
 
     @property
     def naked_value(self):
-        return self._naked_value
+        return np.round(self._naked_value, 3)
 
     @property
     def hint(self):
