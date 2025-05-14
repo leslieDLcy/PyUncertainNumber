@@ -1,7 +1,7 @@
 """leslie's general bound to bound implementation"""
 
 from ...pba.intervals.number import Interval
-from ...pba.intervalOperators import make_vec_interval
+from ...pba.intervals.intervalOperators import make_vec_interval
 
 import numpy as np
 

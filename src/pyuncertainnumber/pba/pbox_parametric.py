@@ -8,7 +8,7 @@ import itertools
 from .params import Params
 from typing import *
 from warnings import *
-from .intervalOperators import wc_scalar_interval
+from .intervals.intervalOperators import wc_scalar_interval
 
 if TYPE_CHECKING:
     from .pbox_abc import Pbox

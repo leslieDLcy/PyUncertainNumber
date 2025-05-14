@@ -13,7 +13,7 @@ from .mixed_uncertainty.mixed_up import (
     double_monte_carlo,
     equi_cutting,
 )
-from ..pba.intervalOperators import make_vec_interval
+from ..pba.intervals.intervalOperators import make_vec_interval
 import numpy as np
 from scipy.stats import qmc
 

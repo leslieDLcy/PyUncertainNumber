@@ -23,7 +23,7 @@ from scipy.stats import (
     f as F,
 )
 import scipy.stats as sps
-from ..pba.intervalOperators import mean
+from ..pba.intervals.intervalOperators import mean
 from ..pba.intervals import Interval
 from pyuncertainnumber import pba
 from ..pba.distributions import Distribution as D

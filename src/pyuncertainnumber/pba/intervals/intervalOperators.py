@@ -1,7 +1,7 @@
 from functools import singledispatch
 import numpy as np
-from .intervals import intervalise, Interval
-from ..nlp.language_parsing import parse_interval_expression, hedge_interpret
+from . import intervalise, Interval
+from ...nlp.language_parsing import parse_interval_expression, hedge_interpret
 from numbers import Number
 
 """ operations for generic Interval objects """
@@ -9,24 +9,31 @@ from numbers import Number
 # see the hedged interpretation for Interval in `nlp/language_parsing.py`
 
 
-@singledispatch
-def parse_bounds(bounds):
-    """parse the self.bounds argument"""
-    return wc_scalar_interval(bounds)
-
-
-@parse_bounds.register(str)
-def _str(bounds: str):
-
+def parse_bounds(b):
     try:
-        return hedge_interpret(bounds)
+        return wc_scalar_interval(b)
     except Exception:
-        pass
+        return make_vec_interval(b)
 
-    try:
-        return parse_interval_expression(bounds)
-    except Exception:
-        raise ValueError("Invalid input")
+
+# @singledispatch
+# def parse_scalar_bound(bounds):
+#     """parse the scalar type of bounds argument"""
+#     return wc_scalar_interval(bounds)
+
+
+# @parse_scalar_bound.register(str)
+# def _str(bounds: str):
+
+#     try:
+#         return hedge_interpret(bounds)
+#     except Exception:
+#         pass
+
+#     try:
+#         return parse_interval_expression(bounds)
+#     except Exception:
+#         raise ValueError("Invalid input")
 
 
 # * ---------------------make scalar interval object --------------------- *#
@@ -58,11 +65,25 @@ def _scalar(bound: Number):
     return Interval(bound, bound)
 
 
+@wc_scalar_interval.register(str)
+def _scalar(bound: str):
+
+    try:
+        return hedge_interpret(bound)
+    except Exception:
+        pass
+
+    try:
+        return parse_interval_expression(bound)
+    except Exception:
+        raise ValueError("Invalid input")
+
+
 # * ---------------------make vector interval object --------------------- *#
 
 
 def make_vec_interval(vec):
-    """transform the argument into a vector interval tmp"""
+    """parse into a vector interval"""
 
     assert len(vec) > 1, "Interval must have more than one element"
 

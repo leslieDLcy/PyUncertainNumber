@@ -16,7 +16,7 @@ from .check import DistributionSpecification
 from ..pba.pbox_parametric import named_pbox
 from typing import Sequence
 from ..pba.distributions import Distribution
-from ..pba.intervalOperators import parse_bounds
+from ..pba.intervals.intervalOperators import parse_bounds
 from ..pba.intervals.number import Interval
 from numbers import Number
 from ..pba.distributions import Distribution
@@ -388,7 +388,7 @@ class UncertainNumber:
     # * ---------------------binary operations---------------------#
 
     def bin_ops(self, other, ops):
-        from ..pba.intervalOperators import convert_pbox
+        from ..pba.intervals.intervalOperators import convert_pbox
 
         try:
             return ops(self._construct, other._construct)

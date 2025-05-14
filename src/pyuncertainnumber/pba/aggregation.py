@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import itertools
 import numpy as np
-from .intervalOperators import make_vec_interval
+from .intervals.intervalOperators import make_vec_interval
 from .utils import weighted_ecdf, CDF_bundle, reweighting
 import matplotlib.pyplot as plt
 from .intervals import Interval

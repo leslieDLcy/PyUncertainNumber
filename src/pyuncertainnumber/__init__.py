@@ -11,7 +11,7 @@ from .pba.aggregation import *
 
 # * --------------------- Interval ---------------------*#
 # from pyuncertainnumber.pba.intervals.number import Interval as I
-from pyuncertainnumber.pba.intervalOperators import make_vec_interval
+from pyuncertainnumber.pba.intervals.intervalOperators import make_vec_interval
 from pyuncertainnumber.pba.intervals import intervalise
 
 

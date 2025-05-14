@@ -3,7 +3,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from .intervalOperators import wc_scalar_interval, make_vec_interval
+from .intervals.intervalOperators import wc_scalar_interval, make_vec_interval
 from collections import namedtuple
 from dataclasses import dataclass
 from .intervals.number import Interval

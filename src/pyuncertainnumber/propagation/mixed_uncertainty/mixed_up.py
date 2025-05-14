@@ -5,7 +5,7 @@ from functools import partial
 import itertools
 from ...pba.pbox_abc import convert_pbox
 from ...pba.aggregation import stacking
-from ...pba.intervalOperators import make_vec_interval
+from ...pba.intervals.intervalOperators import make_vec_interval
 from ..epistemic_uncertainty.b2b import b2b
 
 if TYPE_CHECKING:

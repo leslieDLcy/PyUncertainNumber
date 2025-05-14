@@ -13,7 +13,7 @@ class EpistemicDomain:
     """
 
     def __init__(self, *vars):
-        from ...pba.intervalOperators import make_vec_interval
+        from ...pba.intervals.intervalOperators import make_vec_interval
 
         self.vec_interval = make_vec_interval(list(vars))
 

@@ -39,7 +39,7 @@ def p_backcalc(a, c, ops):
         a, c (Pbox):probability box objects
         ops (object) : {'additive_bcc', 'multiplicative_bcc'} whether additive or multiplicative
     """
-    from pyuncertainnumber.pba.intervalOperators import make_vec_interval
+    from pyuncertainnumber.pba.intervals.intervalOperators import make_vec_interval
     from pyuncertainnumber.pba.aggregation import stacking
     from .pbox_base import Pbox
     from .intervals.number import Interval as I
