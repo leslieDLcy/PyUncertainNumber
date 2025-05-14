@@ -1,14 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import numpy as np
-import itertools
 import numpy as np
 from .intervals.intervalOperators import make_vec_interval
 from .utils import weighted_ecdf, CDF_bundle, reweighting
 import matplotlib.pyplot as plt
 from .intervals import Interval
-import importlib
 import functools
+from .dss import DempsterShafer
 
 from .pbox_abc import Staircase, convert_pbox
 
@@ -23,6 +22,7 @@ __all__ = ["stochastic_mixture", "envelope", "imposition", "stacking", "env_ecdf
 
 # TODO: if adding the decorator to make UN class
 # @makeUN
+# TODO: add return type argument
 def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
     """it could work for either Pbox, distribution, DS structure or Intervals
 
@@ -91,12 +91,12 @@ def stacking(
     match return_type:
         case "pbox":
             return Staircase.from_CDFbundle(cdf1, cdf2)
-        case "ds":
+        case "dss":
             return DempsterShafer(intervals=vec_interval, masses=weights)
-        case "bounds":
+        case "cdf":
             return cdf1, cdf2
         case _:
-            raise ValueError("return_type must be one of {'pbox', 'ds', 'bounds'}")
+            raise ValueError("return_type must be one of {'pbox', 'dss', 'cdf'}")
 
 
 def mixture_pbox(l_pboxes, weights=None, display=False):

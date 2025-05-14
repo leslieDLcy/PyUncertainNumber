@@ -20,19 +20,29 @@ class DempsterShafer:
     """Class for Dempester-Shafer structures.
 
     args:
-        - the `intervals` argument accepts wildcard vector intervals {list of list pairs, Interval, pairs of nInterval};
+    # TODO: add type hints
+        - the `intervals` argument accepts wildcard vector intervals {list of list pairs, vec Interval};
         - masses (list): probability masses
     """
 
     def __init__(self, intervals, masses: list[float]):
-        self._intrep = np.array(intervals)
+
         self._intervals = make_vec_interval(intervals)
         self._masses = np.array(masses)
+
+        # TODO: revised the following logic
+        try:
+            self._intrep = np.array(intervals)
+        except Exception as e:
+            pass
 
     def _create_DSstructure(self):
         return [
             dempstershafer_element(i, m) for i, m in zip(self._intervals, self._masses)
         ]
+
+    def __repr__(self):
+        return f"Dempster Shafer structure with {len(self._intervals)} focal elements"
 
     @property
     def structure(self):
@@ -45,6 +55,10 @@ class DempsterShafer:
     @property
     def masses(self):
         return self._masses
+
+    @property
+    def naked_value(self):
+        return np.round(np.sum(self._intervals.mid * self._masses), 3)
 
     def disassemble(self):
         return self._intrep, self._masses
@@ -59,6 +73,7 @@ class DempsterShafer:
                 plot_DS_structure(intervals, masses, ax=ax, **kwargs)
 
     def to_pbox(self):
+        # TODO: add re-ordering
         intervals, masses = self.disassemble()
         return stacking(intervals, masses, return_type="pbox")
 

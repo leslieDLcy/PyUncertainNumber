@@ -158,6 +158,12 @@ class UncertainNumber:
                         self.distribution_parameters, essence=self.essence
                     )
                 self._construct = par.yield_construct()
+            case "dempster_shafer":
+                from ..pba.dss import DempsterShafer
+
+                self._construct = DempsterShafer(
+                    intervals=parse_bounds(self.bounds), masses=self.masses
+                )
 
         self.naked_value = self._construct.naked_value
 

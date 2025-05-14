@@ -235,6 +235,7 @@ def get_concise_repr(a_dict):
             "distribution_parameters",
             "pbox_parameters",
             "bounds",
+            "masses",
             "_UnitsRep",
             "_math_object",
             "deter_value_rep",
