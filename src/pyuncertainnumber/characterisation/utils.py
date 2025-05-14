@@ -236,6 +236,8 @@ def get_concise_repr(a_dict):
             "pbox_parameters",
             "bounds",
             "masses",
+            "_units",
+            "_physical_quantity",
             "_skip_construct_init",
             "_UnitsRep",
             "_math_object",

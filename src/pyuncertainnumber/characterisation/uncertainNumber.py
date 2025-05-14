@@ -89,7 +89,7 @@ class UncertainNumber:
         variability=None,
         dependence=None,
         uncertainty=None,
-        _physical_quantity=None,
+        physical_quantity=None,
         _samples=None,
         **kwargs,
     ):
@@ -116,7 +116,7 @@ class UncertainNumber:
         self.variability = variability
         self.dependence = dependence
         self.uncertainty = uncertainty
-        self._physical_quantity = _physical_quantity
+        self._physical_quantity = physical_quantity
         self._samples = _samples
         self.__init_check()
         self.__init_construct()
@@ -225,7 +225,13 @@ class UncertainNumber:
 
     def __repr__(self) -> str:
         """concise __repr__"""
-        self._field_str = self._get_concise_representation()
+
+        field_values = get_concise_repr(self.__dict__)
+        self._field_str = ", ".join(f"{k}={v!r}" for k, v in field_values.items())
+
+        # fancy string formatting of units
+        u_str = f", physical_quantity={self._physical_quantity:~P}"
+        self._field_str += u_str
         return f"{self.__class__.__name__}({self._field_str})"
 
     def describe(self, type="verbose"):
@@ -278,11 +284,12 @@ class UncertainNumber:
 
     # * ---------------------some class methods---------------------* #
 
-    def _get_concise_representation(self):
-        """get a concise representation of the UN object"""
+    # def _get_concise_representation(self):
+    #     """get a concise representation of the UN object"""
 
-        field_values = get_concise_repr(self.__dict__)
-        return ", ".join(f"{k}={v!r}" for k, v in field_values.items())
+    #     # stripped dict for __repr__
+    #     field_values = get_concise_repr(self.__dict__)
+    #     return ", ".join(f"{k}={v!r}" for k, v in field_values.items())
 
     def ci(self):
         """get 95% range confidence interval"""
@@ -326,6 +333,17 @@ class UncertainNumber:
         """set the physical quantity of the uncertain number"""
         self._units = value
         self._update_physical_quantity()
+
+    @property
+    def physical_quantity(self):
+        """get the physical quantity of the uncertain number"""
+        return self._physical_quantity
+
+    @physical_quantity.setter
+    def physical_quantity(self, value):
+        """set the physical quantity of the uncertain number"""
+        self._physical_quantity = value
+        # self.units = str(self._physical_quantity.units)
 
     # * ---------------------other constructors--------------------- *#
 
@@ -425,11 +443,14 @@ class UncertainNumber:
         from ..pba.pbox_abc import convert_pbox
 
         try:
-            return ops(self._construct, other._construct)
+            new_cons = ops(self._construct, other._construct)
         except:
             a = convert_pbox(self._construct)
             b = convert_pbox(other._construct)
-            return UncertainNumber.fromConstruct(ops(a, b))
+            new_cons = ops(a, b)
+
+        new_un = UncertainNumber.fromConstruct(new_cons)
+        return pass_down_units(self, other, ops, new_un)
 
     def __add__(self, other):
         """add two uncertain numbers"""
@@ -557,25 +578,6 @@ def I(i: str | list[float | int]) -> UncertainNumber:
 # * ---------------------parse inputs for UN only  --------------------- *#
 
 
-def _parse_interverl_inputs(vars):
-    """Parse the input intervals
-
-    note:
-        - Ioanna's funcs typically take 2D NumPy arra
-    """
-
-    if isinstance(vars, np.ndarray):
-        if vars.shape[1] != 2:
-            raise ValueError(
-                "vars must be a 2D array with two columns per row (lower and upper bounds)"
-            )
-        else:
-            return vars
-
-    if isinstance(vars, list):
-        return UncertainNumber._toIntervalBackend(vars)
-
-
 def match_pbox(keyword, parameters):
     """match the distribution keyword from the initialisation to create the underlying distribution object
 
@@ -641,6 +643,20 @@ class ParamSpecification:
             self._true_type = "distribution"
         else:
             self._true_type = "pbox"
+
+
+def pass_down_units(a, b, ops, t):
+    """pass down the units of the uncertain number
+
+    args:
+        - a: the first uncertain number
+        - b: the second uncertain number
+        - ops: the operation to be performed
+        - t: the result uncertain number of the operation
+    """
+    new_q = ops(a._physical_quantity, b._physical_quantity)
+    t.physical_quantity = new_q
+    return t
 
 
 # * ---------------------parametric shortcuts  --------------------- *#
