@@ -85,6 +85,9 @@ class UncertainNumber:
     # UN object, which shall be linked with the 'pba' or `Intervals` package
     naked_value: float = field(default=None)
     p_flag: bool = field(default=True, repr=False)  # parameterised flag
+    _skip_construct_init: bool = field(
+        default=False, repr=False, compare=False
+    )  # skip the instantiation for construct
 
     # * ---------------------auxlliary information---------------------*#
     # some simple boiler plates
@@ -147,23 +150,27 @@ class UncertainNumber:
         UncertainNumber.instances.append(self)
 
         # * ------------------------ create the underlying construct
-        match self.essence:
-            case "interval":
-                self._construct = parse_bounds(self.bounds)
-            case "distribution" | "pbox":
-                if self.pbox_parameters is not None:
-                    par = Parameterisation(self.pbox_parameters, essence=self.essence)
-                else:
-                    par = Parameterisation(
-                        self.distribution_parameters, essence=self.essence
-                    )
-                self._construct = par.yield_construct()
-            case "dempster_shafer":
-                from ..pba.dss import DempsterShafer
 
-                self._construct = DempsterShafer(
-                    intervals=parse_bounds(self.bounds), masses=self.masses
-                )
+        if not self._skip_construct_init:
+            match self.essence:
+                case "interval":
+                    self._construct = parse_bounds(self.bounds)
+                case "distribution" | "pbox":
+                    if self.pbox_parameters is not None:
+                        par = Parameterisation(
+                            self.pbox_parameters, essence=self.essence
+                        )
+                    else:
+                        par = Parameterisation(
+                            self.distribution_parameters, essence=self.essence
+                        )
+                    self._construct = par.yield_construct()
+                case "dempster_shafer":
+                    from ..pba.dss import DempsterShafer
+
+                    self._construct = DempsterShafer(
+                        intervals=parse_bounds(self.bounds), masses=self.masses
+                    )
 
         self.naked_value = self._construct.naked_value
 
@@ -367,7 +374,9 @@ class UncertainNumber:
     def from_pbox(cls, p):
         """genenal from  pbox"""
         # passPboxParameters()
-        return cls(essence="pbox", p_flag=False, _construct=p, _skip_post_init=True)
+        return cls(
+            essence="pbox", p_flag=False, _construct=p, _skip_construct_init=True
+        )
 
     @classmethod
     def from_ds(cls, ds):
