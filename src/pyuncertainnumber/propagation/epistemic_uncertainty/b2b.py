@@ -32,6 +32,7 @@ def b2b(
             - 'ga': genetic algorithm
             - 'bo': bayesian optimisation
             - 'diret': direct apply function (the default)
+        style: the style only used for subinterval propagation
         **kwargs: additional keyword arguments to be passed to the function
 
     note:

@@ -118,7 +118,7 @@ class EpistemicPropagation(P):
 
         from ..pba.intervals.number import Interval
 
-        assert all(isinstance(v.construct, Interval) for v in self._vars) or all(
+        assert all(
             isinstance(v, Interval) for v in self._vars
         ), "Not all variables are intervals"
 
