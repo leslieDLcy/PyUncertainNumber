@@ -17,6 +17,12 @@ from ..pba.intervals.intervalOperators import make_vec_interval
 import numpy as np
 from scipy.stats import qmc
 
+from abc import ABC, abstractmethod
+from ..pba.pbox_abc import Pbox
+from ..pba.intervals.number import Interval
+from ..pba.distributions import Distribution
+from ..propagation.epistemic_uncertainty.b2b import b2b
+
 """the new top-level module for the propagation of uncertain numbers"""
 
 """crossover logic
@@ -30,10 +36,10 @@ if TYPE_CHECKING:
     from ..characterisation.uncertainNumber import UncertainNumber
 
 
-from abc import ABC, abstractmethod
-from ..pba.pbox_abc import Pbox
-from ..pba.intervals.number import Interval
-from ..pba.distributions import Distribution
+import logging
+
+# Basic configuration for logging
+logging.basicConfig(level=logging.INFO)
 
 
 class P(ABC):
@@ -138,8 +144,6 @@ class EpistemicPropagation(P):
             "local optimisation",
             "genetic_optimisation",
             "genetic_optimization",
-            "genetic optimization",
-            "genetic optimisation",
         ], f"Method {self.method} not supported for epistemic uncertainty propagation"
 
     def __call__(self, **kwargs):
@@ -183,16 +187,14 @@ class EpistemicPropagation(P):
 
 
 class MixedPropagation(P):
-    def __init__(
-        self, vars, func, method, save_raw_data: bool = False, interval_strategy=None
-    ):
+    def __init__(self, vars, func, method, interval_strategy=None):
         """initialisation
 
         args:
             interval_strategy: a certain strategy used for the interval propagation
                 such as endpoints, subinterval, etc. By default, it is set to None
         """
-        super().__init__(vars, func, method, save_raw_data)
+        super().__init__(vars, func, method)
         self.interval_strategy = interval_strategy
         self.post_init_check()
 
@@ -204,7 +206,7 @@ class MixedPropagation(P):
         has_D = any(isinstance(item, Distribution) for item in self._vars)
         has_P = any(isinstance(item, Pbox) for item in self._vars)
 
-        assert (has_I and has_D) or has_P, "Not a mixed uncertainty problem"
+        # assert (has_I and has_D) or has_P, "Not a mixed uncertainty problem"
 
     def method_check(self):
         assert self.method in [
@@ -261,51 +263,57 @@ class Propagation:
         self._func = func
         self.method = method
         self.interval_strategy = interval_strategy
+        self._post_init_check()
 
     def _post_init_check(self):
+
+        # strip the underlying constructs from UN
+        self._constructs = [c._construct for c in self._vars]
 
         # supported methods check
 
         # assign method herein
-
-        # strip the UN classes into the underlying constructs
-        pass
+        self.assign_method()
 
     def assign_method(self):
         # created an underlying propagation `self.p` object
 
         # all
-        all_I = all(isinstance(item._construct, Interval) for item in self._vars)
-        all_D = all(isinstance(item._construct, Distribution) for item in self._vars)
+        all_I = all(isinstance(item, Interval) for item in self._constructs)
+        all_D = all(isinstance(item, Distribution) for item in self._constructs)
         # any
-        has_I = any(isinstance(item._construct, Interval) for item in self._vars)
-        has_D = any(isinstance(item._construct, Distribution) for item in self._vars)
-        has_P = any(isinstance(item._construct, Pbox) for item in self._vars)
+        has_I = any(isinstance(item, Interval) for item in self._constructs)
+        has_D = any(isinstance(item, Distribution) for item in self._constructs)
+        has_P = any(isinstance(item, Pbox) for item in self._constructs)
 
         if all_I:
             # all intervals
-            self.p = EpistemicPropagation(
-                self._vars, self._func, self.method, self.save_raw_data
-            )
+            logging.info("interval propagation")
+            self.p = b2b(self._constructs, self._func, self.method)
         elif all_D:
+            logging.info("distribution propagation")
             # all distributions
-            self.p = AleatoryPropagation(
-                self._vars, self._func, self.method, self.save_raw_data
-            )
+            self.p = AleatoryPropagation(self._constructs, self._func, self.method)
         elif (has_I and has_D) or has_P:
             # mixed uncertainty
+            logging.info("mixed uncertainty propagation")
             self.p = MixedPropagation(
-                self._vars,
+                self._constructs,
                 self._func,
                 self.method,
-                self.save_raw_data,
-                interval_strategy=self.kwargs.get("interval_strategy", None),
+                self.interval_strategy,
+                # interval_strategy=self.kwargs.get("interval_strategy", None),
             )
         else:
             raise ValueError(
                 "Not a valid combination of uncertainty types. "
                 "Please check the input variables."
             )
+
+    @property
+    def constructs(self):
+        """return the underlying constructs"""
+        return self._constructs
 
     def run(self, **kwargs):
         """doing the propagation"""

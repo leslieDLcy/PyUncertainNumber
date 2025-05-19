@@ -7,6 +7,7 @@ import numpy as np
 
 
 # TODO: integrate GA and BO implementations
+# TODO: add discussion of `func` signature (args, collection, matrix) in the notes section
 def b2b(
     vecs: Interval | list[Interval],
     func,
@@ -27,7 +28,8 @@ def b2b(
 
     args:
         vecs: a vector Interval or a list or tuple of scalar Interval
-        func: performance or response function or a black-box model as in subprocess. Expect 2D inputs.
+        func: performance or response function or a black-box model as in subprocess.
+            Expect 2D inputs therefore `func` shall have the matrix signature. See Notes for additional details.
         interval_strategy: the interval_strategy used for interval propagation
             - 'endpoints': only the endpoints
             - 'ga': genetic algorithm
