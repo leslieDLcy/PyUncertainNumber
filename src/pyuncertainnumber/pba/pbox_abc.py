@@ -716,6 +716,7 @@ def convert_pbox(un):
 
 
 def pbox_number_ops(pbox: Staircase | Leaf, n: float | int, f: callable):
+    # TODO: ask Scott. pbox sqrt operaton how to do?
     """blueprint for arithmetic between pbox and real numbers"""
     l = f(pbox.left, n)
     r = f(pbox.right, n)

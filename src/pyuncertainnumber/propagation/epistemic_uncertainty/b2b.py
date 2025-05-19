@@ -6,6 +6,7 @@ from ...pba.intervals.intervalOperators import make_vec_interval
 import numpy as np
 
 
+# TODO: integrate GA and BO implementations
 def b2b(
     vecs: Interval | list[Interval],
     func,

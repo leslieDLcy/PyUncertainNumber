@@ -16,15 +16,27 @@ if TYPE_CHECKING:
 
 
 # * ------------- some of the function for testing APIs
+
+
+def foo_args(x0, x1, x2):
+    """func signature with individual inputs (arguments)"""
+    return x0**3 + x1 + x2
+
+
 def foo(x):
+    """func signature with iterable input (list, tuple, np.ndarray)"""
     return x[0] ** 3 + x[1] + x[2]
 
 
 def foo_vec(x):
+    """func signature with matrix input (2D np.ndarray)"""
     return x[:, 0] ** 3 + x[:, 1] + x[:, 2]
 
 
 def foo_universal(x):
+    """a universal signature that takes iterable and matrix inputs but not individual inputs"""
+
+    # foo_iterable signature
     if isinstance(x, list | tuple):
         return x[0] ** 3 + x[1] + x[2]
     elif isinstance(x, np.ndarray):
