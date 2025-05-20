@@ -28,6 +28,8 @@ __all__ = [
     "UncertainNumber",
     "I",
     "norm",
+    "gaussian",
+    "normal",
     "alpha",
     "anglit",
     "argus",
@@ -627,6 +629,16 @@ def is_un(sth):
 
 @makeUNPbox
 def norm(*args):
+    return "norm"
+
+
+@makeUNPbox
+def gaussian(*args):
+    return "norm"
+
+
+@makeUNPbox
+def normal(*args):
     return "norm"
 
 
