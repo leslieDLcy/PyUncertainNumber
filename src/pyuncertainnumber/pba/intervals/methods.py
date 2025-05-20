@@ -632,7 +632,11 @@ def tolist(x: Interval):
 #####################################################################################
 
 
-def subintervalise(x_: Interval, n: Union[int, tuple] = 0):
+def subintervalise(x_: Interval, n: Union[int, tuple] = 0) -> Interval:
+    """
+    return:
+        - matrix Interval
+    """
     x = intervalise(x_)
     d = len(x.shape)  # dimension of the array
     if n == 0 | n == 1:

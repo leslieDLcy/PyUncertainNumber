@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-
+from functools import partial
 from .epistemic_uncertainty.endpoints import endpoints_method
 from .epistemic_uncertainty.extremepoints import extremepoints_method
 from .epistemic_uncertainty.subinterval import subinterval_method
@@ -115,8 +115,8 @@ class AleatoryPropagation(P):
 
 
 class EpistemicPropagation(P):
-    def __init__(self, vars, func, method, save_raw_data: bool = False):
-        super().__init__(vars, func, method, save_raw_data)
+    def __init__(self, vars, func, method):
+        super().__init__(vars, func, method)
         self.post_init_check()
 
     def type_check(self):
@@ -151,11 +151,11 @@ class EpistemicPropagation(P):
         """doing the propagation"""
         match self.method:
             case "endpoint" | "endpoints" | "vertex":
-                handler = endpoints_method
+                handler = partial(b2b, interval_strategy="endpoints")
             case "extremepoints":
                 handler = extremepoints_method
             case "subinterval" | "subinterval_reconstitution":
-                handler = subinterval_method
+                handler = partial(b2b, interval_strategy="subinterval")
             case "cauchy" | "endpoint_cauchy" | "endpoints_cauchy":
                 handler = cauchydeviates_method
             case (
@@ -180,7 +180,6 @@ class EpistemicPropagation(P):
         results = handler(
             make_vec_interval(self._vars),  # pass down vec interval
             self.func,
-            self.save_raw_data,
             **kwargs,
         )
         return results

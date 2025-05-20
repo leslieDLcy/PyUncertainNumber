@@ -34,10 +34,16 @@ def foo_vec(x):
 
 
 def foo_universal(x):
-    """a universal signature that takes iterable and matrix inputs but not individual inputs"""
+    """a universal signature that takes iterable and matrix inputs but not individual inputs
+
+    caveat:
+        - this function works with a vector Interval object
+        - but wrong answer with a 2d matrix Interval object due to unclear broadcasting rules
+    """
+    from ..pba.intervals.number import Interval
 
     # foo_iterable signature
-    if isinstance(x, list | tuple):
+    if isinstance(x, list | tuple | Interval):
         return x[0] ** 3 + x[1] + x[2]
     elif isinstance(x, np.ndarray):
         if x.ndim == 1:

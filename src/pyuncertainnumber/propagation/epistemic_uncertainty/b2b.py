@@ -158,7 +158,8 @@ def subinterval_method(vec_itvl, func, style=None, n_sub=None, parallel=False):
 
     sub = subintervalise(vec_itvl, n_sub)
     if style == "direct":
-        return reconstitute(func(sub))
+        row_n = sub.shape[0]
+        return reconstitute([func(sub[IND]) for IND in range(row_n)])
     elif style == "endpoints":
         return reconstitute([endpoints(sub[i], func) for i in range(len(sub))])
 
