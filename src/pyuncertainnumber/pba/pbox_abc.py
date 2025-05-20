@@ -200,9 +200,14 @@ class Staircase(Pbox):
         style="band",
         fill_color="lightgray",
         bound_colors=None,
+        nuance="step",
         **kwargs,
     ):
-        """default plotting function"""
+        """default plotting function
+
+        args:
+            style (str): 'band' or 'simple'
+        """
 
         if ax is None:
             fig, ax = plt.subplots()
@@ -210,12 +215,21 @@ class Staircase(Pbox):
         p_axis = self._pvalues if self._pvalues is not None else Params.p_values
         plot_bound_colors = bound_colors if bound_colors is not None else ["g", "b"]
 
-        def display_the_box():
+        def display_the_box(nuance):
             """display two F curves plus the top-bottom horizontal lines"""
-            ax.step(self.left, p_axis, c=plot_bound_colors[0], where="post")
-            ax.step(self.right, p_axis, c=plot_bound_colors[1], where="post")
-            ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
-            ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+
+            if nuance == "step":
+                ax.step(self.left, p_axis, c=plot_bound_colors[0], where="post")
+                ax.step(self.right, p_axis, c=plot_bound_colors[1], where="post")
+                ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
+                ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+            elif nuance == "curve":
+                ax.plot(self.left, p_axis, c=plot_bound_colors[0])
+                ax.plot(self.right, p_axis, c=plot_bound_colors[1])
+                ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
+                ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+            else:
+                raise ValueError("nuance must be either 'step' or 'curve'")
 
         if title is not None:
             ax.set_title(title)
@@ -229,9 +243,9 @@ class Staircase(Pbox):
                 alpha=0.3,
                 **kwargs,
             )
-            display_the_box()
+            display_the_box(nuance)
         elif style == "simple":
-            display_the_box()
+            display_the_box(nuance)
         else:
             raise ValueError("style must be either 'simple' or 'band'")
         ax.set_xlabel(r"$x$")

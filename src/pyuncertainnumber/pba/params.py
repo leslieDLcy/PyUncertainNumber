@@ -180,11 +180,12 @@ class Params:
 
     steps = 200
     many = 2000
-    # the percentiles
-    p_values = np.linspace(0.0001, 0.9999, steps)
 
-    p_lboundary = 0.0001
-    p_hboundary = 0.9999
+    p_lboundary = 0.001
+    p_hboundary = 0.999
+
+    # the percentiles
+    p_values = np.linspace(p_lboundary, p_hboundary, steps)
 
     # by default
     scott_hedged_interpretation = {}
