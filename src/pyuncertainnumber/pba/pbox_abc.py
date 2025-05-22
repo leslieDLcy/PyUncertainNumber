@@ -99,6 +99,10 @@ class Pbox(ABC):
         ), "Length of lower and upper bounds is not consistent"
 
     @property
+    def p_values(self):
+        return self._pvalues
+
+    @property
     def range(self):
         return self._range
 
@@ -351,7 +355,7 @@ class Staircase(Pbox):
     def discretise(self, n=None):
         from .utils import equi_selection
 
-        if n is None:
+        if (n is None) or (n == Params.steps):
             return I(lo=self.left, hi=self.right)
         else:
             l, r = equi_selection(self.left, n), equi_selection(self.right, n)
@@ -734,6 +738,8 @@ def pbox_number_ops(pbox: Staircase | Leaf, n: float | int, f: callable):
     """blueprint for arithmetic between pbox and real numbers"""
     l = f(pbox.left, n)
     r = f(pbox.right, n)
+    l = sorted(l)
+    r = sorted(r)
     new_mean = f(pbox.mean, n)
     return Staircase(left=l, right=r, mean=new_mean, var=pbox.var)
 

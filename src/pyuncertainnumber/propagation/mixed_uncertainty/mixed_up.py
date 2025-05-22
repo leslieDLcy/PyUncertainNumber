@@ -80,33 +80,28 @@ def slicing(
     vars: list[Distribution | Interval | Pbox],
     func,
     interval_strategy,
-    n_sam,
+    n_sam=200,
+    outer_approximate=False,
     dependency=None,
     **kwargs,
-) -> Pbox:
-    """independence assumption by now"""
-
-    p_vars = [convert_pbox(v) for v in vars]
-
-    itvs = [p.outer_approximate()[1] for p in p_vars]
-    b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
-    container = [b2b_f(_item) for _item in itertools.product(*itvs)]
-    return stacking(container)
-
-
-def equi_cutting(
-    vars, func, interval_strategy, n_sam, dependency=None, **kwargs
 ) -> Pbox:
     """equid-probaility discretisation and alpha cutting
 
     args:
         func: callable
         x: uncertain variable
+
+    note:
+        independence assumption by now
     """
     p_vars = [convert_pbox(v) for v in vars]
 
-    # get a lot of intervals
-    itvs = [v.discretise(n_sam) for v in p_vars]
+    # TODO: outer_approximate does not take n_sam yet. Fixed it
+    if outer_approximate:
+        itvs = [p.outer_approximate()[1] for p in p_vars]
+    else:
+        itvs = [v.discretise(n_sam) for v in p_vars]
+
     b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
     container = [b2b_f(_item) for _item in itertools.product(*itvs)]
     return stacking(container)
