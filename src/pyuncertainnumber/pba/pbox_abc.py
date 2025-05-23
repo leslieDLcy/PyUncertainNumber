@@ -335,12 +335,13 @@ class Staircase(Pbox):
     def __pow__(self, other):
         return self.pow(other, dependency="f")
 
-    def __rpow__(self, other):
-        if not hasattr(other, "__iter__"):
-            other = np.array((other))
+    def __rpow__(self, other: Number):
+        # if not hasattr(other, "__iter__"):
+        #     other = np.array((other))
+        from functools import partial
 
-        b = Pbox(other)
-        return b.pow(self, dependency="f")
+        bar = partial(np.power, other)
+        return self._unary_template(bar)
 
     # * --------------------- methods ---------------------*#
 
