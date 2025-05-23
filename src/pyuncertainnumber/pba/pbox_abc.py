@@ -261,6 +261,23 @@ class Staircase(Pbox):
         self.plot(*args, **kwargs)
         plt.show()
 
+    def plot_probability_bound(self, x: float, ax=None, **kwargs):
+        """plot the probability bound at a certain quantile x
+
+        note:
+            - a vertical line
+        """
+
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        p_lo = self.cdf(x).lo
+        p_hi = self.cdf(x).hi
+        self.plot(ax=ax, **kwargs)
+        ax.plot([x, x], [p_lo, p_hi], c="r", label="probability bound", zorder=50)
+        ax.legend()
+        return ax
+
     # * --------------------- constructors ---------------------*#
     @classmethod
     def from_CDFbundle(cls, a, b):
@@ -327,7 +344,7 @@ class Staircase(Pbox):
 
     # * --------------------- methods ---------------------*#
 
-    def cdf(self, x):
+    def cdf(self, x: np.ndarray):
         """get the bounds on the cdf w.r.t x value
 
         args:
