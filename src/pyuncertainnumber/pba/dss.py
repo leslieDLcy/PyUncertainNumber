@@ -21,7 +21,8 @@ class DempsterShafer:
 
     args:
     # TODO: add type hints
-        - the `intervals` argument accepts wildcard vector intervals {list of list pairs, vec Interval};
+    # TODO: restructure the constructor needed
+        - the `intervals` argument accepts wildcard vector intervals {list of list pairs or vec Interval};
         - masses (list): probability masses
     """
 
@@ -45,7 +46,7 @@ class DempsterShafer:
         return f"Dempster Shafer structure with {len(self._intervals)} focal elements"
 
     @property
-    def structure(self):
+    def structures(self):
         return self._create_DSstructure()
 
     @property
@@ -63,7 +64,8 @@ class DempsterShafer:
     def disassemble(self):
         return self._intrep, self._masses
 
-    def display(self, style="box", ax=None, **kwargs):
+    # TODO: fixed needed as it does not return the ax object.
+    def plot(self, style="box", ax=None, **kwargs):
         intervals, masses = self.disassemble()
         match style:
             # TODO the to_pbox() interpolation is not perfect
@@ -71,6 +73,10 @@ class DempsterShafer:
                 agg.stacking(intervals, masses, display=True, ax=ax, return_type="pbox")
             case "interval":
                 plot_DS_structure(intervals, masses, ax=ax, **kwargs)
+
+    def display(self, style="box", ax=None, **kwargs):
+        self.plot(style=style, ax=ax, **kwargs)
+        plt.show()
 
     def to_pbox(self):
         # TODO: add re-ordering
@@ -90,7 +96,7 @@ class DempsterShafer:
 @mpl.rc_context({"text.usetex": True})
 def plot_DS_structure(
     vec_interval: list[Interval],
-    weights=None,
+    masses=None,
     offset=0.3,
     ax=None,
     **kwargs,
@@ -99,18 +105,18 @@ def plot_DS_structure(
 
     args:
         vec_interval: vectorised interval objects
-        weights: weights of the intervals
-        offset: offset for display the weights next to the intervals
+        masses: masses of the intervals
+        offset: offset for display the masses next to the intervals
     """
     vec_interval = make_vec_interval(vec_interval)
     fig, ax = plt.subplots() if ax is None else (ax.figure, ax)
     for i, intl in enumerate(vec_interval):  # horizontally plot the interval
         ax.plot([intl.lo, intl.hi], [i, i], **kwargs)
-        if weights is not None:
+        if masses is not None:
             ax.text(
                 intl.hi + offset,
                 i,
-                f"{weights[i]:.2f}",
+                f"{masses[i]:.2f}",
                 verticalalignment="center",
                 horizontalalignment="right",
             )

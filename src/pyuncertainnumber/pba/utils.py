@@ -32,10 +32,35 @@ class CDF_bundle:
         """utility to tranform sps.ecdf to cdf_bundle"""
         return cls(e.cdf.quantiles, e.cdf.probabilities)
 
+    def plot_bounds(self, other):
+        """plot the lower and upper bounds"""
+        return plot_two_cdf_bundle(self, other)
+
 
 def transform_ecdf_bundle(e):
     """utility to tranform sps.ecdf to cdf_bundle"""
     return CDF_bundle(e.cdf.quantiles, e.cdf.probabilities)
+
+
+def pl_ecdf_bounds_2(q1, p1, q2, p2, ax=None, marker="+"):
+    """plot the bounding cdf functions with two sets of quantiles and probabilities"""
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    ax.step(q1, p1, marker=marker, c="g", where="post")
+    ax.step(q2, p2, marker=marker, c="b", where="post")
+    ax.plot([q1[0], q2[0]], [0, 0], c="b")
+    ax.plot([q1[-1], q2[-1]], [1, 1], c="g")
+    return ax
+
+
+def plot_two_cdf_bundle(cdf1, cdf2, ax=None, **kwargs):
+    """plot two cdf_bundle objects"""
+    if ax is None:
+        fig, ax = plt.subplots()
+    q1, p1 = cdf1.quantiles, cdf1.probabilities
+    q2, p2 = cdf2.quantiles, cdf2.probabilities
+    return pl_ecdf_bounds_2(q1, p1, q2, p2, ax=ax, **kwargs)
 
 
 def pl_ecdf_bounding_bundles(

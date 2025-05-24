@@ -52,6 +52,7 @@ def stacking(
     display=False,
     ax=None,
     return_type="pbox",
+    **kwargs,
 ) -> Pbox:
     """stochastic mixture operation of Intervals with probability masses
 
@@ -71,22 +72,17 @@ def stacking(
     """
     from .pbox_abc import Staircase
     from .dss import DempsterShafer
+    from .utils import plot_two_cdf_bundle
 
     vec_interval = make_vec_interval(vec_interval)
     q1, p1 = weighted_ecdf(vec_interval.lo, weights)
     q2, p2 = weighted_ecdf(vec_interval.hi, weights)
 
-    if display:
-        # display the two cdf bounds by default
-        if ax is None:
-            fig, ax = plt.subplots()
-        ax.step(q1, p1, marker="+", c="g", where="post")
-        ax.step(q2, p2, marker="+", c="b", where="post")
-        ax.plot([q1[0], q2[0]], [0, 0], c="b")
-        ax.plot([q1[-1], q2[-1]], [1, 1], c="g")
-
     cdf1 = CDF_bundle(q1, p1)
     cdf2 = CDF_bundle(q2, p2)
+
+    if display:
+        plot_two_cdf_bundle(cdf1, cdf2, ax=ax, **kwargs)
 
     match return_type:
         case "pbox":
@@ -128,8 +124,6 @@ def mixture_ds(l_ds, display=False):
     # assert sorted(intervals) == np.unique(intervals), "intervals replicate"
     masses = reweighting([ds.disassemble()[1] for ds in l_ds])
     return DempsterShafer(intervals, masses)
-    # below is to return the mixture as in a pbox
-    # return stacking(intervals, masses, display=display)
 
 
 def imposition(l_un: list[Staircase | float | int]) -> Staircase:

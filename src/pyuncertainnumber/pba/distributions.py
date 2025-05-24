@@ -579,6 +579,7 @@ named_dists = {
     "ncf": sps.ncf,
     "nct": sps.nct,
     "norm": sps.norm,
+    "normal": sps.norm,
     "gaussian": sps.norm,
     "norminvgauss": sps.norminvgauss,
     "pareto": sps.pareto,
