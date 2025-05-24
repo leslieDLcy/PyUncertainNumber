@@ -536,6 +536,34 @@ class Staircase(Pbox):
     def recip(self):
         return Staircase(left=1 / np.flip(self.right), right=1 / np.flip(self.left))
 
+    def log(self):
+        """natural logarithm of the pbox
+
+        note:
+            - the pbox must be positive
+        """
+        if self.lo <= 0:
+            raise ValueError("Logarithm is not defined for non-positive values")
+        return self._unary_template(np.log)
+
+    def sin(self):
+        from .intervals.methods import sin
+
+        itvls = sin(self.to_interval())
+        return simple_stacking(itvls)
+
+    def cos(self):
+        from .intervals.methods import cos
+
+        itvls = cos(self.to_interval())
+        return simple_stacking(itvls)
+
+    def tanh(self):
+        from .intervals.methods import tanh
+
+        itvls = tanh(self.to_interval())
+        return simple_stacking(itvls)
+
     # * ---------------------binary operations--------------------- *#
 
     def add(self, other, dependency="f"):
@@ -758,7 +786,10 @@ def pbox_number_ops(pbox: Staircase | Leaf, n: float | int, f: callable):
     r = f(pbox.right, n)
     l = sorted(l)
     r = sorted(r)
-    new_mean = f(pbox.mean, n)
+    try:
+        new_mean = f(pbox.mean, n)
+    except:
+        new_mean = None
     return Staircase(left=l, right=r, mean=new_mean, var=pbox.var)
 
     # Staircase(left=pbox.left + n, right=pbox.right + n)
@@ -766,3 +797,49 @@ def pbox_number_ops(pbox: Staircase | Leaf, n: float | int, f: callable):
 
 def truncate(pbox, min, max):
     return pbox.truncate(min, max)
+
+
+# * --------------------- unary functions ---------------------*#
+def sin():
+    pass
+
+
+def cos():
+    pass
+
+
+def tanh():
+    pass
+
+
+def exp():
+    pass
+
+
+def log():
+    pass
+
+
+def sqrt():
+    pass
+
+
+# * --------------------- utility functions tmp ---------------------*#
+def simple_stacking(itvls):
+    """simple version of stacking vector Interval objects into pbox
+
+    args:
+        itvls (Interval): a vector Interval object to be stacked
+
+    note:
+        - only meant for quick use during development
+        - see `stacking` function for production use
+    """
+    from .utils import weighted_ecdf, CDF_bundle
+
+    q1, p1 = weighted_ecdf(itvls.lo)
+    q2, p2 = weighted_ecdf(itvls.hi)
+
+    cdf1 = CDF_bundle(q1, p1)
+    cdf2 = CDF_bundle(q2, p2)
+    return Staircase.from_CDFbundle(cdf1, cdf2)
