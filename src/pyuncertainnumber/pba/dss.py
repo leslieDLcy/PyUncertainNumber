@@ -26,16 +26,12 @@ class DempsterShafer:
         - masses (list): probability masses
     """
 
-    def __init__(self, intervals, masses: list[float]):
+    def __init__(
+        self, intervals: Interval | list[list] | np.ndarray, masses: list[float]
+    ):
 
         self._intervals = make_vec_interval(intervals)
         self._masses = np.array(masses)
-
-        # TODO: revised the following logic
-        try:
-            self._intrep = np.array(intervals)
-        except Exception as e:
-            pass
 
     def _create_DSstructure(self):
         return [
@@ -61,27 +57,27 @@ class DempsterShafer:
     def naked_value(self):
         return np.round(np.sum(self._intervals.mid * self._masses), 3)
 
-    def disassemble(self):
-        return self._intrep, self._masses
-
-    # TODO: fixed needed as it does not return the ax object.
     def plot(self, style="box", ax=None, **kwargs):
-        intervals, masses = self.disassemble()
+        """for box type transform dss into a pbox and plot"""
         match style:
-            # TODO the to_pbox() interpolation is not perfect
             case "box":
-                agg.stacking(intervals, masses, display=True, ax=ax, return_type="pbox")
+                dss_pbox = self.to_pbox()
+                dss_pbox.plot(ax=ax, **kwargs)
             case "interval":
-                plot_DS_structure(intervals, masses, ax=ax, **kwargs)
+                plot_DS_structure(self.intervals, self.masses, ax=ax, **kwargs)
 
     def display(self, style="box", ax=None, **kwargs):
         self.plot(style=style, ax=ax, **kwargs)
         plt.show()
 
     def to_pbox(self):
-        # TODO: add re-ordering
-        intervals, masses = self.disassemble()
-        return agg.stacking(intervals, masses, return_type="pbox")
+        dss_pbox = agg.stacking(
+            self.intervals,
+            self.masses,
+            display=False,
+            return_type="pbox",
+        )
+        return dss_pbox
 
     @classmethod
     def from_dsElements(cls, *ds_elements: dempstershafer_element):
