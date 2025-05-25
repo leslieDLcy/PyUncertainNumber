@@ -274,8 +274,16 @@ class Staircase(Pbox):
         p_lo = self.cdf(x).lo
         p_hi = self.cdf(x).hi
         self.plot(ax=ax, **kwargs)
-        ax.plot([x, x], [p_lo, p_hi], c="r", label="probability bound", zorder=50)
-        ax.legend()
+
+        ax.plot(
+            [x, x],
+            [p_lo, p_hi],
+            c="r",
+            label="probability bound",
+            zorder=50,
+        )
+        ax.scatter(x, p_lo, c="r", marker="^", zorder=50)
+        ax.scatter(x, p_hi, c="r", marker="v", zorder=50)
         return ax
 
     # * --------------------- constructors ---------------------*#
