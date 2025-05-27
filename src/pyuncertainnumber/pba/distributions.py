@@ -105,6 +105,14 @@ class Distribution:
         return np.round(self._naked_value, 3)
 
     @property
+    def low(self):
+        return self._dist.ppf(Params.p_lboundary)
+
+    @property
+    def hi(self):
+        return self._dist.ppf(Params.p_hboundary)
+
+    @property
     def hint(self):
         pass
 

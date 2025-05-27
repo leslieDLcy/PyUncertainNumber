@@ -47,6 +47,12 @@ class DempsterShafer:
 
     @property
     def intervals(self):
+        """Returns the Interval-typed focal elements of the Dempster-Shafer structure."""
+        return self._intervals
+
+    @property
+    def focal_elements(self):
+        """Returns the focal elements of the Dempster-Shafer structure."""
         return self._intervals
 
     @property

@@ -119,10 +119,10 @@ def mixture_ds(l_ds, display=False):
 
     from .dss import DempsterShafer
 
-    intervals = np.concatenate([ds.disassemble()[0] for ds in l_ds], axis=0)
+    intervals = np.concatenate([ds.intervals.to_numpy() for ds in l_ds], axis=0)
     # TODO check the duplicate intervals
     # assert sorted(intervals) == np.unique(intervals), "intervals replicate"
-    masses = reweighting([ds.disassemble()[1] for ds in l_ds])
+    masses = reweighting([ds.masses for ds in l_ds])
     return DempsterShafer(intervals, masses)
 
 
