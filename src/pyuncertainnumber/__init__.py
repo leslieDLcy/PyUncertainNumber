@@ -5,7 +5,6 @@ from pyuncertainnumber.characterisation.uncertainNumber import *
 import pyuncertainnumber.pba as pba
 from pyuncertainnumber.pba.pbox_nonparam import *
 from pyuncertainnumber.characterisation.stats import fit
-from .pba.aggregation import *
 
 
 # * --------------------- Pbox ---------------------*#
@@ -31,6 +30,8 @@ from pyuncertainnumber.pba.cbox import infer_cbox, infer_predictive_distribution
 # * --------------------- DempsterShafer ---------------------*#
 from pyuncertainnumber.pba.dss import dempstershafer_element, DempsterShafer
 
+# * ---------------------  aggregation ---------------------*#
+from pyuncertainnumber.pba.aggregation import *
 
 # * ---------------------  propagation ---------------------*#
 from pyuncertainnumber.propagation.epistemic_uncertainty.b2b import b2b
