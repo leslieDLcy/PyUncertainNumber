@@ -16,7 +16,14 @@ if TYPE_CHECKING:
 
 # makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
 
-__all__ = ["stochastic_mixture", "envelope", "imposition", "stacking", "env_ecdf"]
+__all__ = [
+    "stochastic_mixture",
+    "envelope",
+    "imposition",
+    "stacking",
+    "env_ecdf",
+    "env_ecdf_sep",
+]
 
 
 # TODO: if adding the decorator to make UN class
@@ -195,3 +202,10 @@ def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
         return Staircase(left=l_bound, right=u_bound)
     elif ret_type == "cdf":
         return CDF_bundle(l_bound, pp), CDF_bundle(u_bound, pp)
+
+
+def env_ecdf_sep(*ecdfs, ret_type="pbox", ecdf_choice="canonical"):
+    """nonparametric envelope function for separate empirical CDFs"""
+
+    data = np.array(ecdfs)
+    return env_ecdf(data, ret_type=ret_type, ecdf_choice=ecdf_choice)
