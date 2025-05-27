@@ -201,16 +201,17 @@ class Staircase(Pbox):
         self,
         title=None,
         ax=None,
-        style="band",
+        style="box",
         fill_color="lightgray",
         bound_colors=None,
         nuance="step",
+        alpha=0.3,
         **kwargs,
     ):
         """default plotting function
 
         args:
-            style (str): 'band' or 'simple'
+            style (str): 'box' or 'simple'
         """
 
         if ax is None:
@@ -237,21 +238,21 @@ class Staircase(Pbox):
 
         if title is not None:
             ax.set_title(title)
-        if style == "band":
+        if style == "box":
             ax.fill_betweenx(
                 y=p_axis,
                 x1=self.left,
                 x2=self.right,
                 interpolate=True,
                 color=fill_color,
-                alpha=0.3,
+                alpha=alpha,
                 **kwargs,
             )
             display_the_box(nuance)
         elif style == "simple":
             display_the_box(nuance)
         else:
-            raise ValueError("style must be either 'simple' or 'band'")
+            raise ValueError("style must be either 'simple' or 'box'")
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(X \leq x)$")
         "label" in kwargs and ax.legend()
