@@ -3,7 +3,7 @@ from pyuncertainnumber.characterisation.uncertainNumber import *
 
 # * --------------------- pba ---------------------*#
 import pyuncertainnumber.pba as pba
-from pyuncertainnumber.pba.pbox_nonparam import *
+from pyuncertainnumber.pba.pbox_free import *
 from pyuncertainnumber.characterisation.stats import fit
 
 
