@@ -95,7 +95,6 @@ class DempsterShafer:
         return cls(intervals, masses)
 
 
-@mpl.rc_context({"text.usetex": True})
 def plot_DS_structure(
     vec_interval: list[Interval],
     masses=None,
@@ -124,4 +123,40 @@ def plot_DS_structure(
             )
     ax.margins(x=0.2, y=0.1)
     ax.set_yticks([])
+    return ax
+
+
+def plot_DS_structure_with_labels(
+    vec_interval: list[Interval],
+    masses=None,
+    offset=0.3,
+    ax=None,
+    **kwargs,
+):
+    """temp use: plot the intervals in a vectorised form
+
+    args:
+        vec_interval: vectorised interval objects
+        masses: masses of the intervals
+        offset: offset for display the masses next to the intervals
+    """
+    vec_interval = make_vec_interval(vec_interval)
+
+    expert_l = ["a", "b", "c", "d"]
+
+    fig, ax = plt.subplots() if ax is None else (ax.figure, ax)
+    for i, intl in enumerate(vec_interval):  # horizontally plot the interval
+        ax.plot([intl.lo, intl.hi], [i, i], label=f"expert {expert_l[i]}", **kwargs)
+
+        if masses is not None:
+            ax.text(
+                intl.hi + offset,
+                i,
+                f"{masses[i]:.2f}",
+                verticalalignment="center",
+                horizontalalignment="right",
+            )
+    ax.margins(x=0.2, y=0.1)
+    ax.set_yticks([])
+    ax.legend()
     return ax

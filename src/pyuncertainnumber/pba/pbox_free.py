@@ -404,17 +404,12 @@ def min_max_median(
     """
     Generates a distribution-free p-box based upon the minimum, maximum and median of the variable
 
-    **Parameters**:
+    args:
+        minimum : minimum value of the variable
+        maximum : maximum value of the variable
+        median : median value of the variable
 
-        ``minimum`` : minimum value of the variable
-
-        ``maximum`` : maximum value of the variable
-
-        ``median`` : median value of the variable
-
-
-    **Returns**:
-
+    return:
         ``Pbox``
 
     """
