@@ -35,7 +35,6 @@ __all__ = [
 
 if TYPE_CHECKING:
     from .utils import CDF_bundle
-    from .pbox_base import Pbox
 
 
 def KS_bounds(s, alpha: float, display=True) -> tuple[CDF_bundle]:
@@ -396,9 +395,9 @@ def min_max_mode(
 
 
 def min_max_median(
-    minimum: Union[float, int],
-    maximum: Union[float, int],
-    median: Union[float, int],
+    minimum: Number,
+    maximum: Number,
+    median: Number,
     steps: int = Params.steps,
 ) -> Pbox:
     # TODO error in function
@@ -422,14 +421,29 @@ def min_max_median(
     if minimum == maximum:
         return min_max(minimum, maximum)
 
-    ii = np.array([i / steps for i in range(steps)])
-    jj = np.array([j / steps for j in range(1, steps + 1)])
+    # ii = np.array([i / steps for i in range(steps)])
+    # jj = np.array([j / steps for j in range(1, steps + 1)])
 
+    # return Staircase(
+    #     left=np.array([p if p > 0.5 else minimum for p in ii]),
+    #     right=np.array([p if p <= 0.5 else minimum for p in jj]),
+    #     mean=I((minimum + median) / 2, (median + maximum) / 2),
+    #     var=I(0, (maximum - minimum) * (maximum - minimum) / 4),
+    # )
+    p_minmax = min_max(minimum, maximum)
+    r = p_minmax.alpha_cut(0.5)
+    l = p_minmax.left.copy()
+
+    half_mark = steps // 2
+
+    l_quantile = np.where(p_minmax.p_values < 0.5, minimum, median)
+    r_quantile = np.where(p_minmax.p_values >= 0.5, maximum, median)
     return Staircase(
-        left=np.array([p if p > 0.5 else minimum for p in ii]),
-        right=np.array([p if p <= 0.5 else minimum for p in jj]),
+        left=l_quantile,
+        right=r_quantile,
         mean=I((minimum + median) / 2, (median + maximum) / 2),
         var=I(0, (maximum - minimum) * (maximum - minimum) / 4),
+        steps=steps,
     )
 
 
