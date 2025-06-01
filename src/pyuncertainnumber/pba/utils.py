@@ -4,11 +4,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from .intervals.intervalOperators import wc_scalar_interval, make_vec_interval
-from collections import namedtuple
 from dataclasses import dataclass
 from .intervals.number import Interval
 import numpy as np
-
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.path as mpath
+from matplotlib.legend_handler import HandlerBase
 
 # cdf_bundle = namedtuple("cdf_bundle", ["quantiles", "probabilities"])
 # """ a handy composition object for a c.d.f which is a tuple of quantile and probability
@@ -179,20 +181,6 @@ def plot_intervals(vec_interval: list[Interval], ax=None, **kwargs):
     return ax
 
 
-def _interval_list_to_array(l, left=True):
-    if left:
-
-        def f(x):
-            return x.left if isinstance(x, Interval) else x
-
-    else:  # must be right
-
-        def f(x):
-            return x.right if isinstance(x, Interval) else x
-
-    return np.array([f(i) for i in l])
-
-
 def read_json(file_name):
     f = open(file_name)
     data = json.load(f)
@@ -307,3 +295,37 @@ def ecdf(d):
     dd.sort()
     pp.sort()
     return dd, pp
+
+
+# --- Reuse pbox rectangle key function ---
+def create_colored_edge_box(x0, y0, width, height, linewidth=1):
+    verts_top = [(x0, y0 + height), (x0 + width, y0 + height)]
+    verts_left = [(x0, y0), (x0, y0 + height)]
+    verts_bottom = [(x0, y0), (x0 + width, y0)]
+    verts_right = [(x0 + width, y0), (x0 + width, y0 + height)]
+
+    def make_patch(verts, color):
+        path = mpath.Path(verts)
+        return mpatches.PathPatch(
+            path, edgecolor=color, facecolor="none", linewidth=linewidth
+        )
+
+    return [
+        make_patch(verts_top, "green"),
+        make_patch(verts_left, "green"),
+        make_patch(verts_bottom, "blue"),
+        make_patch(verts_right, "blue"),
+    ]
+
+
+# --- Custom pbox legend handler ---
+class CustomEdgeRectHandler(HandlerBase):
+    def create_artists(
+        self, legend, orig_handle, xdescent, ydescent, width, height, fontsize, trans
+    ):
+        rect_patches = create_colored_edge_box(
+            xdescent, ydescent, width, height, linewidth=1
+        )
+        for patch in rect_patches:
+            patch.set_transform(trans)
+        return rect_patches
