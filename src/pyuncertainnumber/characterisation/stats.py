@@ -50,6 +50,7 @@ def makedist(shape: str):
     return decorator_make_dist
 
 
+# TODO: tested with expon which seems incorrect.
 def singleParamPattern(x, shape: str):
     if isinstance(x, sps.CensoredData | np.ndarray | list):
         return D.dist_from_sps(named_dists.get(shape)(mean(x)), shape=shape)
@@ -96,7 +97,7 @@ def fit(method: str, family: str, data: np.ndarray):
 
 
 def MMbernoulli(x):
-    """a first attempt to Maximum likelihood estimation for exponential distribution
+    """a first attempt to Maximum likelihood estimation for Bernoulli distribution
         which accepts both precise and imprecise data;
 
     #! the example of `singleparam` pattern
