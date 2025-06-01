@@ -66,24 +66,58 @@ def plot_two_cdf_bundle(cdf1, cdf2, ax=None, **kwargs):
 
 
 def pl_ecdf_bounding_bundles(
-    b_l: CDF_bundle, b_r: CDF_bundle, ax=None, legend=True, title=None
+    b_l: CDF_bundle,
+    b_r: CDF_bundle,
+    ax=None,
+    legend=True,
+    title=None,
+    sig_level=None,
+    bound_colors=None,
+    label=None,
+    alpha=None,
+    linestyle=None,
+    linewidth=None,
 ):
     if ax is None:
         fig, ax = plt.subplots()
+
+    def set_if_not_none(d, **kwargs):
+        for k, v in kwargs.items():
+            if v is not None:
+                d[k] = v
+
+    plot_bound_colors = bound_colors if bound_colors is not None else ["g", "b"]
+
+    cdf_kwargs = {"drawstyle": "steps-post"}
+
+    set_if_not_none(
+        cdf_kwargs,
+        label=label,
+        linestyle=linestyle,
+        alpha=alpha,
+        linewidth=linewidth,
+    )
+
     ax.plot(
         b_l.quantiles,
         b_l.probabilities,
-        label="upper bound",
-        drawstyle="steps-post",
-        color="g",
+        label=label if label is not None else f"KS condidence bands {sig_level}\% ",
+        color=plot_bound_colors[0],
+        **cdf_kwargs,
     )
     ax.plot(
         b_r.quantiles,
         b_r.probabilities,
-        label="lower bound",
-        drawstyle="steps-post",
-        color="b",
+        color=plot_bound_colors[1],
+        **cdf_kwargs,
     )
+    ax.plot([b_l.quantiles[0], b_r.quantiles[0]], [0, 0], color=plot_bound_colors[1])
+    ax.plot(
+        [b_l.quantiles[-1], b_r.quantiles[-1]],
+        [1, 1],
+        color=plot_bound_colors[0],
+    )
+
     if title is not None:
         ax.set_title(title)
     if legend:
