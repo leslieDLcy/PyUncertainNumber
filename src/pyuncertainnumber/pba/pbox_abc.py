@@ -225,34 +225,28 @@ class Staircase(Pbox):
             """display two F curves plus the top-bottom horizontal lines"""
 
             if nuance == "step":
+                step_kwargs = {
+                    "c": plot_bound_colors[0],
+                    "where": "post",
+                }
+
                 if label is not None:
-                    (line,) = ax.step(
-                        self.left,
-                        p_axis,
-                        c=plot_bound_colors[0],
-                        where="post",
-                        label=label,
-                    )
-                else:
-                    ax.step(
-                        self.left,
-                        p_axis,
-                        c=plot_bound_colors[0],
-                        where="post",
-                    )
+                    step_kwargs["label"] = label
+
+                # Make the plot
+                (line,) = ax.step(self.left, p_axis, **step_kwargs)
                 ax.step(self.right, p_axis, c=plot_bound_colors[1], where="post")
                 ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
                 ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
             elif nuance == "curve":
+                smooth_curve_kwargs = {
+                    "c": plot_bound_colors[0],
+                }
+
                 if label is not None:
-                    (line,) = ax.plot(
-                        self.left,
-                        p_axis,
-                        c=plot_bound_colors[0],
-                        label=label,
-                    )
-                else:
-                    ax.plot(self.left, p_axis, c=plot_bound_colors[0])
+                    smooth_curve_kwargs["label"] = label
+
+                (line,) = ax.plot(self.left, p_axis, **smooth_curve_kwargs)
                 ax.plot(self.right, p_axis, c=plot_bound_colors[1])
                 ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
                 ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
