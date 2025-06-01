@@ -253,7 +253,94 @@ class Staircase(Pbox):
             else:
                 raise ValueError("nuance must be either 'step' or 'curve'")
             if label is not None:
-                ax.legend(handler_map={line: CustomEdgeRectHandler()})
+                ax.legend(handler_map={line: CustomEdgeRectHandler()})  # regular use
+
+        if title is not None:
+            ax.set_title(title)
+        if style == "box":
+            ax.fill_betweenx(
+                y=p_axis,
+                x1=self.left,
+                x2=self.right,
+                interpolate=True,
+                color=fill_color,
+                alpha=alpha,
+                **kwargs,
+            )
+            display_box(nuance, label=None)
+            if "label" in kwargs:
+                ax.legend(loc="best")
+        elif style == "simple":
+            display_box(nuance, label=kwargs["label"] if "label" in kwargs else None)
+        else:
+            raise ValueError("style must be either 'simple' or 'box'")
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$\Pr(X \leq x)$")
+        return ax
+
+    def plot_outside_legend(
+        self,
+        title=None,
+        ax=None,
+        style="box",
+        fill_color="lightgray",
+        bound_colors=None,
+        nuance="step",
+        alpha=0.3,
+        **kwargs,
+    ):
+        """a specific variant of `plot()` which is used for scipy proceeding only.
+
+        args:
+            style (str): 'box' or 'simple'
+        """
+        from .utils import CustomEdgeRectHandler
+
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        p_axis = self._pvalues if self._pvalues is not None else Params.p_values
+        plot_bound_colors = bound_colors if bound_colors is not None else ["g", "b"]
+
+        def display_box(nuance, label=None):
+            """display two F curves plus the top-bottom horizontal lines"""
+
+            if nuance == "step":
+                step_kwargs = {
+                    "c": plot_bound_colors[0],
+                    "where": "post",
+                }
+
+                if label is not None:
+                    step_kwargs["label"] = label
+
+                # Make the plot
+                (line,) = ax.step(self.left, p_axis, **step_kwargs)
+                ax.step(self.right, p_axis, c=plot_bound_colors[1], where="post")
+                ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
+                ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+            elif nuance == "curve":
+                smooth_curve_kwargs = {
+                    "c": plot_bound_colors[0],
+                }
+
+                if label is not None:
+                    smooth_curve_kwargs["label"] = label
+
+                (line,) = ax.plot(self.left, p_axis, **smooth_curve_kwargs)
+                ax.plot(self.right, p_axis, c=plot_bound_colors[1])
+                ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
+                ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+            else:
+                raise ValueError("nuance must be either 'step' or 'curve'")
+            if label is not None:
+                # ax.legend(handler_map={line: CustomEdgeRectHandler()})  # regular use
+                # Put a legend to the right of the current axis
+                ax.legend(
+                    handler_map={line: CustomEdgeRectHandler()},
+                    loc="center left",
+                    bbox_to_anchor=(1, 0.5),
+                )  # onetime use
 
         if title is not None:
             ax.set_title(title)

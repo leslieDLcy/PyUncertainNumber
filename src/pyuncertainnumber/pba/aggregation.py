@@ -174,7 +174,7 @@ def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
     """nonparametric envelope function
 
     arrgs:
-        data (array-like): the components, uncertain number constructs only, on which the envelope operation applied on.
+        data (array): Each row represents a distribution, on which the envelope operation applied.
         ret_type (str): {'pbox' or 'cdf'}
             - default is pbox
             - cdf is the CDF bundle
