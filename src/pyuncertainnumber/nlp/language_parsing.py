@@ -6,8 +6,7 @@ from typing import TYPE_CHECKING
 import re
 import math
 from decimal import Decimal
-from ..pba.interval import PM
-from ..pba.interval import Interval as I
+from ..pba.intervals import Interval as I
 import numpy as np
 from ..characterisation.utils import (
     PlusMinus_parser,
@@ -20,7 +19,7 @@ from ..characterisation.utils import (
 from ..pba.params import Params
 
 if TYPE_CHECKING:
-    from ..pba.pbox_base import Pbox
+    from ..pba.pbox_abc import Pbox
 
 __all__ = ["hedge_interpret"]
 
@@ -66,15 +65,15 @@ def hedge_interpret(hedge: str, return_type="interval") -> I | Pbox:
         # return the interval object
         match kwd:
             case "exactly":
-                return PM(x, 10 ** (-(d + 1)))
+                return I.from_meanform(x, 10 ** (-(d + 1)))
             case "":
-                return PM(x, 0.5 * 10 ** (-d))
+                return I.from_meanform(x, 0.5 * 10 ** (-d))
             case "about":
-                return PM(x, 2 * 10 ** (-d))
+                return I.from_meanform(x, 2 * 10 ** (-d))
             case "around":
-                return PM(x, 10 * 10 ** (-d))
+                return I.from_meanform(x, 10 * 10 ** (-d))
             case "count":
-                return PM(x, np.sqrt(np.abs(x)))
+                return I.from_meanform(x, np.sqrt(np.abs(x)))
             case "almost":
                 return I(x - 0.5 * (10 ** (-d)), x)
             case "over":
@@ -119,23 +118,23 @@ def parse_interval_expression(expression):
     if initial_list_checking(expression):
         an_int = initial_list_checking(expression)
         if len(an_int) == 1:
-            return PM(an_int[0], hw=Params.hw)
+            return I.from_meanform(an_int[0], hw=Params.hw)
         elif len(an_int) > 1:
             return I(*an_int)
     ### type 2 ###
     elif bad_list_checking(expression):
         if PlusMinus_parser(expression) & (not percentage_finder(expression)):
             parsed_list = parser4(expression)
-            return PM(*parsed_list)
+            return I.from_meanform(*parsed_list)
         elif PlusMinus_parser(expression) & percentage_finder(expression):
             # parse the percentage first
             mid_range = percentage_converter(expression)
             parsed_mid_value = parser4(expression)[0]
 
             # if we take the percentage literally
-            # return PM(parsed_mid_value, hw=mid_range)
+            # return I.from_meanform(parsed_mid_value, hw=mid_range)
             # if we take the percentage based on the context
-            return PM(parsed_mid_value, hw=parsed_mid_value * mid_range)
+            return I.from_meanform(parsed_mid_value, hw=parsed_mid_value * mid_range)
     else:
         return "not a valid expression"
 
@@ -166,7 +165,7 @@ class ApproximatorRegCoefficients:
         return sps.lognorm.rvs(s=slog, scale=np.exp(mlog), size=2000)
 
     def _cp(self, z, r, f):
-        from ..pba.pbox_base import Pbox
+        from ..pba.pbox_abc import Pbox
 
         self.L = (
             self.A

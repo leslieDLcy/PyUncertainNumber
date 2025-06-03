@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from .utils import initial_list_checking
-from ..pba.interval import Interval as nInterval
 from ..pba.intervals import Interval
 
 """ This module is for checking the logic for the instantiation and propagation of the Uncertain Number object"""
@@ -32,7 +31,7 @@ class DistributionSpecification:
 
         if isinstance(self.dist_params[0], float | int):
             self._i_flag = False
-        elif isinstance(self.dist_params[0], nInterval | Interval | tuple | list):
+        elif isinstance(self.dist_params[0], Interval | tuple | list):
             self._i_flag = True
         else:
             raise ValueError("The disribution parameters are not clear")

@@ -1,23 +1,23 @@
-""" a Cbox constructor by Leslie"""
+"""a Cbox constructor by Leslie"""
+
 import numpy as np
 from .params import Params
-from .pbox_base import Pbox
 from ..characterisation.utils import tranform_ecdf
 
 
-class Cbox(Pbox):
+class Cbox:
     """
     Confidence boxes (c-boxes) are imprecise generalisations of traditional confidence distributions
 
-    They have a different interpretation to p-boxes but rely on the same underlying mathematics. 
-    As such in pba-for-python c-boxes inhert most of their methods from Pbox. 
+    They have a different interpretation to p-boxes but rely on the same underlying mathematics.
+    As such in pba-for-python c-boxes inhert most of their methods from Pbox.
 
     Args:
         Pbox (_type_): _description_
     """
 
     def __init__(self, *args, extre_bound_params=None, **kwargs):
-        """ Cbox constructor
+        """Cbox constructor
 
         args:
             extre_bound_params: envelope (extreme) bounds of the box
@@ -38,19 +38,20 @@ class Cbox(Pbox):
     def display(self, parameter_name=None, **kwargs):
         if parameter_name is not None:
             ax = super().display(
-                title=f'Cbox {parameter_name}', fill_color='salmon', **kwargs)
+                title=f"Cbox {parameter_name}", fill_color="salmon", **kwargs
+            )
         else:
-            ax = super().display(fill_color='salmon', **kwargs)
-        ax.set_ylabel('Confidence')
+            ax = super().display(fill_color="salmon", **kwargs)
+        ax.set_ylabel("Confidence")
         return ax
 
-    def ci(self, c=0.95, alpha=None, beta=None, style='two-sided'):
-        """ query the confidence interval at a given confidence level `c`"""
-        if style == 'two-sided':
+    def ci(self, c=0.95, alpha=None, beta=None, style="two-sided"):
+        """query the confidence interval at a given confidence level `c`"""
+        if style == "two-sided":
             if alpha is None:
-                alpha = (1-c)/2
+                alpha = (1 - c) / 2
             if beta is None:
-                beta = 1-(1-c)/2
+                beta = 1 - (1 - c) / 2
 
             l_quantile = self.cuth(alpha).left
             r_quantile = self.cuth(beta).right
@@ -73,11 +74,12 @@ class Cbox(Pbox):
 
     #     return self.left(low), self.right(upper)
 
+
 # * ---------------------  constructors--------------------- *#
 
 
 def cbox_from_extredists(rvs, shape=None, extre_bound_params=None):
-    """ define cbox via parameterised extreme bouding distrbution functions
+    """define cbox via parameterised extreme bouding distrbution functions
 
     args:
         rvs (list): list of `scipy.stats.rv_continuous` objects
@@ -96,6 +98,7 @@ def cbox_from_extredists(rvs, shape=None, extre_bound_params=None):
         extre_bound_params=extre_bound_params,
         shape=shape,
     )
+
 
 # used for nextvalue distribution which by nature is pbox
 

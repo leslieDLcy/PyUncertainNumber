@@ -1,23 +1,27 @@
 import numpy as np
-import tqdm
+from rich.progress import track
 from typing import Callable
 from scipy.stats import qmc  # Import Latin Hypercube Sampling from SciPy
 from pyuncertainnumber.propagation.utils import Propagation_results
+from pyuncertainnumber import UncertainNumber
+from ...pba.distributions import Distribution
+
 
 def sampling_aleatory_method(
-    x: list,
+    xs: list[Distribution],
     f: Callable,
-    method: str ="monte_carlo",
+    method: str = "monte_carlo",
+    n_sam: int = 1_000,
     results: Propagation_results = None,
-    n_sam: int = 500,
-    save_raw_data: str ="no") -> Propagation_results:  # Specify return type
+    save_raw_data=False,
+) -> Propagation_results:  # Specify return type
+    #! leslie: I prefer returning the raw output sample
     """Performs aleatory uncertainty propagation using Monte Carlo or Latin Hypercube sampling,
-        when its inputs are uncertain and described by probability distributions. 
-       
+        when its inputs are uncertain and described by probability distributions.
+
     args:
-        x (list): A list of `UncertainNumber` objects, each representing an input
-                 variable with its associated uncertainty.
-        f (Callable): A callable function that takes a 1D NumPy array of input
+        xs (list): A list of `UncertainNumber` or `Distribution` objects;
+        f (Callable): A callable function that takes input
                   values and returns the corresponding output(s). Can be None,
                   in which case only samples are generated.
         results (Propagation_results, optional): An object to store propagation results.
@@ -31,8 +35,8 @@ def sampling_aleatory_method(
                                                   sampling for better space coverage)
                             Defaults to 'monte_carlo'.
         n_sam (int): The number of samples to generate for the chosen sampling method.
-                Defaults to 500.
-        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw 
+                Defaults to 1000.
+        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw
           input data when a function (f) is not provided.
           - 'no': Returns an error that no function is provided.
           - 'yes': Returns the full arrays of unique input combinations.
@@ -41,11 +45,13 @@ def sampling_aleatory_method(
         sampling_aleatory_method(x: list, f: Callable, ...) -> propagation_results
 
     note:
-        If the `f` function returns multiple outputs, the code can accomodate. 
+        If the `f` function returns multiple outputs, the code can accomodate.
         This fuction allows only for the propagation of independent variables.
 
     returns:
-        Returns `Propagation_results` object(s) containing:
+        Returns response samples or a `Propagation_results` object:
+
+        `Propagation_results` object(s) containing:
             - 'un': UncertainNumber object(s) to represent the empirical distribution(s) of the output(s).
             - 'raw_data' (dict): Dictionary containing raw data shared across output(s):
                     - 'x' (np.ndarray): Input values.
@@ -62,63 +68,62 @@ def sampling_aleatory_method(
     if results is None:
         results = Propagation_results()
 
-    if save_raw_data not in ("yes", "no"):
-        raise ValueError("Invalid save_raw_data option. Choose 'yes' or 'no'.")
+    assert callable(f), "The function f must be a callable."
 
     print(f"Total number of input combinations for the {method} method: {n_sam}")
+
     match method:
         case "monte_carlo":
-            parameter_samples = np.array([un.random(size=n_sam) for un in x])
+            if isinstance(xs[0], Distribution):
+                samples = [d.sample(n_sam) for d in xs]
+            elif isinstance(xs[0], UncertainNumber):
+                samples = [un.construct.sample(n_sam) for un in xs]
+            else:
+                raise ValueError(
+                    "The input must be a list of UncertainNumber or Distribution objects."
+                )
+            # samples = np.stack(samples, axis=1)
+            # samples = np.array([un.random(size=n_sam) for un in x])
         case "latin_hypercube":
-            sampler = qmc.LatinHypercube(d=len(x))
-            lhd_samples = sampler.random(n=n_sam)
+            sampler = qmc.LatinHypercube(d=len(xs))
+            lhs_samples = sampler.random(n=n_sam)  # u-space (n, d)
 
-            parameter_samples = []  # Initialize an empty list to store the samples
+            samples = np.concatenate(
+                [d.alpha_cut(lhs_samples[:, i]) for i, d in enumerate(xs)], axis=1
+            )
+        case _:
+            raise ValueError("Invalid UP method!")
 
-            for i, un in enumerate(x):  # Iterate over each UncertainNumber in the list 'x'
-                # Get the entire column of quantiles for this UncertainNumber
-                q_values = lhd_samples[:, i]
+    # TODO discuss the logic to save verbose raw data @ioannaioan
+    # TODO seems to be different behaviors between aleatory and epistemic methods
 
-                # Now we need to calculate the ppf for each q value in the q_values array
-                ppf_values = (
-                    []
-                )  # Initialize an empty list to store the ppf values for this UncertainNumber
-                for q in q_values:  # Iterate over each individual q value
-                    ppf_value = un.ppf(q)  # Calculate the ppf value for this q
-                    # Add the calculated ppf value to the list
-                    ppf_values.append(ppf_value)
+    if save_raw_data:
+        # Transpose to have each row as a sample
+        samples = samples.T
 
-                # Add the list of ppf values to the main list
-                parameter_samples.append(ppf_values)
+        if f is not None:  # Only evaluate if f is provided
+            all_output = np.array(
+                [
+                    f(xi)
+                    for xi in track(
+                        samples, description="function evaluations for samples"
+                    )
+                ]
+            )
 
-            # Convert the list of lists to a NumPy array
-            parameter_samples = np.array(parameter_samples)
-        
-        case _: raise ValueError(
-                     "Invalid UP method!")
+            if all_output.ndim == 1:  # If f returns a single output
+                # Reshape to a column vector
+                all_output = all_output.reshape(-1, 1)
 
-    # Transpose to have each row as a sample
-    parameter_samples = parameter_samples.T
+            # if save_raw_data == 'yes':
+            results.add_raw_data(x=samples)
+            results.add_raw_data(f=all_output)
+        else:
+            raise ValueError(
+                "No function is provided. Select save_raw_data = 'yes' to save the input combinations."
+            )
 
-    if f is not None:  # Only evaluate if f is provided
-        all_output = np.array(
-            [f(xi) for xi in tqdm.tqdm(parameter_samples, desc="function evaluations for samples")]
-        )
-
-        if all_output.ndim == 1:  # If f returns a single output
-            # Reshape to a column vector
-            all_output = all_output.reshape(-1, 1)
-
-        # if save_raw_data == 'yes':
-        results.add_raw_data(x=parameter_samples)
-        results.add_raw_data(f=all_output)
-
-    elif save_raw_data == "yes":  # If f is None and save_raw_data is 'yes'
-        results.add_raw_data(x=parameter_samples)
-
+        return results
     else:
-        raise ValueError(
-            "No function is provided. Select save_raw_data = 'yes' to save the input combinations."
-        )
-
-    return results
+        # simpler logic
+        return f(*samples)

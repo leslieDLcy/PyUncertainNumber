@@ -1,18 +1,20 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+from ...pba.intervals.number import Interval
+
 import numpy as np
-import tqdm
+from rich.progress import track
 from typing import Callable
-from pyuncertainnumber.propagation.epistemic_uncertainty.cartesian_product import (
-    cartesian,
-)
-from pyuncertainnumber.propagation.utils import Propagation_results
+from .cartesian_product import cartesian
+from ..utils import Propagation_results
 
 
 def subinterval_method(
     x: np.ndarray,
     f: Callable,
+    save_raw_data=False,
+    n_sub: np.array = 10,
     results: Propagation_results = None,
-    n_sub: np.array = 3,
-    save_raw_data="no",
 ) -> Propagation_results:  # Specify return type
     """The subinterval reconstitution method.
 
@@ -26,20 +28,20 @@ def subinterval_method(
             each input variable.
             - If a scalar, all input variables are divided into the same number of subintervals (defaults 3 divisions).
             - If an array, each element specifies the number of subintervals for the
-               corresponding input variable.        
-        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw input data when a function (f) 
+               corresponding input variable.
+        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw input data when a function (f)
             is not provided.
             - 'no': Returns an error that no function is provided.
             - 'yes': Returns the full arrays of unique input combinations.
-    
+
     signature:
         subinterval_method(x:np.ndarray, f:Callable, n_sub:np.array ...) -> Propagation_results
 
     notes:
         - The function assumes that the intervals in `x` represent epistemic uncertainties in the input.
         - The subinterval reconstitution method subdivides the input intervals into smaller subintervals
-          to accommodate for the presence of non-monotonic trends in the function output(s). 
-        - The subintervals for the input can vary in number. 
+          to accommodate for the presence of non-monotonic trends in the function output(s).
+        - The subintervals for the input can vary in number.
         - The computational cost increases exponentially with the number of input variables
           and the number of subintervals per variable.
         - The `f` function can return multiple outputs.
@@ -68,15 +70,17 @@ def subinterval_method(
         >>> y = subinterval_method(x, f, n_sub, save_raw_data = 'yes')
         >>> # Print the results
         >>> y.print()
-
     """
+    if isinstance(x, Interval):
+        x = x.to_numpy()
+
     if results is None:
         results = Propagation_results()  # Create an instance of Propagation_results
 
     # Create a sequence of values for each interval based on the number of divisions provided
     # The divisions may be the same for all intervals or they can vary.
     m = x.shape[0]
-   
+
     if type(n_sub) == int:  # All inputs have identical division
         total = (n_sub + 1) ** m
         Xint = np.zeros((0, n_sub + 1), dtype=object)
@@ -98,7 +102,9 @@ def subinterval_method(
 
     # propagates the epistemic uncertainty through subinterval reconstitution
     if f is not None:
-        all_output = np.array([f(xi) for xi in tqdm.tqdm(X, desc="Function evaluations")])
+        all_output = np.array(
+            [f(xi) for xi in track(X, description="Function evaluations")]
+        )
 
         try:
             num_outputs = len(all_output[0])
@@ -148,7 +154,7 @@ def subinterval_method(
         results.raw_data["f"] = all_output
         results.raw_data["x"] = X
 
-    elif save_raw_data == "yes":  # If f is None and save_raw_data is 'yes'
+    elif save_raw_data:  # If f is None and save_raw_data is 'yes'
         results.add_raw_data(x=X)
     else:
         print(
@@ -166,4 +172,3 @@ def subinterval_method(
 # n=2
 # # Call the method
 # y = subinterval_method(x_bounds, f=None, n_sub=n, save_raw_data = 'yes')
-

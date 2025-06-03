@@ -6,25 +6,48 @@ import functools
 # from .variability import Variability
 from .uncertainty_types import Uncertainty_types
 from .ensemble import Ensemble
-from ..pba.interval import Interval as nInterval
 from .utils import *
 from ..pba.params import Params
-from pint import UnitRegistry
 from pathlib import Path
-import itertools
 from ..nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
 from .check import DistributionSpecification
-from ..pba.pbox import named_pbox
+from ..pba.pbox_parametric import named_pbox
 from typing import Sequence
-from ..pba.distributions import Distribution, named_dists
-from ..pba.operation import convert
-from ..pba.intervalOperators import parse_bounds
+from ..pba.distributions import Distribution
+from ..pba.intervals.intervalOperators import parse_bounds
+from ..pba.intervals.number import Interval
+from numbers import Number
+from ..pba.distributions import Distribution
+import operator
+from pint import Quantity
 
 """ Uncertain Number class """
 
+__all__ = [
+    "UncertainNumber",
+    "I",
+    "norm",
+    "gaussian",
+    "normal",
+    "alpha",
+    "anglit",
+    "argus",
+    "arcsine",
+    "beta",
+    "betaprime",
+    "bradford",
+    "burr",
+    "burr12",
+    "cauchy",
+    "chi",
+    "chi2",
+    "cosine",
+    "uniform",
+    "lognormal",
+]
 
-@dataclass
+
 class UncertainNumber:
     """Uncertain Number class
 
@@ -35,73 +58,76 @@ class UncertainNumber:
         -  naked_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
 
     Example:
-        >>> UncertainNumber(name="velocity", symbol="v", units="m/s", bounds=[1, 2])
+        >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", bounds=[1, 2])
     """
 
-    # ---------------------Basic---------------------#
-    name: str = field(default=None)
-    symbol: str = field(default=None)
-    # string input of units, e.g. 'm/s'
-    units: Type[any] = field(default=None, repr=False)
-    _Q: Type[any] = field(default=None, repr=False)
+    Q_ = Quantity
+    instances = []
 
-    # ---------------------Value---------------------#
-    # ensemble: Type[Ensemble] = field(default=None)
-    uncertainty_type: Type[Uncertainty_types] = field(default=None, repr=False)
-    essence: str = field(default=None)  # [interval, distribution, pbox, ds]
-    masses: list[float] = field(default=None, repr=False)
-    bounds: Union[List[float], str] = field(default=None)
-    distribution_parameters: list[str, float | int] = field(default=None)
-    pbox_parameters: list[str, Sequence[nInterval]] = field(default=None, repr=False)
-    hedge: str = field(default=None, repr=False)
-    _construct: Type[any] = field(default=None, repr=False)
-    # this is the deterministic numeric representation of the
-    # UN object, which shall be linked with the 'pba' or `Intervals` package
-    naked_value: float = field(default=None)
-    p_flag: bool = field(default=True, repr=False)  # parameterised flag
-
-    # * ---------------------auxlliary information---------------------*#
-    # some simple boiler plates
-    # lat: float = field(default=0.0, metadata={'unit': 'degrees'})
-    # ensemble: Type[Ensemble] = field(default=None)
-
-    measurand: str = field(default=None, repr=False)
-    nature: str = field(default=None, repr=False)
-    provenence: str = field(default=None, repr=False)
-    justification: str = field(default=None, repr=False)
-    structure: str = field(default=None, repr=False)
-    security: str = field(default=None, repr=False)
-
-    # * ---------------------aleatoric component--------------------- *#
-    ensemble: Type[Ensemble] = field(default=None, repr=False)
-    variability: str = field(default=None, repr=False)
-    dependence: str = field(default=None, repr=False)
-
-    # * ---------------------epistemic component---------------------*#
-    uncertainty: str = field(default=None, repr=False)
-
-    # class variable
-    instances = []  # TODO named as registry later on
-
-    # * --------------------- additional ---------------------*#
-    _samples: np.ndarray | list = field(default=None, repr=False)
+    def __init__(
+        self,
+        name=None,
+        symbol=None,
+        unit=None,
+        uncertainty_type=None,
+        essence=None,
+        masses=None,
+        bounds=None,
+        distribution_parameters=None,
+        pbox_parameters=None,
+        hedge=None,
+        _construct=None,
+        naked_value=1.0,
+        p_flag=True,
+        _skip_construct_init=False,
+        measurand=None,
+        nature=None,
+        provenence=None,
+        justification=None,
+        structure=None,
+        security=None,
+        ensemble=None,
+        variability=None,
+        dependence=None,
+        uncertainty=None,
+        physical_quantity=None,
+        _samples=None,
+        **kwargs,
+    ):
+        self.name = name
+        self.symbol = symbol
+        self.uncertainty_type = uncertainty_type
+        self.essence = essence
+        self.masses = masses
+        self.bounds = bounds
+        self.distribution_parameters = distribution_parameters
+        self.pbox_parameters = pbox_parameters
+        self.hedge = hedge
+        self._construct = _construct
+        self.naked_value = naked_value
+        self.p_flag = p_flag
+        self._skip_construct_init = _skip_construct_init
+        self.measurand = measurand
+        self.nature = nature
+        self.provenence = provenence
+        self.justification = justification
+        self.structure = structure
+        self.security = security
+        self.ensemble = ensemble
+        self.variability = variability
+        self.dependence = dependence
+        self.uncertainty = uncertainty
+        self._physical_quantity = physical_quantity
+        self._samples = _samples
+        self.__init_check()
+        self.__init_construct()
+        self.naked_value = self._construct.naked_value
+        self.unit = unit
 
     # *  ---------------------more on initialisation---------------------*#
-    def parameterised_pbox_specification(self):
-        if self.p_flag:
-            self._construct = self.match_pbox(
-                self.distribution_parameters[0],
-                self.distribution_parameters[1],
-            )
-            self.naked_value = self._construct.mean().midpoint()
 
-    def __post_init__(self):
-        """the de facto initialisation method for the core math objects of the UN class
-
-        caveat:
-            user needs to by themselves figure out the correct
-            shape of the 'distribution_parameters', such as ['uniform', [1,2]]
-        """
+    def __init_check(self):
+        UncertainNumber.instances.append(self)
 
         if not self.essence:
             check_initialisation_list = [
@@ -118,41 +144,47 @@ class UncertainNumber:
                 self.essence = "interval"
                 self.bounds = [-np.inf, np.inf]
 
-        UncertainNumber.instances.append(self)
+    def __init_construct(self):
+        """the de facto parameterisation/instantiation procedure for the core constructs of the UN class
 
-        ### create the underlying construct ###
-        match self.essence:
-            case "interval":
-                self._construct = parse_bounds(self.bounds)
-                self.naked_value = self._construct.midpoint()
-            case "distribution":
-                if self._samples is not None:
-                    self._construct = Distribution(sample_data=self._samples)
-                elif self.distribution_parameters is not None:
-                    p_ = DistributionSpecification(
-                        dist_family=self.distribution_parameters[0],
-                        dist_params=self.distribution_parameters[1],
-                    )
-                    if p_.i_flag:
-                        self.parameterised_pbox_specification()
-                    else:
-                        self._construct = Distribution(
-                            dist_family=self.distribution_parameters[0],
-                            dist_params=self.distribution_parameters[1],
+        caveat:
+            user needs to by themselves figure out the correct
+            shape of the 'distribution_parameters', such as ['uniform', [1,2]]
+        """
+
+        # * ------------------------ create the underlying construct
+
+        if not self._skip_construct_init:
+            match self.essence:
+                case "interval":
+                    self._construct = parse_bounds(self.bounds)
+                case "distribution" | "pbox":
+                    if self.pbox_parameters is not None:
+                        par = Parameterisation(
+                            self.pbox_parameters, essence=self.essence
                         )
-                        self.naked_value = self._construct._naked_value
-            case "pbox":
-                self.parameterised_pbox_specification()
+                    else:
+                        par = Parameterisation(
+                            self.distribution_parameters, essence=self.essence
+                        )
+                    self._construct = par.yield_construct()
+                case "dempster_shafer":
+                    from ..pba.dss import DempsterShafer
 
-        ### 'unit' representation of the un ###
-        ureg = UnitRegistry()
-        Q_ = ureg.Quantity
-        # I can use the following logic to double check the arithmetic operations of the UN object
-        if isinstance(self.naked_value, float | int):
-            self._Q = Q_(self.naked_value, self.units)
-            # self.naked_value * ureg(self.units)  # Quantity object
-        else:
-            self._Q = Q_(1, self.units)
+                    self._construct = DempsterShafer(
+                        intervals=parse_bounds(self.bounds), masses=self.masses
+                    )
+
+    def parameterised_pbox_specification(self):
+        if self.p_flag:
+            self._construct = self.match_pbox(
+                self.distribution_parameters[0],
+                self.distribution_parameters[1],
+            )
+            self.naked_value = self._construct.mean().midpoint()
+
+    def _update_physical_quantity(self):
+        self._physical_quantity = self.Q_(self.naked_value, self.unit)
 
     @staticmethod
     def match_pbox(keyword, parameters):
@@ -180,7 +212,7 @@ class UncertainNumber:
         """
         pass
 
-    ##### object representations #####
+    # * ---------------------object representation---------------------* #
 
     def __str__(self):
         """the verbose user-friendly string representation
@@ -194,7 +226,13 @@ class UncertainNumber:
 
     def __repr__(self) -> str:
         """concise __repr__"""
-        self._field_str = self._get_concise_representation()
+
+        field_values = get_concise_repr(self.__dict__)
+        self._field_str = ", ".join(f"{k}={v!r}" for k, v in field_values.items())
+
+        # fancy string formatting of unit
+        u_str = f", physical_quantity={self._physical_quantity:~P}"
+        self._field_str += u_str
         return f"{self.__class__.__name__}({self._field_str})"
 
     def describe(self, type="verbose"):
@@ -245,13 +283,7 @@ class UncertainNumber:
                         )
                         self._construct.quick_plot()
 
-    # ---------------------some class methods---------------------#
-
-    def _get_concise_representation(self):
-        """get a concise representation of the UN object"""
-
-        field_values = get_concise_repr(self.__dict__)
-        return ", ".join(f"{k}={repr(v)}" for k, v in field_values.items())
+    # * ---------------------some methods---------------------* #
 
     def ci(self):
         """get 95% range confidence interval"""
@@ -266,22 +298,47 @@ class UncertainNumber:
             case "pbox":
                 return "unfinshed"
 
+    def plot(self, **kwargs):
+        """quick plot of the uncertain number object"""
+
+        return self._construct.plot(**kwargs)
+
     def display(self, **kwargs):
         """quick plot of the uncertain number object"""
 
         return self._construct.display(**kwargs)
 
-    # * ---------------------getters --------------------- *#
+    # * ---------------------properties --------------------- *#
     @property
     def construct(self):
         return self._construct
 
-    # * ---------------------other constructors--------------------- *#
+    @property
+    def construct_type(self):
+        type(self._construct)
 
-    # @classmethod
-    # def I(cls, i: list[float | int]):
-    #     """create a shorcut an interval-type UN object"""
-    #     return cls(essence="interval", bounds=i)
+    @property
+    def unit(self):
+        """get the physical quantity of the uncertain number"""
+        return self._units
+
+    @unit.setter
+    def unit(self, value):
+        """set the physical quantity of the uncertain number"""
+        self._units = value
+        self._update_physical_quantity()
+
+    @property
+    def physical_quantity(self):
+        """get the physical quantity of the uncertain number"""
+        return self._physical_quantity
+
+    @physical_quantity.setter
+    def physical_quantity(self, value):
+        """set the physical quantity of the uncertain number"""
+        self._physical_quantity = value
+
+    # * --------------------- constructors--------------------- *#
 
     @classmethod
     def from_hedge(cls, hedged_language):
@@ -299,14 +356,13 @@ class UncertainNumber:
     @classmethod
     def fromConstruct(cls, construct):
         """create an Uncertain Number from a construct object"""
-        from ..pba.pbox_base import Pbox
-        from ..pba.interval import Interval as nInterval
-        from ..pba.ds import DempsterShafer
+        from ..pba.pbox_abc import Leaf, Staircase
+        from ..pba.dss import DempsterShafer
         from ..pba.distributions import Distribution
 
-        if isinstance(construct, Pbox):
+        if isinstance(construct, Leaf | Staircase):
             return cls.from_pbox(construct)
-        if isinstance(construct, nInterval):
+        if isinstance(construct, Interval):
             return cls.from_Interval(construct)
         if isinstance(construct, DempsterShafer):
             return cls.from_ds(construct)
@@ -340,16 +396,6 @@ class UncertainNumber:
                 _samples=D.sample_data,
             )
 
-    # @classmethod
-    # def from_constraints(cls, min, max, mean, median, variance, **kwargs):
-    #     """to construct a pbox given the properties of the distribution
-
-    #     returns:
-    #         - a pbox-type UN object
-    #     note:
-    #         - whether differentiate explicitly if free/parametric pbox
-    #     """
-    #     pass
     @classmethod
     def from_Interval(cls, u):
         return cls(essence="interval", bounds=u)
@@ -358,7 +404,9 @@ class UncertainNumber:
     def from_pbox(cls, p):
         """genenal from  pbox"""
         # passPboxParameters()
-        return cls(essence="pbox", p_flag=False, _construct=p)
+        return cls(
+            essence="pbox", p_flag=False, _construct=p, _skip_construct_init=True
+        )
 
     @classmethod
     def from_ds(cls, ds):
@@ -384,195 +432,53 @@ class UncertainNumber:
 
     # * ---------------------binary operations---------------------#
 
+    def bin_ops(self, other, ops):
+        from ..pba.pbox_abc import convert_pbox
+
+        # new_cons = ops(self._construct, other._construct)
+        if is_un(other) == 0:
+            new_cons = ops(self._construct, other)
+        elif is_un(other) == 1:
+            a = convert_pbox(self._construct)
+            b = convert_pbox(other._construct)
+            new_cons = ops(a, b)
+        elif is_un(other) == 2:
+            raise ValueError(
+                "construct object entered. propagation can be done but units won't be passed down"
+            )
+
+        new_un = UncertainNumber.fromConstruct(new_cons)
+        return pass_down_units(self, other, ops, new_un)
+
     def __add__(self, other):
         """add two uncertain numbers"""
-        if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(nInterval(other))
-        a, b = self._construct, other._construct
-        if isinstance(a, nInterval) and isinstance(b, nInterval):
-            r = a + b
-            return UncertainNumber.from_Interval(r)
-        else:
-            r = convert(a) + convert(b)
-        # TODO unit handling for arithmetic operations not implemented
-        # TODO due to the stupid multi Registry error
-        # newQ = self._Q + other._Q
-        return UncertainNumber.from_pbox(r)
+        return self.bin_ops(other, operator.add)
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
-
-        if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(nInterval(other))
-        a, b = self._construct, other._construct
-
-        if isinstance(a, nInterval) and isinstance(b, nInterval):
-            r = a - b
-            return UncertainNumber.from_Interval(r)
-        else:
-            r = convert(a) - convert(b)
-        return UncertainNumber.from_pbox(r)
+        return self.bin_ops(other, operator.sub)
 
     def __mul__(self, other):
         """multiply two uncertain numbers"""
-
-        if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(nInterval(other))
-        a, b = self._construct, other._construct
-        if isinstance(a, nInterval) and isinstance(b, nInterval):
-            r = a * b
-            return UncertainNumber.from_Interval(r)
-        else:
-            r = convert(a) * convert(b)
-        return UncertainNumber.from_pbox(r)
+        return self.bin_ops(other, operator.mul)
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
         """divide two uncertain numbers"""
-
-        if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(nInterval(other))
-
-        a, b = self._construct, other._construct
-        if isinstance(a, nInterval) and isinstance(b, nInterval):
-            r = a / b
-            return UncertainNumber.from_Interval(r)
-        else:
-            r = convert(a) / convert(b)
-        return UncertainNumber.from_pbox(r)
+        return self.bin_ops(other, operator.truediv)
 
     def __rtruediv__(self, other):
         return self.__truediv__(other)
 
     def __pow__(self, other):
         """power of two uncertain numbers"""
+        return self.bin_ops(other, operator.pow)
 
-        if isinstance(other, float | int | np.number):
-            other = UncertainNumber.from_Interval(nInterval(other))
-        a, b = self._construct, other._construct
-        if isinstance(a, nInterval) and isinstance(b, nInterval):
-            r = a**b
-            return UncertainNumber.from_Interval(r)
-        else:
-            r = convert(a) ** convert(b)
-        return UncertainNumber.from_pbox(r)
-
-    @classmethod
-    def _toIntervalBackend(cls, vars=None) -> np.array:
-        """transform any UN object to an `interval`
-        #! currently in use
-        # TODO think if use Marco's Interval Vector object
-
-        question:
-            - what is the `interval` representation: list, nd.array or Interval object?
-
-        returns:
-            - 2D np.array representation for all the interval-typed UNs
-        """
-        all_objs = {instance.symbol: instance for instance in cls.instances}
-
-        if vars is not None:
-            selected_objs = [all_objs[k] for k in all_objs if k in vars]
-        else:
-            selected_objs = [all_objs[k] for k in all_objs]
-
-        # keep the order of the vars ....
-        def as_interval(sth):
-            """a helper function to convert to intervals"""
-            if sth.essence == "interval":
-                return sth.bounds
-            else:
-                return sth._construct.rangel
-
-        _UNintervals_list = [as_interval(k) for k in selected_objs]
-        _UNintervals = np.array(_UNintervals_list).reshape(-1, 2)
-        return _UNintervals
-
-    @classmethod
-    def _IntervaltoCompBackend(cls, vars):
-        """convert the interval-tupe UNs instantiated to the computational backend
-
-        note:
-            - it will automatically convert all the UN objects in array-like to the computational backend
-            - essentially vars shall be all interval-typed UNs by now
-
-        returns:
-            - nd.array or Marco's Interval object
-
-        thoughts:
-            - if Marco's, then we'd use `intervalise` func to get all interval objects
-            and then to create another func to convert the interval objects to np.array to do endpoints method
-        """
-
-        # from augument list to intervals list
-        all_objs = {instance.symbol: instance for instance in cls.instances}
-        _intervals = [all_objs[k].bounds for k in all_objs if k in vars]
-        _UNintervals = np.array(_intervals).reshape(-1, 2)
-        return _UNintervals
-
-    # ---------------------Uncertainty propatation methods---------------------#
-
-    # @classmethod
-    # def vertexMethod(cls, vars, func):
-    #     """implementation of the endpoints method for the uncertain number
-
-    #     args:
-    #         vars: list
-    #             the selected list of the symbols of UN or a list of arrays
-    #         func: function
-    #             the function to be applied to the uncertain number
-    #     """
-
-    #     if isinstance(vars[0], str):
-    #         # _UNintervals = UncertainNumber._IntervaltoCompBackend(vars) # bp
-    #         _UNintervals = UncertainNumber._toIntervalBackend(vars)
-    #         df = vM(_UNintervals, func)
-    #         return df
-    #     elif isinstance(vars[0], int | float):
-    #         # create a list of UN objects using hedge interpretation
-    #         def get_hedgedUN(a_num_list):
-    #             return [cls.from_hedge(f"{i}") for i in a_num_list]
-
-    #         UN_list = get_hedgedUN(vars)
-    #         _UNintervals = [k.bounds for k in UN_list]
-    #         _UNintervals = np.array(_UNintervals).reshape(-1, 2)
-
-    #         df = vM(_UNintervals, func)
-
-    #         return df
-
-    # @classmethod
-    # def endpointsMethod(cls, vars, func, **kwargs):
-    #     """implementation of the endpoints method for the uncertain number using
-    #     Marco's implementation
-
-    #     note:
-    #         `vars` shall be consistent with the signature of `func`. This means that
-    #         only a selected list of uncertain numbers will be used according to the func provided.
-
-    #     args:
-    #         vars: list
-    #             the chosen list of uncertain numbers
-    #         func: function
-    #             the function to be applied to the uncertain number
-    #     """
-    #     # _UNintervals = UncertainNumber._IntervaltoCompBackend(vars) # bp
-    #     _UNintervals = UncertainNumber._toIntervalBackend(vars)
-    #     output_bounds_lo, output_bounds_hi, _, _ = endpoints_propagation_2n(
-    #         _UNintervals, func
-    #     )
-    #     return cls(
-    #         essence="interval",
-    #         bounds=(output_bounds_lo, output_bounds_hi),
-    #         **kwargs,
-    #     )
-    #     # return endpoints_propagation_2n(_UNintervals, func)
-
-    # ---------------------serialisation functions---------------------#
+    # * ---------------------serialisation functions---------------------*#
 
     def JSON_dump(self, filename="UN_data.json"):
         """the JSON serialisation of the UN object into the filesystem"""
@@ -581,91 +487,27 @@ class UncertainNumber:
         with open(filepath, "w") as fp:
             json.dump(self, fp, cls=UNEncoder, indent=4)
 
-    def random(self, size=None):
-        """Generate random samples from the distribution."""
-        match self.essence:
-            case "interval":
-                return ValueError(
-                    "Random sampling is only supported for distribution-type UncertainNumbers."
-                )
-            case "distribution":
-                which_dist = self.distribution_parameters[0]
-                return named_dists[which_dist].rvs(
-                    *self.distribution_parameters[1], size=size
-                )
-            case "pbox":
-                return ValueError(
-                    "Random sampling is only supported for distribution-type UncertainNumbers."
-                )
-
-    def ppf(self, q=None):
-        """ "Calculate the percent point function (inverse of CDF) at quantile q."""
-        match self.essence:
-            case "interval":
-                return ValueError(
-                    "PPF calculation is not supported for interval-type UncertainNumbers."
-                )
-            case "distribution":
-                which_dist = self.distribution_parameters[0]
-                # Define the distribution
-                dist = named_dists[which_dist](*self.distribution_parameters[1])
-                return dist.ppf(q)
-            case "pbox":
-                which_dist = self.distribution_parameters[0]
-                # Assuming the p-box parameters are stored as a list of intervals
-                param_specs = self.distribution_parameters[1]
-
-                # Helper function to create parameter lists from specs
-                def get_param_list(spec):
-                    if isinstance(spec, list):
-                        return spec  # Already a list
-                    else:
-                        # Create a list with repeated value
-                        return [spec, spec]
-
-                # Generate parameter lists
-                param_lists = [get_param_list(spec) for spec in param_specs]
-
-                # Generate all combinations of lower and upper bounds for each parameter
-                param_combinations = list(itertools.product(*param_lists))
-
-                # Calculate the PPF for each combination (handling array q)
-                if isinstance(q, np.ndarray):
-                    ppf_values = np.array(
-                        [
-                            [named_dists[which_dist](*params).ppf(qi) for qi in q]
-                            for params in param_combinations
-                        ]
-                    )
-                    return np.array(
-                        [np.min(ppf_values, axis=0), np.max(ppf_values, axis=0)]
-                    )
-
-                else:  # If q is a single value
-                    ppf_values = []
-                    for params in param_combinations:
-                        dist = named_dists[which_dist](*params)
-                        ppf_value = dist.ppf(q)
-
-                        if isinstance(ppf_value, np.ndarray):
-                            ppf_values.extend(ppf_value)
-                        else:
-                            ppf_values.append(ppf_value)
-
-                    return [min(ppf_values), max(ppf_values)]
-
 
 # * ---------------------shortcuts --------------------- *#
 def makeUNPbox(func):
 
-    from ..pba.pbox import _bound_pcdf
-    from ..pba.intervalOperators import wc_interval
+    from ..pba.pbox_parametric import _bound_pcdf
 
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-        i_args = [wc_interval(arg) for arg in args]
-        shape_value = func(*args, **kwargs)
-        p = _bound_pcdf(shape_value, *i_args)
+        family_str = func(*args, **kwargs)
+        p = _bound_pcdf(family_str, *args)
+        return UncertainNumber.fromConstruct(p)
+
+    return wrapper_decorator
+
+
+def constructUN(func):
+    """from a construct to create a UN"""
+
+    @functools.wraps(func)
+    def wrapper_decorator(*args, **kwargs):
+        p = func(*args, **kwargs)
         return UncertainNumber.fromConstruct(p)
 
     return wrapper_decorator
@@ -676,9 +518,213 @@ def I(i: str | list[float | int]) -> UncertainNumber:
     return UncertainNumber.fromConstruct(parse_bounds(i))
 
 
+# * ---------------------parse inputs for UN only  --------------------- *#
+
+
+def match_pbox(keyword, parameters):
+    """match the distribution keyword from the initialisation to create the underlying distribution object
+
+    args:
+        - keyword: (str) the distribution keyword
+        - parameters: (list) the parameters of the distribution
+    """
+    obj = named_pbox.get(keyword, "You're lucky as the distribution is not supported")
+    if isinstance(obj, str):
+        print(obj)  # print the error message
+    return obj(*parameters)
+
+
+class Parameterisation:
+    def __init__(self, parm_specification, essence: str):
+        self.parm_specification = ParamSpecification(parm_specification)
+        self.essence = essence
+
+    def yield_construct(self):
+        # to ouput Distribution or Pbox accordingly
+        if "pbox" in (self.essence, self.parm_specification._true_type):
+            pbox = match_pbox(
+                self.parm_specification.family, self.parm_specification.parameters
+            )
+            return pbox
+        else:
+            dist = Distribution(
+                dist_family=self.parm_specification.family,
+                dist_params=self.parm_specification.parameters,
+            )
+            return dist
+
+
+class ParamSpecification:
+    """only for the format of specification
+
+    note:
+        a recommended specification: ['gaussian', (12,4)] or ['gaussian', ([0,12],[1,4])]
+    """
+
+    def __init__(self, input):
+        if (
+            not isinstance(input, list)
+            or len(input) != 2
+            or not isinstance(input[0], str)
+            or not isinstance(input[1], tuple)
+        ):
+            raise ValueError("Input must be in the format ['str', (a, b)]")
+
+        self.family = input[0]
+        self.parameters = input[1]
+        self.un_type_check()
+
+    def supported_distribution_check(self):
+        """check if the family is implemented"""
+        pass
+
+    def un_type_check(self):
+        """infer the real type of UN given the specification"""
+
+        # distribution case
+        if all(isinstance(x, Number) for x in self.parameters):
+            self._true_type = "distribution"
+        else:
+            self._true_type = "pbox"
+
+
+# * ---------------------helper functions  --------------------- *#
+
+
+def pass_down_units(a, b, ops, t):
+    """pass down the unit of the uncertain number
+
+    args:
+        - a: the first uncertain number
+        - b: the second uncertain number
+        - ops: the operation to be performed
+        - t: the result uncertain number of the operation
+    """
+    if is_un(b) == 0:
+        try:
+            new_q = ops(a._physical_quantity, b * a._physical_quantity.units)
+        except Exception:
+            new_q = ops(a._physical_quantity, b)
+    elif is_un(b) == 1:
+        new_q = ops(a._physical_quantity, b._physical_quantity)
+
+    t.physical_quantity = new_q
+    return t
+
+
+def is_un(sth):
+
+    from pyuncertainnumber import Interval, Pbox, Distribution, DempsterShafer
+
+    if isinstance(sth, Number):
+        return 0
+    elif isinstance(sth, UncertainNumber):
+        return 1
+    elif isinstance(sth, Interval | Pbox | DempsterShafer | Distribution):
+        return 2
+
+
+# * ---------------------parametric shortcuts  --------------------- *#
+
+
 @makeUNPbox
 def norm(*args):
     return "norm"
+
+
+@makeUNPbox
+def gaussian(*args):
+    return "norm"
+
+
+@makeUNPbox
+def normal(*args):
+    return "norm"
+
+
+@makeUNPbox
+def alpha(*args):
+    return "alpha"
+
+
+@makeUNPbox
+def anglit(*args):
+    return "anglit"
+
+
+@makeUNPbox
+def argus(*args):
+    return "argus"
+
+
+@makeUNPbox
+def arcsine(*args):
+    return "arcsine"
+
+
+@makeUNPbox
+def beta(*args):
+    return "beta"
+
+
+@makeUNPbox
+def betaprime(*args):
+    return "betaprime"
+
+
+@makeUNPbox
+def bradford(*args):
+    return "bradford"
+
+
+@makeUNPbox
+def burr(*args):
+    return "burr"
+
+
+@makeUNPbox
+def burr12(*args):
+    return "burr12"
+
+
+@makeUNPbox
+def cauchy(*args):
+    return "cauchy"
+
+
+@makeUNPbox
+def chi(*args):
+    return "chi"
+
+
+@makeUNPbox
+def chi2(*args):
+    return "chi2"
+
+
+@makeUNPbox
+def cosine(*args):
+    return "cosine"
+
+
+@makeUNPbox
+def crystalball(*args):
+    return "crystalball"
+
+
+@makeUNPbox
+def dgamma(*args):
+    return "dgamma"
+
+
+@makeUNPbox
+def dweibull(*args):
+    return "dweibull"
+
+
+@makeUNPbox
+def erlang(*args):
+    return "erlang"
 
 
 @makeUNPbox
@@ -687,27 +733,428 @@ def expon(*args):
 
 
 @makeUNPbox
+def exponnorm(*args):
+    return "exponnorm"
+
+
+@makeUNPbox
+def exponweib(*args):
+    return "exponweib"
+
+
+@makeUNPbox
+def exponpow(*args):
+    return "exponpow"
+
+
+@makeUNPbox
+def f(*args):
+    return "f"
+
+
+@makeUNPbox
+def fatiguelife(*args):
+    return "fatiguelife"
+
+
+@makeUNPbox
+def fisk(*args):
+    return "fisk"
+
+
+@makeUNPbox
+def foldcauchy(*args):
+    return "foldcauchy"
+
+
+@makeUNPbox
+def genlogistic(*args):
+    return "genlogistic"
+
+
+@makeUNPbox
+def gennorm(*args):
+    return "gennorm"
+
+
+@makeUNPbox
+def genpareto(*args):
+    return "genpareto"
+
+
+@makeUNPbox
+def genexpon(*args):
+    return "genexpon"
+
+
+@makeUNPbox
+def genextreme(*args):
+    return "genextreme"
+
+
+@makeUNPbox
+def gausshyper(*args):
+    return "gausshyper"
+
+
+@makeUNPbox
 def gamma(*args):
     return "gamma"
 
 
-# * ---------------------parse inputs for UN only  --------------------- *#
+@makeUNPbox
+def gengamma(*args):
+    return "gengamma"
 
 
-def _parse_interverl_inputs(vars):
-    """Parse the input intervals
+@makeUNPbox
+def genhalflogistic(*args):
+    return "genhalflogistic"
 
-    note:
-        - Ioanna's funcs typically take 2D NumPy arra
-    """
 
-    if isinstance(vars, np.ndarray):
-        if vars.shape[1] != 2:
-            raise ValueError(
-                "vars must be a 2D array with two columns per row (lower and upper bounds)"
-            )
-        else:
-            return vars
+@makeUNPbox
+def geninvgauss(*args):
+    return "geninvgauss"
 
-    if isinstance(vars, list):
-        return UncertainNumber._toIntervalBackend(vars)
+
+@makeUNPbox
+def gompertz(*args):
+    return "gompertz"
+
+
+@makeUNPbox
+def gumbel_r(*args):
+    return "gumbel_r"
+
+
+@makeUNPbox
+def gumbel_l(*args):
+    return "gumbel_l"
+
+
+@makeUNPbox
+def halfcauchy(*args):
+    return "halfcauchy"
+
+
+@makeUNPbox
+def halflogistic(*args):
+    return "halflogistic"
+
+
+@makeUNPbox
+def halfnorm(*args):
+    return "halfnorm"
+
+
+@makeUNPbox
+def halfgennorm(*args):
+    return "halfgennorm"
+
+
+@makeUNPbox
+def hypsecant(*args):
+    return "hypsecant"
+
+
+@makeUNPbox
+def invgamma(*args):
+    return "invgamma"
+
+
+@makeUNPbox
+def invgauss(*args):
+    return "invgauss"
+
+
+@makeUNPbox
+def invweibull(*args):
+    return "invweibull"
+
+
+@makeUNPbox
+def irwinhall(*args):
+    return "irwinhall"
+
+
+@makeUNPbox
+def jf_skew_t(*args):
+    return "jf_skew_t"
+
+
+@makeUNPbox
+def johnsonsb(*args):
+    return "johnsonsb"
+
+
+@makeUNPbox
+def johnsonsu(*args):
+    return "johnsonsu"
+
+
+@makeUNPbox
+def kappa4(*args):
+    return "kappa4"
+
+
+@makeUNPbox
+def kappa3(*args):
+    return "kappa3"
+
+
+@makeUNPbox
+def ksone(*args):
+    return "ksone"
+
+
+@makeUNPbox
+def kstwo(*args):
+    return "kstwo"
+
+
+@makeUNPbox
+def kstwobign(*args):
+    return "kstwobign"
+
+
+@makeUNPbox
+def laplace(*args):
+
+    return "laplace"
+
+
+@makeUNPbox
+def laplace_asymmetric(*args):
+    return "laplace_asymmetric"
+
+
+@makeUNPbox
+def levy(*args):
+    return "levy"
+
+
+@makeUNPbox
+def levy_l(*args):
+    return "levy_l"
+
+
+@makeUNPbox
+def levy_stable(*args):
+    return "levy_stable"
+
+
+@makeUNPbox
+def logistic(*args):
+    return "logistic"
+
+
+@makeUNPbox
+def loggamma(*args):
+    return "loggamma"
+
+
+@makeUNPbox
+def loglaplace(*args):
+    return "loglaplace"
+
+
+@makeUNPbox
+def loguniform(*args):
+    return "loguniform"
+
+
+@makeUNPbox
+def lomax(*args):
+    return "lomax"
+
+
+@makeUNPbox
+def maxwell(*args):
+    return "maxwell"
+
+
+@makeUNPbox
+def mielke(*args):
+    return "mielke"
+
+
+@makeUNPbox
+def moyal(*args):
+    return "moyal"
+
+
+@makeUNPbox
+def nakagami(*args):
+    return "nakagami"
+
+
+@makeUNPbox
+def ncx2(*args):
+    return "ncx2"
+
+
+@makeUNPbox
+def ncf(*args):
+    return "ncf"
+
+
+@makeUNPbox
+def nct(*args):
+    return "nct"
+
+
+@makeUNPbox
+def norminvgauss(*args):
+    return "norminvgauss"
+
+
+@makeUNPbox
+def pareto(*args):
+    return "pareto"
+
+
+@makeUNPbox
+def pearson3(*args):
+    return "pearson3"
+
+
+@makeUNPbox
+def powerlaw(*args):
+    return "powerlaw"
+
+
+@makeUNPbox
+def powerlognorm(*args):
+    return "powerlognorm"
+
+
+@makeUNPbox
+def powernorm(*args):
+    return "powernorm"
+
+
+@makeUNPbox
+def rdist(*args):
+    return "rdist"
+
+
+@makeUNPbox
+def rayleigh(*args):
+    return "rayleigh"
+
+
+@makeUNPbox
+def rel_breitwigner(*args):
+    return "rel_breitwigner"
+
+
+@makeUNPbox
+def rice(*args):
+    return "rice"
+
+
+@makeUNPbox
+def recipinvgauss(*args):
+    return "recipinvgauss"
+
+
+@makeUNPbox
+def semicircular(*args):
+    return "semicircular"
+
+
+@makeUNPbox
+def skewcauchy(*args):
+    return "skewcauchy"
+
+
+@makeUNPbox
+def skewnorm(*args):
+    return "skewnorm"
+
+
+@makeUNPbox
+def studentized_range(*args):
+    return "studentized_range"
+
+
+@makeUNPbox
+def t(*args):
+    return "t"
+
+
+@makeUNPbox
+def trapezoid(*args):
+    return "trapezoid"
+
+
+@makeUNPbox
+def triang(*args):
+    return "triang"
+
+
+@makeUNPbox
+def truncexpon(*args):
+    return "truncexpon"
+
+
+@makeUNPbox
+def truncnorm(*args):
+    return "truncnorm"
+
+
+@makeUNPbox
+def truncpareto(*args):
+    return "truncpareto"
+
+
+@makeUNPbox
+def truncweibull_min(*args):
+    return "truncweibull_min"
+
+
+@makeUNPbox
+def tukeylambda(*args):
+    return "tukeylambda"
+
+
+def uniform_sps(*args):
+    return "uniform"
+
+
+@makeUNPbox
+def vonmises(*args):
+    return "vonmises"
+
+
+@makeUNPbox
+def vonmises_line(*args):
+    return "vonmises_line"
+
+
+@makeUNPbox
+def wald(*args):
+    return "wald"
+
+
+@makeUNPbox
+def weibull_min(*args):
+    return "weibull_min"
+
+
+@makeUNPbox
+def weibull_max(*args):
+    return "weibull_max"
+
+
+@makeUNPbox
+def wrapcauchy(*args):
+    return "wrapcauchy"
+
+
+# *---------------------some special ones ---------------------*#
+
+from ..pba.pbox_parametric import lognormal, uniform
+
+uniform = constructUN(uniform)
+lognormal = constructUN(lognormal)

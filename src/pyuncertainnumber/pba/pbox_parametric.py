@@ -1,16 +1,44 @@
+from __future__ import annotations
 import functools
-from .interval import Interval as nInterval
-from .pbox_base import Pbox
+
+from .pbox_abc import Pbox, Leaf
 import scipy.stats as sps
 import numpy as np
 import itertools
 from .params import Params
 from typing import *
 from warnings import *
-from .intervalOperators import wc_interval
+from .intervals.intervalOperators import wc_scalar_interval
+
+if TYPE_CHECKING:
+    from .pbox_abc import Pbox
 
 
 """ parametric pboxes"""
+
+
+def makePbox(func) -> Pbox:
+    @functools.wraps(func)
+    def wrapper_decorator(*args, **kwargs):
+        family_str = func(*args, **kwargs)
+        return _bound_pcdf(family_str, *args)
+
+    return wrapper_decorator
+
+
+# top-level
+def _bound_pcdf(dist_family, *args, **kwargs):
+    """bound the parametric CDF
+
+    note:
+        - only support fully bounded parameters
+    """
+    from .pbox_abc import Leaf
+
+    Left, Right, mean, var = _get_bounds(dist_family, *args, **kwargs)
+    return Leaf(
+        left=Left, right=Right, shape=dist_family, dist_params=args, mean=mean, var=var
+    )
 
 
 def _get_bounds(dist_family, *args, steps=Params.steps):
@@ -18,16 +46,21 @@ def _get_bounds(dist_family, *args, steps=Params.steps):
 
     args:
         - dist_family: (str) the name of the distribution
+        *args : several parameter (interval or list)
     """
 
     from .distributions import named_dists
+    from .intervals.number import Interval as I
 
     # TODO logically speaking, it can be (0,1) ergo support will be [-inf, inf] see it works with other part codes
     # define percentile range thus getting the support
+
+    i_args = [wc_scalar_interval(b) for b in args]
+
     p = Params.p_values
 
     # get bound arguments
-    new_args = itertools.product(*args)
+    new_args = itertools.product(*[i.to_numpy() for i in i_args])
 
     bounds = []
 
@@ -52,43 +85,13 @@ def _get_bounds(dist_family, *args, steps=Params.steps):
     Left = np.array([min([b[i] for b in bounds]) for i in range(steps)])
     Right = np.array([max([b[i] for b in bounds]) for i in range(steps)])
 
-    var = nInterval(np.float64(var_lo), np.float64(var_hi))
-    mean = nInterval(np.float64(mean_lo), np.float64(mean_hi))
+    var = I(var_lo, var_hi)
+    mean = I(mean_lo, mean_hi)
 
     return Left, Right, mean, var
 
 
-def _bound_pcdf(dist_family, *args, steps=Params.steps):
-    """bound the parametric CDF
-
-    note:
-        - only support fully bounded parameters
-    """
-
-    Left, Right, mean, var = _get_bounds(dist_family, *args)
-
-    return Pbox(
-        Left,
-        Right,
-        shape=dist_family,
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
-
-
-def makePbox(func):
-    @functools.wraps(func)
-    def wrapper_decorator(*args, **kwargs):
-        i_args = [wc_interval(arg) for arg in args]
-        shape_value = func(*args, **kwargs)
-        return _bound_pcdf(shape_value, *i_args)
-
-    return wrapper_decorator
-
-
-# * ---------------------supported distributional objects for pboxes ---------------------#
+# * ---------------------supported distributional pboxes ---------------------#
 
 
 @makePbox
@@ -224,10 +227,10 @@ def foldcauchy(*args):
 def foldnorm(mu, s, steps=Params.steps):
 
     x = np.linspace(0.0001, 0.9999, steps)
-    if mu.__class__.__name__ != "nInterval":
-        mu = nInterval(mu)
-    if s.__class__.__name__ != "nInterval":
-        s = nInterval(s)
+    if mu.__class__.__name__ != "wc_scalar_interval":
+        mu = wc_scalar_interval(mu)
+    if s.__class__.__name__ != "wc_scalar_interval":
+        s = wc_scalar_interval(s)
 
     new_args = [
         [mu.lo() / s.lo(), 0, s.lo()],
@@ -260,8 +263,8 @@ def foldnorm(mu, s, steps=Params.steps):
     Left = [min([b[i] for b in bounds]) for i in range(steps)]
     Right = [max([b[i] for b in bounds]) for i in range(steps)]
 
-    var = nInterval(np.float64(var_lo), np.float64(var_hi))
-    mean = nInterval(np.float64(mean_lo), np.float64(mean_hi))
+    var = wc_scalar_interval(np.float64(var_lo), np.float64(var_hi))
+    mean = wc_scalar_interval(np.float64(mean_lo), np.float64(mean_hi))
 
     Left = np.array(Left)
     Right = np.array(Right)
@@ -665,43 +668,16 @@ def wrapcauchy(*args):
 
 # *---------------------some special ones ---------------------*#
 
-# * not sure why it is still here.
-# def beta(*args, steps=Params.steps):
-#     """
-#     Beta distribution
-#     """
-#     args = list(args)
-#     for i in range(0, len(args)):
-#         if args[i].__class__.__name__ != "nInterval":
-#             args[i] = nInterval(args[i])
-#         if args[i].left == 0:
-#             args[i].left = 1e-5
-#         if args[i].right == 0:
-#             args[i].right = 1e-5
 
-#     Left, Right, mean, var = _get_bounds("beta", steps, *args)
-
-#     return Pbox(
-#         Left,
-#         Right,
-#         steps=steps,
-#         shape="beta",
-#         mean_left=mean.left,
-#         mean_right=mean.right,
-#         var_left=var.left,
-#         var_right=var.right,
-#     )
-
-
-def lognormal(
+def lognormal_weird(
     mean,
     var,
     steps=Params.steps,
 ):
-    """
-    Creates a p-box for the lognormal distribution
+    """p-box for the lognormal distribution
 
     *Note: the parameters used are the mean and variance of the lognormal distribution
+
     not the mean and variance of the underlying normal*
     See:
     `[1]<https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters>`
@@ -716,25 +692,17 @@ def lognormal(
         variance of the lognormal distribution
 
     Returns
-    ----------
+    -------
     Pbox
 
     """
-    if steps > 1000:
-        x = np.linspace(1 / steps, 1 - 1 / steps, steps)
-    else:
-        x = np.linspace(0.001, 0.999, Params.steps)
 
-    if mean.__class__.__name__ != "nInterval":
-        mean = nInterval(mean, mean)
-    if var.__class__.__name__ != "nInterval":
-        var = nInterval(var, var)
+    x = np.linspace(0.001, 0.999, Params.steps)
+    mean, var = wc_scalar_interval(mean), wc_scalar_interval(var)
 
     def __lognorm(mean, var):
-
         sigma = np.sqrt(np.log1p(var / mean**2))
         mu = np.log(mean) - 0.5 * sigma * sigma
-
         return sps.lognorm(sigma, loc=0, scale=np.exp(mu))
 
     bound0 = __lognorm(mean.left, var.left).ppf(x)
@@ -747,57 +715,48 @@ def lognormal(
 
     Left = np.array(Left)
     Right = np.array(Right)
-    return Pbox(Left, Right, steps=steps, shape="lognormal")
+    return Leaf(left=Left, right=Right, steps=steps, shape="lognormal")
 
 
-# def frechet_r(*args, steps = Params.steps):
-#     args = list(args)
-#     for i in range(0,len(args)):
-#         if args[i].__class__.__name__ != 'nInterval':
-#             args[i] = nInterval(args[i])
+# @makePbox
+# def lognormal(*args):
+#     return "lognormal"
 
-#     Left, Right, mean, var = _get_bounds('frechet_r',steps,*args)
 
-#     return Pbox(
-#           Left,
-#           Right,
-#           steps      = steps,
-#           shape      = 'frechet_r',
-#           mean_left  = mean.left,
-#           mean_right = mean.right,
-#           var_left   = var.left,
-#           var_right  = var.right
-#           )
+def uniform(a, b, steps=Params.steps):
+    """special case of Uniform distribution as
+    Scipy has an unbelivably strange parameterisation than common sense
 
-# def frechet_l(*args, steps = Params.steps):
-#     args = list(args)
-#     for i in range(0,len(args)):
-#         if args[i].__class__.__name__ != 'nInterval':
-#             args[i] = nInterval(args[i])
+    args:
+        - a: (float) lower endpoint
+        - b: (float) upper endpoints
+    """
 
-#     Left, Right, mean, var = _get_bounds('frechet_l',steps,*args)
+    # loc, scale = uniform_reparameterisation(a,  b)
+    # return uniform_sps(loc, scale)
 
-#     return Pbox(
-#           Left,
-#           Right,
-#           steps      = steps,
-#           shape      = 'frechet_l',
-#           mean_left  = mean.left,
-#           mean_right = mean.right,
-#           var_left   = var.left,
-#           var_right  = var.right
-#           )
+    a, b = [wc_scalar_interval(arg) for arg in [a, b]]
+
+    Left = np.linspace(a.left, b.left, steps)
+    Right = np.linspace(a.right, b.right, steps)
+
+    return Leaf(
+        left=Left,
+        right=Right,
+        steps=steps,
+        shape="uniform",
+    )
 
 
 def trapz(a, b, c, d, steps=Params.steps):
-    if a.__class__.__name__ != "nInterval":
-        a = nInterval(a)
-    if b.__class__.__name__ != "nInterval":
-        b = nInterval(b)
-    if c.__class__.__name__ != "nInterval":
-        c = nInterval(c)
-    if d.__class__.__name__ != "nInterval":
-        d = nInterval(d)
+    if a.__class__.__name__ != "wc_scalar_interval":
+        a = wc_scalar_interval(a)
+    if b.__class__.__name__ != "wc_scalar_interval":
+        b = wc_scalar_interval(b)
+    if c.__class__.__name__ != "wc_scalar_interval":
+        c = wc_scalar_interval(c)
+    if d.__class__.__name__ != "wc_scalar_interval":
+        d = wc_scalar_interval(d)
 
     x = np.linspace(0.0001, 0.9999, steps)
     left = sps.trapz.ppf(
@@ -812,14 +771,14 @@ def trapz(a, b, c, d, steps=Params.steps):
 
 def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
-    if left.__class__.__name__ != "nInterval":
-        left = nInterval(left)
-    if right.__class__.__name__ != "nInterval":
-        right = nInterval(right)
-    if mean.__class__.__name__ != "nInterval":
-        mean = nInterval(mean)
-    if stddev.__class__.__name__ != "nInterval":
-        stddev = nInterval(stddev)
+    if left.__class__.__name__ != "wc_scalar_interval":
+        left = wc_scalar_interval(left)
+    if right.__class__.__name__ != "wc_scalar_interval":
+        right = wc_scalar_interval(right)
+    if mean.__class__.__name__ != "wc_scalar_interval":
+        mean = wc_scalar_interval(mean)
+    if stddev.__class__.__name__ != "wc_scalar_interval":
+        stddev = wc_scalar_interval(stddev)
 
     a, b = (left - mean) / stddev, (right - mean) / stddev
 
@@ -837,31 +796,6 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
     )
 
 
-def uniform(a, b, steps=Params.steps):
-    """special case of Uniform distribution as
-    Scipy has an unbelivably strange parameterisation than common sense
-
-    args:
-        - a: (float) lower endpoint
-        - b: (float) upper endpoints
-    """
-
-    # loc, scale = uniform_reparameterisation(a,  b)
-    # return uniform_sps(loc, scale)
-
-    a, b = [nInterval(arg) for arg in [a, b] if arg is not isinstance(arg, nInterval)]
-
-    Left = np.linspace(a.left, b.left, steps)
-    Right = np.linspace(a.right, b.right, steps)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="uniform",
-    )
-
-
 def weibull(*args, steps=Params.steps):
 
     wm = weibull_max(*args)
@@ -874,7 +808,9 @@ def weibull(*args, steps=Params.steps):
 def KM(k, m, steps=Params.steps):
     with catch_warnings():
         simplefilter("ignore")
-        return beta(nInterval(k, k + 1), nInterval(m, m + 1), steps=steps)
+        return beta(
+            wc_scalar_interval(k, k + 1), wc_scalar_interval(m, m + 1), steps=steps
+        )
 
 
 def KN(k, n, steps=Params.steps):
@@ -986,18 +922,8 @@ def zipfian(*args):
 
 # *---------------------aliases---------------------*#
 normal = norm
-N = normal
 gaussian = norm
-U = uniform
-lognorm = lognormal
-
-
-# def betapert(minimum, maximum, mode):
-#     mu = (minimum + maximum + 4*mode)/6
-#     alpha1 = (mu - minimum)*(2*mode - minimum - maximum)/((mode - mu)*(maximum - minimum))
-#     alpha2 = alpha1*(maximum - mu)/(mu - minimum)
-#     return minimum + (maximum - minimum) * beta(alpha1, alpha2)
-
+lognormal = lognormal_weird
 
 # *---------------------named pboxes for UN ---------------------*#
 named_pbox = {
@@ -1064,7 +990,7 @@ named_pbox = {
     "logistic": logistic,
     "loggamma": loggamma,
     "loglaplace": loglaplace,
-    "lognormal": lognormal,
+    "lognormal": lognormal_weird,
     "loguniform": loguniform,
     "lomax": lomax,
     "maxwell": maxwell,

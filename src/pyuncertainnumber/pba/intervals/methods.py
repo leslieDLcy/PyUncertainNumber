@@ -632,12 +632,14 @@ def tolist(x: Interval):
 #####################################################################################
 
 
-def subintervalise(x_: Interval, n: Union[int, tuple] = 0):
+def subintervalise(x_: Interval, n: Union[int, tuple] = 0) -> Interval:
+    """
+    return:
+        - matrix Interval
+    """
     x = intervalise(x_)
     d = len(x.shape)  # dimension of the array
-    if n == 0:
-        return x
-    elif n == 1:
+    if n == 0 | n == 1:
         return x  # should return a subtiling (sized interval)
     if x.scalar:  # or x.scalar == True
         xx = linspace(x.lo, x.hi, num=n + 1)

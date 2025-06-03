@@ -1,32 +1,8 @@
 """
 :#######################################################
-: Intervals Library v02 for Python
-: Developed by Marco de Angelis
+: Intervals Library originally created by Marco de Angelis
+: Continuesly developed and refactored by Leslie Yu Chen
 :#######################################################
-
-Place the folder `intervals` that contains this file in your working directory.
-Then place the following line at the top of your code.
-
-`import intervals as ia`
-
-Once the library has been imported you can create an interval
-
-`a = ia.Interval(1,5)`
-`b = ia.Interval(-2,-1)
-
-and perform mathematical operations between them
-
-`a + b`
-`a - b`
-`a * b`
-`a / b`
-
-
-----------------------------------------------------
-:Created Tue Feb 08 2022
-:github.com/marcodeangelis
-:MIT License
-----------------------------------------------------
 """
 
 # Sequence: # Must have __len__() and __getitem__(). Ex.: Tuple, List, Range
@@ -39,7 +15,7 @@ from typing import Sequence, Sized, Iterable, Optional, Any, Tuple, Union
 import numpy as np
 import numpy
 from numpy import ndarray, asarray, stack, transpose, ascontiguousarray, zeros
-
+import matplotlib.pyplot as plt
 
 # float32=numpy.float32
 
@@ -101,16 +77,7 @@ def show(x: Interval) -> str:
 
 
 class Interval:
-    """
-    --------------------------
-    Created Feb 2022
-    github.com/marcodeangelis
-    MIT License
-    --------------------------
-
-    Interval is the main class.
-
-    """
+    """Interval is the main class"""
 
     def __repr__(self):  # return
         return show(self)
@@ -155,13 +122,57 @@ class Interval:
     def __getitem__(self, i: Union[int, slice]):  # make class indexable
         return Interval(lo=self.__lo[i], hi=self.__hi[i])
 
-    # -------------- METHODS -------------- #
+    # * -------------- METHODS -------------- *#
     def to_numpy(self) -> np.ndarray:
         """transform interval objects to numpy arrays"""
         if self.scalar:
-            return [self.lo.item(), self.hi.item()]
+            return np.array([self.lo.item(), self.hi.item()])
         else:
-            return list(zip(self.lo.item(), self.hi.item()))
+            return np.asarray((self.lo, self.hi)).T
+
+    def to_pbox(self):
+        from ..pbox_abc import Staircase
+        from ..params import Params
+
+        return Staircase(
+            left=np.repeat(self.lo, Params.steps),
+            right=np.repeat(self.hi, Params.steps),
+            mean=self,
+            var=Interval(0, (self.hi - self.lo) * (self.hi - self.lo) / 4),
+        )
+
+    def lhs_sample(self, n) -> np.ndarray:
+        """LHS sampling within the interval
+
+        args:
+            n: number of samples
+        """
+        from scipy.stats import qmc
+
+        sampler = qmc.LatinHypercube(d=self.__len__())
+        sample = sampler.random(n=n)
+        sample = qmc.scale(sample, self.lo, self.hi)
+        return sample
+
+    def endpoints_lhs_sample(self, n) -> np.ndarray:
+        """LHS sampling within the interval plus the endpoints
+
+        args:
+            n: number of samples
+        """
+        lhs_sample = self.lhs_sample(n)
+        endpoints = np.array([self.lo, self.hi])
+        return np.vstack((endpoints, lhs_sample))
+
+    def plot(self, ax=None, **kwargs):
+        p = self.to_pbox()
+        if ax is None:
+            fig, ax = plt.subplots()
+        p.plot(ax=ax, **kwargs)
+
+    def display(self):
+        self.plot()
+        plt.show()
 
     @property
     def lo(self) -> Union[ndarray, float]:
@@ -175,6 +186,14 @@ class Interval:
 
     # if len(self.shape)==0: return self.__hi
     # return self.__hi # return transpose(transpose(self.__val)[1])
+
+    @property
+    def left(self):
+        return self.lo
+
+    @property
+    def right(self):
+        return self.hi
 
     @property
     def width(self):
@@ -210,7 +229,15 @@ class Interval:
     def shape(self):
         return self.__shape
 
-    # -------------- ARITHMETIC -------------- #
+    @property
+    def ndim(self):
+        return len(self.__shape)
+
+    @property
+    def naked_value(self):
+        return self.mid
+
+    # * -------------- ARITHMETIC -------------- *#
     # unary operators #
     def __neg__(self):
         return Interval(-self.hi, -self.lo)
@@ -345,7 +372,7 @@ class Interval:
                 lo = numpy.min([a, b], axis=0)
                 hi = numpy.max([a, b], axis=0)
         else:
-            raise NotImplemented
+            raise NotImplementedError("Not implemented yet")
         return Interval(lo, hi)
 
     def __lt__(self, other):
@@ -377,6 +404,42 @@ class Interval:
 
     def __ne__(self, other):
         return not (self == other)
+
+    @classmethod
+    def from_meanform(cls, x, half_width):
+        return cls(x - half_width, x + half_width)
+
+
+# * -------------- lightweight Interval
+
+import numpy as np
+
+
+class LightweightInterval(Interval):
+    def __init__(
+        self,
+        lo: Union[float, np.ndarray],
+        hi: Optional[Union[float, np.ndarray]] = None,
+    ) -> None:
+        # Directly assign values without checks
+        self.__lo = lo
+        self.__hi = hi if hi is not None else lo
+
+        # Store the shape (this is just lo.shape, because they have the same shape)
+        self.__shape = ()
+
+    def __repr__(self):
+        return f"[{self.__lo},{self.__hi}]"
+
+    @property
+    def lo(self) -> Union[ndarray, float]:
+        return self.__lo
+
+    # if len(self.shape)==0: return self.__lo
+    # return self.__lo # return transpose(transpose(self.__val)[0]) # from shape (3,7,2) to (2,7,3) to (3,7)
+    @property
+    def hi(self) -> Union[ndarray, float]:
+        return self.__hi
 
 
 # Properties or maybe attributes of the interval class. These apply to all interval-like objects.
@@ -457,8 +520,8 @@ def mid(x: Interval) -> Union[float, ndarray]:
 
 
 def mig(x):
-    return numpy_max(numpy_abs(x.lo), numpy_abs(x.hi))  # mignitude
+    return np.max(np.abs(x.lo), np.abs(x.hi))  # mignitude
 
 
 def mag(x):
-    return numpy_min(numpy_abs(x.lo), numpy_abs(x.hi))  # magnitude
+    return np.min(np.abs(x.lo), np.abs(x.hi))  # magnitude

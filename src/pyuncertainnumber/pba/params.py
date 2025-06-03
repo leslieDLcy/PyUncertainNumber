@@ -1,4 +1,4 @@
-""" Hyperparameters for the pba """
+"""Hyperparameters for the pba"""
 
 from dataclasses import dataclass
 import numpy as np
@@ -180,11 +180,12 @@ class Params:
 
     steps = 200
     many = 2000
-    # the percentiles
-    p_values = np.linspace(0.0001, 0.9999, steps)
 
-    p_lboundary = 0.0001
-    p_hboundary = 0.9999
+    p_lboundary = 0.001
+    p_hboundary = 0.999
+
+    # the percentiles
+    p_values = np.linspace(p_lboundary, p_hboundary, steps)
 
     # by default
     scott_hedged_interpretation = {}
@@ -283,9 +284,3 @@ class Named:
     k = 22
     m = 11
     n = k + m
-
-    # @property
-    # # template for property
-    # def sth(self):
-    #     """ template for property"""
-    #     return int(round(self.patch_window_seconds / self.stft_hop_seconds))

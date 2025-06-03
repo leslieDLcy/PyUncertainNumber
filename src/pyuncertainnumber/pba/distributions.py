@@ -1,15 +1,18 @@
-"""distribution constructs """
+"""distribution constructs"""
 
 import numpy as np
 import scipy.stats as sps
-import matplotlib as mpl
+import matplotlib.pyplot as plt
 from warnings import *
 from dataclasses import dataclass
 from typing import *
 from ..characterisation.utils import pl_pcdf, pl_ecdf
 import scipy
 from .params import Params
-from .pbox import named_pbox
+from .pbox_parametric import named_pbox
+import statsmodels.distributions.copula as Copula
+from .dependency import Dependency
+from statsmodels.distributions.copula.api import CopulaDistribution
 
 
 @dataclass
@@ -66,6 +69,10 @@ class Distribution:
                 "Sampling not supported for sample-approximated distributions"
             )
 
+    def alpha_cut(self, alpha):
+        """alpha cut interface"""
+        return self._dist.ppf(alpha)
+
     def make_naked_value(self):
         """one value representation of the distribution
         note:
@@ -76,11 +83,15 @@ class Distribution:
         else:
             self._naked_value = np.mean(self.sample_data)
 
-    def display(self, **kwargs):
+    def plot(self, **kwargs):
         """display the distribution"""
         if self.sample_data is not None:
             return pl_ecdf(self.sample_data, **kwargs)
         pl_pcdf(self._dist, **kwargs)
+
+    def display(self, **kwargs):
+        self.plot(**kwargs)
+        plt.show()
 
     def _get_hint(self):
         pass
@@ -91,7 +102,15 @@ class Distribution:
 
     @property
     def naked_value(self):
-        return self._naked_value
+        return np.round(self._naked_value, 3)
+
+    @property
+    def low(self):
+        return self._dist.ppf(Params.p_lboundary)
+
+    @property
+    def hi(self):
+        return self._dist.ppf(Params.p_hboundary)
 
     @property
     def hint(self):
@@ -117,284 +136,378 @@ class Distribution:
             # pass
             return named_pbox.get(self.dist_family)(*self.dist_params)
 
+    def __neg__(self):
+        return -self.to_pbox()
 
-# * ------------------ sample-approximated dist representation  ------------------ *#
+    def __add__(self, other):
+        p = self.to_pbox()
+        return p.add(other, dependency="f")
 
+    def __radd__(self, other):
+        return self.add(other, dependency="f")
 
-def bernoulli(p):
-    return np.random.uniform(size=Params.many) < p
+    def __sub__(self, other):
+        p = self.to_pbox()
+        return p.sub(other, dependency="f")
 
+    def __rsub__(self, other):
+        self = -self
+        return self.add(other, dependency="f")
 
-def beta(a, b):
-    # if (a==0) and (b==0) : return(env(np.repeat(0.0, Params.many), np.repeat(1.0, Params.many)))  # this is [0,1]
-    if (a == 0) and (b == 0):
-        return bernoulli(0.5)  # or should it be [0,1]?
-    if a == 0:
-        return np.repeat(0.0, Params.many)
-    if b == 0:
-        return np.repeat(1.0, Params.many)
-    return scipy.stats.beta.rvs(a, b, size=Params.many)
+    def __mul__(self, other):
+        p = self.to_pbox()
+        return p.mul(other, dependency="f")
 
+    def __rmul__(self, other):
+        return self.mul(other, dependency="f")
 
-def betabinomial2(size, v, w):
-    return scipy.stats.binom.rvs(size, beta(v, w), size=Params.many)
+    def __truediv__(self, other):
+        p = self.to_pbox()
+        return p.div(other, dependency="f")
 
+    def __rtruediv__(self, other):
+        p = self.to_pbox()
+        try:
+            return other * p.recip()
+        except:
+            return NotImplemented
 
-def betabinomial(size, v, w):
-    return scipy.stats.betabinom.rvs(size, v, w, size=Params.many)
+    def __pow__(self, other):
+        p = self.to_pbox()
+        return p.pow(other, dependency="f")
 
-
-def binomial(size, p):
-    return scipy.stats.binom.rvs(size, p, size=Params.many)
-
-
-def chisquared(v):
-    return scipy.stats.chi2.rvs(v, size=Params.many)
-
-
-def delta(a):
-    return np.repeat(a, Params.many)
-
-
-def exponential(rate=1, mean=None):
-    if mean is None:
-        mean = 1 / rate
-    # rate = 1/mean
-    return scipy.stats.expon.rvs(scale=mean, size=Params.many)
-
-
-def exponential1(mean=1):
-    return scipy.stats.expon.rvs(scale=mean, size=Params.many)
+    def __rpow__(self, other):
+        if not hasattr(other, "__iter__"):
+            other = np.array((other))
+        p = self.to_pbox()
+        return p.pow(other, dependency="f")
 
 
-def F(df1, df2):
-    return scipy.stats.f.rvs(df1, df2, size=Params.many)
+class JointDistribution:
 
-
-def gamma(shape, rate=1, scale=None):
-    if scale is None:
-        scale = 1 / rate
-    rate = 1 / scale
-    return scipy.stats.gamma.rvs(a=shape, scale=1 / rate, size=Params.many)
-
-
-def gammaexponential(shape, rate=1, scale=None):
-    if scale is None:
-        scale = 1 / rate
-    rate = 1 / scale
-    # expon(scale=gamma(a=shape, scale=1/rate))
-    return scipy.stats.expon.rvs(
-        scale=1 / scipy.stats.gamma.rvs(a=shape, scale=scale, size=Params.many),
-        size=Params.many,
-    )
-
-
-def geometric(m):
-    return scipy.stats.geom.rvs(m, size=Params.many)
-
-
-def gumbel(loc, scale):
-    return scipy.stats.gumbel_r.rvs(loc, scale, size=Params.many)
-
-
-def inversechisquared(v):
-    return 1 / chisquared(v)
-
-
-def inversegamma(shape, scale=None, rate=None):
-    if scale is None and not rate is None:
-        scale = 1 / rate
-    return scipy.stats.invgamma.rvs(a=shape, scale=scale, size=Params.many)
-
-
-def laplace(a, b):
-    return scipy.stats.laplace.rvs(a, b, size=Params.many)
-
-
-def logistic(loc, scale):
-    return scipy.stats.logistic.rvs(loc, scale, size=Params.many)
-
-
-def lognormal(m, s):
-    m2 = m**2
-    s2 = s**2
-    mlog = np.log(m2 / np.sqrt(m2 + s2))
-    slog = np.sqrt(np.log((m2 + s2) / m2))
-    return scipy.stats.lognorm.rvs(s=slog, scale=np.exp(mlog), size=Params.many)
-
-
-def lognormal2(mlog, slog):
-    return scipy.stats.lognorm.rvs(s=slog, scale=np.exp(mlog), size=Params.many)
-
-
-# lognormal = function(mean=NULL, std=NULL, meanlog=NULL, stdlog=NULL, median=NULL, cv=NULL, name='', ...){
-#  if (is.null(meanlog) & !is.null(median)) meanlog = log(median)
-#  if (is.null(stdlog) & !is.null(cv)) stdlog = sqrt(log(cv^2 + 1))
-#  # lognormal(a, b) ~ lognormal2(log(a^2/sqrt(a^2+b^2)),sqrt(log((a^2+b^2)/a^2)))
-#  if (is.null(meanlog) & (!is.null(mean)) & (!is.null(std))) meanlog = log(mean^2/sqrt(mean^2+std^2))
-#  if (is.null(stdlog) & !is.null(mean) & !is.null(std)) stdlog = sqrt(log((mean^2+std^2)/mean^2))
-#  if (!is.null(meanlog) & !is.null(stdlog)) Slognormal0(meanlog,stdlog,name) else stop('not enough information to specify the lognormal distribution')
-#  }
-
-
-def loguniform_solve(m, v):
-    def loguniform_f(a, m, v):
-        return a * m * np.exp(2 * (v / (m**2) + 1)) + np.exp(2 * a / m) * (
-            a * m - 2 * ((m**2) + v)
-        )
-
-    def LUgrid(aa, w):
-        return left(aa) + (right(aa) - left(aa)) * w / 100.0
-
-    aa = (m - np.sqrt(4 * v), m)  # interval
-    a = m
-    ss = loguniform_f(a, m, v)
-    for j in range(4):
-        for i in range(101):  # 0:100
-            a = LUgrid(aa, i)
-            s = abs(loguniform_f(a, m, v))
-            if s < ss:
-                ss = s
-                si = i
-        a = LUgrid(aa, si)
-        aa = (LUgrid(aa, si - 1), LUgrid(aa, si + 1))  # interval
-    return a
-
-
-def loguniform(min=None, max=None, minlog=None, maxlog=None, mean=None, std=None):
-    if (min is None) and (not (minlog is None)):
-        min = np.exp(minlog)
-    if (max is None) and (not (maxlog is None)):
-        max = np.exp(maxlog)
-    if (
-        (max is None)
-        and (not (mean is None))
-        and (not (std is None))
-        and (not (min is None))
+    def __init__(
+        self,
+        copula: Dependency,
+        marginals: list[Distribution],
     ):
-        max = 2 * (mean**2 + std**2) / mean - min
-    if (min is None) and (max is None) and (not (mean is None)) and (not (std is None)):
-        min = loguniform_solve(mean, std**2)
-        max = 2 * (mean**2 + std**2) / mean - min
-    return scipy.stats.loguniform.rvs(min, max, size=Params.many)
+        self.marginals = marginals
+        self.copula = copula
+        self._joint_dist = CopulaDistribution(
+            copula=self.copula._copula, marginals=[m._dist for m in self.marginals]
+        )
+        self.ndim = len(self.marginals)
+
+    @staticmethod
+    def from_sps(copula: Copula, marginals: list[sps.rv_continuous]):
+        return CopulaDistribution(copula=copula, marginals=marginals)
+
+    def sample(self, size):
+        """generate orginal-space samples from the joint distribution"""
+        return self._joint_dist.rvs(size)
+
+    def u_sample(self, size):
+        """generate copula-space samples from the joint distribution"""
+        return self.copula.rvs(size)
 
 
-def loguniform1(m, s):
-    return loguniform(mean=m, std=s)
+# * ------------------ special sane cases ------------------ *#
+def uniform_sane(a, b):
+    return sps.uniform(loc=a, scale=b - a)
 
 
-def negativebinomial(size, prob):
-    return scipy.stats.nbinom.rvs(size, prob, size=Params.many)
+def lognormal_sane(mu, sigma):
+    """The sane lognormal which creates a lognormal distribution object based on the mean (mu) and standard deviation (sigma)
+    of the underlying normal distribution.
+
+    args:
+        - mu (float): Mean of the underlying normal distribution
+        - sigma (float): Standard deviation of the underlying normal distribution
+
+    Returns:
+        - A scipy.stats.lognorm frozen distribution object
+    """
+    shape = sigma  # shape parameter for lognorm
+    scale = np.exp(mu)  # scale parameter is exp(mu)
+    return sps.lognorm(s=shape, scale=scale)
 
 
-def normal(m, s):
-    return scipy.stats.norm.rvs(m, s, size=Params.many)
+# * ------------------ sample-approximated dist representation by Scott ------------------ *#
 
 
-def pareto(mode, c):
-    return scipy.stats.pareto.rvs(c, scale=mode, size=Params.many)
+# def bernoulli(p):
+#     return np.random.uniform(size=Params.many) < p
 
 
-def poisson(m):
-    return scipy.stats.poisson.rvs(m, size=Params.many)
+# def beta(a, b):
+#     # if (a==0) and (b==0) : return(env(np.repeat(0.0, Params.many), np.repeat(1.0, Params.many)))  # this is [0,1]
+#     if (a == 0) and (b == 0):
+#         return bernoulli(0.5)  # or should it be [0,1]?
+#     if a == 0:
+#         return np.repeat(0.0, Params.many)
+#     if b == 0:
+#         return np.repeat(1.0, Params.many)
+#     return scipy.stats.beta.rvs(a, b, size=Params.many)
 
 
-def powerfunction(b, c):
-    return scipy.stats.powerlaw.rvs(c, scale=b, size=Params.many)
+# def betabinomial2(size, v, w):
+#     return scipy.stats.binom.rvs(size, beta(v, w), size=Params.many)
 
 
-# parameterisation of rayleigh differs from that in pba.r
+# def betabinomial(size, v, w):
+#     return scipy.stats.betabinom.rvs(size, v, w, size=Params.many)
 
 
-def rayleigh(loc, scale):
-    return scipy.stats.rayleigh.rvs(loc, scale, size=Params.many)
+# def binomial(size, p):
+#     return scipy.stats.binom.rvs(size, p, size=Params.many)
 
 
-def sawinconrad(min, mu, max):  # WHAT are the 'implicit constraints' doing?
-    def sawinconradalpha01(mu):
-        def f(alpha):
-            return 1 / (1 - 1 / np.exp(alpha)) - 1 / alpha - mu
-
-        if np.abs(mu - 0.5) < 0.000001:
-            return 0
-        return uniroot(f, np.array((-500, 500)))
-
-    def qsawinconrad(p, min, mu, max):
-        alpha = sawinconradalpha01((mu - min) / (max - min))
-        if np.abs(alpha) < 0.000001:
-            return min + (max - min) * p
-        else:
-            min + (max - min) * ((np.log(1 + p * (np.exp(alpha) - 1))) / alpha)
-
-    a = left(min)
-    b = right(max)
-    c = left(mu)
-    d = right(mu)
-    if c < a:
-        c = a  # implicit constraints
-    if b < d:
-        d = b
-    # return(qsawinconrad(np.random.uniform(size=Params.many), min, mu, max))
-    return qsawinconrad(np.random.uniform(size=Params.many), min, mu, max)
+# def chisquared(v):
+#     return scipy.stats.chi2.rvs(v, size=Params.many)
 
 
-def student(v):
-    return scipy.stats.t.rvs(v, size=Params.many)
+# def delta(a):
+#     return np.repeat(a, Params.many)
 
 
-def uniform(a, b):
-    return scipy.stats.uniform.rvs(
-        a, b - a, size=Params.many
-    )  # who parameterizes like this?!?!
+# def exponential(rate=1, mean=None):
+#     if mean is None:
+#         mean = 1 / rate
+#     # rate = 1/mean
+#     return scipy.stats.expon.rvs(scale=mean, size=Params.many)
 
 
-def triangular(min, mode, max):
-    return np.random.triangular(
-        min, mode, max, size=Params.many
-    )  # cheating: uses random rather than scipy.stats
+# def exponential1(mean=1):
+#     return scipy.stats.expon.rvs(scale=mean, size=Params.many)
 
 
-def histogram(x):
-    return x[(np.trunc(scipy.stats.uniform.rvs(size=Params.many) * len(x))).astype(int)]
+# def F(df1, df2):
+#     return scipy.stats.f.rvs(df1, df2, size=Params.many)
 
 
-def mixture(x, w=None):
-    if w is None:
-        w = np.repeat(1, len(x))
-    print(Params.many)
-    r = np.sort(scipy.stats.uniform.rvs(size=Params.many))[::-1]
-    x = np.concatenate(([x[0]], x))
-    w = np.cumsum(np.concatenate(([0], w))) / np.sum(w)
-    u = []
-    j = len(x) - 1
-    for p in r:
-        while True:
-            if w[j] <= p:
-                break
-            j = j - 1
-        u = np.concatenate(([x[j + 1]], u))
-    return u[np.argsort(scipy.stats.uniform.rvs(size=len(u)))]
+# def gamma(shape, rate=1, scale=None):
+#     if scale is None:
+#         scale = 1 / rate
+#     rate = 1 / scale
+#     return scipy.stats.gamma.rvs(a=shape, scale=1 / rate, size=Params.many)
 
 
-# * ---------------------Scott ancillary funcs --------------------- *#
+# def gammaexponential(shape, rate=1, scale=None):
+#     if scale is None:
+#         scale = 1 / rate
+#     rate = 1 / scale
+#     # expon(scale=gamma(a=shape, scale=1/rate))
+#     return scipy.stats.expon.rvs(
+#         scale=1 / scipy.stats.gamma.rvs(a=shape, scale=scale, size=Params.many),
+#         size=Params.many,
+#     )
 
 
-def left(x):
-    return np.min(x)
+# def geometric(m):
+#     return scipy.stats.geom.rvs(m, size=Params.many)
 
 
-def right(x):
-    return np.max(x)
+# def gumbel(loc, scale):
+#     return scipy.stats.gumbel_r.rvs(loc, scale, size=Params.many)
 
 
-def uniroot(f, a):
-    # https://stackoverflow.com/questions/43271440/find-a-root-of-a-function-in-a-given-range
-    # https://docs.scipy.org/doc/scipy-0.18.1/reference/optimize.html#root-finding
-    #    from scipy.optimize import brentq
-    #    return(brentq(f, min(a), max(a))) #,args=(t0)) # any function arguments beyond the varied parameter
-    from scipy.optimize import fsolve
+# def inversechisquared(v):
+#     return 1 / chisquared(v)
 
-    return fsolve(f, (min(a) + max(a)) / 2)
+
+# def inversegamma(shape, scale=None, rate=None):
+#     if scale is None and not rate is None:
+#         scale = 1 / rate
+#     return scipy.stats.invgamma.rvs(a=shape, scale=scale, size=Params.many)
+
+
+# def laplace(a, b):
+#     return scipy.stats.laplace.rvs(a, b, size=Params.many)
+
+
+# def logistic(loc, scale):
+#     return scipy.stats.logistic.rvs(loc, scale, size=Params.many)
+
+
+# # def lognormal(m, s):
+# #     m2 = m**2
+# #     s2 = s**2
+# #     mlog = np.log(m2 / np.sqrt(m2 + s2))
+# #     slog = np.sqrt(np.log((m2 + s2) / m2))
+# #     return scipy.stats.lognorm.rvs(s=slog, scale=np.exp(mlog), size=Params.many)
+
+
+# # def lognormal2(mlog, slog):
+# #     return scipy.stats.lognorm.rvs(s=slog, scale=np.exp(mlog), size=Params.many)
+
+
+# # lognormal = function(mean=NULL, std=NULL, meanlog=NULL, stdlog=NULL, median=NULL, cv=NULL, name='', ...){
+# #  if (is.null(meanlog) & !is.null(median)) meanlog = log(median)
+# #  if (is.null(stdlog) & !is.null(cv)) stdlog = sqrt(log(cv^2 + 1))
+# #  # lognormal(a, b) ~ lognormal2(log(a^2/sqrt(a^2+b^2)),sqrt(log((a^2+b^2)/a^2)))
+# #  if (is.null(meanlog) & (!is.null(mean)) & (!is.null(std))) meanlog = log(mean^2/sqrt(mean^2+std^2))
+# #  if (is.null(stdlog) & !is.null(mean) & !is.null(std)) stdlog = sqrt(log((mean^2+std^2)/mean^2))
+# #  if (!is.null(meanlog) & !is.null(stdlog)) Slognormal0(meanlog,stdlog,name) else stop('not enough information to specify the lognormal distribution')
+# #  }
+
+
+# def loguniform_solve(m, v):
+#     def loguniform_f(a, m, v):
+#         return a * m * np.exp(2 * (v / (m**2) + 1)) + np.exp(2 * a / m) * (
+#             a * m - 2 * ((m**2) + v)
+#         )
+
+#     def LUgrid(aa, w):
+#         return left(aa) + (right(aa) - left(aa)) * w / 100.0
+
+#     aa = (m - np.sqrt(4 * v), m)  # interval
+#     a = m
+#     ss = loguniform_f(a, m, v)
+#     for j in range(4):
+#         for i in range(101):  # 0:100
+#             a = LUgrid(aa, i)
+#             s = abs(loguniform_f(a, m, v))
+#             if s < ss:
+#                 ss = s
+#                 si = i
+#         a = LUgrid(aa, si)
+#         aa = (LUgrid(aa, si - 1), LUgrid(aa, si + 1))  # interval
+#     return a
+
+
+# def loguniform(min=None, max=None, minlog=None, maxlog=None, mean=None, std=None):
+#     if (min is None) and (not (minlog is None)):
+#         min = np.exp(minlog)
+#     if (max is None) and (not (maxlog is None)):
+#         max = np.exp(maxlog)
+#     if (
+#         (max is None)
+#         and (not (mean is None))
+#         and (not (std is None))
+#         and (not (min is None))
+#     ):
+#         max = 2 * (mean**2 + std**2) / mean - min
+#     if (min is None) and (max is None) and (not (mean is None)) and (not (std is None)):
+#         min = loguniform_solve(mean, std**2)
+#         max = 2 * (mean**2 + std**2) / mean - min
+#     return scipy.stats.loguniform.rvs(min, max, size=Params.many)
+
+
+# def loguniform1(m, s):
+#     return loguniform(mean=m, std=s)
+
+
+# def negativebinomial(size, prob):
+#     return scipy.stats.nbinom.rvs(size, prob, size=Params.many)
+
+
+# def normal(m, s):
+#     return scipy.stats.norm.rvs(m, s, size=Params.many)
+
+
+# def pareto(mode, c):
+#     return scipy.stats.pareto.rvs(c, scale=mode, size=Params.many)
+
+
+# def poisson(m):
+#     return scipy.stats.poisson.rvs(m, size=Params.many)
+
+
+# def powerfunction(b, c):
+#     return scipy.stats.powerlaw.rvs(c, scale=b, size=Params.many)
+
+
+# # parameterisation of rayleigh differs from that in pba.r
+
+
+# def rayleigh(loc, scale):
+#     return scipy.stats.rayleigh.rvs(loc, scale, size=Params.many)
+
+
+# def sawinconrad(min, mu, max):  # WHAT are the 'implicit constraints' doing?
+#     def sawinconradalpha01(mu):
+#         def f(alpha):
+#             return 1 / (1 - 1 / np.exp(alpha)) - 1 / alpha - mu
+
+#         if np.abs(mu - 0.5) < 0.000001:
+#             return 0
+#         return uniroot(f, np.array((-500, 500)))
+
+#     def qsawinconrad(p, min, mu, max):
+#         alpha = sawinconradalpha01((mu - min) / (max - min))
+#         if np.abs(alpha) < 0.000001:
+#             return min + (max - min) * p
+#         else:
+#             min + (max - min) * ((np.log(1 + p * (np.exp(alpha) - 1))) / alpha)
+
+#     a = left(min)
+#     b = right(max)
+#     c = left(mu)
+#     d = right(mu)
+#     if c < a:
+#         c = a  # implicit constraints
+#     if b < d:
+#         d = b
+#     # return(qsawinconrad(np.random.uniform(size=Params.many), min, mu, max))
+#     return qsawinconrad(np.random.uniform(size=Params.many), min, mu, max)
+
+
+# def student(v):
+#     return scipy.stats.t.rvs(v, size=Params.many)
+
+
+# def uniform(a, b):
+#     return scipy.stats.uniform.rvs(
+#         a, b - a, size=Params.many
+#     )  # who parameterizes like this?!?!
+
+
+# def triangular(min, mode, max):
+#     return np.random.triangular(
+#         min, mode, max, size=Params.many
+#     )  # cheating: uses random rather than scipy.stats
+
+
+# def histogram(x):
+#     return x[(np.trunc(scipy.stats.uniform.rvs(size=Params.many) * len(x))).astype(int)]
+
+
+# def mixture(x, w=None):
+#     if w is None:
+#         w = np.repeat(1, len(x))
+#     print(Params.many)
+#     r = np.sort(scipy.stats.uniform.rvs(size=Params.many))[::-1]
+#     x = np.concatenate(([x[0]], x))
+#     w = np.cumsum(np.concatenate(([0], w))) / np.sum(w)
+#     u = []
+#     j = len(x) - 1
+#     for p in r:
+#         while True:
+#             if w[j] <= p:
+#                 break
+#             j = j - 1
+#         u = np.concatenate(([x[j + 1]], u))
+#     return u[np.argsort(scipy.stats.uniform.rvs(size=len(u)))]
+
+
+# # * ---------------------Scott ancillary funcs --------------------- *#
+
+
+# def left(x):
+#     return np.min(x)
+
+
+# def right(x):
+#     return np.max(x)
+
+
+# def uniroot(f, a):
+#     # https://stackoverflow.com/questions/43271440/find-a-root-of-a-function-in-a-given-range
+#     # https://docs.scipy.org/doc/scipy-0.18.1/reference/optimize.html#root-finding
+#     #    from scipy.optimize import brentq
+#     #    return(brentq(f, min(a), max(a))) #,args=(t0)) # any function arguments beyond the varied parameter
+#     from scipy.optimize import fsolve
+
+#     return fsolve(f, (min(a) + max(a)) / 2)
 
 
 # a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
@@ -462,7 +575,8 @@ named_dists = {
     "logistic": sps.logistic,
     "loggamma": sps.loggamma,
     "loglaplace": sps.loglaplace,
-    "lognorm": sps.lognorm,
+    # "lognorm": sps.lognorm,
+    "lognormal": lognormal_sane,
     "loguniform": sps.loguniform,
     "lomax": sps.lomax,
     "maxwell": sps.maxwell,
@@ -473,6 +587,7 @@ named_dists = {
     "ncf": sps.ncf,
     "nct": sps.nct,
     "norm": sps.norm,
+    "normal": sps.norm,
     "gaussian": sps.norm,
     "norminvgauss": sps.norminvgauss,
     "pareto": sps.pareto,
@@ -492,7 +607,7 @@ named_dists = {
     "truncexpon": sps.truncexpon,
     "truncnorm": sps.truncnorm,
     "tukeylambda": sps.tukeylambda,
-    "uniform": sps.uniform,
+    "uniform": uniform_sane,
     "vonmises": sps.vonmises,
     "vonmises_line": sps.vonmises_line,
     "wald": sps.wald,

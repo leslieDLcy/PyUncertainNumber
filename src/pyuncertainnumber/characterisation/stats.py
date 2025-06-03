@@ -22,13 +22,14 @@ from scipy.stats import (
     loguniform,
     f as F,
 )
+import scipy
 import scipy.stats as sps
-from ..pba.intervalOperators import mean
+from ..pba.intervals.intervalOperators import mean
 from ..pba.intervals import Interval
 from pyuncertainnumber import pba
 from ..pba.distributions import Distribution as D
 from ..pba.distributions import named_dists
-from ..pba.pbox import named_pbox
+from ..pba.pbox_parametric import named_pbox
 import functools
 from .core import makeUN
 
@@ -49,6 +50,8 @@ def makedist(shape: str):
     return decorator_make_dist
 
 
+# TODO: tested with expon which seems incorrect.
+# TODO: stats.expon takes `1/lambda` as the scale, which is the inverse of the rate parameter.
 def singleParamPattern(x, shape: str):
     if isinstance(x, sps.CensoredData | np.ndarray | list):
         return D.dist_from_sps(named_dists.get(shape)(mean(x)), shape=shape)
@@ -95,7 +98,7 @@ def fit(method: str, family: str, data: np.ndarray):
 
 
 def MMbernoulli(x):
-    """a first attempt to Maximum likelihood estimation for exponential distribution
+    """a first attempt to Maximum likelihood estimation for Bernoulli distribution
         which accepts both precise and imprecise data;
 
     #! the example of `singleparam` pattern
@@ -165,6 +168,8 @@ def MMchisquared(x):
 #         raise TypeError('Input data type not supported')
 
 
+# TODO: this is incorrect as **kwargs are not passed.
+# TODO: expon takes (scale=1/lambda) as kwargs
 def MMexponential(x):
     return singleParamPattern(x, "expon")
 

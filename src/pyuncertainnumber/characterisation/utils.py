@@ -9,7 +9,7 @@ import numpy as np
 from pymongo import MongoClient
 import matplotlib.pyplot as plt
 import scipy.stats as sps
-from ..pba.params import Params
+
 
 # TODO create a defending mechanism for parsing '[15+-10%]' as only '[15 +- 10%]' works now
 
@@ -54,6 +54,8 @@ def tranform_ecdf(s, display=False, **kwargs):
 def pl_pcdf(
     dist: type[sps.rv_continuous | sps.rv_discrete], ax=None, title=None, **kwargs
 ):
+    from ..pba.params import Params
+
     """plot CDF from parametric distribution objects"""
 
     if ax is None:
@@ -229,7 +231,20 @@ def get_concise_repr(a_dict):
 
     # remove some unwanted fields (keys)
     entries_to_remove(
-        remove_entries=["_UnitsRep", "_math_object", "deter_value_rep", "_Q", "p_flag"],
+        remove_entries=[
+            "distribution_parameters",
+            "pbox_parameters",
+            "bounds",
+            "masses",
+            "_unit",
+            "_physical_quantity",
+            "_skip_construct_init",
+            "_UnitsRep",
+            "_math_object",
+            "deter_value_rep",
+            "_Q",
+            "p_flag",
+        ],
         the_dict=Noneremoved_dict,
     )
     return Noneremoved_dict
