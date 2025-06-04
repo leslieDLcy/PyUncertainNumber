@@ -111,11 +111,17 @@ def pl_ecdf_bounding_bundles(
         color=plot_bound_colors[1],
         **cdf_kwargs,
     )
-    ax.plot([b_l.quantiles[0], b_r.quantiles[0]], [0, 0], color=plot_bound_colors[1])
+    ax.plot(
+        [b_l.quantiles[0], b_r.quantiles[0]],
+        [0, 0],
+        color=plot_bound_colors[1],
+        **cdf_kwargs,
+    )
     ax.plot(
         [b_l.quantiles[-1], b_r.quantiles[-1]],
         [1, 1],
         color=plot_bound_colors[0],
+        **cdf_kwargs,
     )
 
     if title is not None:

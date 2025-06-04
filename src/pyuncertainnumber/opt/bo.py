@@ -97,11 +97,15 @@ class BayesOpt:
             allow_duplicate_points=True,
             **kwargs,
         )
-        # initial exploration of the design space
-        self.optimizer.maximize(
-            init_points=self.num_explorations,
-            n_iter=0,
-        )
+
+        try:
+            # initial exploration of the design space
+            self.optimizer.maximize(
+                init_points=self.num_explorations,
+                n_iter=0,
+            )
+        except:
+            pass
 
         # * _________________ run the BO iterations to get the optimal Xc
         for _ in range(self.num_iterations):
