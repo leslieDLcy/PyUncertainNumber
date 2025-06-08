@@ -29,7 +29,7 @@ Functions
    pyuncertainnumber.pba.utils.transform_eeCDF_bundle
    pyuncertainnumber.pba.utils.pl_ecdf_bounding_bundles
    pyuncertainnumber.pba.utils.sorting
-   pyuncertainnumber.pba.utils.weighted_ecdf
+   pyuncertainnumber.pba.utils.get_ecdf
    pyuncertainnumber.pba.utils.reweighting
    pyuncertainnumber.pba.utils.round
    pyuncertainnumber.pba.utils.uniform_reparameterisation
@@ -81,7 +81,7 @@ Module Contents
 
 .. py:function:: sorting(list1, list2)
 
-.. py:function:: weighted_ecdf(s, w=None, display=False)
+.. py:function:: get_ecdf(s, w=None, display=False)
 
    compute the weighted ecdf from (precise) sample data
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import numpy as np
 from .intervals.intervalOperators import make_vec_interval
-from .utils import weighted_ecdf, eCDF_bundle, reweighting
-import matplotlib.pyplot as plt
+from .utils import reweighting
+from .ecdf import eCDF_bundle, get_ecdf
 from .intervals import Interval
 import functools
 
@@ -82,8 +82,8 @@ def stacking(
     from .utils import plot_two_eCDF_bundle
 
     vec_interval = make_vec_interval(vec_interval)
-    q1, p1 = weighted_ecdf(vec_interval.lo, weights)
-    q2, p2 = weighted_ecdf(vec_interval.hi, weights)
+    q1, p1 = get_ecdf(vec_interval.lo, weights)
+    q2, p2 = get_ecdf(vec_interval.hi, weights)
 
     cdf1 = eCDF_bundle(q1, p1)
     cdf2 = eCDF_bundle(q2, p2)
@@ -183,9 +183,9 @@ def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
     note:
         envelope on a set of empirical CDFs
     """
-    from .utils import ecdf, weighted_ecdf
+    from .utils import ecdf, get_ecdf
 
-    ecdf_func = weighted_ecdf if ecdf_choice == "canonical" else ecdf
+    ecdf_func = get_ecdf if ecdf_choice == "canonical" else ecdf
 
     # assume each row as a sample and eCDF
     q_list = []

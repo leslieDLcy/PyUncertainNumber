@@ -7,7 +7,7 @@ from warnings import warn
 import numpy as np
 import matplotlib.pyplot as plt
 from .params import Params
-from .utils import pl_ecdf_bounding_bundles, weighted_ecdf, eCDF_bundle
+from .ecdf import pl_ecdf_bounding_bundles, get_ecdf, eCDF_bundle
 from .imprecise import imprecise_ecdf
 from numbers import Number
 
@@ -52,7 +52,7 @@ def KS_bounds(s, alpha: float, display=True) -> tuple[eCDF_bundle]:
         # ecdf = sps.ecdf(s)
         # b = transform_eeCDF_bundle(ecdf)
 
-        q, p = weighted_ecdf(s)
+        q, p = get_ecdf(s)
         f_l, f_r = p + dn, p - dn
         f_l, f_r = logical_bounding(f_l), logical_bounding(f_r)
         # new ecdf bundles

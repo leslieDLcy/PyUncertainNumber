@@ -2,9 +2,7 @@ from __future__ import annotations
 from typing import *
 from .intervals import Interval
 import scipy.stats as sps
-from .utils import transform_eeCDF_bundle
-from .utils import weighted_ecdf
-from .utils import eCDF_bundle
+from .ecdf import transform_eCDF_bundle, get_ecdf, eCDF_bundle
 
 
 def imprecise_ecdf_sps(s: Interval) -> tuple[eCDF_bundle, eCDF_bundle]:
@@ -17,8 +15,8 @@ def imprecise_ecdf_sps(s: Interval) -> tuple[eCDF_bundle, eCDF_bundle]:
         - left and right cdfs
         - pbox
     """
-    b_l = transform_eeCDF_bundle(sps.ecdf(s.lo))
-    b_r = transform_eeCDF_bundle(sps.ecdf(s.hi))
+    b_l = transform_eCDF_bundle(sps.ecdf(s.lo))
+    b_r = transform_eCDF_bundle(sps.ecdf(s.hi))
 
     return b_l, b_r
 
@@ -30,7 +28,7 @@ def imprecise_ecdf(s: Interval) -> tuple[eCDF_bundle, eCDF_bundle]:
         - left and right cdfs
         - pbox
     """
-    b_l = eCDF_bundle(*weighted_ecdf(s.lo))
-    b_r = eCDF_bundle(*weighted_ecdf(s.hi))
+    b_l = eCDF_bundle(*get_ecdf(s.lo))
+    b_r = eCDF_bundle(*get_ecdf(s.hi))
 
     return b_l, b_r
