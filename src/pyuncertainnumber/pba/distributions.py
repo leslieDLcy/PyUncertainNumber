@@ -217,7 +217,17 @@ class JointDistribution:
 
 
 class ECDF(Staircase):
-    """empirical cumulative distribution function (ecdf) class"""
+    """empirical cumulative distribution function (ecdf) class
+
+    note:
+        - supported by Pbox API hence samples will be intervals
+
+    example:
+        >>> import numpy as np
+        >>> s = np.random.normal(size=1000)
+        >>> ecdf = ECDF(s)
+        >>> ecdf.plot()
+    """
 
     def __init__(self, empirical_data: np.ndarray):
         left, p_values = get_ecdf(empirical_data)
