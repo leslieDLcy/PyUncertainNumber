@@ -48,6 +48,30 @@ def bound_steps_check(bound):
     return bound
 
 
+# * --------------------- constructors ---------------------*#
+def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
+    """transform into pbox object from extreme bounds parameterised by `sps.dist`
+
+    args:
+        rvs (list): list of scipy.stats.rv_continuous objects"""
+
+    # x_sup
+    bounds = [rv.ppf(Params.p_values) for rv in rvs]
+
+    if bounds[0][-1] > bounds[1][-1]:
+        # swap left and right bounds
+        bounds[0], bounds[1] = bounds[1], bounds[0]
+
+    if extre_bound_params is not None:
+        print(extre_bound_params)
+
+    return Staircase(
+        left=bounds[0],
+        right=bounds[1],
+        shape=shape,
+    )
+
+
 class Pbox(ABC):
     """a base class for Pbox"""
 

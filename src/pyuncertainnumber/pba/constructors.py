@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from scipy.interpolate import interp1d
 import numpy as np
-from .pbox_abc import Pbox
+from .pbox_abc import Staircase, Pbox
 from .params import Params
 from ..characterisation.utils import tranform_ecdf
 
@@ -24,23 +24,6 @@ if TYPE_CHECKING:
 #     p_lo, q_lo = interpolate_p(a.probabilities, a.quantiles)
 #     p_hi, q_hi = interpolate_p(b.probabilities, b.quantiles)
 #     return Staircase(left=q_lo, right=q_hi)
-
-
-def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
-    """transform into pbox object from extreme bounds parameterised by `sps.dist`
-
-    args:
-        rvs (list): list of scipy.stats.rv_continuous objects"""
-
-    # x_sup
-    bounds = [rv.ppf(Params.p_values) for rv in rvs]
-    if extre_bound_params is not None:
-        print(extre_bound_params)
-    return Pbox(
-        left=bounds[0],
-        right=bounds[1],
-        shape=shape,
-    )
 
 
 """ initially used for cbox next-value distribution """
