@@ -221,7 +221,7 @@ class ECDF(Staircase):
 
     def __init__(self, empirical_data: np.ndarray):
         left, p_values = get_ecdf(empirical_data)
-        super().__init__(left=left, right=left, p_values=p_values)
+        super().__init__(left=left, right=left)
 
 
 # * ------------------ special sane cases ------------------ *#

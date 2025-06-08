@@ -7,7 +7,6 @@ from numbers import Number
 import operator
 import itertools
 from .utils import condensation, smooth_condensation, find_nearest, is_increasing
-
 import logging
 
 # Configure the logging system with a simple format
@@ -113,6 +112,7 @@ class Pbox(ABC):
     @left.setter
     def left(self, value):
         self._left = bound_steps_check(value)
+        self.steps = len(self._left)
 
     @property
     def right(self):
@@ -121,6 +121,7 @@ class Pbox(ABC):
     @right.setter
     def right(self, value):
         self._right = bound_steps_check(value)
+        self.steps = len(self._right)
 
     @property
     def lo(self):
