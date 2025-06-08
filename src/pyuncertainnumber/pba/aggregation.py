@@ -79,7 +79,7 @@ def stacking(
     """
     from .pbox_abc import Staircase
     from .dss import DempsterShafer
-    from .utils import plot_two_eCDF_bundle
+    from .ecdf import plot_two_eCDF_bundle
 
     vec_interval = make_vec_interval(vec_interval)
     q1, p1 = get_ecdf(vec_interval.lo, weights)

@@ -27,7 +27,7 @@ def transform_eCDF_bundle(e):
 
 
 def pl_ecdf_bounds_2(q1, p1, q2, p2, ax=None, marker="+"):
-    """plot the bounding cdf functions with two sets of quantiles and probabilities"""
+    """plot the upper and lower bounding cdf functions with two sets of quantiles and probabilities"""
     if ax is None:
         fig, ax = plt.subplots()
 
@@ -39,7 +39,7 @@ def pl_ecdf_bounds_2(q1, p1, q2, p2, ax=None, marker="+"):
 
 
 def plot_two_eCDF_bundle(cdf1, cdf2, ax=None, **kwargs):
-    """plot two eCDF_bundle objects"""
+    """plot upper and lower eCDF_bundle objects"""
     if ax is None:
         fig, ax = plt.subplots()
     q1, p1 = cdf1.quantiles, cdf1.probabilities
