@@ -104,8 +104,6 @@ def stacking(
 
 def mixture_pbox(l_pboxes, weights=None, display=False):
 
-    from .pbox_base import Pbox
-
     if weights is None:
         N = len(l_pboxes)
         weights = np.repeat(1 / N, N)  # equal weights

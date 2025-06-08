@@ -13,6 +13,20 @@ import matplotlib.path as mpath
 from matplotlib.legend_handler import HandlerBase
 
 
+def extend_ecdf(cdf):
+    """add zero and one to the ecdf
+
+    args: CDF_bundle
+    """
+    if cdf.probabilities[0] != 0:
+        cdf.probabilities = np.insert(cdf.probabilities, 0, 0)
+        cdf.quantiles = np.insert(cdf.quantiles, 0, cdf.quantiles[0])
+    if cdf.probabilities[-1] != 1:
+        cdf.probabilities = np.append(cdf.probabilities, 1)
+        cdf.quantiles = np.append(cdf.quantiles, cdf.quantiles[-1])
+    return cdf
+
+
 def sorting(list1, list2):
     list1, list2 = (list(t) for t in zip(*sorted(zip(list1, list2))))
     return list1, list2

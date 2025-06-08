@@ -53,6 +53,7 @@ def interpolate_p(p, q):
 
     f = interp1d(p, q, kind="next", fill_value=(p[0], p[-1]), bounds_error=False)
     # range
-    new_p = np.linspace(p[0], p[-1], Params.steps)
+    # new_p = np.linspace(p[0], p[-1], Params.steps)
+    new_p = Params.p_values
     new_q = f(new_p)
     return new_p, new_q

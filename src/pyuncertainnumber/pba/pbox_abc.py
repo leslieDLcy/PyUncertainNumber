@@ -44,7 +44,9 @@ def bound_steps_check(bound):
         # 'next' kind interpolation needed
         from .constructors import interpolate_p
 
-        p_lo, bound = interpolate_p(p=np.linspace(0.0001, 0.9999, len(bound)), q=bound)
+        p_lo, bound = interpolate_p(
+            p=np.linspace(Params.p_lboundary, Params.p_hboundary, len(bound)), q=bound
+        )
     return bound
 
 
@@ -422,12 +424,17 @@ class Staircase(Pbox):
     # * --------------------- constructors ---------------------*#
     @classmethod
     def from_CDFbundle(cls, a, b):
-        """pbox from emipirical CDF bundle
+        """pbox from two emipirical CDF bundle
+
         args:
             - a : CDF bundle of lower extreme F;
             - b : CDF bundle of upper extreme F;
         """
         from .constructors import interpolate_p
+        from .utils import extend_ecdf
+
+        a = extend_ecdf(a)
+        b = extend_ecdf(b)
 
         p_lo, q_lo = interpolate_p(a.probabilities, a.quantiles)
         p_hi, q_hi = interpolate_p(b.probabilities, b.quantiles)
