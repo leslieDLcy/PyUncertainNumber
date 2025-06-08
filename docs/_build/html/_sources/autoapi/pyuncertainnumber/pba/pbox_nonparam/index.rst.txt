@@ -29,7 +29,7 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: KS_bounds(s, alpha: float, display=True) -> Tuple[pyuncertainnumber.pba.utils.CDF_bundle, pyuncertainnumber.pba.utils.CDF_bundle]
+.. py:function:: KS_bounds(s, alpha: float, display=True) -> Tuple[pyuncertainnumber.pba.utils.eCDF_bundle, pyuncertainnumber.pba.utils.eCDF_bundle]
 
    construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
 

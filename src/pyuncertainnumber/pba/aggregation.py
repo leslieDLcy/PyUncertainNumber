@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import numpy as np
 from .intervals.intervalOperators import make_vec_interval
-from .utils import weighted_ecdf, CDF_bundle, reweighting
+from .utils import weighted_ecdf, eCDF_bundle, reweighting
 import matplotlib.pyplot as plt
 from .intervals import Interval
 import functools
@@ -70,7 +70,7 @@ def stacking(
         - return_type (str): {'pbox' or 'ds' or 'bounds'}
 
     return:
-        - the left and right bound F in `cdf_bundlebounds` by default
+        - the left and right bound F in `eCDF_bundlebounds` by default
         but can choose to return a p-box
 
     note:
@@ -79,17 +79,17 @@ def stacking(
     """
     from .pbox_abc import Staircase
     from .dss import DempsterShafer
-    from .utils import plot_two_cdf_bundle
+    from .utils import plot_two_eCDF_bundle
 
     vec_interval = make_vec_interval(vec_interval)
     q1, p1 = weighted_ecdf(vec_interval.lo, weights)
     q2, p2 = weighted_ecdf(vec_interval.hi, weights)
 
-    cdf1 = CDF_bundle(q1, p1)
-    cdf2 = CDF_bundle(q2, p2)
+    cdf1 = eCDF_bundle(q1, p1)
+    cdf2 = eCDF_bundle(q2, p2)
 
     if display:
-        plot_two_cdf_bundle(cdf1, cdf2, ax=ax, **kwargs)
+        plot_two_eCDF_bundle(cdf1, cdf2, ax=ax, **kwargs)
 
     match return_type:
         case "pbox":
@@ -201,7 +201,7 @@ def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
     if ret_type == "pbox":
         return Staircase(left=l_bound, right=u_bound)
     elif ret_type == "cdf":
-        return CDF_bundle(l_bound, pp), CDF_bundle(u_bound, pp)
+        return eCDF_bundle(l_bound, pp), eCDF_bundle(u_bound, pp)
 
 
 def env_ecdf_sep(*ecdfs, ret_type="pbox", ecdf_choice="canonical"):

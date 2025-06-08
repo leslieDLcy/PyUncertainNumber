@@ -8,11 +8,11 @@ from ..characterisation.utils import tranform_ecdf
 
 
 if TYPE_CHECKING:
-    from .utils import CDF_bundle
+    from .utils import eCDF_bundle
 
 
 # # TODO to integrate it
-# def pbox_fromeF(a: CDF_bundle, b: CDF_bundle):
+# def pbox_fromeF(a: eCDF_bundle, b: eCDF_bundle):
 #     """pbox from emipirical CDF bundle
 #     args:
 #         - a : CDF bundle of lower extreme F;

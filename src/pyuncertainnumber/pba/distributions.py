@@ -7,25 +7,26 @@ from warnings import *
 from dataclasses import dataclass
 from typing import *
 from ..characterisation.utils import pl_pcdf, pl_ecdf
-import scipy
 from .params import Params
 from .pbox_parametric import named_pbox
 import statsmodels.distributions.copula as Copula
 from .dependency import Dependency
 from statsmodels.distributions.copula.api import CopulaDistribution
 
+# * --------------------- parametric cases --------------------- *#
+
 
 @dataclass
 class Distribution:
-    """two signature for the distribution object, either a parametric specification or a nonparametric sample per se"""
+    """two signature for the distribution object, either a parametric specification or from a nonparametric empirical data set"""
 
     dist_family: str = None
     dist_params: list[float] | Tuple[float, ...] = None
-    sample_data: list[float] | np.ndarray = None
+    empirical_data: list[float] | np.ndarray = None
 
     def __post_init__(self):
         if all(
-            v is None for v in [self.dist_family, self.dist_params, self.sample_data]
+            v is None for v in [self.dist_family, self.dist_params, self.empirical_data]
         ):
             raise ValueError(
                 "At least one of dist_family, dist_params or sample must be specified"
@@ -35,11 +36,11 @@ class Distribution:
         self.make_naked_value()
 
     def __repr__(self):
-        # if self.sample_data is not None:
+        # if self.empirical_data is not None:
         #     return "sample-approximated distribution object"
         if self.dist_params is not None:
             return f"dist ~ {self.dist_family}{self.dist_params}"
-        elif self.sample_data is not None:
+        elif self.empirical_data is not None:
             return "dist ~ sample-approximated distribution object"
         else:
             return "wrong initialisation"
@@ -81,12 +82,12 @@ class Distribution:
         if self._flag:
             self._naked_value = self._dist.mean()
         else:
-            self._naked_value = np.mean(self.sample_data)
+            self._naked_value = np.mean(self.empirical_data)
 
     def plot(self, **kwargs):
         """display the distribution"""
-        if self.sample_data is not None:
-            return pl_ecdf(self.sample_data, **kwargs)
+        if self.empirical_data is not None:
+            return pl_ecdf(self.empirical_data, **kwargs)
         pl_pcdf(self._dist, **kwargs)
 
     def display(self, **kwargs):
@@ -210,6 +211,173 @@ class JointDistribution:
         return self.copula.rvs(size)
 
 
+# * --------------------- non-parametric ecdf cases --------------------- *#
+
+
+@dataclass
+class eeCDF_bundle:
+    """a handy tuple of eCDF function q and p"""
+
+    quantiles: np.ndarray
+    probabilities: np.ndarray
+    # TODO plot ecdf not starting from 0
+
+    @classmethod
+    def from_sps_ecdf(cls, e):
+        """utility to tranform sps.ecdf to eCDF_bundle"""
+        return cls(e.cdf.quantiles, e.cdf.probabilities)
+
+    def plot_bounds(self, other):
+        """plot the lower and upper bounds"""
+        return plot_two_eCDF_bundle(self, other)
+
+
+def transform_eeCDF_bundle(e):
+    """utility to tranform sps.ecdf to eCDF_bundle"""
+    return eCDF_bundle(e.cdf.quantiles, e.cdf.probabilities)
+
+
+def pl_ecdf_bounds_2(q1, p1, q2, p2, ax=None, marker="+"):
+    """plot the bounding cdf functions with two sets of quantiles and probabilities"""
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    ax.step(q1, p1, marker=marker, c="g", where="post")
+    ax.step(q2, p2, marker=marker, c="b", where="post")
+    ax.plot([q1[0], q2[0]], [0, 0], c="b")
+    ax.plot([q1[-1], q2[-1]], [1, 1], c="g")
+    return ax
+
+
+def plot_two_eCDF_bundle(cdf1, cdf2, ax=None, **kwargs):
+    """plot two eCDF_bundle objects"""
+    if ax is None:
+        fig, ax = plt.subplots()
+    q1, p1 = cdf1.quantiles, cdf1.probabilities
+    q2, p2 = cdf2.quantiles, cdf2.probabilities
+    return pl_ecdf_bounds_2(q1, p1, q2, p2, ax=ax, **kwargs)
+
+
+def pl_ecdf_bounding_bundles(
+    b_l: eCDF_bundle,
+    b_r: eCDF_bundle,
+    ax=None,
+    legend=True,
+    title=None,
+    sig_level=None,
+    bound_colors=None,
+    label=None,
+    alpha=None,
+    linestyle=None,
+    linewidth=None,
+):
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    def set_if_not_none(d, **kwargs):
+        for k, v in kwargs.items():
+            if v is not None:
+                d[k] = v
+
+    plot_bound_colors = bound_colors if bound_colors is not None else ["g", "b"]
+
+    cdf_kwargs = {"drawstyle": "steps-post"}
+
+    set_if_not_none(
+        cdf_kwargs,
+        label=label,
+        linestyle=linestyle,
+        alpha=alpha,
+        linewidth=linewidth,
+    )
+
+    ax.plot(
+        b_l.quantiles,
+        b_l.probabilities,
+        label=label if label is not None else f"KS condidence bands {sig_level}\% ",
+        color=plot_bound_colors[0],
+        **cdf_kwargs,
+    )
+    ax.plot(
+        b_r.quantiles,
+        b_r.probabilities,
+        color=plot_bound_colors[1],
+        **cdf_kwargs,
+    )
+    ax.plot(
+        [b_l.quantiles[0], b_r.quantiles[0]],
+        [0, 0],
+        color=plot_bound_colors[1],
+        **cdf_kwargs,
+    )
+    ax.plot(
+        [b_l.quantiles[-1], b_r.quantiles[-1]],
+        [1, 1],
+        color=plot_bound_colors[0],
+        **cdf_kwargs,
+    )
+
+    if title is not None:
+        ax.set_title(title)
+    if legend:
+        ax.legend()
+
+
+def ecdf(d):
+    """return the quantile and probability of a ecdf
+
+    note:
+        Scott's version which leads to doubling the length of quantiles and probabilities
+        to make it a step function
+    """
+    d = np.array(d)
+    N = d.size
+    pp = np.concatenate((np.arange(N), np.arange(1, N + 1))) / N
+    dd = np.concatenate((d, d))
+    dd.sort()
+    pp.sort()
+    return dd, pp
+
+
+def weighted_ecdf(s, w=None, display=False) -> tuple:
+    """compute the weighted ecdf from (precise) sample data
+
+    args:
+        s (array-like) : precise sample data
+        w (array-like) : weights
+
+    note:
+        - Sudret eq.1
+
+    return:
+        ecdf in the form of a tuple of q and p
+    """
+
+    if w is None:
+        # weights
+        N = len(s)
+        w = np.repeat(1 / N, N)
+    else:
+        w = np.array(w)
+
+    # s, w = sorting(s, w)
+    arr = np.stack((s, w), axis=1)
+    arr = arr[np.argsort(arr[:, 0])]
+
+    p = np.cumsum(arr[:, 1])
+
+    # for box plotting
+    q = np.insert(arr[:, 0], 0, arr[0, 0], axis=0)
+    p = np.insert(p, 0, 0.0, axis=0)
+
+    if display == True:
+        fig, ax = plt.subplots()
+        ax.step(q, p, marker="+", where="post")
+
+    # return quantile and probabilities
+    return q, p
+
+
 # * ------------------ special sane cases ------------------ *#
 def uniform_sane(a, b):
     return sps.uniform(loc=a, scale=b - a)
@@ -231,286 +399,6 @@ def lognormal_sane(mu, sigma):
     return sps.lognorm(s=shape, scale=scale)
 
 
-# * ------------------ sample-approximated dist representation by Scott ------------------ *#
-
-
-# def bernoulli(p):
-#     return np.random.uniform(size=Params.many) < p
-
-
-# def beta(a, b):
-#     # if (a==0) and (b==0) : return(env(np.repeat(0.0, Params.many), np.repeat(1.0, Params.many)))  # this is [0,1]
-#     if (a == 0) and (b == 0):
-#         return bernoulli(0.5)  # or should it be [0,1]?
-#     if a == 0:
-#         return np.repeat(0.0, Params.many)
-#     if b == 0:
-#         return np.repeat(1.0, Params.many)
-#     return scipy.stats.beta.rvs(a, b, size=Params.many)
-
-
-# def betabinomial2(size, v, w):
-#     return scipy.stats.binom.rvs(size, beta(v, w), size=Params.many)
-
-
-# def betabinomial(size, v, w):
-#     return scipy.stats.betabinom.rvs(size, v, w, size=Params.many)
-
-
-# def binomial(size, p):
-#     return scipy.stats.binom.rvs(size, p, size=Params.many)
-
-
-# def chisquared(v):
-#     return scipy.stats.chi2.rvs(v, size=Params.many)
-
-
-# def delta(a):
-#     return np.repeat(a, Params.many)
-
-
-# def exponential(rate=1, mean=None):
-#     if mean is None:
-#         mean = 1 / rate
-#     # rate = 1/mean
-#     return scipy.stats.expon.rvs(scale=mean, size=Params.many)
-
-
-# def exponential1(mean=1):
-#     return scipy.stats.expon.rvs(scale=mean, size=Params.many)
-
-
-# def F(df1, df2):
-#     return scipy.stats.f.rvs(df1, df2, size=Params.many)
-
-
-# def gamma(shape, rate=1, scale=None):
-#     if scale is None:
-#         scale = 1 / rate
-#     rate = 1 / scale
-#     return scipy.stats.gamma.rvs(a=shape, scale=1 / rate, size=Params.many)
-
-
-# def gammaexponential(shape, rate=1, scale=None):
-#     if scale is None:
-#         scale = 1 / rate
-#     rate = 1 / scale
-#     # expon(scale=gamma(a=shape, scale=1/rate))
-#     return scipy.stats.expon.rvs(
-#         scale=1 / scipy.stats.gamma.rvs(a=shape, scale=scale, size=Params.many),
-#         size=Params.many,
-#     )
-
-
-# def geometric(m):
-#     return scipy.stats.geom.rvs(m, size=Params.many)
-
-
-# def gumbel(loc, scale):
-#     return scipy.stats.gumbel_r.rvs(loc, scale, size=Params.many)
-
-
-# def inversechisquared(v):
-#     return 1 / chisquared(v)
-
-
-# def inversegamma(shape, scale=None, rate=None):
-#     if scale is None and not rate is None:
-#         scale = 1 / rate
-#     return scipy.stats.invgamma.rvs(a=shape, scale=scale, size=Params.many)
-
-
-# def laplace(a, b):
-#     return scipy.stats.laplace.rvs(a, b, size=Params.many)
-
-
-# def logistic(loc, scale):
-#     return scipy.stats.logistic.rvs(loc, scale, size=Params.many)
-
-
-# # def lognormal(m, s):
-# #     m2 = m**2
-# #     s2 = s**2
-# #     mlog = np.log(m2 / np.sqrt(m2 + s2))
-# #     slog = np.sqrt(np.log((m2 + s2) / m2))
-# #     return scipy.stats.lognorm.rvs(s=slog, scale=np.exp(mlog), size=Params.many)
-
-
-# # def lognormal2(mlog, slog):
-# #     return scipy.stats.lognorm.rvs(s=slog, scale=np.exp(mlog), size=Params.many)
-
-
-# # lognormal = function(mean=NULL, std=NULL, meanlog=NULL, stdlog=NULL, median=NULL, cv=NULL, name='', ...){
-# #  if (is.null(meanlog) & !is.null(median)) meanlog = log(median)
-# #  if (is.null(stdlog) & !is.null(cv)) stdlog = sqrt(log(cv^2 + 1))
-# #  # lognormal(a, b) ~ lognormal2(log(a^2/sqrt(a^2+b^2)),sqrt(log((a^2+b^2)/a^2)))
-# #  if (is.null(meanlog) & (!is.null(mean)) & (!is.null(std))) meanlog = log(mean^2/sqrt(mean^2+std^2))
-# #  if (is.null(stdlog) & !is.null(mean) & !is.null(std)) stdlog = sqrt(log((mean^2+std^2)/mean^2))
-# #  if (!is.null(meanlog) & !is.null(stdlog)) Slognormal0(meanlog,stdlog,name) else stop('not enough information to specify the lognormal distribution')
-# #  }
-
-
-# def loguniform_solve(m, v):
-#     def loguniform_f(a, m, v):
-#         return a * m * np.exp(2 * (v / (m**2) + 1)) + np.exp(2 * a / m) * (
-#             a * m - 2 * ((m**2) + v)
-#         )
-
-#     def LUgrid(aa, w):
-#         return left(aa) + (right(aa) - left(aa)) * w / 100.0
-
-#     aa = (m - np.sqrt(4 * v), m)  # interval
-#     a = m
-#     ss = loguniform_f(a, m, v)
-#     for j in range(4):
-#         for i in range(101):  # 0:100
-#             a = LUgrid(aa, i)
-#             s = abs(loguniform_f(a, m, v))
-#             if s < ss:
-#                 ss = s
-#                 si = i
-#         a = LUgrid(aa, si)
-#         aa = (LUgrid(aa, si - 1), LUgrid(aa, si + 1))  # interval
-#     return a
-
-
-# def loguniform(min=None, max=None, minlog=None, maxlog=None, mean=None, std=None):
-#     if (min is None) and (not (minlog is None)):
-#         min = np.exp(minlog)
-#     if (max is None) and (not (maxlog is None)):
-#         max = np.exp(maxlog)
-#     if (
-#         (max is None)
-#         and (not (mean is None))
-#         and (not (std is None))
-#         and (not (min is None))
-#     ):
-#         max = 2 * (mean**2 + std**2) / mean - min
-#     if (min is None) and (max is None) and (not (mean is None)) and (not (std is None)):
-#         min = loguniform_solve(mean, std**2)
-#         max = 2 * (mean**2 + std**2) / mean - min
-#     return scipy.stats.loguniform.rvs(min, max, size=Params.many)
-
-
-# def loguniform1(m, s):
-#     return loguniform(mean=m, std=s)
-
-
-# def negativebinomial(size, prob):
-#     return scipy.stats.nbinom.rvs(size, prob, size=Params.many)
-
-
-# def normal(m, s):
-#     return scipy.stats.norm.rvs(m, s, size=Params.many)
-
-
-# def pareto(mode, c):
-#     return scipy.stats.pareto.rvs(c, scale=mode, size=Params.many)
-
-
-# def poisson(m):
-#     return scipy.stats.poisson.rvs(m, size=Params.many)
-
-
-# def powerfunction(b, c):
-#     return scipy.stats.powerlaw.rvs(c, scale=b, size=Params.many)
-
-
-# # parameterisation of rayleigh differs from that in pba.r
-
-
-# def rayleigh(loc, scale):
-#     return scipy.stats.rayleigh.rvs(loc, scale, size=Params.many)
-
-
-# def sawinconrad(min, mu, max):  # WHAT are the 'implicit constraints' doing?
-#     def sawinconradalpha01(mu):
-#         def f(alpha):
-#             return 1 / (1 - 1 / np.exp(alpha)) - 1 / alpha - mu
-
-#         if np.abs(mu - 0.5) < 0.000001:
-#             return 0
-#         return uniroot(f, np.array((-500, 500)))
-
-#     def qsawinconrad(p, min, mu, max):
-#         alpha = sawinconradalpha01((mu - min) / (max - min))
-#         if np.abs(alpha) < 0.000001:
-#             return min + (max - min) * p
-#         else:
-#             min + (max - min) * ((np.log(1 + p * (np.exp(alpha) - 1))) / alpha)
-
-#     a = left(min)
-#     b = right(max)
-#     c = left(mu)
-#     d = right(mu)
-#     if c < a:
-#         c = a  # implicit constraints
-#     if b < d:
-#         d = b
-#     # return(qsawinconrad(np.random.uniform(size=Params.many), min, mu, max))
-#     return qsawinconrad(np.random.uniform(size=Params.many), min, mu, max)
-
-
-# def student(v):
-#     return scipy.stats.t.rvs(v, size=Params.many)
-
-
-# def uniform(a, b):
-#     return scipy.stats.uniform.rvs(
-#         a, b - a, size=Params.many
-#     )  # who parameterizes like this?!?!
-
-
-# def triangular(min, mode, max):
-#     return np.random.triangular(
-#         min, mode, max, size=Params.many
-#     )  # cheating: uses random rather than scipy.stats
-
-
-# def histogram(x):
-#     return x[(np.trunc(scipy.stats.uniform.rvs(size=Params.many) * len(x))).astype(int)]
-
-
-# def mixture(x, w=None):
-#     if w is None:
-#         w = np.repeat(1, len(x))
-#     print(Params.many)
-#     r = np.sort(scipy.stats.uniform.rvs(size=Params.many))[::-1]
-#     x = np.concatenate(([x[0]], x))
-#     w = np.cumsum(np.concatenate(([0], w))) / np.sum(w)
-#     u = []
-#     j = len(x) - 1
-#     for p in r:
-#         while True:
-#             if w[j] <= p:
-#                 break
-#             j = j - 1
-#         u = np.concatenate(([x[j + 1]], u))
-#     return u[np.argsort(scipy.stats.uniform.rvs(size=len(u)))]
-
-
-# # * ---------------------Scott ancillary funcs --------------------- *#
-
-
-# def left(x):
-#     return np.min(x)
-
-
-# def right(x):
-#     return np.max(x)
-
-
-# def uniroot(f, a):
-#     # https://stackoverflow.com/questions/43271440/find-a-root-of-a-function-in-a-given-range
-#     # https://docs.scipy.org/doc/scipy-0.18.1/reference/optimize.html#root-finding
-#     #    from scipy.optimize import brentq
-#     #    return(brentq(f, min(a), max(a))) #,args=(t0)) # any function arguments beyond the varied parameter
-#     from scipy.optimize import fsolve
-
-#     return fsolve(f, (min(a) + max(a)) / 2)
-
-
-# a dict that links ''distribution name'' requiring specification to the scipy.stats distribution
 named_dists = {
     "alpha": sps.alpha,
     "anglit": sps.anglit,

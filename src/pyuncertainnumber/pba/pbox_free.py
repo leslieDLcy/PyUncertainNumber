@@ -7,7 +7,7 @@ from warnings import warn
 import numpy as np
 import matplotlib.pyplot as plt
 from .params import Params
-from .utils import pl_ecdf_bounding_bundles, weighted_ecdf, CDF_bundle
+from .utils import pl_ecdf_bounding_bundles, weighted_ecdf, eCDF_bundle
 from .imprecise import imprecise_ecdf
 from numbers import Number
 
@@ -34,10 +34,10 @@ __all__ = [
 # ---------------------from data---------------------#
 
 if TYPE_CHECKING:
-    from .utils import CDF_bundle
+    from .utils import eCDF_bundle
 
 
-def KS_bounds(s, alpha: float, display=True) -> tuple[CDF_bundle]:
+def KS_bounds(s, alpha: float, display=True) -> tuple[eCDF_bundle]:
     """construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
 
     args:
@@ -50,13 +50,13 @@ def KS_bounds(s, alpha: float, display=True) -> tuple[CDF_bundle]:
     # precise data
     if isinstance(s, list | np.ndarray):
         # ecdf = sps.ecdf(s)
-        # b = transform_ecdf_bundle(ecdf)
+        # b = transform_eeCDF_bundle(ecdf)
 
         q, p = weighted_ecdf(s)
         f_l, f_r = p + dn, p - dn
         f_l, f_r = logical_bounding(f_l), logical_bounding(f_r)
         # new ecdf bundles
-        b_l, b_r = CDF_bundle(q, f_l), CDF_bundle(q, f_r)
+        b_l, b_r = eCDF_bundle(q, f_l), eCDF_bundle(q, f_r)
 
         if display:
             fig, ax = plt.subplots()

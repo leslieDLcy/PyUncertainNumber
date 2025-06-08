@@ -17,8 +17,8 @@ Classes
 
 .. autoapisummary::
 
-   pyuncertainnumber.pba.utils.cdf_bundle
-   pyuncertainnumber.pba.utils.CDF_bundle
+   pyuncertainnumber.pba.utils.eCDF_bundle
+   pyuncertainnumber.pba.utils.eCDF_bundle
 
 
 Functions
@@ -26,7 +26,7 @@ Functions
 
 .. autoapisummary::
 
-   pyuncertainnumber.pba.utils.transform_ecdf_bundle
+   pyuncertainnumber.pba.utils.transform_eeCDF_bundle
    pyuncertainnumber.pba.utils.pl_ecdf_bounding_bundles
    pyuncertainnumber.pba.utils.sorting
    pyuncertainnumber.pba.utils.weighted_ecdf
@@ -43,7 +43,7 @@ Functions
 Module Contents
 ---------------
 
-.. py:class:: cdf_bundle
+.. py:class:: eCDF_bundle
 
    Bases: :py:obj:`tuple`
 
@@ -54,7 +54,7 @@ Module Contents
    .. py:attribute:: probabilities
 
 
-.. py:class:: CDF_bundle
+.. py:class:: eCDF_bundle
 
    .. py:attribute:: quantiles
       :type:  numpy.ndarray
@@ -68,16 +68,16 @@ Module Contents
       :classmethod:
 
 
-      utility to tranform sps.ecdf to cdf_bundle
+      utility to tranform sps.ecdf to eCDF_bundle
 
 
 
-.. py:function:: transform_ecdf_bundle(e)
+.. py:function:: transform_eeCDF_bundle(e)
 
-   utility to tranform sps.ecdf to cdf_bundle
+   utility to tranform sps.ecdf to eCDF_bundle
 
 
-.. py:function:: pl_ecdf_bounding_bundles(b_l: CDF_bundle, b_r: CDF_bundle, alpha=0.025, ax=None, legend=True, title=None)
+.. py:function:: pl_ecdf_bounding_bundles(b_l: eCDF_bundle, b_r: eCDF_bundle, alpha=0.025, ax=None, legend=True, title=None)
 
 .. py:function:: sorting(list1, list2)
 

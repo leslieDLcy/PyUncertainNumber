@@ -356,10 +356,10 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.utils.cdf_bundle" title="pyuncertainnumber.pba.utils.cdf_bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdf_bundle</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle" title="pyuncertainnumber.pba.utils.eCDF_bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eCDF_bundle</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.utils.CDF_bundle" title="pyuncertainnumber.pba.utils.CDF_bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CDF_bundle</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle" title="pyuncertainnumber.pba.utils.eCDF_bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eCDF_bundle</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -371,8 +371,8 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.utils.transform_ecdf_bundle" title="pyuncertainnumber.pba.utils.transform_ecdf_bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_ecdf_bundle</span></code></a>(e)</p></td>
-<td><p>utility to tranform sps.ecdf to cdf_bundle</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.utils.transform_eeCDF_bundle" title="pyuncertainnumber.pba.utils.transform_eeCDF_bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_eeCDF_bundle</span></code></a>(e)</p></td>
+<td><p>utility to tranform sps.ecdf to eCDF_bundle</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyuncertainnumber.pba.utils.pl_ecdf_bounding_bundles" title="pyuncertainnumber.pba.utils.pl_ecdf_bounding_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pl_ecdf_bounding_bundles</span></code></a>(b_l, b_r[, alpha, ax, ...])</p></td>
 <td><p></p></td>
@@ -414,51 +414,51 @@
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.cdf_bundle">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.utils.</span></span><span class="sig-name descname"><span class="pre">cdf_bundle</span></span><a class="headerlink" href="#pyuncertainnumber.pba.utils.cdf_bundle" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.eCDF_bundle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.utils.</span></span><span class="sig-name descname"><span class="pre">eCDF_bundle</span></span><a class="headerlink" href="#pyuncertainnumber.pba.utils.eCDF_bundle" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.cdf_bundle.quantiles">
-<span class="sig-name descname"><span class="pre">quantiles</span></span><a class="headerlink" href="#pyuncertainnumber.pba.utils.cdf_bundle.quantiles" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.eCDF_bundle.quantiles">
+<span class="sig-name descname"><span class="pre">quantiles</span></span><a class="headerlink" href="#pyuncertainnumber.pba.utils.eCDF_bundle.quantiles" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.cdf_bundle.probabilities">
-<span class="sig-name descname"><span class="pre">probabilities</span></span><a class="headerlink" href="#pyuncertainnumber.pba.utils.cdf_bundle.probabilities" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.eCDF_bundle.probabilities">
+<span class="sig-name descname"><span class="pre">probabilities</span></span><a class="headerlink" href="#pyuncertainnumber.pba.utils.eCDF_bundle.probabilities" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.CDF_bundle">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.utils.</span></span><span class="sig-name descname"><span class="pre">CDF_bundle</span></span><a class="headerlink" href="#pyuncertainnumber.pba.utils.CDF_bundle" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.eCDF_bundle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.utils.</span></span><span class="sig-name descname"><span class="pre">eCDF_bundle</span></span><a class="headerlink" href="#pyuncertainnumber.pba.utils.eCDF_bundle" title="Link to this definition">¶</a></dt>
 <dd><dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.CDF_bundle.quantiles">
-<span class="sig-name descname"><span class="pre">quantiles</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#pyuncertainnumber.pba.utils.CDF_bundle.quantiles" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.eCDF_bundle.quantiles">
+<span class="sig-name descname"><span class="pre">quantiles</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#pyuncertainnumber.pba.utils.eCDF_bundle.quantiles" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.CDF_bundle.probabilities">
-<span class="sig-name descname"><span class="pre">probabilities</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#pyuncertainnumber.pba.utils.CDF_bundle.probabilities" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.eCDF_bundle.probabilities">
+<span class="sig-name descname"><span class="pre">probabilities</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#pyuncertainnumber.pba.utils.eCDF_bundle.probabilities" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.CDF_bundle.from_sps_ecdf">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_sps_ecdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.utils.CDF_bundle.from_sps_ecdf" title="Link to this definition">¶</a></dt>
-<dd><p>utility to tranform sps.ecdf to cdf_bundle</p>
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.eCDF_bundle.from_sps_ecdf">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_sps_ecdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.utils.eCDF_bundle.from_sps_ecdf" title="Link to this definition">¶</a></dt>
+<dd><p>utility to tranform sps.ecdf to eCDF_bundle</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.transform_ecdf_bundle">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.utils.</span></span><span class="sig-name descname"><span class="pre">transform_ecdf_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.utils.transform_ecdf_bundle" title="Link to this definition">¶</a></dt>
-<dd><p>utility to tranform sps.ecdf to cdf_bundle</p>
+<dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.transform_eeCDF_bundle">
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.utils.</span></span><span class="sig-name descname"><span class="pre">transform_eeCDF_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.utils.transform_eeCDF_bundle" title="Link to this definition">¶</a></dt>
+<dd><p>utility to tranform sps.ecdf to eCDF_bundle</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyuncertainnumber.pba.utils.pl_ecdf_bounding_bundles">
-<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.utils.</span></span><span class="sig-name descname"><span class="pre">pl_ecdf_bounding_bundles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b_l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyuncertainnumber.pba.utils.CDF_bundle" title="pyuncertainnumber.pba.utils.CDF_bundle"><span class="pre">CDF_bundle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyuncertainnumber.pba.utils.CDF_bundle" title="pyuncertainnumber.pba.utils.CDF_bundle"><span class="pre">CDF_bundle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.utils.pl_ecdf_bounding_bundles" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyuncertainnumber.pba.utils.</span></span><span class="sig-name descname"><span class="pre">pl_ecdf_bounding_bundles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b_l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle" title="pyuncertainnumber.pba.utils.eCDF_bundle"><span class="pre">eCDF_bundle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle" title="pyuncertainnumber.pba.utils.eCDF_bundle"><span class="pre">eCDF_bundle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyuncertainnumber.pba.utils.pl_ecdf_bounding_bundles" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -593,18 +593,18 @@
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.cdf_bundle"><code class="docutils literal notranslate"><span class="pre">cdf_bundle</span></code></a><ul>
-<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.cdf_bundle.quantiles"><code class="docutils literal notranslate"><span class="pre">cdf_bundle.quantiles</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.cdf_bundle.probabilities"><code class="docutils literal notranslate"><span class="pre">cdf_bundle.probabilities</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle"><code class="docutils literal notranslate"><span class="pre">eCDF_bundle</span></code></a><ul>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle.quantiles"><code class="docutils literal notranslate"><span class="pre">eCDF_bundle.quantiles</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle.probabilities"><code class="docutils literal notranslate"><span class="pre">eCDF_bundle.probabilities</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.CDF_bundle"><code class="docutils literal notranslate"><span class="pre">CDF_bundle</span></code></a><ul>
-<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.CDF_bundle.quantiles"><code class="docutils literal notranslate"><span class="pre">CDF_bundle.quantiles</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.CDF_bundle.probabilities"><code class="docutils literal notranslate"><span class="pre">CDF_bundle.probabilities</span></code></a></li>
-<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.CDF_bundle.from_sps_ecdf"><code class="docutils literal notranslate"><span class="pre">CDF_bundle.from_sps_ecdf()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle"><code class="docutils literal notranslate"><span class="pre">eCDF_bundle</span></code></a><ul>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle.quantiles"><code class="docutils literal notranslate"><span class="pre">eCDF_bundle.quantiles</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle.probabilities"><code class="docutils literal notranslate"><span class="pre">eCDF_bundle.probabilities</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.eCDF_bundle.from_sps_ecdf"><code class="docutils literal notranslate"><span class="pre">eCDF_bundle.from_sps_ecdf()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.transform_ecdf_bundle"><code class="docutils literal notranslate"><span class="pre">transform_ecdf_bundle()</span></code></a></li>
+<li><a class="reference internal" href="#pyuncertainnumber.pba.utils.transform_eeCDF_bundle"><code class="docutils literal notranslate"><span class="pre">transform_eeCDF_bundle()</span></code></a></li>
 <li><a class="reference internal" href="#pyuncertainnumber.pba.utils.pl_ecdf_bounding_bundles"><code class="docutils literal notranslate"><span class="pre">pl_ecdf_bounding_bundles()</span></code></a></li>
 <li><a class="reference internal" href="#pyuncertainnumber.pba.utils.sorting"><code class="docutils literal notranslate"><span class="pre">sorting()</span></code></a></li>
 <li><a class="reference internal" href="#pyuncertainnumber.pba.utils.weighted_ecdf"><code class="docutils literal notranslate"><span class="pre">weighted_ecdf()</span></code></a></li>

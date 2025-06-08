@@ -951,11 +951,11 @@ def simple_stacking(itvls):
         - only meant for quick use during development
         - see `stacking` function for production use
     """
-    from .utils import weighted_ecdf, CDF_bundle
+    from .utils import weighted_ecdf, eCDF_bundle
 
     q1, p1 = weighted_ecdf(itvls.lo)
     q2, p2 = weighted_ecdf(itvls.hi)
 
-    cdf1 = CDF_bundle(q1, p1)
-    cdf2 = CDF_bundle(q2, p2)
+    cdf1 = eCDF_bundle(q1, p1)
+    cdf2 = eCDF_bundle(q2, p2)
     return Staircase.from_CDFbundle(cdf1, cdf2)

@@ -18,7 +18,7 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: pbox_fromeF(a: pyuncertainnumber.pba.utils.CDF_bundle, b: pyuncertainnumber.pba.utils.CDF_bundle)
+.. py:function:: pbox_fromeF(a: pyuncertainnumber.pba.utils.eCDF_bundle, b: pyuncertainnumber.pba.utils.eCDF_bundle)
 
    pbox from emipirical CDF bundle
    :param - a: CDF bundle of lower extreme F;
