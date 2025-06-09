@@ -412,7 +412,7 @@ class UncertainNumber:
 
     @classmethod
     def from_ds(cls, ds):
-        cls.from_pbox(ds.to_pbox())
+        return cls.from_pbox(ds.to_pbox())
 
     @classmethod
     def from_sps(cls, sps_dist):

@@ -16,27 +16,6 @@ if TYPE_CHECKING:
     from .pbox_abc import Pbox
     from .dss import DempsterShafer
 
-# makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
-
-# __all__ = [
-#     "stochastic_mixture",
-#     "envelope",
-#     "imposition",
-#     "stacking",
-#     "env_ecdf",
-#     "env_ecdf_sep",
-# ]
-
-
-# def expose_functions_as_public(mapping, wrapper):
-#     """
-#     mapping: dict of {public_name: private_function}
-#     wrapper: function decorator to wrap private_function for public API
-#     """
-#     globals_ = globals()
-#     for public_name, func in mapping.items():
-#         globals_[public_name] = wrapper(func)
-
 
 # envelope
 def _envelope(*l_constructs: Pbox | DempsterShafer | Number) -> Staircase:
@@ -116,7 +95,7 @@ def stacking(
     """stochastic mixture operation of Intervals with probability masses
 
     args:
-        - l_constructs (list): list of uncertain numbers
+        - l_constructs (list): list of constructs of uncertain numbers
         - weights (list): list of weights
         - display (Boolean): boolean for plotting
         - return_type (str): {'pbox' or 'ds' or 'bounds'}
@@ -239,3 +218,12 @@ api_map = {
 expose_functions_as_public(api_map, UNtoUN)
 
 __all__ = list(api_map.keys())
+__all__.extend(
+    [
+        "stacking",
+        "mixture_pbox",
+        "mixture_ds",
+        "env_ecdf",
+        "env_ecdf_sep",
+    ]
+)
