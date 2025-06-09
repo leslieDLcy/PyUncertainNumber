@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 import re
 import math
 from decimal import Decimal
-from ..pba.intervals import Interval as I
 import numpy as np
 from ..characterisation.utils import (
     PlusMinus_parser,
@@ -16,10 +15,11 @@ from ..characterisation.utils import (
     initial_list_checking,
     bad_list_checking,
 )
-from ..pba.params import Params
+from .params import Params
 
 if TYPE_CHECKING:
     from ..pba.pbox_abc import Pbox
+    from ..pba.intervals import Interval as I
 
 __all__ = ["hedge_interpret"]
 
@@ -62,6 +62,8 @@ def hedge_interpret(hedge: str, return_type="interval") -> I | Pbox:
         kwd = ""
 
     if return_type == "interval":
+        from ..pba.intervals import Interval as I
+
         # return the interval object
         match kwd:
             case "exactly":
@@ -134,7 +136,11 @@ def parse_interval_expression(expression):
             # if we take the percentage literally
             # return I.from_meanform(parsed_mid_value, hw=mid_range)
             # if we take the percentage based on the context
-            return I.from_meanform(parsed_mid_value, hw=parsed_mid_value * mid_range)
+            from ..pba.intervals import Interval as I
+
+            return I.from_meanform(
+                parsed_mid_value, half_width=parsed_mid_value * mid_range
+            )
     else:
         return "not a valid expression"
 

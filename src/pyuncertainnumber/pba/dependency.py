@@ -42,6 +42,7 @@ class Dependency:
         return self._copula.cdf(u)
 
     def sample(self, n: int):
+        """draws n samples in the U space"""
         return self._copula.rvs(n)
 
     def display(self, style="3d", ax=None):

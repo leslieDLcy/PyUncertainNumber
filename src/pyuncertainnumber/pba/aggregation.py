@@ -2,38 +2,66 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import numpy as np
 from .intervals.intervalOperators import make_vec_interval
-from .utils import weighted_ecdf, CDF_bundle, reweighting
-import matplotlib.pyplot as plt
+from .utils import reweighting
+from .ecdf import eCDF_bundle, get_ecdf
 from .intervals import Interval
 import functools
-
-
+from numbers import Number
+from ..decorator import UNtoUN
 from .pbox_abc import Staircase, convert_pbox
+from .utils import expose_functions_as_public
+
 
 if TYPE_CHECKING:
     from .pbox_abc import Pbox
     from .dss import DempsterShafer
 
-# makeUN = importlib.import_module("pyuncertainnumber.characterisation.core").makeUN
 
-__all__ = [
-    "stochastic_mixture",
-    "envelope",
-    "imposition",
-    "stacking",
-    "env_ecdf",
-    "env_ecdf_sep",
-]
+# envelope
+def _envelope(*l_constructs: Pbox | DempsterShafer | Number) -> Staircase:
+    """calculates the envelope of uncertain number constructs
+
+    args:
+        l_constructs (list): the components, constructs only, on which the envelope operation applied on.
+
+    returns:
+        the envelope of the given arguments,  either a p-box or an interval.
+    """
+
+    def binary_env(p1, p2):
+        return p1.env(p2)
+
+    xs = [convert_pbox(x) for x in l_constructs]
+    return functools.reduce(binary_env, xs)
 
 
-# TODO: if adding the decorator to make UN class
-# @makeUN
-# TODO: add return type argument
-def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
+# imposition
+def _imposition(*l_constructs: Staircase | DempsterShafer | Number) -> Staircase:
+    """Returns the imposition/intersection of the list of p-boxes
+
+    args:
+        - l_constructs (list): a list of UN objects to be mixed
+
+    returns:
+        - Pbox
+
+    note:
+        - #TODO verfication needed for the base function `p1.imp(p2)`
+    """
+
+    def binary_imp(p1, p2):
+        return p1.imp(p2)
+
+    xs = [convert_pbox(x) for x in l_constructs]
+    return functools.reduce(binary_imp, xs)
+
+
+# mixture
+def _stochastic_mixture(*l_constructs, weights=None, display=False, **kwargs):
     """it could work for either Pbox, distribution, DS structure or Intervals
 
     args:
-        - l_un (list): list of uncertain numbers constructs
+        - l_constructs (list): list of constructs of uncertain number
         - weights (list): list of weights
         - display (Boolean): boolean for plotting
     # TODO mix types later
@@ -45,16 +73,20 @@ def stochastic_mixture(l_uns, weights=None, display=False, **kwargs):
     from .dss import DempsterShafer
     from .intervals import Interval
 
-    if isinstance(l_uns[0], Interval | list):
-        return stacking(l_uns, weights, display=display, **kwargs)
-    elif isinstance(l_uns[0], Pbox):
-        return mixture_pbox(l_uns, weights, display=display)
-    elif isinstance(l_uns[0], DempsterShafer):
-        return mixture_ds(l_uns, display=display)
+    if isinstance(l_constructs[0], Interval | list):
+        return stacking(l_constructs, weights=weights, display=display, **kwargs)
+    elif isinstance(l_constructs[0], Pbox):
+        return mixture_pbox(*l_constructs, weights, display=display)
+    elif isinstance(l_constructs[0], DempsterShafer):
+        return mixture_ds(*l_constructs, display=display)
+
+
+# * --------------- construct levels ----------------- * #
 
 
 def stacking(
     vec_interval: Interval | list[Interval],
+    *,
     weights=None,
     display=False,
     ax=None,
@@ -64,32 +96,34 @@ def stacking(
     """stochastic mixture operation of Intervals with probability masses
 
     args:
-        - l_un (list): list of uncertain numbers
+        - l_constructs (list): list of constructs of uncertain numbers
         - weights (list): list of weights
         - display (Boolean): boolean for plotting
         - return_type (str): {'pbox' or 'ds' or 'bounds'}
 
     return:
-        - the left and right bound F in `cdf_bundlebounds` by default
+        - the left and right bound F in `eCDF_bundlebounds` by default
         but can choose to return a p-box
 
     note:
+        - it takes a list of intervals or a single vectorised interval, which is
+        a different signature compared to the other aggregation functions.
         - together the interval and masses, it can be deemed that all the inputs
         required is jointly a DS structure
     """
     from .pbox_abc import Staircase
     from .dss import DempsterShafer
-    from .utils import plot_two_cdf_bundle
+    from .ecdf import plot_two_eCDF_bundle
 
     vec_interval = make_vec_interval(vec_interval)
-    q1, p1 = weighted_ecdf(vec_interval.lo, weights)
-    q2, p2 = weighted_ecdf(vec_interval.hi, weights)
+    q1, p1 = get_ecdf(vec_interval.lo, weights)
+    q2, p2 = get_ecdf(vec_interval.hi, weights)
 
-    cdf1 = CDF_bundle(q1, p1)
-    cdf2 = CDF_bundle(q2, p2)
+    cdf1 = eCDF_bundle(q1, p1)
+    cdf2 = eCDF_bundle(q2, p2)
 
     if display:
-        plot_two_cdf_bundle(cdf1, cdf2, ax=ax, **kwargs)
+        plot_two_eCDF_bundle(cdf1, cdf2, ax=ax, **kwargs)
 
     match return_type:
         case "pbox":
@@ -102,9 +136,7 @@ def stacking(
             raise ValueError("return_type must be one of {'pbox', 'dss', 'cdf'}")
 
 
-def mixture_pbox(l_pboxes, weights=None, display=False):
-
-    from .pbox_base import Pbox
+def mixture_pbox(*l_pboxes, weights=None, display=False) -> Pbox:
 
     if weights is None:
         N = len(l_pboxes)
@@ -121,7 +153,7 @@ def mixture_pbox(l_pboxes, weights=None, display=False):
     return pb
 
 
-def mixture_ds(l_ds, display=False):
+def mixture_ds(*l_ds, display=False) -> DempsterShafer:
     """mixture operation for DS structure"""
 
     from .dss import DempsterShafer
@@ -131,43 +163,6 @@ def mixture_ds(l_ds, display=False):
     # assert sorted(intervals) == np.unique(intervals), "intervals replicate"
     masses = reweighting([ds.masses for ds in l_ds])
     return DempsterShafer(intervals, masses)
-
-
-def imposition(l_un: list[Staircase | float | int]) -> Staircase:
-    """Returns the imposition/intersection of the list of p-boxes
-
-    args:
-        - l_un (list): a list of UN objects to be mixed
-
-    returns:
-        - Pbox
-
-    note:
-        - #TODO verfication needed for the base function `p1.imp(p2)`
-    """
-
-    def binary_imp(p1, p2):
-        return p1.imp(p2)
-
-    xs = [convert_pbox(x) for x in l_un]
-    return functools.reduce(binary_imp, xs)
-
-
-def envelope(l_un):
-    """calculates the envelope of uncertain number constructs
-
-    args:
-        l_un (array like): the components, uncertain number constructs only, on which the envelope operation applied on.
-
-    returns:
-        the envelope of the given arguments,  either a p-box or an interval.
-    """
-
-    def binary_env(p1, p2):
-        return p1.env(p2)
-
-    xs = [convert_pbox(x) for x in l_un]
-    return functools.reduce(binary_env, xs)
 
 
 def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
@@ -183,9 +178,9 @@ def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
     note:
         envelope on a set of empirical CDFs
     """
-    from .utils import ecdf, weighted_ecdf
+    from .utils import ecdf, get_ecdf
 
-    ecdf_func = weighted_ecdf if ecdf_choice == "canonical" else ecdf
+    ecdf_func = get_ecdf if ecdf_choice == "canonical" else ecdf
 
     # assume each row as a sample and eCDF
     q_list = []
@@ -201,7 +196,7 @@ def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
     if ret_type == "pbox":
         return Staircase(left=l_bound, right=u_bound)
     elif ret_type == "cdf":
-        return CDF_bundle(l_bound, pp), CDF_bundle(u_bound, pp)
+        return eCDF_bundle(l_bound, pp), eCDF_bundle(u_bound, pp)
 
 
 def env_ecdf_sep(*ecdfs, ret_type="pbox", ecdf_choice="canonical"):
@@ -209,3 +204,29 @@ def env_ecdf_sep(*ecdfs, ret_type="pbox", ecdf_choice="canonical"):
 
     data = np.array(ecdfs)
     return env_ecdf(data, ret_type=ret_type, ecdf_choice=ecdf_choice)
+
+
+# exposed APIs
+
+
+# envelope = UNtoUN(_envelope)
+
+# Mapping: public API name -> private function
+api_map = {
+    "envelope": _envelope,
+    "imposition": _imposition,
+    "stochastic_mixture": _stochastic_mixture,
+}
+
+expose_functions_as_public(api_map, UNtoUN)
+
+__all__ = list(api_map.keys())
+__all__.extend(
+    [
+        "stacking",
+        "mixture_pbox",
+        "mixture_ds",
+        "env_ecdf",
+        "env_ecdf_sep",
+    ]
+)

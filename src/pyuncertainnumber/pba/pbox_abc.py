@@ -7,7 +7,6 @@ from numbers import Number
 import operator
 import itertools
 from .utils import condensation, smooth_condensation, find_nearest, is_increasing
-
 import logging
 
 # Configure the logging system with a simple format
@@ -45,8 +44,34 @@ def bound_steps_check(bound):
         # 'next' kind interpolation needed
         from .constructors import interpolate_p
 
-        p_lo, bound = interpolate_p(p=np.linspace(0.0001, 0.9999, len(bound)), q=bound)
+        p_lo, bound = interpolate_p(
+            p=np.linspace(Params.p_lboundary, Params.p_hboundary, len(bound)), q=bound
+        )
     return bound
+
+
+# * --------------------- constructors ---------------------*#
+def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
+    """transform into pbox object from extreme bounds parameterised by `sps.dist`
+
+    args:
+        rvs (list): list of scipy.stats.rv_continuous objects"""
+
+    # x_sup
+    bounds = [rv.ppf(Params.p_values) for rv in rvs]
+
+    if bounds[0][-1] > bounds[1][-1]:
+        # swap left and right bounds
+        bounds[0], bounds[1] = bounds[1], bounds[0]
+
+    if extre_bound_params is not None:
+        print(extre_bound_params)
+
+    return Staircase(
+        left=bounds[0],
+        right=bounds[1],
+        shape=shape,
+    )
 
 
 class Pbox(ABC):
@@ -113,6 +138,7 @@ class Pbox(ABC):
     @left.setter
     def left(self, value):
         self._left = bound_steps_check(value)
+        self.steps = len(self._left)
 
     @property
     def right(self):
@@ -121,6 +147,7 @@ class Pbox(ABC):
     @right.setter
     def right(self, value):
         self._right = bound_steps_check(value)
+        self.steps = len(self._right)
 
     @property
     def lo(self):
@@ -397,12 +424,17 @@ class Staircase(Pbox):
     # * --------------------- constructors ---------------------*#
     @classmethod
     def from_CDFbundle(cls, a, b):
-        """pbox from emipirical CDF bundle
+        """pbox from two emipirical CDF bundle
+
         args:
             - a : CDF bundle of lower extreme F;
             - b : CDF bundle of upper extreme F;
         """
         from .constructors import interpolate_p
+        from .utils import extend_ecdf
+
+        a = extend_ecdf(a)
+        b = extend_ecdf(b)
 
         p_lo, q_lo = interpolate_p(a.probabilities, a.quantiles)
         p_hi, q_hi = interpolate_p(b.probabilities, b.quantiles)
@@ -951,11 +983,11 @@ def simple_stacking(itvls):
         - only meant for quick use during development
         - see `stacking` function for production use
     """
-    from .utils import weighted_ecdf, CDF_bundle
+    from .utils import get_ecdf, eCDF_bundle
 
-    q1, p1 = weighted_ecdf(itvls.lo)
-    q2, p2 = weighted_ecdf(itvls.hi)
+    q1, p1 = get_ecdf(itvls.lo)
+    q2, p2 = get_ecdf(itvls.hi)
 
-    cdf1 = CDF_bundle(q1, p1)
-    cdf2 = CDF_bundle(q2, p2)
+    cdf1 = eCDF_bundle(q1, p1)
+    cdf2 = eCDF_bundle(q2, p2)
     return Staircase.from_CDFbundle(cdf1, cdf2)

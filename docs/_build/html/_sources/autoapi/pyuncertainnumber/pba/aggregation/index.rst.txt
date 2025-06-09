@@ -48,7 +48,7 @@ Module Contents
 
    :returns:
 
-             - the left and right bound F in `cdf_bundlebounds` by default
+             - the left and right bound F in `eCDF_bundlebounds` by default
              but can choose to return a p-box
 
    .. note::

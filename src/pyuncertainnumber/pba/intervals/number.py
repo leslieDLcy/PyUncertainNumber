@@ -306,7 +306,7 @@ class Interval:
 
     def __rmul__(self, left):
         leftType = left.__class__.__name__
-        if (leftType == "ndarray") | (leftType in NUMERIC_TYPES):
+        if (leftType == "ndarray") | (leftType in NUMERIC_TYPES) | np.isscalar(left):
             return self.__mul__(left)
         else:
             return NotImplemented

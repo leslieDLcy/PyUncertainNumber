@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
-from typing import Type, Union, List
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import functools
 
 # from .measurand import Measurand
@@ -7,15 +7,12 @@ import functools
 from .uncertainty_types import Uncertainty_types
 from .ensemble import Ensemble
 from .utils import *
-from ..pba.params import Params
+from .config import Config
 from pathlib import Path
 from ..nlp.language_parsing import hedge_interpret
-from scipy.stats import norm
 from .check import DistributionSpecification
 from ..pba.pbox_parametric import named_pbox
-from typing import Sequence
-from ..pba.distributions import Distribution
-from ..pba.intervals.intervalOperators import parse_bounds
+from ..pba.intervals.intervalOperators import parse_bounds, wc_scalar_interval_feature
 from ..pba.intervals.number import Interval
 from numbers import Number
 from ..pba.distributions import Distribution
@@ -23,6 +20,12 @@ import operator
 from pint import Quantity
 
 """ Uncertain Number class """
+
+
+if TYPE_CHECKING:
+    from ..pba.intervals.number import Interval
+    from ..pba.distributions import Distribution
+
 
 __all__ = [
     "UncertainNumber",
@@ -368,6 +371,8 @@ class UncertainNumber:
             return cls.from_ds(construct)
         if isinstance(construct, Distribution):
             return cls.fromDistribution(construct)
+        if isinstance(construct, cls):
+            return construct
         else:
             raise ValueError("The construct object is not recognised")
 
@@ -410,7 +415,7 @@ class UncertainNumber:
 
     @classmethod
     def from_ds(cls, ds):
-        cls.from_pbox(ds.to_pbox())
+        return cls.from_pbox(ds.to_pbox())
 
     @classmethod
     def from_sps(cls, sps_dist):
@@ -483,7 +488,7 @@ class UncertainNumber:
     def JSON_dump(self, filename="UN_data.json"):
         """the JSON serialisation of the UN object into the filesystem"""
 
-        filepath = Path(Params.result_path) / filename
+        filepath = Path(Config.result_path) / filename
         with open(filepath, "w") as fp:
             json.dump(self, fp, cls=UNEncoder, indent=4)
 
@@ -513,9 +518,9 @@ def constructUN(func):
     return wrapper_decorator
 
 
-def I(i: str | list[float | int]) -> UncertainNumber:
+def I(*args: str | list[Number] | Interval) -> UncertainNumber:
     """a shortcut for the interval-type UN object"""
-    return UncertainNumber.fromConstruct(parse_bounds(i))
+    return UncertainNumber.fromConstruct(wc_scalar_interval_feature(*args))
 
 
 # * ---------------------parse inputs for UN only  --------------------- *#

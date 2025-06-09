@@ -1999,7 +1999,7 @@ Package Contents
 
 
 
-.. py:function:: KS_bounds(s, alpha: float, display=True) -> Tuple[pyuncertainnumber.pba.utils.CDF_bundle, pyuncertainnumber.pba.utils.CDF_bundle]
+.. py:function:: KS_bounds(s, alpha: float, display=True) -> Tuple[pyuncertainnumber.pba.utils.eCDF_bundle, pyuncertainnumber.pba.utils.eCDF_bundle]
 
    construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
 
@@ -2096,7 +2096,7 @@ Package Contents
 
    :returns:
 
-             - the left and right bound F in `cdf_bundlebounds` by default
+             - the left and right bound F in `eCDF_bundlebounds` by default
              but can choose to return a p-box
 
    .. note::

@@ -1,7 +1,7 @@
 from __future__ import annotations
 import functools
 
-from .pbox_abc import Pbox, Leaf
+from .pbox_abc import Pbox, Leaf, pbox_from_extredists
 import scipy.stats as sps
 import numpy as np
 import itertools
@@ -31,22 +31,27 @@ def _bound_pcdf(dist_family, *args, **kwargs):
     """bound the parametric CDF
 
     note:
+        - top-level implemenatation
         - only support fully bounded parameters
     """
     from .pbox_abc import Leaf
 
-    Left, Right, mean, var = _get_bounds(dist_family, *args, **kwargs)
+    Left, Right, mean, var = _parametric_bounds(dist_family, *args, **kwargs)
     return Leaf(
         left=Left, right=Right, shape=dist_family, dist_params=args, mean=mean, var=var
     )
 
 
-def _get_bounds(dist_family, *args, steps=Params.steps):
-    """from distribution specification to define the lower and upper bounds of the p-box
+def _parametric_bounds(dist_family, *args, steps=Params.steps):
+    """from parametric distribution specification to define the lower and upper bound of the p-box
 
     args:
         - dist_family: (str) the name of the distribution
-        *args : several parameter (interval or list)
+        - *args : several parameter (interval or list)
+
+    note:
+        - middle level implementation
+
     """
 
     from .distributions import named_dists
@@ -184,9 +189,10 @@ def erlang(*args):
     return "erlang"
 
 
-@makePbox
-def expon(*args):
-    return "expon"
+# special case due to kwargs (scale)
+# @makePbox
+# def expon(*args):
+#     return "expon"
 
 
 @makePbox
@@ -748,6 +754,10 @@ def uniform(a, b, steps=Params.steps):
     )
 
 
+def expon(scale, loc=0, steps=Params.steps):
+    return _bound_pcdf("expon", loc, scale)
+
+
 def trapz(a, b, c, d, steps=Params.steps):
     if a.__class__.__name__ != "wc_scalar_interval":
         a = wc_scalar_interval(a)
@@ -782,7 +792,7 @@ def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
 
     a, b = (left - mean) / stddev, (right - mean) / stddev
 
-    Left, Right, mean, var = _get_bounds("truncnorm", steps, a, b, mean, stddev)
+    Left, Right, mean, var = _parametric_bounds("truncnorm", steps, a, b, mean, stddev)
 
     return Pbox(
         Left,

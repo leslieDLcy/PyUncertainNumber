@@ -79,7 +79,7 @@ class DempsterShafer:
     def to_pbox(self):
         dss_pbox = agg.stacking(
             self.intervals,
-            self.masses,
+            weights=self.masses,
             display=False,
             return_type="pbox",
         )
