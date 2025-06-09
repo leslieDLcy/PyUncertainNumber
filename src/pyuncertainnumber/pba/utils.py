@@ -16,7 +16,8 @@ from matplotlib.legend_handler import HandlerBase
 def extend_ecdf(cdf):
     """add zero and one to the ecdf
 
-    args: CDF_bundle
+    args:
+        CDF_bundle
     """
     if cdf.probabilities[0] != 0:
         cdf.probabilities = np.insert(cdf.probabilities, 0, 0)
@@ -217,6 +218,15 @@ import sys
 
 
 def expose_functions_as_public(mapping, wrapper):
+    """expose private functions as public APIs
+
+    args:
+        mapping (dict): a dictionary containing private function names mapped to public APIs
+        wrapper (callable): a function that wraps the original functions (e.g., the decorator UNtoUN)
+
+    note:
+        the decorator which wraps the original function returning Pbox into returning UN, hence making the public UN API
+    """
     # Get the module that called this function
     caller_globals = sys._getframe(1).f_globals
     for name, fn in mapping.items():
