@@ -7,7 +7,7 @@ import functools
 from .uncertainty_types import Uncertainty_types
 from .ensemble import Ensemble
 from .utils import *
-from ..pba.params import Params
+from .config import Config
 from pathlib import Path
 from ..nlp.language_parsing import hedge_interpret
 from scipy.stats import norm
@@ -483,7 +483,7 @@ class UncertainNumber:
     def JSON_dump(self, filename="UN_data.json"):
         """the JSON serialisation of the UN object into the filesystem"""
 
-        filepath = Path(Params.result_path) / filename
+        filepath = Path(Config.result_path) / filename
         with open(filepath, "w") as fp:
             json.dump(self, fp, cls=UNEncoder, indent=4)
 
@@ -511,6 +511,18 @@ def constructUN(func):
         return UncertainNumber.fromConstruct(p)
 
     return wrapper_decorator
+
+
+# def exposeUN(func):
+#     """from a construct to create a UN with a choice"""
+
+#     @functools.wraps(func)
+#     def wrapper_decorator(*args, **kwargs):
+#         return_raw = kwargs.pop("return_raw", False)
+#         p = func(*args, **kwargs)
+#         return p if return_raw else UncertainNumber.fromConstruct(p)
+
+#     return wrapper_decorator
 
 
 def I(i: str | list[float | int]) -> UncertainNumber:

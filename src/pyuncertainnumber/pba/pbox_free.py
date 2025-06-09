@@ -10,6 +10,7 @@ from .params import Params
 from .ecdf import pl_ecdf_bounding_bundles, get_ecdf, eCDF_bundle
 from .imprecise import imprecise_ecdf
 from numbers import Number
+from ..decorator import exposeUN
 
 """ non-parametric pbox  """
 
@@ -203,6 +204,7 @@ def handle_default(**kwargs):
 # * --------------------- supporting functions---------------------*#
 
 
+@exposeUN
 def min_max(minimum: Number, maximum: Number) -> Staircase:
     """Equivalent to an interval object constructed as a nonparametric Pbox.
 
@@ -221,6 +223,7 @@ def min_max(minimum: Number, maximum: Number) -> Staircase:
     )
 
 
+@exposeUN
 def min_mean(minimum, mean, steps=Params.steps) -> Staircase:
     """Nonparametric pbox construction based on constraint of minimum and mean
 
@@ -241,6 +244,7 @@ def min_mean(minimum, mean, steps=Params.steps) -> Staircase:
     )
 
 
+@exposeUN
 def max_mean(
     maximum: Number,
     mean: Number,
@@ -259,6 +263,7 @@ def max_mean(
     return min_mean(-maximum, -mean).__neg__()
 
 
+@exposeUN
 def mean_std(mean: Number, std: Number, steps=Params.steps) -> Staircase:
     """Nonparametric pbox construction based on constraint of mean and std
 
@@ -277,6 +282,7 @@ def mean_std(mean: Number, std: Number, steps=Params.steps) -> Staircase:
     return Staircase(left=left, right=right, mean=I(mean, mean), var=I(std**2, std**2))
 
 
+@exposeUN
 def mean_var(
     mean: Number,
     var: Number,
@@ -293,6 +299,7 @@ def mean_var(
     return mean_std(mean, np.sqrt(var))
 
 
+@exposeUN
 def min_max_mean(
     minimum: Number,
     maximum: Number,
@@ -327,6 +334,7 @@ def min_max_mean(
     )
 
 
+@exposeUN
 def pos_mean_std(
     mean: Union[float, int],
     std: Union[float, int],
@@ -362,6 +370,7 @@ def pos_mean_std(
     )
 
 
+@exposeUN
 def min_max_mode(
     minimum: Number,
     maximum: Number,
@@ -394,13 +403,13 @@ def min_max_mode(
     return Staircase(left=l, right=r, mean=I(mean_l, mean_r), var=I(var_l, var_r))
 
 
+@exposeUN
 def min_max_median(
     minimum: Number,
     maximum: Number,
     median: Number,
     steps: int = Params.steps,
 ) -> Pbox:
-    # TODO error in function
     """
     Generates a distribution-free p-box based upon the minimum, maximum and median of the variable
 
@@ -416,16 +425,7 @@ def min_max_median(
     if minimum == maximum:
         return min_max(minimum, maximum)
 
-    # ii = np.array([i / steps for i in range(steps)])
-    # jj = np.array([j / steps for j in range(1, steps + 1)])
-
-    # return Staircase(
-    #     left=np.array([p if p > 0.5 else minimum for p in ii]),
-    #     right=np.array([p if p <= 0.5 else minimum for p in jj]),
-    #     mean=I((minimum + median) / 2, (median + maximum) / 2),
-    #     var=I(0, (maximum - minimum) * (maximum - minimum) / 4),
-    # )
-    p_minmax = min_max(minimum, maximum)
+    p_minmax = I(minimum, maximum).to_pbox()
     r = p_minmax.alpha_cut(0.5)
     l = p_minmax.left.copy()
 
@@ -442,82 +442,7 @@ def min_max_median(
     )
 
 
-# TODO not updated yet
-# def min_max_median_is_mode(
-#     minimum: Union[I, float, int],
-#     maximum: Union[I, float, int],
-#     m: Union[I, float, int],
-#     steps: int = Params.steps,
-# ) -> Pbox:
-#
-#     """
-#     Generates a distribution-free p-box based upon the minimum, maximum and median/mode of the variable when median = mode.
-
-#     **Parameters**:
-
-#         ``minimum`` : minimum value of the variable
-
-#         ``maximum`` : maximum value of the variable
-
-#         ``m`` : m = median = mode value of the variable
-
-
-#     **Returns**:
-
-#         ``Pbox``
-
-#     """
-#     ii = np.array([i / steps for i in range(steps)])
-#     jjj = [j / steps for j in range(1, steps - 1)] + [1 - 1 / steps]
-
-#     u = [p * 2 * (m - minimum) + minimum if p <= 0.5 else m for p in ii]
-
-#     d = [(p - 0.5) * 2 * (maximum - m) + m if p > 0.5 else m for p in jjj]
-
-#     return Pbox(
-#         left=u,
-#         right=d,
-#         mean_left=(minimum + 3 + m) / 4,
-#         mean_right=(3 * m + maximum) / 4,
-#         var_left=0,
-#         var_right=(maximum - minimum) * (maximum - minimum) / 4,
-#     )
-
-# TODO not updated yet
-# def symmetric_mean_std(
-#     mean: Union[I, float, int],
-#     std: Union[I, float, int],
-#     steps: int = Params.steps,
-# ) -> Pbox:
-#     """
-#     Generates a symmetrix distribution-free p-box based upon the mean and standard deviation of the variable
-
-#     **Parameters**:
-
-#     ``mean`` :  mean value of the variable
-#     ``std`` : standard deviation of the variable
-
-#     **Returns**
-
-#         ``Pbox``
-
-#     """
-#     iii = [1 / steps] + [i / steps for i in range(1, steps - 1)]
-#     jjj = [j / steps for j in range(1, steps - 1)] + [1 - 1 / steps]
-
-#     u = [mean - std / np.sqrt(2 * p) if p <= 0.5 else mean for p in iii]
-#     d = [mean + std / np.sqrt(2 * (1 - p)) if p > 0.5 else mean for p in jjj]
-
-#     return Pbox(
-#         left=u,
-#         right=d,
-#         mean_left=mean,
-#         mean_right=mean,
-#         var_left=std**2,
-#         var_right=std**2,
-#     )
-
-
+@exposeUN
 def min_max_mean_std(
     minimum: Number,
     maximum: Number,
@@ -653,6 +578,7 @@ def min_max_mean_std(
     )
 
 
+@exposeUN
 def min_max_mean_var(
     minimum: Number,
     maximum: Number,
@@ -687,6 +613,7 @@ def min_max_mean_var(
     return min_max_mean_std(minimum, maximum, mean, np.sqrt(var), **kwargs)
 
 
+@exposeUN
 def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
     """yields a distribution-free p-box based on specified percentiles of the variable
 
