@@ -136,7 +136,11 @@ def parse_interval_expression(expression):
             # if we take the percentage literally
             # return I.from_meanform(parsed_mid_value, hw=mid_range)
             # if we take the percentage based on the context
-            return I.from_meanform(parsed_mid_value, hw=parsed_mid_value * mid_range)
+            from ..pba.intervals import Interval as I
+
+            return I.from_meanform(
+                parsed_mid_value, half_width=parsed_mid_value * mid_range
+            )
     else:
         return "not a valid expression"
 

@@ -106,6 +106,8 @@ def stacking(
         but can choose to return a p-box
 
     note:
+        - it takes a list of intervals or a single vectorised interval, which is
+        a different signature compared to the other aggregation functions.
         - together the interval and masses, it can be deemed that all the inputs
         required is jointly a DS structure
     """
