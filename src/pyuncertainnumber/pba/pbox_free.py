@@ -44,6 +44,12 @@ def KS_bounds(s, alpha: float, display=True) -> tuple[eCDF_bundle]:
     args:
         - s (array-like): sample data, precise and imprecise
         - dn (scalar): KS critical value at a significance level and sample size N;
+
+    returns:
+        - two CDF bounds, i.e. upper and lower (eCDF_bundle)
+
+    note:
+        With the upper and lower bounds, a free pbox can be constructed.
     """
     # TODO quantile of two bounds have different support ergo not a box yet
     # * to make the output as a pbox
@@ -144,6 +150,7 @@ def known_constraints(
     percentiles=None,
     std=None,
     var=None,
+    **kwargs,
 ) -> Pbox:
     args = {
         "maximum": maximum,
@@ -518,7 +525,7 @@ def min_max_mean_std(
     sl = s.left / ran
     mr = (m.right - minimum) / ran
     sr = s.right / ran
-    z = min_max(minimum, maximum)
+    z = I(minimum, maximum).to_pbox()
     n = len(z.left)
     L = [0.0] * n
     R = [1.0] * n

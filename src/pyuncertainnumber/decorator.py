@@ -33,10 +33,10 @@ def exposeUN(func):
 
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-        return_raw = kwargs.pop("return_raw", False)
+        return_construct = kwargs.pop("return_construct", False)
         p = func(*args, **kwargs)
 
-        if return_raw:
+        if return_construct:
             return p
         from .characterisation.uncertainNumber import UncertainNumber
 

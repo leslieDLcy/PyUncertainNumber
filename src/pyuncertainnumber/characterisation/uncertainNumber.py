@@ -368,6 +368,8 @@ class UncertainNumber:
             return cls.from_ds(construct)
         if isinstance(construct, Distribution):
             return cls.fromDistribution(construct)
+        if isinstance(construct, cls):
+            return construct
         else:
             raise ValueError("The construct object is not recognised")
 
