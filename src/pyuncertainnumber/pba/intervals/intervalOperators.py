@@ -10,73 +10,96 @@ from numbers import Number
 
 
 def parse_bounds(b):
+    """top-level function that universally parse scalar and vector bounds"""
     try:
         return wc_scalar_interval(b)
     except Exception:
         return make_vec_interval(b)
 
 
+# * ---------------------make scalar interval object --------------------- *#
+
+
+def wc_scalar_interval(bound):
+    """wildcard scalar interval
+
+    This function is used to parse a scalar bound into an Interval object.
+    It can handle various input types such as lists, tuples, and strings.
+    If the input is a string, it attempts to interpret it using the
+    `hedge_interpret` function or parse it as an interval expression.
+    If the input is a single number, it creates an Interval with that number
+    as both bounds.
+    """
+    from ...characterisation.uncertainNumber import UncertainNumber as UN
+
+    if isinstance(bound, list):
+        return Interval(*bound)
+    elif isinstance(bound, tuple):
+        return Interval(*bound)
+    elif isinstance(bound, Interval):
+        return bound
+    elif isinstance(bound, Number):
+        return Interval(bound, bound)
+    elif isinstance(bound, str):
+        try:
+            return hedge_interpret(bound)
+        except Exception:
+            pass
+        try:
+            return parse_interval_expression(bound)
+        except Exception:
+            raise ValueError("Invalid input")
+    elif isinstance(bound, UN):
+        return bound.construct
+    else:
+        raise TypeError("Unsupported type for interval creation")
+
+
+""" old implementation
+
+note: it is deprecated due to it cannot handle custom Class e.g. UN 
+because it has to import UN which creates circular import issue.
+"""
+
+
 # @singledispatch
-# def parse_scalar_bound(bounds):
-#     """parse the scalar type of bounds argument"""
-#     return wc_scalar_interval(bounds)
+# def wc_scalar_interval(bound):
+#     """wildcard scalar interval"""
+#     return Interval(bound)
 
 
-# @parse_scalar_bound.register(str)
-# def _str(bounds: str):
+# @wc_scalar_interval.register(list)
+# def _list(bound: list):
+#     return Interval(*bound)
+
+
+# @wc_scalar_interval.register(tuple)
+# def _tuple(bound: tuple):
+#     return Interval(*bound)
+
+
+# @wc_scalar_interval.register(Interval)
+# def _marco_interval_like(bound: Interval):
+#     return bound
+
+
+# @wc_scalar_interval.register(Number)
+# def _scalar(bound: Number):
+#     return Interval(bound, bound)
+
+
+# @wc_scalar_interval.register(str)
+# def _scalar(bound: str):
 
 #     try:
-#         return hedge_interpret(bounds)
+#         return hedge_interpret(bound)
 #     except Exception:
 #         pass
 
 #     try:
-#         return parse_interval_expression(bounds)
+#         return parse_interval_expression(bound)
 #     except Exception:
 #         raise ValueError("Invalid input")
-
-
-# * ---------------------make scalar interval object --------------------- *#
-
-
-@singledispatch
-def wc_scalar_interval(bound):
-    """wildcard scalar interval"""
-    return Interval(bound)
-
-
-@wc_scalar_interval.register(list)
-def _list(bound: list):
-    return Interval(*bound)
-
-
-@wc_scalar_interval.register(tuple)
-def _tuple(bound: tuple):
-    return Interval(*bound)
-
-
-@wc_scalar_interval.register(Interval)
-def _marco_interval_like(bound: Interval):
-    return bound
-
-
-@wc_scalar_interval.register(Number)
-def _scalar(bound: Number):
-    return Interval(bound, bound)
-
-
-@wc_scalar_interval.register(str)
-def _scalar(bound: str):
-
-    try:
-        return hedge_interpret(bound)
-    except Exception:
-        pass
-
-    try:
-        return parse_interval_expression(bound)
-    except Exception:
-        raise ValueError("Invalid input")
 
 
 # * ---------------------make vector interval object --------------------- *#

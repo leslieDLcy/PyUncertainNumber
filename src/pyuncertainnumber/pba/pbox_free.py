@@ -625,39 +625,23 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
     """yields a distribution-free p-box based on specified percentiles of the variable
 
     args:
-        ``percentiles`` : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: I(3,4), 1:5})
-        ``steps`` : number of steps to use in the p-box
+        percentiles : dictionary of percentiles and their values (e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: I(3,4), 1:5})
+        steps : number of steps to use in the p-box
 
-    .. important::
-
+    note:
         The percentiles dictionary is of the form {percentile: value}. Where value can either be a number or an I. If value is a number, the percentile is assumed to be a point percentile. If value is an I, the percentile is assumed to be an interval percentile.
-
-    .. warning::
-
         If no keys for 0 and 1 are given, ``-np.inf`` and ``np.inf`` are used respectively. This will result in a p-box that is not bounded and raise a warning.
-
         If the percentiles are not increasing, the percentiles will be intersected. This may not be desired behaviour.
+        ValueError: If any of the percentiles are not between 0 and 1.
 
-    .. error::
-
-        ``ValueError``: If any of the percentiles are not between 0 and 1.
-
-    **Returns**
-
-        ``Pbox``
-
-
-    **Example**:
-
-    .. code-block:: python
-
-        pba.from_percentiles(
-            {0: 0,
-            0.25: 0.5,
-            0.5: pba.I(1,2),
-            0.75: pba.I(1.5,2.5),
-            1: 3}
-        ).show()
+    Example:
+        >>> pba.from_percentiles(
+        >>>     {0: 0,
+        >>>     0.25: 0.5,
+        >>>     0.5: pba.I(1,2),
+        >>>     0.75: pba.I(1.5,2.5),
+        >>>     1: 3})
+        >>>     .show()
     """
     # check if 0 and 1 are in the dictionary
     if 0 not in percentiles.keys():
@@ -670,10 +654,12 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
     # sort the dictionary by percentile
     percentiles = dict(sorted(percentiles.items()))
 
+    from .intervals.intervalOperators import wc_scalar_interval
+
     # transform values to intervals
     for k, v in percentiles.items():
-        if not isinstance(v, I):
-            percentiles[k] = I(v, v)
+        # if not isinstance(v, I):
+        percentiles[k] = wc_scalar_interval(v)
 
     if any([p < 0 or p > 1 for p in percentiles.keys()]):
         raise ValueError("Percentiles must be between 0 and 1")
