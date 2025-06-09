@@ -211,3 +211,13 @@ class CustomEdgeRectHandler(HandlerBase):
         for patch in rect_patches:
             patch.set_transform(trans)
         return rect_patches
+
+
+import sys
+
+
+def expose_functions_as_public(mapping, wrapper):
+    # Get the module that called this function
+    caller_globals = sys._getframe(1).f_globals
+    for name, fn in mapping.items():
+        caller_globals[name] = wrapper(fn)
