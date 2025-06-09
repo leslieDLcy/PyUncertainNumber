@@ -107,6 +107,7 @@ because it has to import UN which creates circular import issue.
 
 def make_vec_interval(vec):
     """parse into a vector interval"""
+    from ...characterisation.uncertainNumber import UncertainNumber as UN
 
     assert len(vec) > 1, "Interval must have more than one element"
 
@@ -117,6 +118,8 @@ def make_vec_interval(vec):
             return intervalise(vec)
         except Exception:
             return intervalise(list(vec))
+    elif isinstance(vec[0], UN):
+        return intervalise([v.construct for v in vec])
     else:
         raise NotImplementedError
 

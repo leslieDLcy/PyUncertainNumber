@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
-from typing import Type, Union, List
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import functools
 
 # from .measurand import Measurand
@@ -10,11 +10,8 @@ from .utils import *
 from .config import Config
 from pathlib import Path
 from ..nlp.language_parsing import hedge_interpret
-from scipy.stats import norm
 from .check import DistributionSpecification
 from ..pba.pbox_parametric import named_pbox
-from typing import Sequence
-from ..pba.distributions import Distribution
 from ..pba.intervals.intervalOperators import parse_bounds
 from ..pba.intervals.number import Interval
 from numbers import Number
@@ -23,6 +20,12 @@ import operator
 from pint import Quantity
 
 """ Uncertain Number class """
+
+
+if TYPE_CHECKING:
+    from ..pba.intervals.number import Interval
+    from ..pba.distributions import Distribution
+
 
 __all__ = [
     "UncertainNumber",
@@ -515,19 +518,7 @@ def constructUN(func):
     return wrapper_decorator
 
 
-# def exposeUN(func):
-#     """from a construct to create a UN with a choice"""
-
-#     @functools.wraps(func)
-#     def wrapper_decorator(*args, **kwargs):
-#         return_raw = kwargs.pop("return_raw", False)
-#         p = func(*args, **kwargs)
-#         return p if return_raw else UncertainNumber.fromConstruct(p)
-
-#     return wrapper_decorator
-
-
-def I(i: str | list[float | int]) -> UncertainNumber:
+def I(i: str | list[Number] | Interval) -> UncertainNumber:
     """a shortcut for the interval-type UN object"""
     return UncertainNumber.fromConstruct(parse_bounds(i))
 

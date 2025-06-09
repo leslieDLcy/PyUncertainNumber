@@ -74,7 +74,7 @@ def _stochastic_mixture(*l_constructs, weights=None, display=False, **kwargs):
     from .intervals import Interval
 
     if isinstance(l_constructs[0], Interval | list):
-        return stacking(*l_constructs, weights, display=display, **kwargs)
+        return stacking(l_constructs, weights=weights, display=display, **kwargs)
     elif isinstance(l_constructs[0], Pbox):
         return mixture_pbox(*l_constructs, weights, display=display)
     elif isinstance(l_constructs[0], DempsterShafer):
@@ -86,6 +86,7 @@ def _stochastic_mixture(*l_constructs, weights=None, display=False, **kwargs):
 
 def stacking(
     vec_interval: Interval | list[Interval],
+    *,
     weights=None,
     display=False,
     ax=None,
