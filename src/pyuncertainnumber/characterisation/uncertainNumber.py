@@ -12,7 +12,7 @@ from pathlib import Path
 from ..nlp.language_parsing import hedge_interpret
 from .check import DistributionSpecification
 from ..pba.pbox_parametric import named_pbox
-from ..pba.intervals.intervalOperators import parse_bounds
+from ..pba.intervals.intervalOperators import parse_bounds, wc_scalar_interval_feature
 from ..pba.intervals.number import Interval
 from numbers import Number
 from ..pba.distributions import Distribution
@@ -518,9 +518,9 @@ def constructUN(func):
     return wrapper_decorator
 
 
-def I(i: str | list[Number] | Interval) -> UncertainNumber:
+def I(*args: str | list[Number] | Interval) -> UncertainNumber:
     """a shortcut for the interval-type UN object"""
-    return UncertainNumber.fromConstruct(parse_bounds(i))
+    return UncertainNumber.fromConstruct(wc_scalar_interval_feature(*args))
 
 
 # * ---------------------parse inputs for UN only  --------------------- *#

@@ -10,7 +10,7 @@ from numbers import Number
 
 
 def parse_bounds(b):
-    """top-level function that universally parse scalar and vector bounds"""
+    """top-level function that universally parses scalar and vector bounds"""
     try:
         return wc_scalar_interval(b)
     except Exception:
@@ -18,6 +18,53 @@ def parse_bounds(b):
 
 
 # * ---------------------make scalar interval object --------------------- *#
+
+
+def wc_scalar_interval_feature(*args):
+    """wildcard scalar interval
+
+        This function is used to parse a scalar bound into an Interval object.
+        It can handle various input types such as lists, tuples, and strings.
+        If the input is a string, it attempts to interpret it using the
+        `hedge_interpret` function or parse it as an interval expression.
+        If the input is a single number, it creates an Interval with that number
+        as both bounds.
+
+
+    note:
+        This function is a beta version of `wc_scalar_interval` which is meant to test the API signature.
+        If run into error, then resort back to `wc_scalar_interval`.
+    """
+    from ...characterisation.uncertainNumber import UncertainNumber as UN
+
+    if len(args) == 1:
+        bound = args[0]
+    elif len(args) == 2:
+        return Interval(*args)
+    else:
+        raise ValueError("wc_scalar_interval only accepts 1 or 2 arguments")
+
+    if isinstance(bound, list):
+        return Interval(*bound)
+    elif isinstance(bound, tuple):
+        return Interval(*bound)
+    elif isinstance(bound, Interval):
+        return bound
+    elif isinstance(bound, Number):
+        return Interval(bound, bound)
+    elif isinstance(bound, str):
+        try:
+            return hedge_interpret(bound)
+        except Exception:
+            pass
+        try:
+            return parse_interval_expression(bound)
+        except Exception:
+            raise ValueError("Invalid input")
+    elif isinstance(bound, UN):
+        return bound.construct
+    else:
+        raise TypeError("Unsupported type for interval creation")
 
 
 def wc_scalar_interval(bound):
