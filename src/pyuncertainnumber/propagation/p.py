@@ -1,9 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from functools import partial
-from .epistemic_uncertainty.endpoints import endpoints_method
 from .epistemic_uncertainty.extremepoints import extremepoints_method
-from .epistemic_uncertainty.subinterval import subinterval_method
 from .epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
 from .epistemic_uncertainty.local_optimisation import local_optimisation_method
 from .epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
@@ -11,7 +9,6 @@ from .mixed_uncertainty.mixed_up import (
     interval_monte_carlo,
     slicing,
     double_monte_carlo,
-    equi_cutting,
 )
 from ..pba.intervals.intervalOperators import make_vec_interval
 import numpy as np
@@ -42,6 +39,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
+# * ------------------ constructs Propagation ------------------ *
 class P(ABC):
     def __init__(self, vars, func, method, save_raw_data: bool = False):
         self._vars = vars
@@ -235,17 +233,17 @@ class MixedPropagation(P):
         return results
 
 
-"""
-hint: 
-For A, E, M, use construct classes
-
-For P, use the UN level
-"""
-
-
-# top-level Uncertain Number class propagation
+# * ------------------ Uncertain Number Propagation ------------------ *
 class Propagation:
-    # TODO I'd like to strip UN classes into construct classes herein
+    """high-level integrated class for the propagation of uncertain numbers
+
+    args:
+        vars: a list of uncertain numbers objects
+        func: the response or performance function applied to the uncertain numbers
+        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
+        interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+    """
+
     def __init__(
         self,
         vars: list[UncertainNumber],
@@ -288,7 +286,7 @@ class Propagation:
         if all_I:
             # all intervals
             logging.info("interval propagation")
-            self.p = b2b(self._constructs, self._func, self.method)
+            self.p = EpistemicPropagation(self._constructs, self._func, self.method)
         elif all_D:
             logging.info("distribution propagation")
             # all distributions
