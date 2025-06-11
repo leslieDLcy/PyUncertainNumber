@@ -171,7 +171,7 @@ class ApproximatorRegCoefficients:
         return sps.lognorm.rvs(s=slog, scale=np.exp(mlog), size=2000)
 
     def _cp(self, z, r, f):
-        from ..pba.pbox_abc import Pbox
+        from ..pba.pbox_abc import Staircase
 
         self.L = (
             self.A
@@ -194,7 +194,7 @@ class ApproximatorRegCoefficients:
         # the left and right extreme bounds of the pbox in approximated sample form
         self.p = (min(self.a) - self.q, self.q + max(self.a))
         l, r = tranform_ecdf(self.p[0]), tranform_ecdf(self.p[1])
-        return Pbox(l, r)
+        return Staircase(left=l, right=r)
 
 
 def decipher_zrf(num, d):
