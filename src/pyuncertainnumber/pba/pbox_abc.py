@@ -983,7 +983,7 @@ def simple_stacking(itvls):
         - only meant for quick use during development
         - see `stacking` function for production use
     """
-    from .utils import get_ecdf, eCDF_bundle
+    from .ecdf import get_ecdf, eCDF_bundle
 
     q1, p1 = get_ecdf(itvls.lo)
     q2, p2 = get_ecdf(itvls.hi)
