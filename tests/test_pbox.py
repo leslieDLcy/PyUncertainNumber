@@ -2,8 +2,8 @@ import pyuncertainnumber as pun
 import numpy as np
 from pyuncertainnumber import pba
 from pyuncertainnumber import UncertainNumber as UN
-from pyuncertainnumber.pba.pbox_base import Pbox
-from pyuncertainnumber import stochastic_mixture
+from pyuncertainnumber.pba.pbox_abc import Pbox
+from pyuncertainnumber.pba.aggregation import stochastic_mixture
 
 
 # *  ---------------------construction---------------------*#
@@ -26,14 +26,15 @@ def test_interval_aggregation():
     upper_endpoints = np.random.uniform(0.5, 1.5, 7)
     m_weights = [0.1, 0.1, 0.25, 0.15, 0.1, 0.1, 0.2]
     # a list of nInterval objects
-    nI = [pba.I(couple) for couple in zip(lower_endpoints, upper_endpoints)]
+    nI = [pun.I(*couple) for couple in zip(lower_endpoints, upper_endpoints)]
+
     pbox_mix = stochastic_mixture(
-        nI, weights=m_weights, display=True, return_type="pbox"
+        *nI, weights=m_weights, display=True, return_type="pbox"
     )
     print("the result of the mixture operation")
     assert isinstance(
         pbox_mix, UN
-    ), "Failed to aggregate weights intervals expert opinions into UncertainNumber objects"
+    ), "Failed to aggregate weights intervals expert opinions into Pbox objects"
 
 
 # *  ---------------------arithmetic---------------------*#
