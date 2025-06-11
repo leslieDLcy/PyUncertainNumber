@@ -36,7 +36,7 @@ e = UN(
 
 **Requirement:** It requires `Python >=3.11`
 
-`PyUncertainNumber` can be installed from [PyPI](https://pypi.org/project/pyuncertainnumber/). Upon activation of your virtual environment, use your terminal. For additional details, refer to [installation guide](https://pyuncertainnumber.readthedocs.io/en/latest/guides/installation.html).
+`PyUncertainNumber` can be installed from [PyPI](https://pypi.org/project/pyuncertainnumber/). Upon activation of your virtual environment, use the code below in your terminal. For additional instructions, refer to [installation guide](https://pyuncertainnumber.readthedocs.io/en/latest/guides/installation.html).
 
 ```shell
 pip install pyuncertainnumber
@@ -52,7 +52,7 @@ pip install pyuncertainnumber
 
 ## UQ multiverse
 
-UQ is a big world (like Marvel multiverse) consisting of abundant theories and software implementations on multiple platforms. Some notable examples include [OpenCossan](https://github.com/cossan-working-group/OpenCossan) [UQlab](https://www.uqlab.com/) in Matlab and [ProbabilityBoundsAnalysis.jl](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl) in Julia, and many others of course. `PyUncertainNumber` builds upon on a few pioneering projects and will continue to be dedicated to support imprecise analysis in engineering using Python.
+UQ is a big world (like Marvel multiverse) consisting of abundant theories and software implementations on multiple platforms. We focus mainly on the imprecise probability frameworks. Some notable examples include [OpenCossan](https://github.com/cossan-working-group/OpenCossan) [UQlab](https://www.uqlab.com/) in Matlab and [ProbabilityBoundsAnalysis.jl](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl) in Julia, and many others of course. `PyUncertainNumber` builds upon on a few pioneering projects and will continue to be dedicated to support imprecise analysis in engineering using Python.
 
 <!-- ## Contributing
 
