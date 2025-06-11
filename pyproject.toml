@@ -18,6 +18,9 @@ dependencies = [
   "scipy",
   "tqdm",
   "pytest",
+  "bayesian-optimization",
+  "geneticalgorithm",
+  "statsmodels",
 ]
 description = "Rigorous computation with Uncertain Number in Python"
 license = {text = "MIT License"}

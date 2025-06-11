@@ -178,7 +178,7 @@ def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
     note:
         envelope on a set of empirical CDFs
     """
-    from .utils import ecdf, get_ecdf
+    from .ecdf import ecdf, get_ecdf
 
     ecdf_func = get_ecdf if ecdf_choice == "canonical" else ecdf
 
