@@ -1,4 +1,4 @@
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyuncertainnumber)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyuncertainnumber?v=0.0.9)
 ![version](https://img.shields.io/pypi/v/pyuncertainnumber)
 ![Documentation Status](https://readthedocs.org/projects/pyuncertainnumber/badge/?version=latest)
 ![license](https://img.shields.io/github/license/leslieDLcy/PyUncertainNumber)
