@@ -1,8 +1,10 @@
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyuncertainnumber)
 ![version](https://img.shields.io/pypi/v/pyuncertainnumber)
 ![Documentation Status](https://readthedocs.org/projects/pyuncertainnumber/badge/?version=latest)
 ![license](https://img.shields.io/github/license/leslieDLcy/PyUncertainNumber)
 ![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
 
+![Logo](./assets/UNlogo3.png)
 
 # PyUncertainNumber
 
