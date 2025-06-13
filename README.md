@@ -4,7 +4,10 @@
 ![license](https://img.shields.io/github/license/leslieDLcy/PyUncertainNumber)
 ![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
 
-![Logo](./assets/UNlogo3.png)
+<p align="center">
+  <img src="./assets/UNlogo3.png" alt="Logo" width="200"/>
+</p>
+
 
 # PyUncertainNumber
 
