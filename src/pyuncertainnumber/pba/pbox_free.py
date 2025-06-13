@@ -141,6 +141,7 @@ def d_alpha(n, alpha):
 # * ---------top level func for known statistical properties------*#
 
 
+# TODO: add distribution family
 def known_constraints(
     maximum=None,
     mean=None,
