@@ -219,9 +219,16 @@ class Staircase(Pbox):
             self.var = I(666, 666)
 
     def __repr__(self):
-        mean_text = f"{self.mean}"
-        var_text = f"{self.var}"
-        range_text = f"{self._range}"
+        def format_interval(interval):
+            try:
+                return f"[{interval.lo:.3f}, {interval.hi:.3f}]"
+            except Exception:
+                return str(interval)
+
+        mean_text = format_interval(self.mean)
+        var_text = format_interval(self.var)
+        range_text = format_interval(self._range)
+
         return f"Pbox ~ (range={range_text}, mean={mean_text}, var={var_text})"
 
     def plot(
