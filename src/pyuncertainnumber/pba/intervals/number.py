@@ -405,6 +405,43 @@ class Interval:
     def __ne__(self, other):
         return not (self == other)
 
+    # * -------------- unary functions -------------- *#
+
+    def abs(self):
+        from .methods import abs as iabs
+
+        return iabs(self)
+
+    def sqrt(self):
+        from .methods import sqrt as isqrt
+
+        return isqrt(self)
+
+    def exp(self):
+        from .methods import exp as iexp
+
+        return iexp(self)
+
+    def log(self):
+        from .methods import log as ilog
+
+        return ilog(self)
+
+    def sin(self):
+        from .methods import sin as isin
+
+        return isin(self)
+
+    def cos(self):
+        from .methods import cos as icos
+
+        return icos(self)
+
+    def tan(self):
+        from .methods import tan as itan
+
+        return itan(self)
+
     @classmethod
     def from_meanform(cls, x, half_width):
         return cls(x - half_width, x + half_width)

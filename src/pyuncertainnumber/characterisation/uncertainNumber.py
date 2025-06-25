@@ -392,7 +392,7 @@ class UncertainNumber:
         """
         distSpec = DistributionSpecification(D.dist_family, D.dist_params)
 
-        if D.sample_data is None:
+        if D.empirical_data is None:
             return cls(
                 essence="distribution",
                 distribution_parameters=distSpec.get_specification(),
