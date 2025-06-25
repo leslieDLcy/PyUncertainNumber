@@ -20,7 +20,14 @@ from .ecdf import get_ecdf
 
 @dataclass
 class Distribution:
-    """two signature for the distribution object, either a parametric specification or from a nonparametric empirical data set"""
+    """Two signature are currentlly supported, either a parametric specification or from a nonparametric empirical data set
+
+    note:
+        the nonparametric instasntiation via arrtribute `empirical_data` will be deprecated soon. We will introduct a ECDF class instead.
+
+    example:
+        >>> d = Distribution('gaussian', (0,1))
+    """
 
     dist_family: str = None
     dist_params: list[float] | tuple[float, ...] = None
@@ -187,6 +194,7 @@ class Distribution:
 
 
 class JointDistribution:
+    """Bivariate joint distribution class"""
 
     def __init__(
         self,
