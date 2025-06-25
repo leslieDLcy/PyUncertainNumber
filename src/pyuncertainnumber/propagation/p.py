@@ -220,12 +220,10 @@ class MixedPropagation(P):
                 handler = interval_monte_carlo
             case "slicing":
                 handler = slicing
-            case "equi_cutting":
-                handler = equi_cutting
             case "double_monte_carlo":
                 handler = double_monte_carlo
             case None:
-                handler = equi_cutting
+                handler = slicing
             case _:
                 raise ValueError("Unknown method")
 

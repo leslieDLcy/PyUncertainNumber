@@ -231,7 +231,11 @@ class UncertainNumber:
         """concise __repr__"""
 
         field_values = get_concise_repr(self.__dict__)
-        self._field_str = ", ".join(f"{k}={v!r}" for k, v in field_values.items())
+        # self._field_str = ", ".join(f"{k}={v!r}" for k, v in field_values.items())
+        self._field_str = ", ".join(
+            f"{k}={float(v)!r}" if isinstance(v, np.floating) else f"{k}={v!r}"
+            for k, v in field_values.items()
+        )
 
         # fancy string formatting of unit
         u_str = f", physical_quantity={self._physical_quantity:~P}"

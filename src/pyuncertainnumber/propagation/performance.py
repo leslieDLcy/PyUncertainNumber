@@ -136,12 +136,12 @@ def cb_deflection_vectorised(x: np.ndarray | Interval):
     return deflection
 
 
-def cb_deflection_separate(beam_length, I, F, E):
+def cb_deflection_separate(L, I, F, E):
     """compute the deflection in the cantilever beam example
 
     # TODO add typing for UncertainNumber
     Args:
-        beam_length (UncertainNumber): Length of the beam (m)
+        L (UncertainNumber): Length of the beam (m)
         I: Second moment of area (mm^4)
         F: Applied force (N)
         E: Young's modulus (MPa)
@@ -151,15 +151,15 @@ def cb_deflection_separate(beam_length, I, F, E):
                Returns np.nan if calculation error occurs.
     """
 
-    deflection = F * beam_length**3 / (3 * E * 10**6 * I)  # deflection in m
+    deflection = F * L**3 / (3 * E * 10**6 * I)  # deflection in m
     return deflection
 
 
-def cb_stress(y, beam_length, I, F):
+def cb_stress(y, L, I, F):
     """to compute bending stress in the cantilever beam example"""
 
     try:
-        stress = F * beam_length * y / I / 1000  # stress in MPa
+        stress = F * L * y / I / 1000  # stress in MPa
     except:
         stress = np.nan
 

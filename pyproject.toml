@@ -20,7 +20,7 @@ dependencies = [
   "pytest",
   "bayesian-optimization",
   "geneticalgorithm",
-  "statsmodels",
+  "statsmodels >=0.14, <0.15", # Verified 0.14.4 compatibility
 ]
 description = "Rigorous computation with Uncertain Number in Python"
 license = {text = "MIT License"}
@@ -30,7 +30,7 @@ maintainers = [
 name = "pyuncertainnumber"
 readme = "README.md"
 requires-python = ">= 3.11"
-version = "0.0.9"
+version = "0.0.10"
 
 [tool.setuptools.packages.find]
 # All the following settings are optional:
@@ -38,4 +38,4 @@ where = ["src"] # ["."] by default
 
 [project.urls]
 Documentation = "https://pyuncertainnumber.readthedocs.io/en/latest/index.html"
-Homepage = "https://example.com"
+Homepage = "https://github.com/leslieDLcy/PyUncertainNumber"
