@@ -41,6 +41,8 @@ logging.basicConfig(level=logging.INFO)
 
 # * ------------------ constructs Propagation ------------------ *
 class P(ABC):
+    """Base class blueprint"""
+
     def __init__(self, vars, func, method, save_raw_data: bool = False):
         self._vars = vars
         self.func = func
@@ -66,6 +68,14 @@ class P(ABC):
 
 
 class AleatoryPropagation(P):
+    """Aleatoric uncertainty propagation class for construct
+
+    args:
+        vars: a list of uncertain numbers objects
+        func: the response or performance function applied to the uncertain numbers
+        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
+        interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+    """
 
     from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
 
@@ -113,6 +123,15 @@ class AleatoryPropagation(P):
 
 
 class EpistemicPropagation(P):
+    """Epistemic uncertainty propagation class for construct
+
+    args:
+        vars: a list of uncertain numbers objects
+        func: the response or performance function applied to the uncertain numbers
+        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
+        interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+    """
+
     def __init__(self, vars, func, method):
         super().__init__(vars, func, method)
         self.post_init_check()
@@ -184,13 +203,17 @@ class EpistemicPropagation(P):
 
 
 class MixedPropagation(P):
-    def __init__(self, vars, func, method, interval_strategy=None):
-        """initialisation
+    """mixed uncertainty propagation class for construct
 
-        args:
-            interval_strategy: a certain strategy used for the interval propagation
-                such as endpoints, subinterval, etc. By default, it is set to None
-        """
+    args:
+        vars: a list of uncertain numbers objects
+        func: the response or performance function applied to the uncertain numbers
+        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
+        interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+    """
+
+    def __init__(self, vars, func, method, interval_strategy=None):
+
         super().__init__(vars, func, method)
         self.interval_strategy = interval_strategy
         self.post_init_check()
@@ -240,6 +263,23 @@ class Propagation:
         func: the response or performance function applied to the uncertain numbers
         method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
         interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+
+    example:
+        >>> import pyuncertainnumber as pun
+        >>> # constructions of uncertain number
+        >>> a = pun.I(2, 3)
+        >>> b = pun.normal(4, 1)
+        >>> c = pun.uniform([4,5], [9,10])
+
+        >>> # high-level propagation API
+        >>> p = Propagation(vars=[a,b,c],
+        >>>     func=foo,
+        >>>     method='slicing',
+        >>>     interval_strategy='subinterval'
+        >>> )
+
+        >>> # heavy-lifting
+        >>> t = p.run(n_sam=20, n_sub=2, style='endpoints')
     """
 
     def __init__(
@@ -249,11 +289,7 @@ class Propagation:
         method,
         interval_strategy=None,
     ):
-        """top-level class for the propagation of uncertain numbers
 
-        args:
-            vars: a list of uncertain numbers objects
-        """
         self._vars = vars
         self._func = func
         self.method = method
