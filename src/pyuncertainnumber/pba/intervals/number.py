@@ -16,7 +16,6 @@ import numpy as np
 import numpy
 from numpy import ndarray, asarray, stack, transpose, ascontiguousarray, zeros
 import matplotlib.pyplot as plt
-from . import methods as m
 
 # float32=numpy.float32
 
@@ -409,25 +408,39 @@ class Interval:
     # * -------------- unary functions -------------- *#
 
     def abs(self):
-        return m.abs(self)
+        from .methods import abs as iabs
+
+        return iabs(self)
 
     def sqrt(self):
-        return m.sqrt(self)
+        from .methods import sqrt as isqrt
+
+        return isqrt(self)
 
     def exp(self):
-        return m.exp(self)
+        from .methods import exp as iexp
+
+        return iexp(self)
 
     def log(self):
-        return m.log(self)
+        from .methods import log as ilog
+
+        return ilog(self)
 
     def sin(self):
-        return m.sin(self)
+        from .methods import sin as isin
+
+        return isin(self)
 
     def cos(self):
-        return m.cos(self)
+        from .methods import cos as icos
+
+        return icos(self)
 
     def tan(self):
-        return m.tan(self)
+        from .methods import tan as itan
+
+        return itan(self)
 
     @classmethod
     def from_meanform(cls, x, half_width):

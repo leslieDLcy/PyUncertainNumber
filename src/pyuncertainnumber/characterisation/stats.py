@@ -37,33 +37,9 @@ from .core import makeUN
 """ Here we define the statistical inference functions from data for the UncertainNumber class. """
 
 
-def makedist(shape: str):
-    """change return from sps.dist to Distribution objects"""
-
-    def decorator_make_dist(func):
-        @functools.wraps(func)
-        def wrapper_decorator(*args, **kwargs):  # input array x
-            return D.dist_from_sps(func(*args, **kwargs), shape)
-
-        return wrapper_decorator
-
-    return decorator_make_dist
-
-
-# TODO: tested with expon which seems incorrect.
-# TODO: stats.expon takes `1/lambda` as the scale, which is the inverse of the rate parameter.
-def singleParamPattern(x, shape: str):
-    if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return D.dist_from_sps(named_dists.get(shape)(mean(x)), shape=shape)
-    elif isinstance(x, Interval):
-        return named_pbox.get(shape)(mean(x))
-    else:
-        raise TypeError("Input data type not supported")
-
-
 @makeUN
 def fit(method: str, family: str, data: np.ndarray):
-    """top-level fit from data
+    """parametric estimator to fit a distribution from data
 
     args:
         - method (str): method of fitting, e.g., {'mle' or 'mom'} 'entropy', 'pert', 'fermi', 'bayesian'
@@ -89,6 +65,30 @@ def fit(method: str, family: str, data: np.ndarray):
             return mom.get(family)(data)
         case _:
             raise ValueError("method not supported")
+
+
+def makedist(shape: str):
+    """a decorator to transform a `sps.dist` into `Distribution` objects"""
+
+    def decorator_make_dist(func):
+        @functools.wraps(func)
+        def wrapper_decorator(*args, **kwargs):  # input array x
+            return D.dist_from_sps(func(*args, **kwargs), shape)
+
+        return wrapper_decorator
+
+    return decorator_make_dist
+
+
+# TODO: tested with expon which seems incorrect.
+# TODO: stats.expon takes `1/lambda` as the scale, which is the inverse of the rate parameter.
+def singleParamPattern(x, shape: str):
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return D.dist_from_sps(named_dists.get(shape)(mean(x)), shape=shape)
+    elif isinstance(x, Interval):
+        return named_pbox.get(shape)(mean(x))
+    else:
+        raise TypeError("Input data type not supported")
 
 
 ###############################################################################
@@ -194,7 +194,7 @@ def MMgamma(x):  # **
 
 @makedist("geometric")
 def MMgeometric(x):
-    return
+    pass
 
 
 def MMgeometric(x):
@@ -936,3 +936,43 @@ def fermilnormconfband(x1, x2, n, pr=0.9, conf=0.95, bOt=0.001, tOp=0.999):
     Rfermi[::-1].sort()
     # should prolly shuffle
     return np.concatenate((Lfermi[0:many], Rfermi[0:many]))
+
+
+# * --------------- moments shape distribution constructors --------------- *#
+
+
+def mmmshape(mean, var, shape):
+    """return a distributional object based on moment and shape information"""
+    if shape == "beta":
+        return mm_beta(mean, var)
+    elif shape == "normal":
+        return mm_normal(mean, var)
+    elif shape == "gamma":
+        return mm_gamma(mean, var)
+    else:
+        raise ValueError(f"Shape '{shape}' not supported for moment matching.")
+
+
+def mm_beta(mean_sample, var_sample):
+    """return distributional parameters for beta distribution"""
+    common = mean_sample * (1 - mean_sample) / var_sample - 1
+    alpha = mean_sample * common
+    beta_param = (1 - mean_sample) * common
+
+    return alpha, beta_param
+
+
+def mm_normal(mean_sample, var_sample):
+    """return distributional parameters for normal distribution"""
+    return mean_sample, np.sqrt(var_sample)
+
+
+def mm_gamma(mean_sample, var_sample):
+    """return distributional parameters for gamma distribution"""
+    alpha = mean_sample**2 / var_sample
+    theta = var_sample / mean_sample
+
+    return alpha, theta
+
+
+# TODO: add more distributions in the future
