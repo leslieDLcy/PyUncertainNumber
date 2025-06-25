@@ -22,12 +22,12 @@ copyright = f"{datetime.datetime.now().year}, (Leslie) Yu Chen"
 
 extensions = [
     #   "myst_nb",
+    "sphinx_prompt",
     "myst_parser",
     # 'sphinx.ext.autodoc',
     "autoapi.extension",
     "sphinx_inline_tabs",
     "sphinx.ext.napoleon",
-    "sphinx-prompt",
     "sphinx_copybutton",
 ]
 
