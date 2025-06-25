@@ -41,7 +41,7 @@ logging.basicConfig(level=logging.INFO)
 
 # * ------------------ constructs Propagation ------------------ *
 class P(ABC):
-    """Base class blueprint"""
+    """Base class blueprint. Not for direct use"""
 
     def __init__(self, vars, func, method, save_raw_data: bool = False):
         self._vars = vars
@@ -73,8 +73,22 @@ class AleatoryPropagation(P):
     args:
         vars: a list of uncertain numbers objects
         func: the response or performance function applied to the uncertain numbers
-        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
-        interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+        method: a string indicating the method to be used for propagation.
+
+    notes:
+        Supported methods include "monte_carlo", "latin_hypercube".
+        This function supports with low-level constructs not the high-level `UN` objects.
+        For `UN` objects, use `Propagation` class as an high-level API.
+
+    example:
+        >>> from pyuncertainnumber import pba, Distribution
+        >>> from pyuncertainnumber.propagation.performance import foo_universal
+        >>> from pyuncertainnumber.propagation.p import AleatoryPropagation
+        >>> a = Distribution('gaussian', (3,1))
+        >>> b = Distribution('gaussian', (10, 1))
+        >>> c = Distribution('uniform', (5, 10))
+        >>> alea = AleatoryPropagation(vars=[a,b,c], func=foo_universal, method='monte_carlo')
+        >>> result = alea(n_sam=1000)
     """
 
     from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
@@ -128,8 +142,20 @@ class EpistemicPropagation(P):
     args:
         vars: a list of uncertain numbers objects
         func: the response or performance function applied to the uncertain numbers
-        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
+        method: a string indicating the method to be used for propagation
         interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+
+    notes:
+        This function supports with low-level constructs not the high-level `UN` objects.
+        For `UN` objects, use `Propagation` class as an high-level API.
+
+    example:
+        >>> from pyuncertainnumber import pba
+        >>> a = pba.I(1, 5)
+        >>> b = pba.I(7, 13)
+        >>> c = pba.I(5, 10)
+        >>> ep = EpistemicPropagation(vars=[a,b,c], func=foo_universal, method='subinterval')
+        >>> result = ep(n_sub=20, style='endpoints')
     """
 
     def __init__(self, vars, func, method):
@@ -210,6 +236,18 @@ class MixedPropagation(P):
         func: the response or performance function applied to the uncertain numbers
         method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
         interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+
+    notes:
+        This function supports with low-level constructs not the high-level `UN` objects.
+        For `UN` objects, use `Propagation` class as an high-level API.
+
+    example:
+        >>> from pyuncertainnumber import pba
+        >>> a = pba.normal([2, 3], [1])
+        >>> b = pba.normal([10, 14], [1])
+        >>> c = pba.normal([4, 5], [1])
+        >>> mix = MixedPropagation(vars=[a,b,c], func=foo_universal, method='slicing', interval_strategy='subinterval')  # `subinterval` strategy succeeds
+        >>> result = mix(n_sam=20, n_sub=2, style='endpoints')
     """
 
     def __init__(self, vars, func, method, interval_strategy=None):
