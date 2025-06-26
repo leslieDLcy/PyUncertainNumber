@@ -550,7 +550,7 @@ class Staircase(Pbox):
             p_values = np.linspace(Params.p_lboundary, Params.p_hboundary, n)
             return self.alpha_cut(p_values)
 
-    def outer_approximate(self, n=None):
+    def outer_discretisation(self, n=None):
         """outer approximation of a p-box
 
         args:

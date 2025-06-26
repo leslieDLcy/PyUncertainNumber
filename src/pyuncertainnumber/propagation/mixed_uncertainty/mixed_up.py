@@ -81,7 +81,7 @@ def slicing(
     func,
     interval_strategy,
     n_sam,
-    outer_approximate=True,
+    outer_discretisation=True,
     dependency=None,
     **kwargs,
 ) -> Pbox:
@@ -96,8 +96,8 @@ def slicing(
     """
     p_vars = [convert_pbox(v) for v in vars]
 
-    if outer_approximate:
-        itvs = [p.outer_approximate(n_sam) for p in p_vars]
+    if outer_discretisation:
+        itvs = [p.outer_discretisation(n_sam) for p in p_vars]
     else:
         itvs = [v.discretise(n_sam) for v in p_vars]
 
