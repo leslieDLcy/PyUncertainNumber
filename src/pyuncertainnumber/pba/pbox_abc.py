@@ -551,12 +551,16 @@ class Staircase(Pbox):
             return self.alpha_cut(p_values)
 
     def outer_discretisation(self, n=None):
-        """outer approximation of a p-box
+        """discretisation of a p-box to get intervals based on the scheme of outer approximation
 
         args:
-            - n: number of steps to be used in the approximation
+            n (int): number of steps to be used in the discretisation
+
         note:
-            - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
+            `the_interval_list` will have length one less than that of default `p_values` (i.e. 100 and 99)
+
+        return:
+            the outer intervals in vec-Interval form
         """
 
         from .intervals.number import Interval as I
@@ -574,6 +578,26 @@ class Staircase(Pbox):
         interval_vec = I(lo=np.squeeze(q_l), hi=np.squeeze(q_r))
 
         return interval_vec
+
+    def condensation(self, n):
+        """ourter condensation of the pbox to reduce the number of steps and get a sparser staircase pbox
+
+        args:
+            n (int): number of steps to be used in the discretisation
+
+        note:
+            Have not thought about a better name so we call it `condensation` for now. Candidate names include 'approximation'.
+
+        example:
+            >>> p.condensation(n=5)
+
+        return:
+            a staircase p-box with sparser steps
+        """
+        from .aggregation import stacking
+
+        itvls = self.outer_discretisation(n)
+        return stacking(itvls)
 
     def area_metric(self):
         return np.trapezoid(y=self.left, x=self._pvalues) - np.trapezoid(
