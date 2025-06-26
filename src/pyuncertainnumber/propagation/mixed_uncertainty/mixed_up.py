@@ -92,7 +92,7 @@ def slicing(
         x: uncertain variable
 
     note:
-        independence assumption by now
+        independence assumption by now. Dependency structure is at beta developement now.
     """
     p_vars = [convert_pbox(v) for v in vars]
 
