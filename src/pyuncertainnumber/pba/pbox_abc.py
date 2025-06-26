@@ -560,7 +560,7 @@ class Staircase(Pbox):
         from .intervals.number import Interval as I
 
         if n is not None:
-            p_values = np.arange(0, n) / n
+            p_values = np.linspace(Params.p_lboundary, Params.p_hboundary, n)
         else:
             p_values = self._pvalues
 
@@ -569,9 +569,9 @@ class Staircase(Pbox):
 
         q_l = [self.alpha_cut(p).left for p in p_leftend]
         q_r = [self.alpha_cut(p).right for p in p_rightend]
+        interval_vec = I(lo=np.squeeze(q_l), hi=np.squeeze(q_r))
 
-        interval_vec = I(lo=q_l, hi=q_r)
-        return p_values, interval_vec
+        return interval_vec
 
     def area_metric(self):
         return np.trapezoid(y=self.left, x=self._pvalues) - np.trapezoid(

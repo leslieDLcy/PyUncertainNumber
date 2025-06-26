@@ -76,15 +76,12 @@ def interval_monte_carlo(
     return stacking(container)
 
 
-from ...pba.params import Params
-
-
 def slicing(
     vars: list[Distribution | Interval | Pbox],
     func,
     interval_strategy,
-    n_sam=Params.steps,
-    outer_approximate=False,
+    n_sam,
+    outer_approximate=True,
     dependency=None,
     **kwargs,
 ) -> Pbox:
@@ -101,7 +98,7 @@ def slicing(
 
     # TODO: outer_approximate does not take n_sam yet. Fixed it
     if outer_approximate:
-        itvs = [p.outer_approximate()[1] for p in p_vars]
+        itvs = [p.outer_approximate(n_sam)[1] for p in p_vars]
     else:
         itvs = [v.discretise(n_sam) for v in p_vars]
 
