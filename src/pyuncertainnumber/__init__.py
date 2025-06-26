@@ -35,3 +35,4 @@ from pyuncertainnumber.pba.aggregation import *
 
 # * ---------------------  propagation ---------------------*#
 from pyuncertainnumber.propagation.epistemic_uncertainty.b2b import b2b
+from pyuncertainnumber.propagation.p import Propagation
