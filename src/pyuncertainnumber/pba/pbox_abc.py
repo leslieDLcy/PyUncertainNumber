@@ -188,6 +188,15 @@ class Pbox(ABC):
 
         return I(lo=self.left, hi=self.right)
 
+    def to_dss(self, discretisation=Params.steps):
+        """convert pbox to DempsterShafer object"""
+        from .dss import DempsterShafer
+
+        return DempsterShafer(
+            self.to_interval(),
+            np.repeat(a=(1 / discretisation), repeats=discretisation),
+        )
+
 
 class Staircase(Pbox):
     """distribution free p-box"""
