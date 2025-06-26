@@ -80,7 +80,7 @@ def slicing(
     vars: list[Distribution | Interval | Pbox],
     func,
     interval_strategy,
-    n_sam,
+    n_slices,
     outer_discretisation=True,
     dependency=None,
     **kwargs,
@@ -97,9 +97,9 @@ def slicing(
     p_vars = [convert_pbox(v) for v in vars]
 
     if outer_discretisation:
-        itvs = [p.outer_discretisation(n_sam) for p in p_vars]
+        itvs = [p.outer_discretisation(n_slices) for p in p_vars]
     else:
-        itvs = [v.discretise(n_sam) for v in p_vars]
+        itvs = [v.discretise(n_slices) for v in p_vars]
 
     b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
     container = [b2b_f(_item) for _item in itertools.product(*itvs)]
