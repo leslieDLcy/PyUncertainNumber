@@ -96,9 +96,8 @@ def slicing(
     """
     p_vars = [convert_pbox(v) for v in vars]
 
-    # TODO: outer_approximate does not take n_sam yet. Fixed it
     if outer_approximate:
-        itvs = [p.outer_approximate(n_sam)[1] for p in p_vars]
+        itvs = [p.outer_approximate(n_sam) for p in p_vars]
     else:
         itvs = [v.discretise(n_sam) for v in p_vars]
 
