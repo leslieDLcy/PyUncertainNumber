@@ -76,11 +76,14 @@ def interval_monte_carlo(
     return stacking(container)
 
 
+from ...pba.params import Params
+
+
 def slicing(
     vars: list[Distribution | Interval | Pbox],
     func,
     interval_strategy,
-    n_sam=200,
+    n_sam=Params.steps,
     outer_approximate=False,
     dependency=None,
     **kwargs,
