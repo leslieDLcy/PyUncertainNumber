@@ -184,6 +184,11 @@ class Pbox(ABC):
 
     # * --------------------- functions ---------------------*#
     def to_interval(self):
+        """discretise pbox into a vec-interval of length of default steps
+
+        note:
+            If desired a custom length of vec-interval as output, use `discretise()` method.
+        """
         from .intervals.number import Interval as I
 
         return I(lo=self.left, hi=self.right)
