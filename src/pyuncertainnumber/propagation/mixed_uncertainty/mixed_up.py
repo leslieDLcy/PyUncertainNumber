@@ -85,11 +85,15 @@ def slicing(
     dependency=None,
     **kwargs,
 ) -> Pbox:
-    """equid-probaility discretisation and alpha cutting
+    """slicing algoritm for rigorous propagation of pbox
 
     args:
-        func: callable
-        x: uncertain variable
+        vars (list): list of constructs
+        func (callable) : response function
+        interval_strategy (str) : strategy for interval discretisation, options include {'direct', 'endpoints', 'subinterval'}
+        n_slices: number of slices for each input
+        outer_discretisation (bool): whether to use outer discretisation for pbox. By default is True for rigorous propagation; however, alpha-cut style interval are also supported.
+        dependency: dependency structure (e.g. vine copula or archimedean copula
 
     note:
         independence assumption by now. Dependency structure is at beta developement now.

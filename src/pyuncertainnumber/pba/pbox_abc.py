@@ -525,15 +525,6 @@ class Staircase(Pbox):
         return I(lo=Params.p_values[lo_ind], hi=Params.p_values[hi_ind])
 
     def alpha_cut(self, alpha=0.5):
-        """get the bounds on the quantile at any particular probability level
-
-        args:
-            alpha (array-like): probability levels
-        """
-        ind = find_nearest(Params.p_values, alpha)
-        return I(lo=self.left[ind], hi=self.right[ind])
-
-    def lw_alpha_cut(self, alpha=0.5):
         """test the lightweight `alpha_cut` method
 
         args:
