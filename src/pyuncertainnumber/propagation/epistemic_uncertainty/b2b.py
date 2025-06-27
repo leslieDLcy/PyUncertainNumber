@@ -1,9 +1,14 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 """leslie's general bound to bound implementation"""
 
 from ...pba.intervals.number import Interval
 from ...pba.intervals.intervalOperators import make_vec_interval
-
 import numpy as np
+
+if TYPE_CHECKING:
+    from ...pba.intervals import Interval
 
 
 # TODO: integrate GA and BO implementations
@@ -118,7 +123,7 @@ def i_cartesian_product(a, b):
     return pba.I(lo=flat_lower, hi=flat_upper)
 
 
-def endpoints(vec_itvl, func):
+def endpoints(vec_itvl: Interval, func) -> Interval:
     """Implementation of endpoints method
 
     Args:
@@ -126,31 +131,53 @@ def endpoints(vec_itvl, func):
         func (callable): the function to be evaluated. See notes about function signature.
 
     Notes:
-        The function `func` is expected to accept a 2D numpy array of shape (n, m)
+        The function `func` is expected to accept a 2D numpy array of shape (2**d, d) where `d` is the dimension of the vector interval.
+        Therefore, the function  should have a vectorised signature, as opposted to taking individual scalar inputs.
+
+    Example:
+        >>> from pyuncertainnumber import pba
+        >>> v = pba.I([1, 2], [3, 4])  # a vector interval with two dimensions
+        >>> def bar(x): return x[:, 0] ** 3 + x[:, 1] + 5
+        >>> endpoints(v, func)
+        Interval(8.0, 36.0)
     """
 
     v_np = vec_itvl.to_numpy()
     rows = np.vsplit(v_np, v_np.shape[0])
     arr = vec_cartesian_product(*rows)
-    print(arr.shape)
-    # return arr
+    # print(arr.shape)  # array of shape (2**n, 2)
+
     response = func(arr)  # func on each row of combination of endpoints
     min_response = np.min(response)
     max_response = np.max(response)
     return Interval(min_response, max_response)
 
 
-def subinterval_method(vec_itvl, func, style=None, n_sub=None, parallel=False):
+def subinterval_method(
+    vec_itvl: Interval, func, style=None, n_sub=None, parallel=False
+) -> Interval:
     # TODO parallel subinterval
-    """leslie's implmentation of subinterval method
+    """Implmentation of subinterval method which splits subintervals and reconstitutes later.
 
-    args:
-        vec_itvl: a vector type Interval object
-        func: the function to be evaluated
-        n_sub: number of subintervals
-        style: the style used for interval propagation
+    Args:
+        vec_itvl (Interval): a vector type Interval object
+        func (callable): the function to be evaluated. See notes about function signature.
+        n_sub (int): number of subintervals
+        style (str): the style used for interval propagation which shall be compatible with the response function signature.
             - 'direct': direct apply function
-            - 'endpoints': only the endpoints
+            - 'endpoints': only the endpoints are propagated
+
+    Notes:
+        There are some subtleties about function signature. For ``endpoints`` style, the function `func` should have a vectorised signature
+        as it is expecting a 2D numpy array, whereas for the `direct` style, it is expecting to take individual scalar inputs
+
+    Example:
+        >>> from pyuncertainnumber import pba
+        >>> v = pba.I([1, 2], [3, 4])
+        >>> def bar(x): return x[0] ** 3 + x[1] + 5
+        >>> b2b.subinterval_method(vec_itvl=v, func=bar, style='direct', n_sub=2)
+        >>> def bar_vec(x): return x[:, 0] ** 3 + x[:, 1] + 5
+        >>> b2b.subinterval_method(vec_itvl=v, func=bar_vec, style='endpoints', n_sub=2)
     """
     from pyuncertainnumber.pba.intervals.methods import subintervalise, reconstitute
 
