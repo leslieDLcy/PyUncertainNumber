@@ -7,13 +7,13 @@ from scipy.stats import beta, t, gamma, betabinom, nbinom
 from .params import Params
 from .intervals import Interval
 import scipy
-from .cbox_Leslie import cbox_from_extredists, cbox_from_pseudosamples
+from .cbox_constructor import cbox_from_extredists, cbox_from_pseudosamples
 from .constructors import pbox_from_pseudosamples
 from .pbox_abc import pbox_from_extredists
 import pyuncertainnumber.pba.distributions as d
 
 if TYPE_CHECKING:
-    from .cbox_Leslie import Cbox
+    from .cbox_constructor import Cbox
 
 
 def interval_measurements(func):
