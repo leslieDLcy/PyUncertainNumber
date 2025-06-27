@@ -81,14 +81,14 @@ class AleatoryPropagation(P):
         For `UN` objects, use `Propagation` class as an high-level API.
 
     example:
-        >>> from pyuncertainnumber import pba, Distribution
-        >>> from pyuncertainnumber.propagation.performance import foo_universal
+        >>> from pyuncertainnumber import pba
         >>> from pyuncertainnumber.propagation.p import AleatoryPropagation
-        >>> a = Distribution('gaussian', (3,1))
-        >>> b = Distribution('gaussian', (10, 1))
-        >>> c = Distribution('uniform', (5, 10))
-        >>> alea = AleatoryPropagation(vars=[a,b,c], func=foo_universal, method='monte_carlo')
-        >>> result = alea(n_sam=1000)
+        >>> def foo(x): return x[0] ** 3 + x[1] + x[2]
+        >>> a = pba.Distribution('gaussian', (3,1))
+        >>> b = pba.Distribution('gaussian', (10, 1))
+        >>> c = pba.Distribution('uniform', (5, 10))
+        >>> aleatory = AleatoryPropagation(vars=[a_d, b_d, c_d], func=foo, method='monte_carlo')
+        >>> result = aleatory(n_sam=1000)
     """
 
     from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
@@ -116,19 +116,36 @@ class AleatoryPropagation(P):
         """doing the propagation"""
         match self.method:
             case "monte_carlo":
-                input_samples = np.array(
-                    [v.sample(n_sam) for v in self._vars]
-                ).T  # (n_sam, n_vars) == (n, d)
-                output_samples = self.func(input_samples)
+                # regular sampling style
+                try:
+                    # regular sampling style
+                    input_samples = [v.sample(n_sam) for v in self._vars]
+                    output_samples = self.func(input_samples)
+                except Exception as e:
+                    # vectorised sampling style
+                    input_samples = np.array(
+                        [v.sample(n_sam) for v in self._vars]
+                    ).T  # (n_sam, n_vars) == (n, d)
+                    output_samples = self.func(input_samples)
             case "latin_hypercube" | "lhs":
                 sampler = qmc.LatinHypercube(d=len(self._vars))
                 lhs_samples = sampler.random(n=n_sam)  # u-space (n, d)
-                input_samples = np.array(
-                    [v.alpha_cut(lhs_samples[:, i]) for i, v in enumerate(self._vars)]
-                ).T
-                # ! a shape check
-                # print("shape check of input samples", input_samples.shape)
-                output_samples = self.func(input_samples)
+
+                try:
+                    # regular sampling style
+                    input_samples = [
+                        v.alpha_cut(lhs_samples[:, i]) for i, v in enumerate(self._vars)
+                    ]
+                    output_samples = self.func(input_samples)
+                except Exception as e:
+                    # vectorised sampling style
+                    input_samples = np.array(
+                        [
+                            v.alpha_cut(lhs_samples[:, i])
+                            for i, v in enumerate(self._vars)
+                        ]
+                    ).T
+                    output_samples = self.func(input_samples)
             case "taylor_expansion":
                 pass
             case _:
