@@ -116,7 +116,7 @@ def slicing(
 
 def double_monte_carlo(
     joint_distribution,
-    epis_vars,
+    epistemic_vars,
     n_a,
     n_e,
     func,
@@ -127,14 +127,14 @@ def double_monte_carlo(
     """
     args:
         joint_distribution: an aleatoric sampler based on joint distribution of aleatory variables (or marginal one in 1d case)
-        epis_vars: epistemic variables
+        epistemic_vars: epistemic variables
         n_a: number of aleatory samples
         n_e: number of epistemic samples
         parallel (Boolean): parallel processing. Only use it for heavy computation (black-box) due to overhead
     """
 
     # lhs sample array on epistemic variables
-    epistemic_points = epis_vars.endpoints_lhs_sample(n_e)
+    epistemic_points = epistemic_vars.endpoints_lhs_sample(n_e)
 
     def evaluate_func_on_e(e, n_a, func):
         """propagate wrt one point in the epistemic space
