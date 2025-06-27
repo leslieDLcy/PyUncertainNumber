@@ -60,14 +60,20 @@ e = UN(
 Many propagation methodologies are provided to rigorously propgate the uncertainty through the computational pipeline, intrusively or non-intrusively.
 
 ```python
-a = Propagation(
-    vars=[L, I, F, E],
-    fun=cantilever_beam_deflection,
-    method="extremepoints",
-    n_disc=8,
-    save_raw_data="yes",
-    base_path=base_path,
-)
+
+# shortcut to create uncertain numbers
+a = pun.normal([2,3], [1])
+b = pun.normal([10,14], [1])
+
+# assume a response function
+def foo(x): return x[0] ** 3 + x[1] + x[2]
+
+# intrusive call signature
+response = foo([a, b])
+
+# non-intrusive call signature
+p = Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='subinterval')
+response = p.run(n_slices=50, n_sub=4, style='endpoints')
 ```
 
 ## installation

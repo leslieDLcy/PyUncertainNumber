@@ -119,17 +119,20 @@ def i_cartesian_product(a, b):
 
 
 def endpoints(vec_itvl, func):
-    """leslie's implementation of endpoints method
+    """Implementation of endpoints method
 
-    args:
-        vec_itvl: a vector type Interval object
-        func: the function to be evaluated
+    Args:
+        vec_itvl (Interval): a vector type Interval object
+        func (callable): the function to be evaluated. See notes about function signature.
+
+    Notes:
+        The function `func` is expected to accept a 2D numpy array of shape (n, m)
     """
 
     v_np = vec_itvl.to_numpy()
     rows = np.vsplit(v_np, v_np.shape[0])
     arr = vec_cartesian_product(*rows)
-    # print(arr.shape)
+    print(arr.shape)
     # return arr
     response = func(arr)  # func on each row of combination of endpoints
     min_response = np.min(response)
