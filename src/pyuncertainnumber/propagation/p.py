@@ -19,6 +19,7 @@ from ..pba.pbox_abc import Pbox
 from ..pba.intervals.number import Interval
 from ..pba.distributions import Distribution
 from ..propagation.epistemic_uncertainty.b2b import b2b
+from ..decorator import constructUN
 
 """the new top-level module for the propagation of uncertain numbers"""
 
@@ -291,7 +292,6 @@ class MixedPropagation(P):
         assert self.method in [
             "interval_monte_carlo",
             "slicing",
-            "equi_cutting",
             "double_monte_carlo",
         ], f"Method {self.method} not supported for mixed uncertainty propagation"
 
@@ -322,6 +322,9 @@ class Propagation:
         func: the response or performance function applied to the uncertain numbers
         method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
         interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+
+    notes:
+        Discussion of the methods and strategies.
 
     example:
         >>> import pyuncertainnumber as pun
@@ -405,6 +408,7 @@ class Propagation:
         """return the underlying constructs"""
         return self._constructs
 
+    @constructUN
     def run(self, **kwargs):
         """doing the propagation"""
 

@@ -105,6 +105,10 @@ def slicing(
     else:
         itvs = [v.discretise(n_slices) for v in p_vars]
 
+    if len(itvs) == 1:
+        response_intvl = response_intvl = func(itvs[0])
+        response_pbox = stacking(response_intvl)
+        return response_pbox
     b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
     container = [b2b_f(_item) for _item in itertools.product(*itvs)]
     return stacking(container)
