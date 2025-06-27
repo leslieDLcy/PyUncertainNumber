@@ -540,6 +540,11 @@ class Staircase(Pbox):
         return self.alpha_cut(alpha)
 
     def discretise(self, n=None):
+        """alpha-cut discretisation of the p-box without outer approximation
+
+        args:
+            n (int): number of steps to be used in the discretisation.
+        """
 
         if (n is None) or (n == Params.steps):
             return I(lo=self.left, hi=self.right)
