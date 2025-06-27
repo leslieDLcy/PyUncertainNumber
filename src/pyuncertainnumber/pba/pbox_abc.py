@@ -533,6 +533,17 @@ class Staircase(Pbox):
         ind = find_nearest(Params.p_values, alpha)
         return I(lo=self.left[ind], hi=self.right[ind])
 
+    def lw_alpha_cut(self, alpha=0.5):
+        """test the lightweight `alpha_cut` method
+
+        args:
+            alpha (array-like): probability levels
+        """
+        from .intervals.number import LightweightInterval as lwI
+
+        ind = find_nearest(Params.p_values, alpha)
+        return lwI(lo=self.left[ind], hi=self.right[ind])
+
     def sample(self, n_sam):
         from scipy.stats import qmc
 
