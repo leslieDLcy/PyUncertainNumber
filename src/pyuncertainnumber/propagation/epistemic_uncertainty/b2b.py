@@ -21,26 +21,31 @@ def b2b(
     n_sub=None,
     **kwargs,
 ) -> Interval:
-    """
-    General implementation of a function:
+    """General implementation of interval propagation through a function:
 
-    Y = g(Ix1, Ix2, ..., IxN)
+    .. math::
+        Y = g(I_{x1}, I_{x2}, ..., I_{xn})
 
-    where Ix1, Ix2, ..., IxN are intervals.
+    where :math:`I_{x1}, I_{x2}, ..., I_{xn}` are intervals.
 
-    In a general case, the function g is not necessarily monotonic and g() is a black-box model.
+    In a general case, the function :math:`g` is not necessarily monotonic and :math:`g` may be a black-box model.
     Optimisation to the rescue and two of them particularly: GA and BO.
 
     args:
-        vecs: a vector Interval or a list or tuple of scalar Interval
-        func: performance or response function or a black-box model as in subprocess.
+        vecs (Interval): a vector Interval or a list or tuple of scalar Interval
+        func (callable): performance or response function or a black-box model as in subprocess.
             Expect 2D inputs therefore `func` shall have the matrix signature. See Notes for additional details.
-        interval_strategy: the interval_strategy used for interval propagation
+        interval_strategy (str): the interval_strategy used for interval propagation
+
             - 'endpoints': only the endpoints
+
             - 'ga': genetic algorithm
+
             - 'bo': bayesian optimisation
+
             - 'diret': direct apply function (the default)
-        style: the style only used for subinterval propagation
+
+        style (str): the style only used for subinterval propagation
         **kwargs: additional keyword arguments to be passed to the function
 
     note:
@@ -48,6 +53,9 @@ def b2b(
 
     signature:
         This shall be a top-level func as `epistemic_propagation()`.
+
+    caution:
+        ``interval_strategy`` suggests the method of interval propagation whhile ``style`` is the style of subinterval propagation.
 
     returns:
         Interval: the low and upper bound of the response
@@ -71,6 +79,84 @@ def b2b(
             raise NotImplementedError(
                 f"Method {interval_strategy} is not supported yet."
             )
+
+
+def endpoints(vec_itvl: Interval, func) -> Interval:
+    """Implementation of endpoints method
+
+    args:
+        vec_itvl (Interval): a vector type Interval object
+        func (callable): the function to be evaluated. See notes about function signature.
+
+    note:
+        The function `func` is expected to accept a 2D numpy array of shape :math:`(2^d, d)` where `d` is the dimension of the vector interval.
+        Therefore, the function  should have a vectorised signature, as opposted to taking individual scalar inputs.
+
+    tip:
+        The function `func` is expected to accept a 2D numpy array of shape :math:`(2^d, d)` where `d` is the dimension of the vector interval.
+        Therefore, the function  should have a vectorised signature, as opposted to taking individual scalar inputs.
+
+
+    Example:
+        >>> from pyuncertainnumber import pba
+        >>> v = pba.I([1, 2], [3, 4])  # a vector interval with two dimensions
+        >>> def bar(x): return x[:, 0] ** 3 + x[:, 1] + 5
+        >>> endpoints(v, func)
+        Interval(8.0, 36.0)
+    """
+
+    v_np = vec_itvl.to_numpy()
+    rows = np.vsplit(v_np, v_np.shape[0])
+    arr = vec_cartesian_product(*rows)
+    # print(arr.shape)  # array of shape (2**n, 2)
+
+    response = func(arr)  # func on each row of combination of endpoints
+    min_response = np.min(response)
+    max_response = np.max(response)
+    return Interval(min_response, max_response)
+
+
+def subinterval_method(
+    vec_itvl: Interval, func, style=None, n_sub=None, parallel=False
+) -> Interval:
+    # TODO parallel subinterval
+    """Implmentation of subinterval method which splits subintervals and reconstitutes later.
+
+    Args:
+        vec_itvl (Interval): a vector type Interval object
+        func (callable): the function to be evaluated. See notes about function signature.
+        n_sub (int): number of subintervals
+        style (str): the style used for interval propagation which shall be compatible with the response function signature.
+
+            - 'direct': direct apply function
+
+            - 'endpoints': only the endpoints are propagated
+
+    note:
+        There are some subtleties about function signature. For ``endpoints`` style, the function `func` should have a vectorised signature
+        as it is expecting a 2D numpy array, whereas for the `direct` style, it is expecting to take individual scalar inputs
+
+    Example:
+        >>> from pyuncertainnumber import pba
+        >>> v = pba.I([1, 2], [3, 4])
+        >>> def bar(x): return x[0] ** 3 + x[1] + 5
+        >>> b2b.subinterval_method(vec_itvl=v, func=bar, style='direct', n_sub=2)
+        >>> def bar_vec(x): return x[:, 0] ** 3 + x[:, 1] + 5
+        >>> b2b.subinterval_method(vec_itvl=v, func=bar_vec, style='endpoints', n_sub=2)
+    """
+    from pyuncertainnumber.pba.intervals.methods import subintervalise, reconstitute
+
+    if style is None:
+        raise ValueError("style must be chosen within {'direct', 'endpoints'}.")
+    if n_sub is None:
+        raise ValueError("Number of subintervals n_sub must be provided.")
+
+    sub = subintervalise(vec_itvl, n_sub)
+    if style == "direct":
+        row_n = sub.shape[0]
+        return reconstitute([func(sub[IND]) for IND in range(row_n)])
+    elif style == "endpoints":
+        return reconstitute([endpoints(sub[i], func) for i in range(len(sub))])
 
 
 def vec_cartesian_product(*arrays):
@@ -121,77 +207,6 @@ def i_cartesian_product(a, b):
     flat_upper = cart_upper.reshape(-1, 2)  # shape (4, 2)
 
     return pba.I(lo=flat_lower, hi=flat_upper)
-
-
-def endpoints(vec_itvl: Interval, func) -> Interval:
-    """Implementation of endpoints method
-
-    Args:
-        vec_itvl (Interval): a vector type Interval object
-        func (callable): the function to be evaluated. See notes about function signature.
-
-    Notes:
-        The function `func` is expected to accept a 2D numpy array of shape (2**d, d) where `d` is the dimension of the vector interval.
-        Therefore, the function  should have a vectorised signature, as opposted to taking individual scalar inputs.
-
-    Example:
-        >>> from pyuncertainnumber import pba
-        >>> v = pba.I([1, 2], [3, 4])  # a vector interval with two dimensions
-        >>> def bar(x): return x[:, 0] ** 3 + x[:, 1] + 5
-        >>> endpoints(v, func)
-        Interval(8.0, 36.0)
-    """
-
-    v_np = vec_itvl.to_numpy()
-    rows = np.vsplit(v_np, v_np.shape[0])
-    arr = vec_cartesian_product(*rows)
-    # print(arr.shape)  # array of shape (2**n, 2)
-
-    response = func(arr)  # func on each row of combination of endpoints
-    min_response = np.min(response)
-    max_response = np.max(response)
-    return Interval(min_response, max_response)
-
-
-def subinterval_method(
-    vec_itvl: Interval, func, style=None, n_sub=None, parallel=False
-) -> Interval:
-    # TODO parallel subinterval
-    """Implmentation of subinterval method which splits subintervals and reconstitutes later.
-
-    Args:
-        vec_itvl (Interval): a vector type Interval object
-        func (callable): the function to be evaluated. See notes about function signature.
-        n_sub (int): number of subintervals
-        style (str): the style used for interval propagation which shall be compatible with the response function signature.
-            - 'direct': direct apply function
-            - 'endpoints': only the endpoints are propagated
-
-    Notes:
-        There are some subtleties about function signature. For ``endpoints`` style, the function `func` should have a vectorised signature
-        as it is expecting a 2D numpy array, whereas for the `direct` style, it is expecting to take individual scalar inputs
-
-    Example:
-        >>> from pyuncertainnumber import pba
-        >>> v = pba.I([1, 2], [3, 4])
-        >>> def bar(x): return x[0] ** 3 + x[1] + 5
-        >>> b2b.subinterval_method(vec_itvl=v, func=bar, style='direct', n_sub=2)
-        >>> def bar_vec(x): return x[:, 0] ** 3 + x[:, 1] + 5
-        >>> b2b.subinterval_method(vec_itvl=v, func=bar_vec, style='endpoints', n_sub=2)
-    """
-    from pyuncertainnumber.pba.intervals.methods import subintervalise, reconstitute
-
-    if style is None:
-        raise ValueError("style must be chosen within {'direct', 'endpoints'}.")
-    if n_sub is None:
-        raise ValueError("Number of subintervals n_sub must be provided.")
-
-    sub = subintervalise(vec_itvl, n_sub)
-    if style == "direct":
-        row_n = sub.shape[0]
-        return reconstitute([func(sub[IND]) for IND in range(row_n)])
-    elif style == "endpoints":
-        return reconstitute([endpoints(sub[i], func) for i in range(len(sub))])
 
 
 """

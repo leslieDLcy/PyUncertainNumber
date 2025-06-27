@@ -76,9 +76,12 @@ class AleatoryPropagation(P):
         func: the response or performance function applied to the uncertain numbers
         method: a string indicating the method to be used for propagation.
 
-    notes:
+
+    note:
         Supported methods include "monte_carlo", "latin_hypercube".
-        This function supports with low-level constructs not the high-level `UN` objects.
+
+    caution:
+        This function supports with low-level constructs NOT the high-level `UN` objects.
         For `UN` objects, use `Propagation` class as an high-level API.
 
     example:
@@ -163,8 +166,8 @@ class EpistemicPropagation(P):
         method: a string indicating the method to be used for propagation
         interval_strategy: a strategy for interval propagation, including {'endpoints', 'subinterval'}
 
-    notes:
-        This function supports with low-level constructs not the high-level `UN` objects.
+    caution:
+        This function supports with low-level constructs NOT the high-level `UN` objects.
         For `UN` objects, use `Propagation` class as an high-level API.
 
     example:
@@ -254,11 +257,11 @@ class MixedPropagation(P):
     args:
         vars: a list of uncertain numbers objects
         func: the response or performance function applied to the uncertain numbers
-        method: a string indicating the method to be used for pbox propagation, including {''interval_monte_carlo', 'slicing', 'double_monte_carlo'}.
+        method: a string indicating the method to be used for pbox propagation, including {'interval_monte_carlo', 'slicing', 'double_monte_carlo'}.
         interval_strategy: a strategy for interval propagation, including {'direct', 'subinterval', 'endpoints'}.
 
-    notes:
-        This function supports with low-level constructs not the high-level `UN` objects.
+    caution:
+        This function supports with low-level constructs NOT the high-level `UN` objects.
         For `UN` objects, use `Propagation` class as an high-level API.
 
     example:
@@ -315,7 +318,7 @@ class MixedPropagation(P):
 
 # * ------------------ Uncertain Number Propagation ------------------ *
 class Propagation:
-    """high-level integrated class for the propagation of uncertain numbers
+    """High-level integrated class for the propagation of uncertain numbers
 
     args:
         vars: a list of uncertain numbers objects
@@ -323,7 +326,10 @@ class Propagation:
         method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
         interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
 
-    notes:
+    caution:
+        This class supports with high-level computation with `UncertainNumber` objects.
+
+    note:
         Discussion of the methods and strategies.
 
     example:
@@ -410,7 +416,11 @@ class Propagation:
 
     @constructUN
     def run(self, **kwargs):
-        """doing the propagation"""
+        """doing the propagation and return UN
+
+        return:
+            UncertainNumber: the result of the propagation as an uncertain number object
+        """
 
         # choose the method accordingly
         return self.p(**kwargs)
