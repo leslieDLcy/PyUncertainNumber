@@ -580,6 +580,7 @@ class Staircase(Pbox):
         """
 
         from .intervals.number import Interval as I
+        from .intervals.number import LightweightInterval as lwI
 
         if n is not None:
             p_values = np.linspace(Params.p_lboundary, Params.p_hboundary, n)
@@ -589,9 +590,9 @@ class Staircase(Pbox):
         p_leftend = p_values[0:-1]
         p_rightend = p_values[1:]
 
-        q_l = [self.alpha_cut(p).left for p in p_leftend]
-        q_r = [self.alpha_cut(p).right for p in p_rightend]
-        interval_vec = I(lo=np.squeeze(q_l), hi=np.squeeze(q_r))
+        q_l = self.alpha_cut(p_leftend).left
+        q_r = self.alpha_cut(p_rightend).right
+        interval_vec = lwI(lo=q_l, hi=q_r)
 
         return interval_vec
 
