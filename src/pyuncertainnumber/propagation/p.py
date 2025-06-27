@@ -160,7 +160,7 @@ class EpistemicPropagation(P):
         vars: a list of uncertain numbers objects
         func: the response or performance function applied to the uncertain numbers
         method: a string indicating the method to be used for propagation
-        interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+        interval_strategy: a strategy for interval propagation, including {'endpoints', 'subinterval'}
 
     notes:
         This function supports with low-level constructs not the high-level `UN` objects.
@@ -168,10 +168,12 @@ class EpistemicPropagation(P):
 
     example:
         >>> from pyuncertainnumber import pba
+        >>> from pyuncertainnumber.propagation.p import EpistemicPropagation
+        >>> def foo(x): return x[0] ** 3 + x[1] + x[2]
         >>> a = pba.I(1, 5)
         >>> b = pba.I(7, 13)
         >>> c = pba.I(5, 10)
-        >>> ep = EpistemicPropagation(vars=[a,b,c], func=foo_universal, method='subinterval')
+        >>> ep = EpistemicPropagation(vars=[a,b,c], func=foo, method='subinterval')
         >>> result = ep(n_sub=20, style='endpoints')
     """
 
@@ -251,8 +253,8 @@ class MixedPropagation(P):
     args:
         vars: a list of uncertain numbers objects
         func: the response or performance function applied to the uncertain numbers
-        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
-        interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+        method: a string indicating the method to be used for pbox propagation, including {''interval_monte_carlo', 'slicing', 'double_monte_carlo'}.
+        interval_strategy: a strategy for interval propagation, including {'direct', 'subinterval', 'endpoints'}.
 
     notes:
         This function supports with low-level constructs not the high-level `UN` objects.
@@ -260,11 +262,13 @@ class MixedPropagation(P):
 
     example:
         >>> from pyuncertainnumber import pba
+        >>> from pyuncertainnumber.propagation.p import MixedPropagation
+        >>> def foo(x): return x[0] ** 3 + x[1] + x[2]
         >>> a = pba.normal([2, 3], [1])
         >>> b = pba.normal([10, 14], [1])
         >>> c = pba.normal([4, 5], [1])
-        >>> mix = MixedPropagation(vars=[a,b,c], func=foo_universal, method='slicing', interval_strategy='subinterval')  # `subinterval` strategy succeeds
-        >>> result = mix(n_sam=20, n_sub=2, style='endpoints')
+        >>> mix = MixedPropagation(vars=[a,b,c], func=foo, method='slicing', interval_strategy='direct')
+        >>> result = mix(n_slices=20)
     """
 
     def __init__(self, vars, func, method, interval_strategy=None):
