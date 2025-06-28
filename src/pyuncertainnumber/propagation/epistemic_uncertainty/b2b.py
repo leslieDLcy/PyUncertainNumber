@@ -48,11 +48,9 @@ def b2b(
         style (str): the style only used for subinterval propagation
         **kwargs: additional keyword arguments to be passed to the function
 
-    note:
-        'direct' method is not meant to be called directly but to keep as an option during pbox propagation.
 
-    signature:
-        This shall be a top-level func as `epistemic_propagation()`.
+    tip:
+        This serves as a top-level func as `epistemic_propagation()`.
 
     caution:
         ``interval_strategy`` suggests the method of interval propagation whhile ``style`` is the style of subinterval propagation.
