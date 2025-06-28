@@ -2,7 +2,7 @@
 
 ## Virtual environment
 
-Set up your Python3 virtual environment to safely install the dependencies. For details, refer to this [guide](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) for `venv` or this [guide](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) if you prefer `Conda`.
+Set up your Python3 virtual environment to safely install the dependencies. For details, refer to this [guide](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) for `venv` or this [guide](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) if you prefer `Conda`. For [Spyder](https://www.spyder-ide.org) users, [specify the path to the  the environment interpreter](https://youtu.be/3ELzEG5_haU?si=FZoQ7qtQra-Iro_T) will get you started.
 
 On MacOS/Linux:
 
@@ -34,6 +34,15 @@ python3 -c "import pyuncertainnumber as pun; print(pun.norm([0,12],[1,4]))"
 ## Dependencies
 
 Refer to the `requirements.txt` file from the [GitHub repository](https://github.com/leslieDLcy/PyUncertainNumber/) to see the requirements. Note these will be automatically installed during the `pip` install process of the package. There is no need to manually install them.
+
+
+## Contributions
+
+If you feel like make contributions to the developement, which is highly encouraged, have a fork on GitHub, `git` clone it, `cd` to the project root directory and install it in editable mode. Once you are happy, `pull request` your changes.
+
+```shell
+pip install -e .
+```
 
 ## Questions
 

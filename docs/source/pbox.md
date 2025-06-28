@@ -23,18 +23,20 @@ p-box collectively reflects the variability (aleatoric uncertainty) and incertit
 There is a storng link between p-box and Dempster-Shafer structures (which `PyUncertainNumber` also explicitly provides support :boom:). Each can be converted to the other. However, it should be noted such translation is not one-to-one.
 ```
 
-`PyUncertainNumber` provides support for operations with p-boxes ranging from [characterisation](./guides/uc.md), aggregation, propagation. Go check out these links for details as to the computation with p-boxes. Meanwhile, quick examples show below:
+`PyUncertainNumber` provides support for operations with p-boxes ranging from [characterisation](./guides/uc.md), aggregation, [propagation](./guides/up.md). Go check out these links for details as to the computation with p-boxes. Meanwhile, quick examples are show below:
 
 ```python
-from PyUncertainNumber import UncertainNumber as UN
+from pyuncertainnumber import UncertainNumber as UN
 
 un = UN(
     name='elas_modulus', 
     symbol='E', 
     units='Pa', 
     essence='pbox', 
-    distribution_parameters=['gaussian', [(0,12),(1,4)]])
-_ = un.display(style='band')
+    distribution_parameters=['gaussian', ([0,12],[1,4])]
+    )
+
+un.display()
 ```
 
 <!-- a plot -->

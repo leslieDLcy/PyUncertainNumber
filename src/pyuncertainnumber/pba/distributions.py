@@ -194,7 +194,18 @@ class Distribution:
 
 
 class JointDistribution:
-    """Bivariate joint distribution class"""
+    """Joint distribution class
+
+    implementation:
+        Bivariate implementation supported by now. Multivariate case is under development.
+
+    example:
+        >>> from pyuncertainnumber import pba
+        >>> dist_a, dist_b = pba.Distribution('gaussian', (5,1)), pba.Distribution('uniform', (2, 3))
+        >>> c = pba.Dependency('gaussian', params=0.8)
+        >>> joint_dist = pba.JointDistribution(copula=c, marginals=[dist_a, dist_b])
+        >>> samples = joint_dist.sample(size=1000)
+    """
 
     def __init__(
         self,
@@ -225,10 +236,10 @@ class JointDistribution:
 
 
 class ECDF(Staircase):
-    """empirical cumulative distribution function (ecdf) class
+    """Empirical cumulative distribution function (ecdf) class
 
-    note:
-        - supported by Pbox API hence samples will be intervals
+    implementation:
+        - supported by `Pbox` API hence samples will be degenerate intervals
 
     example:
         >>> import numpy as np
@@ -363,12 +374,14 @@ named_dists = {
     "vonmises": sps.vonmises,
     "vonmises_line": sps.vonmises_line,
     "wald": sps.wald,
+    "weibull": sps.weibull_min,
     "weibull_min": sps.weibull_min,
     "weibull_max": sps.weibull_max,
     "wrapcauchy": sps.wrapcauchy,
     "bernoulli": sps.bernoulli,
     "betabinom": sps.betabinom,
     "binom": sps.binom,
+    "binomial": sps.binom,
     "boltzmann": sps.boltzmann,
     "dlaplace": sps.dlaplace,
     "geom": sps.geom,

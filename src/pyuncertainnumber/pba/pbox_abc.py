@@ -75,7 +75,15 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
 
 
 class Pbox(ABC):
-    """a base class for Pbox"""
+    """a base class for Pbox
+
+    danger:
+        this is an abstract class and should not be instantiated directly.
+
+        .. seealso::
+
+            :class:`pbox_abc.Staircase` and :class:`pbox_abc.Leaf` for concrete implementations.
+    """
 
     def __init__(
         self,
@@ -184,9 +192,23 @@ class Pbox(ABC):
 
     # * --------------------- functions ---------------------*#
     def to_interval(self):
+        """discretise pbox into a vec-interval of length of default steps
+
+        note:
+            If desired a custom length of vec-interval as output, use `discretise()` method.
+        """
         from .intervals.number import Interval as I
 
         return I(lo=self.left, hi=self.right)
+
+    def to_dss(self, discretisation=Params.steps):
+        """convert pbox to DempsterShafer object"""
+        from .dss import DempsterShafer
+
+        return DempsterShafer(
+            self.to_interval(),
+            np.repeat(a=(1 / discretisation), repeats=discretisation),
+        )
 
 
 class Staircase(Pbox):
@@ -511,13 +533,15 @@ class Staircase(Pbox):
         return I(lo=Params.p_values[lo_ind], hi=Params.p_values[hi_ind])
 
     def alpha_cut(self, alpha=0.5):
-        """get the bounds on the quantile at any particular probability level
+        """test the lightweight `alpha_cut` method
 
         args:
             alpha (array-like): probability levels
         """
+        from .intervals.number import LightweightInterval as lwI
+
         ind = find_nearest(Params.p_values, alpha)
-        return I(lo=self.left[ind], hi=self.right[ind])
+        return lwI(lo=self.left[ind], hi=self.right[ind])
 
     def sample(self, n_sam):
         from scipy.stats import qmc
@@ -526,38 +550,70 @@ class Staircase(Pbox):
         return self.alpha_cut(alpha)
 
     def discretise(self, n=None):
-        from .utils import equi_selection
+        """alpha-cut discretisation of the p-box without outer approximation
+
+        args:
+            n (int): number of steps to be used in the discretisation.
+        """
 
         if (n is None) or (n == Params.steps):
             return I(lo=self.left, hi=self.right)
         else:
-            l, r = equi_selection(self.left, n), equi_selection(self.right, n)
-            return I(lo=l, hi=r)
+            # l, r = equi_selection(self.left, n), equi_selection(self.right, n)
+            # return I(lo=l, hi=r)
 
-    def outer_approximate(self, n=None):
-        """outer approximation of a p-box
+            p_values = np.linspace(Params.p_lboundary, Params.p_hboundary, n)
+            return self.alpha_cut(p_values)
+
+    def outer_discretisation(self, n=None):
+        """discretisation of a p-box to get intervals based on the scheme of outer approximation
 
         args:
-            - n: number of steps to be used in the approximation
+            n (int): number of steps to be used in the discretisation
+
         note:
-            - `the_interval_list` will have length one less than that of `p_values` (i.e. 100 and 99)
+            `the_interval_list` will have length one less than that of default `p_values` (i.e. 100 and 99)
+
+        return:
+            the outer intervals in vec-Interval form
         """
 
         from .intervals.number import Interval as I
+        from .intervals.number import LightweightInterval as lwI
 
         if n is not None:
-            p_values = np.arange(0, n) / n
+            p_values = np.linspace(Params.p_lboundary, Params.p_hboundary, n)
         else:
             p_values = self._pvalues
 
         p_leftend = p_values[0:-1]
         p_rightend = p_values[1:]
 
-        q_l = [self.alpha_cut(p).left for p in p_leftend]
-        q_r = [self.alpha_cut(p).right for p in p_rightend]
+        q_l = self.alpha_cut(p_leftend).left
+        q_r = self.alpha_cut(p_rightend).right
+        interval_vec = lwI(lo=q_l, hi=q_r)
 
-        interval_vec = I(lo=q_l, hi=q_r)
-        return p_values, interval_vec
+        return interval_vec
+
+    def condensation(self, n):
+        """ourter condensation of the pbox to reduce the number of steps and get a sparser staircase pbox
+
+        args:
+            n (int): number of steps to be used in the discretisation
+
+        note:
+            Have not thought about a better name so we call it `condensation` for now. Candidate names include 'approximation'.
+
+        example:
+            >>> p.condensation(n=5)
+
+        return:
+            a staircase p-box with sparser steps
+        """
+        from .aggregation import stacking
+
+        itvls = self.outer_discretisation(n)
+        return stacking(itvls)
 
     def area_metric(self):
         return np.trapezoid(y=self.left, x=self._pvalues) - np.trapezoid(
