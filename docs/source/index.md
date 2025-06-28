@@ -76,6 +76,10 @@ p = Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='subi
 response = p.run(n_slices=50, n_sub=4, style='endpoints')
 ```
 
+```{attention}
+The libary is under active develpment, so APIs will change across different versions.
+```
+
 ## installation
 
 ```{tip}
@@ -83,7 +87,8 @@ response = p.run(n_slices=50, n_sub=4, style='endpoints')
 - **Requirement:** Python >=3.11
 ```
 
-`PyUncertainNumber` can be installed from [PyPI](https://pypi.org/project/pyuncertainnumber/). Upon activation of your virtual environment, use your terminal. For additional details, refer to [installation guide](https://pyuncertainnumber.readthedocs.io/en/latest/guides/installation.html).
+`PyUncertainNumber` can be installed from [PyPI](https://pypi.org/project/pyuncertainnumber/). Upon activation of your virtual environment, use your terminal. While we'd like to refer to the library as `PyUncertainNumber`in PascalCase, we use all lowercase (i.e. pyuncertainnumber) when installing from [PyPI](https://pypi.org/project/pyuncertainnumber/) following [PEP 8](https://peps.python.org/pep-0008/) convention.
+For additional details, refer to [installation guide](https://pyuncertainnumber.readthedocs.io/en/latest/guides/installation.html).
 
 ```shell
 pip install pyuncertainnumber
