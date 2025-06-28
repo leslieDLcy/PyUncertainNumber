@@ -282,6 +282,12 @@ class MixedPropagation(P):
         The computation cost increases exponentially with the number of input variables and the number of slices.
         Be cautious with the choice of number of slices ``n_slices`` given the number of input variables ``vars`` of the response function.
 
+
+    note:
+        Discussion of the methods and strategies.
+        When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
+        whereas "subinterval" and "endpoints" require the function to take a vectorised signature.
+
     example:
         >>> from pyuncertainnumber import pba
         >>> from pyuncertainnumber.propagation.p import MixedPropagation
@@ -342,14 +348,20 @@ class Propagation:
     args:
         vars (UncertainNumber): a list of uncertain numbers objects
         func (Callable): the response or performance function applied to the uncertain numbers
-        method (str): a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.) which may depend on the constructs of the uncertain numbers.
-        interval_strategy (str): a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+        method (str):
+            a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.) which may depend on the constructs of the uncertain numbers.
+            See notes about function signature.
+        interval_strategy (str):
+            a strategy for interval propagation, including {'direct', 'subinterval', 'endpoints'} which will
+            affect the function signature of the response function. See notes about function signature.
 
     caution:
         This class supports with high-level computation with `UncertainNumber` objects.
 
     note:
         Discussion of the methods and strategies.
+        When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
+        whereas "subinterval" and "endpoints" require the function to take a vectorised signature.
 
     warning:
         The computation cost increases exponentially with the number of input variables and the number of slices.
@@ -357,10 +369,13 @@ class Propagation:
 
     example:
         >>> import pyuncertainnumber as pun
-        >>> # constructions of uncertain number
+        >>> # construction of uncertain number objects
         >>> a = pun.I(2, 3)
         >>> b = pun.normal(4, 1)
         >>> c = pun.uniform([4,5], [9,10])
+
+        >>> # vectorised function signature with matrix input (2D np.ndarray)
+        >>> def foo_vec(x): return x[:, 0] ** 3 + x[:, 1] + x[:, 2]
 
         >>> # high-level propagation API
         >>> p = Propagation(vars=[a,b,c],
@@ -369,7 +384,7 @@ class Propagation:
         >>>     interval_strategy='subinterval'
         >>> )
 
-        >>> # heavy-lifting
+        >>> # heavy-lifting of propagation
         >>> t = p.run(n_sam=20, n_sub=2, style='endpoints')
     """
 

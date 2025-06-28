@@ -27,26 +27,6 @@ note:
 """
 
 
-def bi_imc(x, y, func, dependency=None, n_sam=100):
-    """bivariate interval monte carlo
-
-    args:
-        x, y (Pbox) : Pbox
-        func: callable which takes vector-type of inputs
-        dependency: dependency structure (regular copula)
-    """
-    from scipy.stats import qmc
-
-    # from pyuncertainnumber.pba.aggregation import stacking
-
-    alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
-    x_i = x.alpha_cut(alpha)
-    y_i = y.alpha_cut(alpha)
-
-    container = [func(_item) for _item in itertools.product(x_i, y_i)]
-    return stacking(container)
-
-
 # TODO: add vine copula
 def interval_monte_carlo(
     vars: list[Interval | Distribution | Pbox],
@@ -57,9 +37,35 @@ def interval_monte_carlo(
     **kwargs,
 ) -> Pbox:
     """
-    Args:
-        vars (list): list of uncertain variables
-        dependency: dependency structure (e.g. vine copula or archimedean copula)
+    args:
+        vars (list): a list of constructs
+        func (callable) : response function
+        interval_strategy (str) :
+            strategy for interval discretisation, options include {'direct', 'endpoints', 'subinterval'}
+        n_sam (int):
+            number of samples for each input
+        dependency: dependency structure (e.g. vine copula or archimedean copula
+
+    tip:
+        Independence assumption by now. Dependency structure is at beta developement now.
+
+    note:
+        When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
+        whereas "subinterval" and "endpoints" require the function to take a vectorised signature.
+
+    return:
+        Pbox
+
+    example:
+        >>> from pyuncertainnumber import pba
+        >>> def foo(x): return x[0] ** 3 + x[1] + x[2]
+        >>> a = pba.normal([2, 3], [1])
+        >>> b = pba.normal([10, 14], [1])
+        >>> c = pba.normal([4, 5], [1])
+        >>> mix = interval_monte_carlo(vars=[a,b,c],
+        >>> ...       func=foo,
+        >>> ...       n_sam=20,
+        >>> ...       interval_strategy='direct')
     """
     from scipy.stats import qmc
 
@@ -69,7 +75,6 @@ def interval_monte_carlo(
     alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
     itvs = [v.alpha_cut(alpha) for v in p_vars]
 
-    #! func must expect 2D inputs
     # TODO add parallel logic herein
     b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
     container = [b2b_f(_item) for _item in itertools.product(*itvs)]
@@ -92,11 +97,31 @@ def slicing(
         func (callable) : response function
         interval_strategy (str) : strategy for interval discretisation, options include {'direct', 'endpoints', 'subinterval'}
         n_slices: number of slices for each input
-        outer_discretisation (bool): whether to use outer discretisation for pbox. By default is True for rigorous propagation; however, alpha-cut style interval are also supported.
+        outer_discretisation (bool): whether to use outer discretisation for pbox.
+            By default is True for rigorous propagation; however, alpha-cut style interval are also supported.
         dependency: dependency structure (e.g. vine copula or archimedean copula
 
+    tip:
+        Independence assumption by now. Dependency structure is at beta developement now.
+
     note:
-        independence assumption by now. Dependency structure is at beta developement now.
+        When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
+        whereas "subinterval" and "endpoints" require the function to take a vectorised signature.
+
+    return:
+        Pbox
+
+    example:
+        >>> from pyuncertainnumber import pba
+        >>> def foo(x): return x[0] ** 3 + x[1] + x[2]
+        >>> a = pba.normal([2, 3], [1])
+        >>> b = pba.normal([10, 14], [1])
+        >>> c = pba.normal([4, 5], [1])
+        >>> mix = slicing(vars=[a,b,c],
+        >>> ...       func=foo,
+        >>> ...       n_slices=20,
+        >>> ...       interval_strategy='direct')
+
     """
     p_vars = [convert_pbox(v) for v in vars]
 
@@ -135,9 +160,9 @@ def double_monte_carlo(
     hint:
         consider a function mapping f(X) -> y
 
-        - X in :math:`R^5` will `n_a=1000`will suggest f(1000, 5)
+        - :math:`X` in :math:`R^5` with `n_a=1000`will suggest f(1000, 5)
 
-        - resulting sample array: for `n_e=2` y : (n_ep+2, n_a) e.g. (4, 1000)
+        - resulting sample array: with `n_e=2`, the response :math:`y` : (n_ep+2, n_a) e.g. (4, 1000)
 
     return:
         numpy array of shape ``(n_e+2, n_a)`` as a collection of CDFs for the response
@@ -148,6 +173,26 @@ def double_monte_carlo(
         One can further envelope these CDFs into a ``Pbox`` or ``UncertainNumber`` object.
 
     example:
+        >>> from pyuncertainnumber import pba
+        >>> # vectorised function signature with matrix input (2D np.ndarray)
+        >>> def foo_vec(x):
+        ...     return x[:, 0] ** 3 + x[:, 1] + x[:, 2] + x[:, 3]
+
+        >>> dist_a = pba.Distribution('gaussian', (5, 1))
+        >>> dist_b = pba.Distribution('uniform', (2, 3))
+        >>> c = pba.Dependency('gaussian', params=0.8)
+        >>> joint_dist = pba.JointDistribution(copula=c, marginals=[dist_a, dist_b])
+
+        >>> xe1 = pba.I(1, 2)
+        >>> xe2 = pba.I(3, 4)
+
+        >>> t = double_monte_carlo(
+        ...     joint_distribution=joint_dist,
+        ...     epistemic_vars=[xe1, xe2],
+        ...     n_a=20,
+        ...     n_e=3,
+        ...     func=foo_vec
+        ... )
     """
     # from epistemic vars into vec interval object
     from pyuncertainnumber import make_vec_interval
@@ -178,3 +223,23 @@ def double_monte_carlo(
     response = np.squeeze(np.stack(list(container), axis=0))
     # TODO : envelope CDFs into a pbox
     return response
+
+
+def bi_imc(x, y, func, dependency=None, n_sam=100):
+    """Bivariate interval monte carlo for convenience
+
+    args:
+        x, y (Pbox) : Pbox
+        func: callable which takes vector-type of inputs
+        dependency: dependency structure (regular copula)
+    """
+    from scipy.stats import qmc
+
+    # from pyuncertainnumber.pba.aggregation import stacking
+
+    alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
+    x_i = x.alpha_cut(alpha)
+    y_i = y.alpha_cut(alpha)
+
+    container = [func(_item) for _item in itertools.product(x_i, y_i)]
+    return stacking(container)

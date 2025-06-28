@@ -92,10 +92,6 @@ def endpoints(vec_itvl: Interval, func) -> Interval:
         The function `func` is expected to accept a 2D numpy array of shape :math:`(2^d, d)` where `d` is the dimension of the vector interval.
         Therefore, the function  should have a vectorised signature, as opposted to taking individual scalar inputs.
 
-    tip:
-        The function `func` is expected to accept a 2D numpy array of shape :math:`(2^d, d)` where `d` is the dimension of the vector interval.
-        Therefore, the function  should have a vectorised signature, as opposted to taking individual scalar inputs.
-
 
     Example:
         >>> from pyuncertainnumber import pba
