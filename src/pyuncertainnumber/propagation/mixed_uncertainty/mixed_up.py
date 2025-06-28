@@ -115,30 +115,46 @@ def slicing(
 
 
 def double_monte_carlo(
-    joint_distribution: JointDistribution,
-    epistemic_vars: Interval,
+    joint_distribution: Distribution | JointDistribution,
+    epistemic_vars: list[Interval],
     n_a: int,
     n_e: int,
     func: callable,
     parallel=False,
 ) -> Pbox:
-    # X in R5. (1000, 5) -> f(X)
-    # samples: (n_ep, n_alea) e.g. (10, 1000)
     """Double-loop Monte Carlo or nested Monte Carlo for mixed uncertainty propagation
 
     args:
-        joint_distribution (JointDistribution): an aleatoric sampler based on joint distribution of aleatory variables (or marginal one in 1d case)
-        epistemic_vars (Intervals): epistemic variables
+        joint_distribution (Distribution or JointDistribution): an aleatoric sampler based on joint distribution of aleatory variables (or marginal one in 1d case).
+            A sampler is basically anything (univariate or multivariate) that has the `sample` interface whereby it can sample a given number of samples.
+        epistemic_vars (list): a list epistemic variables in the form of Interval
         n_a (int): number of aleatory samples
         n_e (int): number of epistemic samples
         parallel (Boolean): parallel processing. Only use it for heavy computation (black-box) due to overhead
 
-    return:
-        a collection of CDFs for the response
-    """
+    hint:
+        consider a function mapping f(X) -> y
 
+        - X in :math:`R^5` will `n_a=1000`will suggest f(1000, 5)
+
+        - resulting sample array: for `n_e=2` y : (n_ep+2, n_a) e.g. (4, 1000)
+
+    return:
+        numpy array of shape ``(n_e+2, n_a)`` as a collection of CDFs for the response
+
+
+    note:
+        The result array can be interpreted as a collection of CDFs for the response function evaluated at the aleatory samples for each epistemic sample.
+        One can further envelope these CDFs into a ``Pbox`` or ``UncertainNumber`` object.
+
+    example:
+    """
+    # from epistemic vars into vec interval object
+    from pyuncertainnumber import make_vec_interval
+
+    v = make_vec_interval(epistemic_vars)
     # lhs sample array on epistemic variables
-    epistemic_points = epistemic_vars.endpoints_lhs_sample(n_e)
+    epistemic_points = v.endpoints_lhs_sample(n_e)
 
     def evaluate_func_on_e(e, n_a, func):
         """propagate wrt one point in the epistemic space
@@ -158,8 +174,7 @@ def double_monte_carlo(
         return func(X_input)
 
     p_func = partial(evaluate_func_on_e, n_a=n_a, func=func)
-
     container = map(p_func, epistemic_points)
-    response = np.squeeze(np.stack(container, axis=0))
+    response = np.squeeze(np.stack(list(container), axis=0))
     # TODO : envelope CDFs into a pbox
     return response

@@ -194,7 +194,11 @@ class Distribution:
 
 
 class JointDistribution:
-    """Bivariate joint distribution class"""
+    """Joint distribution class
+
+    implementation:
+        Bivariate implementation supported by now. Multivariate case is under development.
+    """
 
     def __init__(
         self,
