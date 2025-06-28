@@ -75,7 +75,15 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
 
 
 class Pbox(ABC):
-    """a base class for Pbox"""
+    """a base class for Pbox
+
+    danger:
+        this is an abstract class and should not be instantiated directly.
+
+        .. seealso::
+
+            :class:`pbox_abc.Staircase` and :class:`pbox_abc.Leaf` for concrete implementations.
+    """
 
     def __init__(
         self,

@@ -10,7 +10,7 @@ from ..epistemic_uncertainty.b2b import b2b
 
 if TYPE_CHECKING:
     from ...pba.intervals import Interval
-    from ...pba.distributions import Distribution
+    from ...pba.distributions import Distribution, JointDistribution
     from ...pba.pbox_abc import Pbox
 
 """leslie's implementation on mixed uncertainty propagation
@@ -115,22 +115,26 @@ def slicing(
 
 
 def double_monte_carlo(
-    joint_distribution,
-    epistemic_vars,
-    n_a,
-    n_e,
-    func,
+    joint_distribution: JointDistribution,
+    epistemic_vars: Interval,
+    n_a: int,
+    n_e: int,
+    func: callable,
     parallel=False,
 ) -> Pbox:
     # X in R5. (1000, 5) -> f(X)
     # samples: (n_ep, n_alea) e.g. (10, 1000)
-    """
+    """Double-loop Monte Carlo or nested Monte Carlo for mixed uncertainty propagation
+
     args:
-        joint_distribution: an aleatoric sampler based on joint distribution of aleatory variables (or marginal one in 1d case)
-        epistemic_vars: epistemic variables
-        n_a: number of aleatory samples
-        n_e: number of epistemic samples
+        joint_distribution (JointDistribution): an aleatoric sampler based on joint distribution of aleatory variables (or marginal one in 1d case)
+        epistemic_vars (Intervals): epistemic variables
+        n_a (int): number of aleatory samples
+        n_e (int): number of epistemic samples
         parallel (Boolean): parallel processing. Only use it for heavy computation (black-box) due to overhead
+
+    return:
+        a collection of CDFs for the response
     """
 
     # lhs sample array on epistemic variables

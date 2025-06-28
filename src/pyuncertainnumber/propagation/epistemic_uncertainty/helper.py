@@ -1,21 +1,38 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from scipy.stats import qmc
 import numpy as np
 
+if TYPE_CHECKING:
+    from ...pba.intervals import Interval
 
 """some helper funcs and classes for the epistemic space"""
 
 
 class EpistemicDomain:
-    """This function is used to represent the epistemic space which are indeed bounds of each dimension
+    """Representation of the epistemic space which are indeed bounds of each dimension
 
-    note:
-        default setup is the Beta marginal Gaussian copula combo index from 1 meaning the first update
+    This class provides a set of handy functions to work with epistemic uncertainty in the form of bounds.
+    It will be useful for tasks such as propagation or optimization where epistemic uncertainty is involved.
+
+    args:
+        vars: a set of Interval variables
+
+    tip:
+        a must to use for optimisation tasks where the design bounds can be quickly specified with the ``to_OptBounds`` method.
+
+    example:
+        >>> e = EpistemicDomain(xe1, xe2)
+        >>> # convert the epistemic space to bounds for the optimizer
+        >>> e.to_OptBounds()
+        >>> # perform lhs sampling on the epistemic space
+        >>> sample = e.lhs_sampling(1000)
     """
 
-    def __init__(self, *vars):
+    def __init__(self, *vars: Interval):
         from ...pba.intervals.intervalOperators import make_vec_interval
 
-        self.vec_interval = make_vec_interval(list(vars))
+        self.vec_interval = make_vec_interval(vars)
 
     def lhs_sampling(self, n_samples: int):
         """perform lhs sampling on the epistemic space"""
