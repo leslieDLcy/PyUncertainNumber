@@ -84,6 +84,9 @@ class AleatoryPropagation(P):
         This function supports with low-level constructs NOT the high-level `UN` objects.
         For `UN` objects, use `Propagation` class as an high-level API.
 
+    See Also:
+        Propagation: the high-level API for uncertain number propagation.
+
     example:
         >>> from pyuncertainnumber import pba
         >>> from pyuncertainnumber.propagation.p import AleatoryPropagation
@@ -170,6 +173,9 @@ class EpistemicPropagation(P):
         This function supports with low-level constructs NOT the high-level `UN` objects.
         For `UN` objects, use `Propagation` class as an high-level API.
 
+    See Also:
+        Propagation: the high-level API for uncertain number propagation.
+
     example:
         >>> from pyuncertainnumber import pba
         >>> from pyuncertainnumber.propagation.p import EpistemicPropagation
@@ -252,7 +258,7 @@ class EpistemicPropagation(P):
 
 
 class MixedPropagation(P):
-    """mixed uncertainty propagation class for construct
+    """Mixed uncertainty propagation class for construct
 
     args:
         vars: a list of uncertain numbers objects
@@ -263,6 +269,15 @@ class MixedPropagation(P):
     caution:
         This function supports with low-level constructs NOT the high-level `UN` objects.
         For `UN` objects, use `Propagation` class as an high-level API.
+
+
+    See Also:
+        Propagation: the high-level API for uncertain number propagation.
+
+
+    warning:
+        The computation cost increases exponentially with the number of input variables and the number of slices.
+        Be cautious with the choice of number of slices ``n_slices`` given the number of input variables of the response function.
 
     example:
         >>> from pyuncertainnumber import pba
@@ -323,7 +338,7 @@ class Propagation:
     args:
         vars: a list of uncertain numbers objects
         func: the response or performance function applied to the uncertain numbers
-        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
+        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.) which may depend on the constructs of the uncertain numbers.
         interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
 
     caution:
@@ -331,6 +346,10 @@ class Propagation:
 
     note:
         Discussion of the methods and strategies.
+
+    warning:
+        The computation cost increases exponentially with the number of input variables and the number of slices.
+        Be cautious with the choice of number of slices ``n_slices`` given the number of input variables of the response function.
 
     example:
         >>> import pyuncertainnumber as pun
@@ -354,8 +373,8 @@ class Propagation:
         self,
         vars: list[UncertainNumber],
         func: callable,
-        method,
-        interval_strategy=None,
+        method: str,
+        interval_strategy: str = None,
     ):
 
         self._vars = vars
@@ -365,6 +384,7 @@ class Propagation:
         self._post_init_check()
 
     def _post_init_check(self):
+        """Some checks after initialisation"""
 
         # strip the underlying constructs from UN
         self._constructs = [c._construct for c in self._vars]
@@ -375,6 +395,7 @@ class Propagation:
         self.assign_method()
 
     def assign_method(self):
+        """Assign the propagation method based on the essence of constructs"""
         # created an underlying propagation `self.p` object
 
         # all
@@ -416,7 +437,7 @@ class Propagation:
 
     @constructUN
     def run(self, **kwargs):
-        """doing the propagation and return UN
+        """Doing the propagation and return UN
 
         return:
             UncertainNumber: the result of the propagation as an uncertain number object

@@ -225,10 +225,10 @@ class JointDistribution:
 
 
 class ECDF(Staircase):
-    """empirical cumulative distribution function (ecdf) class
+    """Empirical cumulative distribution function (ecdf) class
 
-    note:
-        - supported by Pbox API hence samples will be intervals
+    implementation:
+        - supported by `Pbox` API hence samples will be degenerate intervals
 
     example:
         >>> import numpy as np

@@ -45,13 +45,21 @@ def KS_bounds(s, alpha: float, display=True) -> tuple[eCDF_bundle]:
 
     args:
         - s (array-like): sample data, precise and imprecise
-        - dn (scalar): KS critical value at a significance level and sample size N;
+        - dn (float): KS critical value at a significance level and sample size N;
 
-    returns:
-        - two CDF bounds, i.e. upper and lower (eCDF_bundle)
+    return:
+        - two CDF bounds, i.e. upper and lower (eCDF_bundle objects)
 
     note:
         With the upper and lower bounds, a free pbox can be constructed.
+
+    example:
+        >>> # both precise data (e.g. numpy array) and imprecise data (e.g. a vector of interval) are supported
+        >>> precise_data = np.random.normal(0, 1, 100)  # precise data case
+        >>> KS_bounds(precise_data, alpha=0.025, display=True)
+        >>>
+        >>> impre_data = pba.I(lo=[0, 1, 2], hi=[7, 8, 9])  # imprecise data case
+        >>> KS_bounds(impre_data, alpha=0.025, display=True)
     """
     # TODO quantile of two bounds have different support ergo not a box yet
     # * to make the output as a pbox
@@ -343,7 +351,7 @@ def mean_std(mean: Number, std: Number, steps=Params.steps) -> UncertainNumber |
         std (number): std value of the variable
 
     return:
-        Pbox
+        UncertainNumber or Pbox
 
 
     tip:
@@ -780,7 +788,7 @@ def from_percentiles(
         >>>     0.5: pba.I(1,2),
         >>>     0.75: pba.I(1.5,2.5),
         >>>     1: 3})
-        >>>     .show()
+        >>>     .display()
     """
     # check if 0 and 1 are in the dictionary
     if 0 not in percentiles.keys():
