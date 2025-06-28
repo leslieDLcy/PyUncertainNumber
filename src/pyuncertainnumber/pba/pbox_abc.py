@@ -75,7 +75,15 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
 
 
 class Pbox(ABC):
-    """a base class for Pbox"""
+    """a base class for Pbox
+
+    danger:
+        this is an abstract class and should not be instantiated directly.
+
+        .. seealso::
+
+            :class:`pbox_abc.Staircase` and :class:`pbox_abc.Leaf` for concrete implementations.
+    """
 
     def __init__(
         self,
@@ -525,15 +533,6 @@ class Staircase(Pbox):
         return I(lo=Params.p_values[lo_ind], hi=Params.p_values[hi_ind])
 
     def alpha_cut(self, alpha=0.5):
-        """get the bounds on the quantile at any particular probability level
-
-        args:
-            alpha (array-like): probability levels
-        """
-        ind = find_nearest(Params.p_values, alpha)
-        return I(lo=self.left[ind], hi=self.right[ind])
-
-    def lw_alpha_cut(self, alpha=0.5):
         """test the lightweight `alpha_cut` method
 
         args:
@@ -580,6 +579,7 @@ class Staircase(Pbox):
         """
 
         from .intervals.number import Interval as I
+        from .intervals.number import LightweightInterval as lwI
 
         if n is not None:
             p_values = np.linspace(Params.p_lboundary, Params.p_hboundary, n)
@@ -589,9 +589,9 @@ class Staircase(Pbox):
         p_leftend = p_values[0:-1]
         p_rightend = p_values[1:]
 
-        q_l = [self.alpha_cut(p).left for p in p_leftend]
-        q_r = [self.alpha_cut(p).right for p in p_rightend]
-        interval_vec = I(lo=np.squeeze(q_l), hi=np.squeeze(q_r))
+        q_l = self.alpha_cut(p_leftend).left
+        q_r = self.alpha_cut(p_rightend).right
+        interval_vec = lwI(lo=q_l, hi=q_r)
 
         return interval_vec
 

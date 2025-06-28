@@ -51,6 +51,21 @@ def foo_universal(x):
         return x[:, 0] ** 3 + x[:, 1] + x[:, 2]
 
 
+def bar(x):
+    """a simple 2-dimensional function for testing purposes"""
+    return x[0] ** 3 + x[1] + 5
+
+
+def bar_vec(x):
+    """a simple vectroised 2-dimensional function for testing purposes"""
+    return x[:, 0] ** 3 + x[:, 1] + 5
+
+
+def bar_individual(x0, x1):
+    """a simple 2-dimensional function for testing purposes with individual inputs"""
+    return x0**3 + x1 + 5
+
+
 #! 'func' needs to take 2D inputs for maxmising the potential for array computation
 def cb_func(x):
     """Calculates deflection and stress for a cantilever beam.

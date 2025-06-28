@@ -153,7 +153,14 @@ because it has to import UN which creates circular import issue.
 
 
 def make_vec_interval(vec):
-    """parse into a vector interval"""
+    """parse into a vector interval
+
+    Example:
+        >>> a, b = pba.I(1, 2), pba.I(3, 4)
+        >>> make_vec_interval([a, b])
+        Interval([1, 3], [2, 4])
+
+    """
     from ...characterisation.uncertainNumber import UncertainNumber as UN
 
     assert len(vec) > 1, "Interval must have more than one element"

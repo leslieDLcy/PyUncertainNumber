@@ -12,6 +12,19 @@ from statsmodels.distributions.copula.api import (
 
 
 class Dependency:
+    """Dependecy class to specify copula models
+
+    args:
+        family (str): name of the copula family, e.g. "gaussian",
+            "t", "frank", "gumbel", "clayton", "independence"
+        params (Number): parameter of the copula, e.g. correlation for gaussian copula
+            or degrees of freedom for t copula
+
+    example:
+        >>> from pyuncertainnumber import pba
+        >>> pba.Dependency('gaussian', params=0.8)
+
+    """
 
     # parameterisation init
     def __init__(self, family: str, params: Number):

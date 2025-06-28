@@ -19,6 +19,7 @@ from ..pba.pbox_abc import Pbox
 from ..pba.intervals.number import Interval
 from ..pba.distributions import Distribution
 from ..propagation.epistemic_uncertainty.b2b import b2b
+from ..decorator import constructUN
 
 """the new top-level module for the propagation of uncertain numbers"""
 
@@ -71,24 +72,32 @@ class AleatoryPropagation(P):
     """Aleatoric uncertainty propagation class for construct
 
     args:
-        vars: a list of uncertain numbers objects
-        func: the response or performance function applied to the uncertain numbers
-        method: a string indicating the method to be used for propagation.
+        vars (Distribution): a list of uncertain numbers objects
+        func (callable): the response or performance function applied to the uncertain numbers
+        method (str): a string indicating the method to be used for propagation.
 
-    notes:
+
+    note:
         Supported methods include "monte_carlo", "latin_hypercube".
-        This function supports with low-level constructs not the high-level `UN` objects.
+
+    caution:
+        This function supports with low-level constructs NOT the high-level `UN` (uncertain number) objects.
         For `UN` objects, use `Propagation` class as an high-level API.
 
+
+        .. seealso::
+            :func:`Propagation` : the high-level API for uncertain number propagation.
+
+
     example:
-        >>> from pyuncertainnumber import pba, Distribution
-        >>> from pyuncertainnumber.propagation.performance import foo_universal
+        >>> from pyuncertainnumber import pba
         >>> from pyuncertainnumber.propagation.p import AleatoryPropagation
-        >>> a = Distribution('gaussian', (3,1))
-        >>> b = Distribution('gaussian', (10, 1))
-        >>> c = Distribution('uniform', (5, 10))
-        >>> alea = AleatoryPropagation(vars=[a,b,c], func=foo_universal, method='monte_carlo')
-        >>> result = alea(n_sam=1000)
+        >>> def foo(x): return x[0] ** 3 + x[1] + x[2]
+        >>> a = pba.Distribution('gaussian', (3,1))
+        >>> b = pba.Distribution('gaussian', (10, 1))
+        >>> c = pba.Distribution('uniform', (5, 10))
+        >>> aleatory = AleatoryPropagation(vars=[a_d, b_d, c_d], func=foo, method='monte_carlo')
+        >>> result = aleatory(n_sam=1000)
     """
 
     from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
@@ -116,19 +125,36 @@ class AleatoryPropagation(P):
         """doing the propagation"""
         match self.method:
             case "monte_carlo":
-                input_samples = np.array(
-                    [v.sample(n_sam) for v in self._vars]
-                ).T  # (n_sam, n_vars) == (n, d)
-                output_samples = self.func(input_samples)
+                # regular sampling style
+                try:
+                    # regular sampling style
+                    input_samples = [v.sample(n_sam) for v in self._vars]
+                    output_samples = self.func(input_samples)
+                except Exception as e:
+                    # vectorised sampling style
+                    input_samples = np.array(
+                        [v.sample(n_sam) for v in self._vars]
+                    ).T  # (n_sam, n_vars) == (n, d)
+                    output_samples = self.func(input_samples)
             case "latin_hypercube" | "lhs":
                 sampler = qmc.LatinHypercube(d=len(self._vars))
                 lhs_samples = sampler.random(n=n_sam)  # u-space (n, d)
-                input_samples = np.array(
-                    [v.alpha_cut(lhs_samples[:, i]) for i, v in enumerate(self._vars)]
-                ).T
-                # ! a shape check
-                # print("shape check of input samples", input_samples.shape)
-                output_samples = self.func(input_samples)
+
+                try:
+                    # regular sampling style
+                    input_samples = [
+                        v.alpha_cut(lhs_samples[:, i]) for i, v in enumerate(self._vars)
+                    ]
+                    output_samples = self.func(input_samples)
+                except Exception as e:
+                    # vectorised sampling style
+                    input_samples = np.array(
+                        [
+                            v.alpha_cut(lhs_samples[:, i])
+                            for i, v in enumerate(self._vars)
+                        ]
+                    ).T
+                    output_samples = self.func(input_samples)
             case "taylor_expansion":
                 pass
             case _:
@@ -140,21 +166,27 @@ class EpistemicPropagation(P):
     """Epistemic uncertainty propagation class for construct
 
     args:
-        vars: a list of uncertain numbers objects
-        func: the response or performance function applied to the uncertain numbers
-        method: a string indicating the method to be used for propagation
-        interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+        vars (Interval): a list of interval objects
+        func (callable): the response or performance function applied to the uncertain numbers
+        method (str): a string indicating the method to be used for propagation
+        interval_strategy (str): a strategy for interval propagation, including {'endpoints', 'subinterval'}
 
-    notes:
-        This function supports with low-level constructs not the high-level `UN` objects.
+    caution:
+        This function supports with low-level constructs NOT the high-level `UN` (uncertain number) objects.
         For `UN` objects, use `Propagation` class as an high-level API.
+
+
+        .. seealso::
+            :func:`Propagation` : the high-level API for uncertain number propagation.
 
     example:
         >>> from pyuncertainnumber import pba
+        >>> from pyuncertainnumber.propagation.p import EpistemicPropagation
+        >>> def foo(x): return x[0] ** 3 + x[1] + x[2]
         >>> a = pba.I(1, 5)
         >>> b = pba.I(7, 13)
         >>> c = pba.I(5, 10)
-        >>> ep = EpistemicPropagation(vars=[a,b,c], func=foo_universal, method='subinterval')
+        >>> ep = EpistemicPropagation(vars=[a,b,c], func=foo, method='subinterval')
         >>> result = ep(n_sub=20, style='endpoints')
     """
 
@@ -229,25 +261,42 @@ class EpistemicPropagation(P):
 
 
 class MixedPropagation(P):
-    """mixed uncertainty propagation class for construct
+    """Mixed uncertainty propagation class for construct
 
     args:
-        vars: a list of uncertain numbers objects
-        func: the response or performance function applied to the uncertain numbers
-        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
-        interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+        vars (Pbox or DempsterShafer): a list of uncertain numbers objects
+        func (callable): the response or performance function applied to the uncertain numbers
+        method (str): a string indicating the method to be used for pbox propagation, including {'interval_monte_carlo', 'slicing', 'double_monte_carlo'}.
+        interval_strategy (str): a strategy for interval propagation, including {'direct', 'subinterval', 'endpoints'}.
 
-    notes:
-        This function supports with low-level constructs not the high-level `UN` objects.
+    caution:
+        This function supports with low-level constructs NOT the high-level `UN` (uncertain number) objects.
         For `UN` objects, use `Propagation` class as an high-level API.
+
+
+        .. seealso::
+            :func:`Propagation` : the high-level API for uncertain number propagation.
+
+
+    warning:
+        The computation cost increases exponentially with the number of input variables and the number of slices.
+        Be cautious with the choice of number of slices ``n_slices`` given the number of input variables ``vars`` of the response function.
+
+
+    note:
+        Discussion of the methods and strategies.
+        When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
+        whereas "subinterval" and "endpoints" require the function to take a vectorised signature.
 
     example:
         >>> from pyuncertainnumber import pba
+        >>> from pyuncertainnumber.propagation.p import MixedPropagation
+        >>> def foo(x): return x[0] ** 3 + x[1] + x[2]
         >>> a = pba.normal([2, 3], [1])
         >>> b = pba.normal([10, 14], [1])
         >>> c = pba.normal([4, 5], [1])
-        >>> mix = MixedPropagation(vars=[a,b,c], func=foo_universal, method='slicing', interval_strategy='subinterval')  # `subinterval` strategy succeeds
-        >>> result = mix(n_sam=20, n_sub=2, style='endpoints')
+        >>> mix = MixedPropagation(vars=[a,b,c], func=foo, method='slicing', interval_strategy='direct')
+        >>> result = mix(n_slices=20)
     """
 
     def __init__(self, vars, func, method, interval_strategy=None):
@@ -256,21 +305,21 @@ class MixedPropagation(P):
         self.interval_strategy = interval_strategy
         self.post_init_check()
 
-    # assume striped UM classes
+    # assume striped UN classes (i.e. constructs only)
     def type_check(self):
-        """mixed UM"""
+        """Inspection if inputs are mixed uncertainy model"""
 
         has_I = any(isinstance(item, Interval) for item in self._vars)
         has_D = any(isinstance(item, Distribution) for item in self._vars)
         has_P = any(isinstance(item, Pbox) for item in self._vars)
 
-        # assert (has_I and has_D) or has_P, "Not a mixed uncertainty problem"
+        assert (has_I and has_D) or has_P, "Not a mixed uncertainty problem"
 
     def method_check(self):
+        """Check if the method is suitable for mixed uncertainty propagation"""
         assert self.method in [
             "interval_monte_carlo",
             "slicing",
-            "equi_cutting",
             "double_monte_carlo",
         ], f"Method {self.method} not supported for mixed uncertainty propagation"
 
@@ -294,20 +343,39 @@ class MixedPropagation(P):
 
 # * ------------------ Uncertain Number Propagation ------------------ *
 class Propagation:
-    """high-level integrated class for the propagation of uncertain numbers
+    """High-level integrated class for the propagation of uncertain numbers
 
     args:
-        vars: a list of uncertain numbers objects
-        func: the response or performance function applied to the uncertain numbers
-        method: a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.)
-        interval_strategy: a strategy for interval propagation, if applicable (e.g. subinterval, etc.)
+        vars (UncertainNumber): a list of uncertain numbers objects
+        func (Callable): the response or performance function applied to the uncertain numbers
+        method (str):
+            a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.) which may depend on the constructs of the uncertain numbers.
+            See notes about function signature.
+        interval_strategy (str):
+            a strategy for interval propagation, including {'direct', 'subinterval', 'endpoints'} which will
+            affect the function signature of the response function. See notes about function signature.
+
+    caution:
+        This class supports with high-level computation with `UncertainNumber` objects.
+
+    note:
+        Discussion of the methods and strategies.
+        When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
+        whereas "subinterval" and "endpoints" require the function to take a vectorised signature.
+
+    warning:
+        The computation cost increases exponentially with the number of input variables and the number of slices.
+        Be cautious with the choice of number of slices ``n_slices`` given the number of input variables ``vars`` of the response function.
 
     example:
         >>> import pyuncertainnumber as pun
-        >>> # constructions of uncertain number
+        >>> # construction of uncertain number objects
         >>> a = pun.I(2, 3)
         >>> b = pun.normal(4, 1)
         >>> c = pun.uniform([4,5], [9,10])
+
+        >>> # vectorised function signature with matrix input (2D np.ndarray)
+        >>> def foo_vec(x): return x[:, 0] ** 3 + x[:, 1] + x[:, 2]
 
         >>> # high-level propagation API
         >>> p = Propagation(vars=[a,b,c],
@@ -316,7 +384,7 @@ class Propagation:
         >>>     interval_strategy='subinterval'
         >>> )
 
-        >>> # heavy-lifting
+        >>> # heavy-lifting of propagation
         >>> t = p.run(n_sam=20, n_sub=2, style='endpoints')
     """
 
@@ -324,8 +392,8 @@ class Propagation:
         self,
         vars: list[UncertainNumber],
         func: callable,
-        method,
-        interval_strategy=None,
+        method: str,
+        interval_strategy: str = None,
     ):
 
         self._vars = vars
@@ -335,6 +403,7 @@ class Propagation:
         self._post_init_check()
 
     def _post_init_check(self):
+        """Some checks after initialisation"""
 
         # strip the underlying constructs from UN
         self._constructs = [c._construct for c in self._vars]
@@ -345,6 +414,7 @@ class Propagation:
         self.assign_method()
 
     def assign_method(self):
+        """Assign the propagation method based on the essence of constructs"""
         # created an underlying propagation `self.p` object
 
         # all
@@ -384,8 +454,13 @@ class Propagation:
         """return the underlying constructs"""
         return self._constructs
 
+    @constructUN
     def run(self, **kwargs):
-        """doing the propagation"""
+        """Doing the propagation and return UN
+
+        return:
+            UncertainNumber: the result of the propagation as an uncertain number object
+        """
 
         # choose the method accordingly
         return self.p(**kwargs)

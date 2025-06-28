@@ -60,14 +60,24 @@ e = UN(
 Many propagation methodologies are provided to rigorously propgate the uncertainty through the computational pipeline, intrusively or non-intrusively.
 
 ```python
-a = Propagation(
-    vars=[L, I, F, E],
-    fun=cantilever_beam_deflection,
-    method="extremepoints",
-    n_disc=8,
-    save_raw_data="yes",
-    base_path=base_path,
-)
+
+# shortcut to create uncertain numbers
+a = pun.normal([2,3], [1])
+b = pun.normal([10,14], [1])
+
+# assume a response function
+def foo(x): return x[0] ** 3 + x[1] + x[2]
+
+# intrusive call signature
+response = foo([a, b])
+
+# non-intrusive call signature
+p = Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='subinterval')
+response = p.run(n_slices=50, n_sub=4, style='endpoints')
+```
+
+```{attention}
+The libary is under active develpment, so APIs will change across different versions.
 ```
 
 ## installation
@@ -77,7 +87,8 @@ a = Propagation(
 - **Requirement:** Python >=3.11
 ```
 
-`PyUncertainNumber` can be installed from [PyPI](https://pypi.org/project/pyuncertainnumber/). Upon activation of your virtual environment, use your terminal. For additional details, refer to [installation guide](https://pyuncertainnumber.readthedocs.io/en/latest/guides/installation.html).
+`PyUncertainNumber` can be installed from [PyPI](https://pypi.org/project/pyuncertainnumber/). Upon activation of your virtual environment, use your terminal. While we'd like to refer to the library as `PyUncertainNumber`in PascalCase, we use all lowercase (i.e. pyuncertainnumber) when installing from [PyPI](https://pypi.org/project/pyuncertainnumber/) following [PEP 8](https://peps.python.org/pep-0008/) convention.
+For additional details, refer to [installation guide](https://pyuncertainnumber.readthedocs.io/en/latest/guides/installation.html).
 
 ```shell
 pip install pyuncertainnumber
