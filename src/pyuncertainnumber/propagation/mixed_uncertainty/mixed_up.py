@@ -5,7 +5,6 @@ from functools import partial
 import itertools
 from ...pba.pbox_abc import convert_pbox
 from ...pba.aggregation import stacking
-from ...pba.intervals.intervalOperators import make_vec_interval
 from ..epistemic_uncertainty.b2b import b2b
 
 if TYPE_CHECKING:
@@ -36,7 +35,8 @@ def interval_monte_carlo(
     dependency=None,
     **kwargs,
 ) -> Pbox:
-    """
+    """Interval Monte Carlo for propagation of pbox
+
     args:
         vars (list): a list of constructs
         func (callable) : response function
@@ -51,7 +51,7 @@ def interval_monte_carlo(
 
     note:
         When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
-        whereas "subinterval" and "endpoints" require the function to take a vectorised signature.
+        whereas "subinterval" and "endpoints" require the function to have a vectorised signature.
 
     return:
         Pbox
@@ -106,7 +106,7 @@ def slicing(
 
     note:
         When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
-        whereas "subinterval" and "endpoints" require the function to take a vectorised signature.
+        whereas "subinterval" and "endpoints" require the function to have a vectorised signature.
 
     return:
         Pbox
