@@ -101,7 +101,7 @@ def endpoints(vec_itvl: Interval, func) -> Interval:
         >>> from pyuncertainnumber import pba
         >>> v = pba.I([1, 2], [3, 4])  # a vector interval with two dimensions
         >>> def bar(x): return x[:, 0] ** 3 + x[:, 1] + 5
-        >>> endpoints(v, func)
+        >>> endpoints(v, bar)
         Interval(8.0, 36.0)
     """
 

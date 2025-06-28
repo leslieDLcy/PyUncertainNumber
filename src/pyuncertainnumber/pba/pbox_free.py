@@ -36,6 +36,8 @@ __all__ = [
 
 if TYPE_CHECKING:
     from .utils import eCDF_bundle
+    from ..characterisation.uncertainNumber import UncertainNumber
+    from .pbox_abc import Pbox
 
 
 def KS_bounds(s, alpha: float, display=True) -> tuple[eCDF_bundle]:
@@ -141,7 +143,6 @@ def d_alpha(n, alpha):
 # * ---------top level func for known statistical properties------*#
 
 
-# TODO: add distribution family
 def known_constraints(
     maximum=None,
     mean=None,
@@ -152,7 +153,34 @@ def known_constraints(
     std=None,
     var=None,
     **kwargs,
-) -> Pbox:
+) -> UncertainNumber:
+    """Construct a uncertain number given known statistical properties specified as constraints.
+
+    args:
+        maximum (number): maximum value of the variable
+        mean (number): mean value of the variable
+        median (number): median value of the variable
+        minimum (number): minimum value of the variable
+        mode (number): mode value of the variable
+        percentiles (dict): dictionary of percentiles and their values, e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: pun.I(3,4), 1:5}
+        std (number): standard deviation of the variable
+        var (number): variance of the variable
+
+    returns:
+        uncertain number
+
+    note:
+        It's also possible to directly call a function given the known information, such as ``pun.mean_std(mean=1, std=0.5)``.
+
+    example:
+        >>> from pyuncertainnumber.pba import known_constraints
+        >>> known_constraints(
+        ...     maximum = 2,
+        ...     mean = 1,
+        ...     var = 0.25,
+        ...     minimum=0,
+        ...     )
+    """
     args = {
         "maximum": maximum,
         "mean": mean,
@@ -213,14 +241,27 @@ def handle_default(**kwargs):
 
 
 @exposeUN
-def min_max(minimum: Number, maximum: Number) -> Staircase:
+def min_max(minimum: Number, maximum: Number) -> UncertainNumber | Pbox:
     """Equivalent to an interval object constructed as a nonparametric Pbox.
 
     args:
         minimum : Left end of box
         maximum : Right end of box
 
-    returns: Pbox
+    returns:
+        UncertainNumber or Pbox
+
+    tip:
+        Two types of return values are possible:
+
+        - by default, a `UncertainNumber` is returned;
+
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
+
+    example:
+        >>> from pyuncertainnumber.pba import min_max
+        >>> min_max(0, 2)  # return a UncertainNumber
+        >>> min_max(0, 2, return_construct=True)  # return a Pbox
     """
 
     return Staircase(
@@ -232,7 +273,7 @@ def min_max(minimum: Number, maximum: Number) -> Staircase:
 
 
 @exposeUN
-def min_mean(minimum, mean, steps=Params.steps) -> Staircase:
+def min_mean(minimum, mean, steps=Params.steps) -> UncertainNumber | Pbox:
     """Nonparametric pbox construction based on constraint of minimum and mean
 
     args:
@@ -240,7 +281,19 @@ def min_mean(minimum, mean, steps=Params.steps) -> Staircase:
         mean (number): mean value of the variable
 
     return:
-        Pbox
+        UncertainNumber or Pbox
+
+    tip:
+        Two types of return values are possible:
+
+        - by default, a `UncertainNumber` is returned;
+
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
+
+    example:
+        >>> from pyuncertainnumber.pba import min_mean
+        >>> min_mean(0, 1)  # return a UncertainNumber
+        >>> min_mean(0, 1, return_construct=True)  # return a Pbox
     """
     jjj = np.array([j / steps for j in range(1, steps - 1)] + [1 - 1 / steps])
     right = [((mean - minimum) / (1 - j) + minimum) for j in jjj]
@@ -257,7 +310,7 @@ def max_mean(
     maximum: Number,
     mean: Number,
     steps=Params.steps,
-) -> Staircase:
+) -> UncertainNumber | Pbox:
     # TODO no __neg__
     """Nonparametric pbox construction based on constraint of maximum and mean
 
@@ -266,13 +319,23 @@ def max_mean(
         mean (number): mean value of the variable
 
     return:
-        Pbox
+        UncertainNumber or Pbox
+
+    tip:
+        Two types of return values are possible:
+
+        - by default, a `UncertainNumber` is returned;
+
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
+
+    example:
+        >>> max_mean(2, 1)  # return a UncertainNumber
     """
     return min_mean(-maximum, -mean).__neg__()
 
 
 @exposeUN
-def mean_std(mean: Number, std: Number, steps=Params.steps) -> Staircase:
+def mean_std(mean: Number, std: Number, steps=Params.steps) -> UncertainNumber | Pbox:
     """Nonparametric pbox construction based on constraint of mean and std
 
     args:
@@ -281,6 +344,18 @@ def mean_std(mean: Number, std: Number, steps=Params.steps) -> Staircase:
 
     return:
         Pbox
+
+
+    tip:
+        Two types of return values are possible:
+
+        - by default, a `UncertainNumber` is returned;
+
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
+
+
+    example:
+        >>> mean_std(1, 0.5)
     """
     iii = [1 / steps] + [i / steps for i in range(1, steps - 1)]
     jjj = [j / steps for j in range(1, steps - 1)] + [1 - 1 / steps]
@@ -294,7 +369,7 @@ def mean_std(mean: Number, std: Number, steps=Params.steps) -> Staircase:
 def mean_var(
     mean: Number,
     var: Number,
-) -> Staircase:
+) -> UncertainNumber | Pbox:
     """Nonparametric pbox construction based on constraint of mean and var
 
     args:
@@ -302,7 +377,18 @@ def mean_var(
         vasr (number): var value of the variable
 
     return:
-        Pbox
+        UncertainNumber or Pbox
+
+
+    tip:
+        Two types of return values are possible:
+
+        - by default, a `UncertainNumber` is returned;
+
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
+
+    example:
+        >>> mean_var(1, 0.25)  # return a UncertainNumber
     """
     return mean_std(mean, np.sqrt(var))
 
@@ -313,23 +399,28 @@ def min_max_mean(
     maximum: Number,
     mean: Number,
     steps: int = Params.steps,
-) -> Staircase:
+) -> UncertainNumber | Pbox:
     # TODO var is missing
-    """
-    Generates a distribution-free p-box based upon the minimum, maximum and mean of the variable
+    """Generates a distribution-free p-box based upon the minimum, maximum and mean of the variable
 
-    **Parameters**:
+    args:
+        minimum (float): minimum value of the variable
+        maximum (float): maximum value of the variable
+        mean (float): mean value of the variable
 
-        ``minimum`` : minimum value of the variable
+    return:
+        UncertainNumber or Pbox
 
-        ``maximum`` : maximum value of the variable
+    tip:
+        Two types of return values are possible:
 
-        ``mean`` : mean value of the variable
+        - by default, a `UncertainNumber` is returned;
+
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
 
 
-    **Returns**:
-
-        ``Pbox``
+    example:
+        >>> min_max_mean(0, 2, 1)
     """
     mid = (maximum - mean) / (maximum - minimum)
     ii = [i / steps for i in range(steps)]
@@ -342,25 +433,28 @@ def min_max_mean(
     )
 
 
+# TODO: to verify if this is correct
 @exposeUN
 def pos_mean_std(
-    mean: Union[float, int],
-    std: Union[float, int],
+    mean: Number,
+    std: Number,
     steps=Params.steps,
 ) -> Pbox:
-    """
-    Generates a positive distribution-free p-box based upon the mean and standard deviation of the variable
+    """Generates a positive distribution-free p-box based upon the mean and standard deviation of the variable
 
-    **Parameters**:
+    args:
+        mean : mean of the variable
+        std : standard deviation of the variable
 
-        ``mean`` : mean of the variable
+    return:
+        UncertainNumber or Pbox
 
-        ``std`` : standard deviation of the variable
+    tip:
+        Two types of return values are possible:
 
+        - by default, a `UncertainNumber` is returned;
 
-    **Returns**:
-
-        ``Pbox``
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
 
     """
     iii = [1 / steps] + [i / steps for i in range(1, steps - 1)]
@@ -384,7 +478,7 @@ def min_max_mode(
     maximum: Number,
     mode: Number,
     steps: int = Params.steps,
-) -> Staircase:
+) -> UncertainNumber | Pbox:
     """Nonparametric pbox construction based on constraint of mean and var
 
     args:
@@ -393,7 +487,17 @@ def min_max_mode(
         mode (number): mode value of the variable
 
     return:
-        Pbox
+        UncertainNumber or Pbox
+
+    tip:
+        Two types of return values are possible:
+
+        - by default, a `UncertainNumber` is returned;
+
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
+
+    example:
+        >>> min_max_mode(0, 2, 1)  # return a UncertainNumber
     """
     if minimum == maximum:
         return min_max(minimum, maximum)
@@ -417,9 +521,8 @@ def min_max_median(
     maximum: Number,
     median: Number,
     steps: int = Params.steps,
-) -> Pbox:
-    """
-    Generates a distribution-free p-box based upon the minimum, maximum and median of the variable
+) -> UncertainNumber | Pbox:
+    """Generates a distribution-free p-box based upon the minimum, maximum and median of the variable
 
     args:
         minimum : minimum value of the variable
@@ -427,7 +530,17 @@ def min_max_median(
         median : median value of the variable
 
     return:
-        ``Pbox``
+        UncertainNumber or Pbox
+
+    tip:
+        Two types of return values are possible:
+
+        - by default, a `UncertainNumber` is returned;
+
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
+
+    example:
+        >>> min_max_median(0, 2, 1)  # return a UncertainNumber
 
     """
     if minimum == maximum:
@@ -457,20 +570,29 @@ def min_max_mean_std(
     mean: Number,
     std: Number,
     **kwargs,
-) -> Staircase:
-    """
-    Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
+) -> UncertainNumber | Pbox:
+    """Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
 
-    **Parameters**
+    args:
+        maximum (number): maximum value of the variable
+        minimum (number): minimum value of the variable
+        std (number): standard deviation of the variable
+        var (number): variance of the variable
 
-        ``minimum`` : minimum value of the variable
-        ``maximum`` : maximum value of the variable
-        ``mean`` : mean value of the variable
-        ``std`` :standard deviation of the variable
+    return:
+        UncertainNumber or Pbox
 
-    **Returns**
 
-        ``Pbox``
+    tip:
+        Two types of return values are possible:
+
+        - by default, a `UncertainNumber` is returned;
+
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
+
+
+    example:
+        >>> min_max_mean_std(0, 2, 1, 0.5)  # return a UncertainNumber
 
     .. seealso::
 
@@ -593,21 +715,25 @@ def min_max_mean_var(
     mean: Number,
     var: Number,
     **kwargs,
-) -> Staircase:
-    """
-    Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
+) -> UncertainNumber | Pbox:
+    """Generates a distribution-free p-box based upon the minimum, maximum, mean and standard deviation of the variable
 
-    **Parameters**
+    args:
+        minimum (number): minimum value of the variable
+        maximum (number): maximum value of the variable
+        mean (number): mean value of the variable
+        var (number): variance of the variable
 
-        ``minimum`` : minimum value of the variable
-        ``maximum`` : maximum value of the variable
-        ``mean`` : mean value of the variable
-        ``var`` :variance of the variable
 
-    **Returns**
+    tip:
+        Two types of return values are possible:
 
-        ``Pbox``
+        - by default, a `UncertainNumber` is returned;
 
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
+
+    example:
+        >>> min_max_mean_var(0, 2, 1, 0.25)  # return a UncertainNumber
 
     .. admonition:: Implementation
 
@@ -622,7 +748,9 @@ def min_max_mean_var(
 
 
 @exposeUN
-def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
+def from_percentiles(
+    percentiles: dict, steps: int = Params.steps
+) -> UncertainNumber | Pbox:
     """yields a distribution-free p-box based on specified percentiles of the variable
 
     args:
@@ -634,6 +762,16 @@ def from_percentiles(percentiles: dict, steps: int = Params.steps) -> Pbox:
         If no keys for 0 and 1 are given, ``-np.inf`` and ``np.inf`` are used respectively. This will result in a p-box that is not bounded and raise a warning.
         If the percentiles are not increasing, the percentiles will be intersected. This may not be desired behaviour.
         ValueError: If any of the percentiles are not between 0 and 1.
+
+    returns:
+        UncertainNumber or Pbox
+
+    tip:
+        Two types of return values are possible:
+
+        - by default, a `UncertainNumber` is returned;
+
+        - For low-level controls, if `return_construct=True` is specified, a `Pbox` is returned.
 
     Example:
         >>> pba.from_percentiles(

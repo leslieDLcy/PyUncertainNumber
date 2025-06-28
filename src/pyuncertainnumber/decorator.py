@@ -46,7 +46,11 @@ def UNtoUN(func):
 
 
 def exposeUN(func):
-    """from a construct to create a UN with a choice"""
+    """From a construct to create a UN with a choice
+
+    example:
+        >>> exposeUN(func)(*args, return_construct=True)
+    """
 
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
