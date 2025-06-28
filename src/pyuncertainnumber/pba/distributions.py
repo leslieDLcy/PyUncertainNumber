@@ -198,6 +198,13 @@ class JointDistribution:
 
     implementation:
         Bivariate implementation supported by now. Multivariate case is under development.
+
+    example:
+        >>> from pyuncertainnumber import pba
+        >>> dist_a, dist_b = pba.Distribution('gaussian', (5,1)), pba.Distribution('uniform', (2, 3))
+        >>> c = pba.Dependency('gaussian', params=0.8)
+        >>> joint_dist = pba.JointDistribution(copula=c, marginals=[dist_a, dist_b])
+        >>> samples = joint_dist.sample(size=1000)
     """
 
     def __init__(
