@@ -24,11 +24,17 @@ class BayesOpt:
 
         args:
             f (callable): the target function to be optimised, should have a single argument
+
             xc_bounds (dict): the bounds for the design space, e.g. {'x1': (0, 1), 'x2': (0, 1)}
+
             dimension (int): the dimension of the design space, i.e. the number of parameters
+
             task (str): either 'minimisation' or 'maximisation'
+
             acquisition_function (str or callable, optional): the acquisition function to be used, e.g. 'UCB', 'EI', 'PI'. If None, defaults to 'UCB'.
+
             num_explorations (int, optional): the number of initial exploration points. Defaults to 100.
+
             num_iterations (int, optional): the number of iterations to run the optimisation. Defaults to 100.
 
         note:
