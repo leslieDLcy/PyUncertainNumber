@@ -23,7 +23,8 @@ class Distribution:
     """Two signature are currentlly supported, either a parametric specification or from a nonparametric empirical data set
 
     note:
-        the nonparametric instasntiation via arrtribute `empirical_data` will be deprecated soon. We will introduct a ECDF class instead.
+        the nonparametric instasntiation via arrtribute `empirical_data` will be deprecated soon.
+        We have introduced a :class:`distributions.ECDF` class instead.
 
     example:
         >>> d = Distribution('gaussian', (0,1))
@@ -196,7 +197,7 @@ class Distribution:
 class JointDistribution:
     """Joint distribution class
 
-    implementation:
+    tip:
         Bivariate implementation supported by now. Multivariate case is under development.
 
     example:
@@ -238,8 +239,9 @@ class JointDistribution:
 class ECDF(Staircase):
     """Empirical cumulative distribution function (ecdf) class
 
-    implementation:
-        - supported by `Pbox` API hence samples will be degenerate intervals
+    .. admonition:: Implementation
+
+        supported by `Pbox` API hence samples will be degenerate intervals
 
     example:
         >>> import numpy as np

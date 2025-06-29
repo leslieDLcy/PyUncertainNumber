@@ -61,6 +61,22 @@ def bar_vec(x):
     return x[:, 0] ** 3 + x[:, 1] + 5
 
 
+def bar_universal(x):
+    """a universal signature that takes iterable and matrix inputs but not individual inputs
+
+    caveat:
+        - this function works with a vector Interval object
+        - but wrong answer with a 2d matrix Interval object due to unclear broadcasting rules
+    """
+
+    if isinstance(x, np.ndarray):
+        if x.ndim == 1:
+            x = x[None, :]
+        return x[:, 0] ** 3 + x[:, 1] + 5  # vectorised signature
+    else:
+        return x[0] ** 3 + x[1] + 5  # iterable signature
+
+
 def bar_individual(x0, x1):
     """a simple 2-dimensional function for testing purposes with individual inputs"""
     return x0**3 + x1 + 5

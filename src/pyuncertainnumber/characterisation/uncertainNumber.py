@@ -349,12 +349,7 @@ class UncertainNumber:
 
     @classmethod
     def from_hedge(cls, hedged_language):
-        """create an Uncertain Number from hedged language
-
-        note:
-            # if interval or pbox, to be implemented later on
-            #  currently only Interval is supported
-        """
+        """create an Uncertain Number from hedged language"""
         an_obj = hedge_interpret(hedged_language)
         essence = "interval"  # TODO: choose between interval, pbox
         left, right = an_obj.left, an_obj.right

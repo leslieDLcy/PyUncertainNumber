@@ -7,7 +7,61 @@ import warnings
 
 
 class BayesOpt:
-    """Bayesian Optimization class for the uncertain number"""
+    """Bayesian Optimisation class
+
+    args:
+        f (callable): the target function to be optimised, should have a single argument
+
+        xc_bounds (dict): the bounds for the design space, e.g. {'x1': (0, 1), 'x2': (0, 1)}
+
+        dimension (int): the dimension of the design space, i.e. the number of parameters
+
+        task (str): either 'minimisation' or 'maximisation'
+
+        acquisition_function (str or callable, optional): the acquisition function to be used, e.g. 'UCB', 'EI', 'PI'. If None, defaults to 'UCB'.
+
+        num_explorations (int, optional): the number of initial exploration points. Defaults to 100.
+
+        num_iterations (int, optional): the number of iterations to run the optimisation. Defaults to 100.
+
+    note:
+        Acquisition functions can be either a string (e.g. 'UCB', 'EI', 'PI') or a callable function.
+        'UCB' stands for Upper Confidence Bound, 'EI' for Expected Improvement, and 'PI' for Probability of Improvement.
+        If a string is provided, the parameter for the acquisition function can be passed as an additional
+        argument to the class constructor. For example, for 'UCB', you can pass a `kappa` value, and for 'EI' or 'PI', you can pass an `xi` value.
+        For low-level controls, if a callable function is provided, it should already be parameterised.
+
+    example:
+        >>> import numpy as np
+        >>> from pyuncertainnumber.opt.bo import BayesOpt
+        >>> def black_box_function(x):
+        ...     return np.exp(-(x - 2)**2) + np.exp(-(x - 6)**2 / 10) + 1 / (x**2 + 1)
+        >>> bo = BayesOpt(
+        ...     f=black_box_function,
+        ...     dimension=1,
+        ...     xc_bounds={'x': (-2, 10)},
+        ...     task='maximisation',
+        ...     num_explorations=3,
+        ...     num_iterations=20
+        ... )
+        >>> bo.run(verbose=True)
+        >>> print(bo.optimal)  # get the optimal parameters and target value
+
+    .. admonition:: Implementation
+
+        For 2D (or higher) optimisation task, the variable bounds can be specified using `EpistemicDomain` class.
+
+        example:
+            >>> from from pyuncertainnumber import pba, EpistemicDomain
+            >>> ed = EpistemicDomain(pba.I(-5, 5), pba.I(-5, 5))
+            >>> BayesOpt(f=foo,
+            ...     dimension=2,
+            ...     xc_bounds= ed.to_BayesOptBounds(),  # the trick
+            ...     task='maximisation',
+            ...     num_explorations=3,
+            ...     num_iterations=20,
+            ...     )
+    """
 
     # TODO add a descriptor for `task`
     def __init__(
@@ -15,10 +69,10 @@ class BayesOpt:
         f,
         xc_bounds,
         dimension,
-        task="maximisation",
+        task,
+        acquisition_function="UCB",
         num_explorations=100,
         num_iterations=100,
-        acquisition_function=None,
     ):
 
         self.task = task  # either minimisation or maximisation
@@ -26,12 +80,30 @@ class BayesOpt:
         self.num_iterations = num_iterations
         self.xc_bounds = xc_bounds
         self.dimension = dimension
-        self.acquisition_function = (
-            acquisition_function
-            if acquisition_function
-            else acquisition.UpperConfidenceBound(kappa=10.0)
-        )
+        self.acquisition_function = self.parse_acq(acquisition_function)
         self.f = f  # the function to be optimised
+
+    def parse_acq(self, acq, parameter=None):
+        """parse the acquisition function
+
+        args:
+            acq (str or callable): the acquisition function to be used. See notes above.
+            parameter (float, optional): parameter for the acquisition function, e.g. kappa for UCB, xi for EI and PI
+        """
+        if isinstance(acq, str):
+            if acq == "UCB":
+                kappa = parameter if parameter else 10.0
+                return acquisition.UpperConfidenceBound(kappa=kappa)
+            elif acq == "EI":
+                xi = parameter if parameter else 0.01
+                return acquisition.ExpectedImprovement(xi=xi)
+            elif acq == "PI":
+                xi = parameter if parameter else 0.01
+                return acquisition.ProbabilityOfImprovement(xi=xi)
+            else:
+                raise ValueError(f"Unknown acquisition function: {acq}")
+        else:
+            return acq
 
     @property
     def f(self):
@@ -88,6 +160,16 @@ class BayesOpt:
         self._all_results = bo_all_dict
 
     def run(self, **kwargs):
+        """run the Bayesian optimisation process.
+
+        args:
+            verbose (bool, optional): whether to print the progress. Defaults to False. Use 'verbose=True' to see the progress.
+
+            **kwargs: additional low--level arguments to be passed to the BayesianOptimization constructor.
+
+        example:
+            >>> foo.run(verbose=True)
+        """
 
         self.optimizer = BayesianOptimization(
             f=self.f,
@@ -118,17 +200,18 @@ class BayesOpt:
         self.get_results()
 
     @property
-    def optimal(self):
+    def optimal(self) -> dict:
+        """return the optimal parameters and target value as a dictionary"""
         return self._optimal_dict
 
     @property
-    def optimal_xc(self):
-        """return the optimal xc"""
-        return self._optimal_dict["xc"]
+    def optimal_xc(self) -> np.ndarray:
+        """return the optimal design points (xc)"""
+        return np.squeeze(self._optimal_dict["xc"])
 
     @property
-    def optimal_target(self):
-        """return the optimal target"""
+    def optimal_target(self) -> np.ndarray:
+        """return the optimal target value f(xc*)"""
         return self._optimal_dict["target"]
 
 

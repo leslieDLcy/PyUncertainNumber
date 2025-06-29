@@ -30,7 +30,7 @@ maintainers = [
 name = "pyuncertainnumber"
 readme = "README.md"
 requires-python = ">= 3.11"
-version = "0.0.13"
+version = "0.0.14"
 
 [tool.setuptools.packages.find]
 # All the following settings are optional:
