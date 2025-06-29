@@ -14,7 +14,7 @@ from pyuncertainnumber.pba.pbox_abc import Pbox
 from pyuncertainnumber.pba.intervals.number import Interval
 from pyuncertainnumber.pba.intervals.intervalOperators import make_vec_interval
 from pyuncertainnumber.pba.intervals import intervalise
-
+from pyuncertainnumber.propagation.epistemic_uncertainty.helper import EpistemicDomain
 
 # * --------------------- Distribution ---------------------*#
 from pyuncertainnumber.pba.distributions import Distribution

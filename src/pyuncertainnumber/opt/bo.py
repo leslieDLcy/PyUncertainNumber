@@ -31,7 +31,6 @@ class BayesOpt:
         argument to the class constructor. For example, for 'UCB', you can pass a `kappa` value, and for 'EI' or 'PI', you can pass an `xi` value.
         For low-level controls, if a callable function is provided, it should already be parameterised.
 
-
     example:
         >>> import numpy as np
         >>> from pyuncertainnumber.opt.bo import BayesOpt
@@ -47,6 +46,21 @@ class BayesOpt:
         ... )
         >>> bo.run(verbose=True)
         >>> print(bo.optimal)  # get the optimal parameters and target value
+
+    .. admonition:: Implementation
+
+        For 2D (or higher) optimisation task, the variable bounds can be specified using `EpistemicDomain` class.
+
+        example:
+            >>> from from pyuncertainnumber import pba, EpistemicDomain
+            >>> ed = EpistemicDomain(pba.I(-5, 5), pba.I(-5, 5))
+            >>> BayesOpt(f=foo,
+            ...     dimension=2,
+            ...     xc_bounds= ed.to_BayesOptBounds(),  # the trick
+            ...     task='maximisation',
+            ...     num_explorations=3,
+            ...     num_iterations=20,
+            ...     )
     """
 
     # TODO add a descriptor for `task`
@@ -150,6 +164,7 @@ class BayesOpt:
 
         args:
             verbose (bool, optional): whether to print the progress. Defaults to False. Use 'verbose=True' to see the progress.
+
             **kwargs: additional low--level arguments to be passed to the BayesianOptimization constructor.
 
         example:

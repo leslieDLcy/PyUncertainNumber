@@ -14,14 +14,6 @@ class GA:
 
         varbound (np.ndarry): the bounds for the design space, e.g. 'np.array([[-2, 10]])'
 
-    .. admonition:: Implementation
-        The range of the design space is defined by `varbound`, which is a 2D numpy array with shape (n, 2), where n is the number of parameters.
-        This is a different signature compared to the Bayesian Optimisation class, which uses a dictionary for bounds.
-        For consistency, it is recommended to use the class `EpistemicDomain.to_varbound()` to automatically take care of the format of the bounds.
-
-        .. seealso::
-            :class:`pyuncertainnumber.propagation.epistemic_uncertainty.helper.EpistemicDomain`: the utility tool for setting up the epistemic domain.
-
     example:
         >>> import numpy as np
         >>> from pyuncertainnumber.opt.ga import GA
@@ -30,6 +22,26 @@ class GA:
         >>> ga = GA(f=black_box_function, task='maximisation', dimension=1, varbound=np.array([[-2, 10]]))
         >>> ga.run()  # the progress bar will be shown as side effect
         >>> print(ga.optimal)  # get the optimal parameters and target value
+
+    .. admonition:: Implementation
+
+        The range of the design space is defined by `varbound`, which is a 2D numpy array with shape (n, 2), where n is the number of parameters.
+        This is a different signature compared to the Bayesian Optimisation class, which uses a dictionary for bounds.
+        For consistency, it is recommended to use the class `EpistemicDomain.to_varbound()` to automatically take care of the format of the bounds.
+
+        example:
+            >>> from pyuncertainnumber import pba, EpistemicDomain
+            >>> ed = EpistemicDomain(pba.I(-5, 5), pba.I(-5, 5))
+            >>> ga = GA(
+            ...     f=foo,
+            ...     task='maximisation',
+            ...     dimension=2,
+            ...     varbound=ed.to_GA_varBounds()  # the trick
+            ... )
+
+    .. seealso::
+
+        :class:`pyuncertainnumber.propagation.epistemic_uncertainty.helper.EpistemicDomain`: the utility tool for setting up the epistemic domain.
     """
 
     # TODO add a descriptor for `task`
