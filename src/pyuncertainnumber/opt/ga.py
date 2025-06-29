@@ -14,7 +14,7 @@ class GA:
 
         varbound (np.ndarry): the bounds for the design space, e.g. 'np.array([[-2, 10]])'
 
-    implementation:
+    .. admonition:: Implementation
         The range of the design space is defined by `varbound`, which is a 2D numpy array with shape (n, 2), where n is the number of parameters.
         This is a different signature compared to the Bayesian Optimisation class, which uses a dictionary for bounds.
         For consistency, it is recommended to use the class `EpistemicDomain.to_varbound()` to automatically take care of the format of the bounds.

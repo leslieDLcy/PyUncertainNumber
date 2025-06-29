@@ -196,7 +196,7 @@ class Distribution:
 class JointDistribution:
     """Joint distribution class
 
-    implementation:
+    tip:
         Bivariate implementation supported by now. Multivariate case is under development.
 
     example:
@@ -238,8 +238,9 @@ class JointDistribution:
 class ECDF(Staircase):
     """Empirical cumulative distribution function (ecdf) class
 
-    implementation:
-        - supported by `Pbox` API hence samples will be degenerate intervals
+    .. admonition:: Implementation
+
+        supported by `Pbox` API hence samples will be degenerate intervals
 
     example:
         >>> import numpy as np

@@ -7,12 +7,14 @@ def get_range_BO(
 ):
     """compute the range of a black-box function using BayesOpt
 
-    implementation:
+    tip:
         for a less verbose output, use (convergence_curve=False, progress_bar=False)
 
     return:
-        - Interval: ``response_itvl``, the interval of the minimum and maximum out of the optimisation given black-box function
-        - dict: ``opt_hint``, the mapping associated with the optimisation, containing the optimal points for min and max
+        Tuple[Interval, dict]: A tuple containing:
+            - response_itvl: The interval of the minimum and maximum from the optimization of the black-box function.
+            - opt_hint: A dictionary with optimal input points for the minimum and maximum values.
+
     """
     from ..pba.intervals.number import Interval
 
