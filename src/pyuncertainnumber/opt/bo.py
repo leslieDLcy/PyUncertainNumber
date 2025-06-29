@@ -7,7 +7,47 @@ import warnings
 
 
 class BayesOpt:
-    """Bayesian Optimization class for the uncertain number"""
+    """Bayesian Optimisation class
+
+    args:
+        f (callable): the target function to be optimised, should have a single argument
+
+        xc_bounds (dict): the bounds for the design space, e.g. {'x1': (0, 1), 'x2': (0, 1)}
+
+        dimension (int): the dimension of the design space, i.e. the number of parameters
+
+        task (str): either 'minimisation' or 'maximisation'
+
+        acquisition_function (str or callable, optional): the acquisition function to be used, e.g. 'UCB', 'EI', 'PI'. If None, defaults to 'UCB'.
+
+        num_explorations (int, optional): the number of initial exploration points. Defaults to 100.
+
+        num_iterations (int, optional): the number of iterations to run the optimisation. Defaults to 100.
+
+    note:
+        Acquisition functions can be either a string (e.g. 'UCB', 'EI', 'PI') or a callable function.
+        'UCB' stands for Upper Confidence Bound, 'EI' for Expected Improvement, and 'PI' for Probability of Improvement.
+        If a string is provided, the parameter for the acquisition function can be passed as an additional
+        argument to the class constructor. For example, for 'UCB', you can pass a `kappa` value, and for 'EI' or 'PI', you can pass an `xi` value.
+        For low-level controls, if a callable function is provided, it should already be parameterised.
+
+
+    example:
+        >>> import numpy as np
+        >>> from pyuncertainnumber.opt.bo import BayesOpt
+        >>> def black_box_function(x):
+        ...     return np.exp(-(x - 2)**2) + np.exp(-(x - 6)**2 / 10) + 1 / (x**2 + 1)
+        >>> bo = BayesOpt(
+        ...     f=black_box_function,
+        ...     dimension=1,
+        ...     xc_bounds={'x': (-2, 10)},
+        ...     task='maximisation',
+        ...     num_explorations=3,
+        ...     num_iterations=20
+        ... )
+        >>> bo.run(verbose=True)
+        >>> print(bo.optimal)  # get the optimal parameters and target value
+    """
 
     # TODO add a descriptor for `task`
     def __init__(
@@ -20,47 +60,6 @@ class BayesOpt:
         num_explorations=100,
         num_iterations=100,
     ):
-        """Bayesian Optimisation class
-
-        args:
-            f (callable): the target function to be optimised, should have a single argument
-
-            xc_bounds (dict): the bounds for the design space, e.g. {'x1': (0, 1), 'x2': (0, 1)}
-
-            dimension (int): the dimension of the design space, i.e. the number of parameters
-
-            task (str): either 'minimisation' or 'maximisation'
-
-            acquisition_function (str or callable, optional): the acquisition function to be used, e.g. 'UCB', 'EI', 'PI'. If None, defaults to 'UCB'.
-
-            num_explorations (int, optional): the number of initial exploration points. Defaults to 100.
-
-            num_iterations (int, optional): the number of iterations to run the optimisation. Defaults to 100.
-
-        note:
-            Acquisition functions can be either a string (e.g. 'UCB', 'EI', 'PI') or a callable function.
-            'UCB' stands for Upper Confidence Bound, 'EI' for Expected Improvement, and 'PI' for Probability of Improvement.
-            If a string is provided, the parameter for the acquisition function can be passed as an additional
-            argument to the class constructor. For example, for 'UCB', you can pass a `kappa` value, and for 'EI' or 'PI', you can pass an `xi` value.
-            For low-level controls, if a callable function is provided, it should already be parameterised.
-
-
-        example:
-            >>> import numpy as np
-            >>> from pyuncertainnumber.opt.bo import BayesOpt
-            >>> def black_box_function(x):
-            ...     return np.exp(-(x - 2)**2) + np.exp(-(x - 6)**2 / 10) + 1 / (x**2 + 1)
-            >>> bo = BayesOpt(
-            ...     f=black_box_function,
-            ...     dimension=1,
-            ...     xc_bounds={'x': (-2, 10)},
-            ...     task='maximisation',
-            ...     num_explorations=3,
-            ...     num_iterations=20
-            ... )
-            >>> bo.run(verbose=True)
-            >>> print(bo.optimal)  # get the optimal parameters and target value
-        """
 
         self.task = task  # either minimisation or maximisation
         self.num_explorations = num_explorations  # initial exploration points

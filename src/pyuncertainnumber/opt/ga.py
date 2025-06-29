@@ -3,38 +3,38 @@ from geneticalgorithm import geneticalgorithm as ga
 
 
 class GA:
-    """high-level interface for the genetic algorithm"""
+    """Genetic Algorithm class
+
+    args:
+        f (callable): the target function to be optimised, should have a single argument
+
+        task (str): either 'minimisation' or 'maximisation'
+
+        dimension (int): the dimension of the design space, i.e. the number of parameters
+
+        varbound (np.ndarry): the bounds for the design space, e.g. 'np.array([[-2, 10]])'
+
+    implementation:
+        The range of the design space is defined by `varbound`, which is a 2D numpy array with shape (n, 2), where n is the number of parameters.
+        This is a different signature compared to the Bayesian Optimisation class, which uses a dictionary for bounds.
+        For consistency, it is recommended to use the class `EpistemicDomain.to_varbound()` to automatically take care of the format of the bounds.
+
+        .. seealso::
+            :class:`pyuncertainnumber.propagation.epistemic_uncertainty.helper.EpistemicDomain`: the utility tool for setting up the epistemic domain.
+
+    example:
+        >>> import numpy as np
+        >>> from pyuncertainnumber.opt.ga import GA
+        >>> def black_box_function(x):
+        ...     return np.exp(-(x - 2)**2) + np.exp(-(x - 6)**2 / 10) + 1 / (x**2 + 1)
+        >>> ga = GA(f=black_box_function, task='maximisation', dimension=1, varbound=np.array([[-2, 10]]))
+        >>> ga.run()  # the progress bar will be shown as side effect
+        >>> print(ga.optimal)  # get the optimal parameters and target value
+    """
 
     # TODO add a descriptor for `task`
     def __init__(self, f: callable, task: str, dimension: int, varbound):
-        """Genetic Algorithm class
 
-        args:
-            f (callable): the target function to be optimised, should have a single argument
-
-            task (str): either 'minimisation' or 'maximisation'
-
-            dimension (int): the dimension of the design space, i.e. the number of parameters
-
-            varbound (np.ndarry): the bounds for the design space, e.g. 'np.array([[-2, 10]])'
-
-        implementation:
-            The range of the design space is defined by `varbound`, which is a 2D numpy array with shape (n, 2), where n is the number of parameters.
-            This is a different signature compared to the Bayesian Optimisation class, which uses a dictionary for bounds.
-            For consistency, it is recommended to use the class `EpistemicDomain.to_varbound()` to automatically take care of the format of the bounds.
-
-            .. seealso::
-                :class:`pyuncertainnumber.propagation.epistemic_uncertainty.helper.EpistemicDomain`: the utility tool for setting up the epistemic domain.
-
-        example:
-            >>> import numpy as np
-            >>> from pyuncertainnumber.opt.ga import GA
-            >>> def black_box_function(x):
-            ...     return np.exp(-(x - 2)**2) + np.exp(-(x - 6)**2 / 10) + 1 / (x**2 + 1)
-            >>> ga = GA(f=black_box_function, task='maximisation', dimension=1, varbound=np.array([[-2, 10]]))
-            >>> ga.run()  # the progress bar will be shown as side effect
-            >>> print(ga.optimal)  # get the optimal parameters and target value
-        """
         self.f = f
         self.task = task
         self.dimension = dimension
