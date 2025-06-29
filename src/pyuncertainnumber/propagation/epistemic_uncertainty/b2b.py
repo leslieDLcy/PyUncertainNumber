@@ -37,8 +37,7 @@ def b2b(
         func (callable): performance or response function or a black-box model as in subprocess.
             Expect 2D inputs therefore `func` shall have the matrix signature. See Notes for additional details.
 
-        interval_strategy (str): the interval_strategy used for interval propagation.
-        The choice shall be compatible with the response function signature. Seethe notes below for additional details.
+        interval_strategy (str): the interval_strategy used for interval propagation. The choice shall be compatible with the response function signature. Seethe notes below for additional details.
 
             - 'endpoints': only the endpoints
 
@@ -46,7 +45,7 @@ def b2b(
 
             - 'bo': bayesian optimisation
 
-            - 'diret': direct apply function (the default)
+            - 'diret': direct apply function to the input intervals (the default)
 
         style (str):
             the style only used for subinterval propagation, including {''direct'', ''endpoints''}.
@@ -58,11 +57,12 @@ def b2b(
         This serves as a top-level for generic interval propagation .
 
     caution:
-        ``interval_strategy`` suggests the method of interval propagation whhile ``style`` is only used for subinterval propagation.
+        ``interval_strategy`` suggests the method of interval propagation (e.g. 'direct' or 'endpoints', or 'ga', or 'bo'),  whhile ``style`` is only used for subinterval propagation.
+        This is to say that what strategy (whether 'direct' or 'endpoints') will be chosen for the sub-intervals.
 
     danger:
-        There are some subtleties about function signature. For ``endpoints`` strategy/style, the function `func` should have a vectorised signature
-        as it is expecting a 2D numpy array, whereas for the `direct` strategy/style, it is expecting to take individual scalar inputs.
+        There are some subtleties about the calling signature of the propagating function. For ``endpoints`` strategy/style, the function `func` should have a vectorised signature
+        as it is expecting a 2D numpy array, whereas for the ``direct`` strategy/style, it is expecting to take individual scalar inputs.
         It is recommended to write a function which implements both signature, as seen in the example below.
 
     returns:
@@ -101,6 +101,11 @@ def b2b(
         ...     n_sub=2)
         [38.0, 156.0]
 
+        >>> # in comparison, one can compare with the result of interval arithmetic
+        >>> def bar_individual(x1, x2):
+        ...     return x1 ** 3 + x2 + 5  # individual signature
+        >>> bar_individual(a, b)
+        [38.0, 156.0]
     """
 
     vec_itvl = make_vec_interval(vars)
