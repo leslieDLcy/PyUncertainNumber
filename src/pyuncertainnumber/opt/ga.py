@@ -69,7 +69,13 @@ class GA:
         # hint: self.model.output_dict["variable"], self.model.output_dict["function"]
 
     def run(self, algorithm_param=None, **kwargs):
-        """run the genetic algorithm"""
+        """run the genetic algorithm
+
+        args:
+            algorithm_param (dict): the parameters for the genetic algorithm; if None, the default parameters will be used.
+            convergence_curve (Boolean): whether to return the convergence curve, default is True
+            progress_bar (Boolean): whether to show the progress bar, default is True
+        """
         if algorithm_param is not None:
             self.model = ga(
                 function=self._f,

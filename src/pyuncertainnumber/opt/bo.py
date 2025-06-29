@@ -185,17 +185,18 @@ class BayesOpt:
         self.get_results()
 
     @property
-    def optimal(self):
+    def optimal(self) -> dict:
+        """return the optimal parameters and target value as a dictionary"""
         return self._optimal_dict
 
     @property
-    def optimal_xc(self):
-        """return the optimal xc"""
-        return self._optimal_dict["xc"]
+    def optimal_xc(self) -> np.ndarray:
+        """return the optimal design points (xc)"""
+        return np.squeeze(self._optimal_dict["xc"])
 
     @property
-    def optimal_target(self):
-        """return the optimal target"""
+    def optimal_target(self) -> np.ndarray:
+        """return the optimal target value f(xc*)"""
         return self._optimal_dict["target"]
 
 
