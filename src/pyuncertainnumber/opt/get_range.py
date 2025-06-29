@@ -73,7 +73,9 @@ def get_range_BO(
     return response_itvl, opt_hint
 
 
-def get_range_GA(f, dimension, varbound, algorithm_param=None, verbose=False, **kwargs):
+def get_range_GA(
+    f: callable, dimension: int, varbound, algorithm_param=None, verbose=False, **kwargs
+):
     """compute the range of the black-box function using GA
 
     return:

@@ -14,11 +14,11 @@ if TYPE_CHECKING:
 # TODO: integrate GA and BO implementations
 # TODO: add discussion of `func` signature (args, collection, matrix) in the notes section
 def b2b(
-    vecs: Interval | list[Interval],
-    func,
-    interval_strategy=None,
-    style=None,
-    n_sub=None,
+    vars: Interval | list[Interval],
+    func: callable,
+    interval_strategy: str = None,
+    style: str = None,
+    n_sub: int = None,
     **kwargs,
 ) -> Interval:
     """General implementation of interval propagation through a function:
@@ -32,10 +32,13 @@ def b2b(
     Optimisation to the rescue and two of them particularly: GA and BO.
 
     args:
-        vecs (Interval): a vector Interval or a list or tuple of scalar Interval
+        vars (Interval): a vector Interval or a list or tuple of scalar Interval
+
         func (callable): performance or response function or a black-box model as in subprocess.
             Expect 2D inputs therefore `func` shall have the matrix signature. See Notes for additional details.
-        interval_strategy (str): the interval_strategy used for interval propagation
+
+        interval_strategy (str): the interval_strategy used for interval propagation.
+        The choice shall be compatible with the response function signature. Seethe notes below for additional details.
 
             - 'endpoints': only the endpoints
 
@@ -45,21 +48,62 @@ def b2b(
 
             - 'diret': direct apply function (the default)
 
-        style (str): the style only used for subinterval propagation
+        style (str):
+            the style only used for subinterval propagation, including {''direct'', ''endpoints''}.
+
         **kwargs: additional keyword arguments to be passed to the function
 
 
     tip:
-        This serves as a top-level func as `epistemic_propagation()`.
+        This serves as a top-level for generic interval propagation .
 
     caution:
-        ``interval_strategy`` suggests the method of interval propagation whhile ``style`` is the style of subinterval propagation.
+        ``interval_strategy`` suggests the method of interval propagation whhile ``style`` is only used for subinterval propagation.
+
+    danger:
+        There are some subtleties about function signature. For ``endpoints`` strategy/style, the function `func` should have a vectorised signature
+        as it is expecting a 2D numpy array, whereas for the `direct` strategy/style, it is expecting to take individual scalar inputs.
+        It is recommended to write a function which implements both signature, as seen in the example below.
 
     returns:
         Interval: the low and upper bound of the response
+
+
+    example:
+        >>> from pyuncertainnumber import b2b
+        >>> import numpy as np
+        >>> import pyuncertainnumber as pba
+
+        >>> # Define a universal function that handles both vectorised and iterable inputs
+        >>> def bar_universal(x):
+        ...     if isinstance(x, np.ndarray):
+        ...         if x.ndim == 1:
+        ...             x = x[None, :]
+        ...         return x[:, 0] ** 3 + x[:, 1] + 5  # vectorised signature
+        ...     else:
+        ...         return x[0] ** 3 + x[1] + 5  # iterable signature
+
+        >>> # Define input intervals
+        >>> a = pba.I(3., 5.)
+        >>> b = pba.I(6., 26.)
+
+        >>> # using the {'endpoints', "direct", ga", "bo"} strategy
+        >>> b2b(vars=[a, b],
+        ...     func=bar_universal,
+        ...     interval_strategy='endpoints')  # replace with {"direct", ga", "bo"}
+        [38.0, 156.0]
+
+        >>> # using the 'subinterval' strategy
+        >>> b2b(vars=[a, b],
+        ...     func=bar_universal,
+        ...     interval_strategy='subinterval',
+        ...     style='endpoints',
+        ...     n_sub=2)
+        [38.0, 156.0]
+
     """
 
-    vec_itvl = make_vec_interval(vecs)
+    vec_itvl = make_vec_interval(vars)
     match interval_strategy:
         case "endpoints":
             return endpoints(vec_itvl, func)
@@ -68,9 +112,30 @@ def b2b(
                 vec_itvl, func, style=style, n_sub=n_sub, **kwargs
             )
         case "ga":
-            pass
+            from ...opt.get_range import get_range_GA
+            from pyuncertainnumber import EpistemicDomain
+
+            ep = EpistemicDomain(vec_itvl)
+            opt_result = get_range_GA(
+                f=func,
+                dimension=len(vec_itvl),
+                varbound=ep.to_GA_varBounds(),
+                verbose=False,
+            )
+            return opt_result[0]  # return the interval only
         case "bo":
-            pass
+            from ...opt.get_range import get_range_BO
+            from pyuncertainnumber import EpistemicDomain
+
+            ep = EpistemicDomain(vec_itvl)
+
+            opt_result = get_range_BO(
+                f=func,
+                dimension=len(vec_itvl),
+                xc_bounds=ep.to_BayesOptBounds(),
+                verbose=False,
+            )
+            return opt_result[0]  # return the interval only
         case "direct":
             return func(vec_itvl)
         case _:
@@ -118,15 +183,18 @@ def subinterval_method(
 
     Args:
         vec_itvl (Interval): a vector type Interval object
+
         func (callable): the function to be evaluated. See notes about function signature.
+
         n_sub (int): number of subintervals
+
         style (str): the style used for interval propagation which shall be compatible with the response function signature.
 
             - 'direct': direct apply function
 
             - 'endpoints': only the endpoints are propagated
 
-    note:
+    danger:
         There are some subtleties about function signature. For ``endpoints`` style, the function `func` should have a vectorised signature
         as it is expecting a 2D numpy array, whereas for the `direct` style, it is expecting to take individual scalar inputs
 
