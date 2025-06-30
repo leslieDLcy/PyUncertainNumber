@@ -3,11 +3,6 @@ build-backend = "setuptools.build_meta"
 requires = ["setuptools >= 61.0"]
 
 [project]
-authors = [
-  {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
-  {name = "Ioanna Ioannou", email = "Ioanna.Ioannou@liverpool.ac.uk"},
-  {name = "Scott Ferson", email = "sandp8@gmail.com"},
-]
 dependencies = [
   "matplotlib",
   "numpy",
@@ -15,7 +10,7 @@ dependencies = [
   "Pint",
   "pymongo",
   "pymoo",
-  "scipy",
+  "scipy >=1.15, <1.15.2"",
   "tqdm",
   "pytest",
   "bayesian-optimization",
@@ -30,7 +25,7 @@ maintainers = [
 name = "pyuncertainnumber"
 readme = "README.md"
 requires-python = ">= 3.11"
-version = "0.0.14"
+version = "0.0.15"
 
 [tool.setuptools.packages.find]
 # All the following settings are optional:
@@ -39,3 +34,8 @@ where = ["src"] # ["."] by default
 [project.urls]
 Documentation = "https://pyuncertainnumber.readthedocs.io/en/latest/index.html"
 Homepage = "https://github.com/leslieDLcy/PyUncertainNumber"
+authors = [
+  {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
+  {name = "Ioanna Ioannou", email = "Ioanna.Ioannou@liverpool.ac.uk"},
+  {name = "Scott Ferson", email = "sandp8@gmail.com"},
+]
