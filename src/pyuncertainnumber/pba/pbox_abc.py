@@ -559,9 +559,6 @@ class Staircase(Pbox):
         if (n is None) or (n == Params.steps):
             return I(lo=self.left, hi=self.right)
         else:
-            # l, r = equi_selection(self.left, n), equi_selection(self.right, n)
-            # return I(lo=l, hi=r)
-
             p_values = np.linspace(Params.p_lboundary, Params.p_hboundary, n)
             return self.alpha_cut(p_values)
 

@@ -203,8 +203,6 @@ def sin(x: Interval):
     if case5:
         return Interval(sin_h, sin_l)
 
-    pass
-
 
 def sin_vector(x: Interval):  # vectorised version of sin().
 
