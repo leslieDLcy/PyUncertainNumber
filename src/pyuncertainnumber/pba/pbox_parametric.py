@@ -1,7 +1,6 @@
 from __future__ import annotations
 import functools
-
-from .pbox_abc import Pbox, Leaf, pbox_from_extredists
+from .pbox_abc import Pbox, Leaf
 import scipy.stats as sps
 import numpy as np
 import itertools

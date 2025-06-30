@@ -1,9 +1,32 @@
-# from pyuncertainnumber.pba.intervals.backcalc import additive_bcc
-
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import itertools
+import functools
 import numpy as np
 from numbers import Number
 from .params import Params
+
+if TYPE_CHECKING:
+    from .pbox_abc import Pbox
+
+
+def isum(l_p):
+    """Sum of pboxes indepedently
+
+    args:
+        l_p (list): list of Pbox objects
+
+    note:
+        Same signature with Python ``sum`` which takes a list of inputs
+
+    tip:
+        Python ``sum`` accomplishes sum of Frechet case.
+    """
+
+    def binary_independent_sum(p1, p2):
+        return p1.add(p2, dependency="i")
+
+    return functools.reduce(binary_independent_sum, l_p)
 
 
 # there is an new `convert` func
@@ -14,7 +37,7 @@ def convert(un):
         - theorically 'un' can be {Interval, DempsterShafer, Distribution, float, int}
     """
 
-    from .pbox_base import Pbox
+    from .pbox_abc import Pbox
     from .dss import DempsterShafer
     from .distributions import Distribution
 
@@ -28,10 +51,6 @@ def convert(un):
         raise TypeError(f"Unable to convert {type(un)} object to Pbox")
 
 
-def interval_monte_carlo(f, x, y):
-    pass
-
-
 def p_backcalc(a, c, ops):
     """backcal for p-boxes
     #! incorrect implementation
@@ -41,7 +60,7 @@ def p_backcalc(a, c, ops):
     """
     from pyuncertainnumber.pba.intervals.intervalOperators import make_vec_interval
     from pyuncertainnumber.pba.aggregation import stacking
-    from .pbox_base import Pbox
+    from .pbox_abc import Pbox
     from .intervals.number import Interval as I
     from .params import Params
 
