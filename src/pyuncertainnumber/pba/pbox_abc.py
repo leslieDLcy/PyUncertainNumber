@@ -244,7 +244,10 @@ class Staircase(Pbox):
         #! we assume that two extreme bounds are valid CDFs
         self.mean_lo, self.var_lo = get_mean_var_from_ecdf(self.left, self._pvalues)
         self.mean_hi, self.var_hi = get_mean_var_from_ecdf(self.right, self._pvalues)
-        self.mean = I(self.mean_lo, self.mean_hi)
+        try:
+            self.mean = I(self.mean_lo, self.mean_hi)
+        except:
+            self.mean = I(666, 666)
         # TODO tmp solution for computing var for pbox
         try:
             self.var = I(self.var_lo, self.var_hi)
