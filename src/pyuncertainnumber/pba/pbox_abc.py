@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import numpy as np
 from abc import ABC, abstractmethod
 from .params import Params
@@ -8,6 +11,9 @@ import operator
 import itertools
 from .utils import condensation, smooth_condensation, find_nearest, is_increasing
 import logging
+
+if TYPE_CHECKING:
+    from pyuncertainnumber import Interval
 
 # Configure the logging system with a simple format
 logging.basicConfig(
@@ -701,6 +707,45 @@ class Staircase(Pbox):
         nright.sort()
 
         return Staircase(left=nleft, right=nright)
+
+    def get_PI(self, alpha: Number = 0.95, style="narrowest") -> Interval:
+        """Compute the predictive interval at the coverage level of `alpha`
+
+        args:
+            alpha (Number): coverage level for the predictive interval, default is 0.95
+            style (str): 'narrowest' or 'widest', default is 'narrowest'
+
+        note:
+            by default, narrowest predictive interval is returned;
+            when the narrowest does not exist, a warning will the generated and then the widest is returned instead.
+
+        example:
+            >>> from pyuncertainnumber import pba
+            >>> p = pba.normal([10, 15, 1])
+            >>> p.get_PI(alpha=0.95, style='narrowest')
+        """
+        from pyuncertainnumber import Interval
+
+        lo_cut_level = (1 - alpha) / 2  # 0.025
+        hi_cut_level = 1 - lo_cut_level  # 0.975
+
+        if style == "narrowest":
+            hi = self.alpha_cut(hi_cut_level).lo
+            lo = self.alpha_cut(lo_cut_level).hi
+            try:
+                return Interval(lo=lo, hi=hi)
+            except Exception:
+                logging.warning(
+                    "narrowest predictive interval does not exist. Return 'widest' style instead."
+                )
+                # do the style == 'widest'
+                hi = self.alpha_cut(hi_cut_level).hi
+                lo = self.alpha_cut(lo_cut_level).lo
+                return Interval(lo=lo, hi=hi)
+        elif style == "widest":
+            hi = self.alpha_cut(hi_cut_level).hi
+            lo = self.alpha_cut(lo_cut_level).lo
+            return Interval(lo=lo, hi=hi)
 
     # * --------------------- aggregations--------------------- *#
     def env(self, other):

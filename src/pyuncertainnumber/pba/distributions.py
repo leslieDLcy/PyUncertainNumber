@@ -1,5 +1,5 @@
-"""distribution constructs"""
-
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import numpy as np
 import scipy.stats as sps
 import matplotlib.pyplot as plt
@@ -13,6 +13,12 @@ from .dependency import Dependency
 from statsmodels.distributions.copula.api import CopulaDistribution
 from .pbox_abc import Staircase
 from .ecdf import get_ecdf
+from numbers import Number
+
+if TYPE_CHECKING:
+    from pyuncertainnumber import Interval
+
+"""distribution constructs"""
 
 
 # * --------------------- parametric cases --------------------- *#
@@ -110,6 +116,28 @@ class Distribution:
     def fit(self, data):
         """fit the distribution to the data"""
         pass
+
+    def get_PI(self, alpha: Number = 0.95) -> Interval:
+        """Compute the predictive interval at the coverage level of `alpha`
+
+        args:
+            - alpha (float): coverage level, default is 0.95
+
+        example:
+            >>> from pyuncertainnumber import pba
+            >>> d = pba.Distribution('gaussian', (0, 1))
+            >>> pi = d.get_PI(alpha=0.95)
+            >>> print(pi)  # prints the interval at the 95% coverage level
+        """
+
+        from pyuncertainnumber import Interval
+
+        lo_cut_level = (1 - alpha) / 2  # 0.025
+        hi_cut_level = 1 - lo_cut_level  # 0.975
+
+        hi = self.alpha_cut(hi_cut_level)
+        lo = self.alpha_cut(lo_cut_level)
+        return Interval(lo, hi)
 
     @property
     def naked_value(self):
