@@ -28,13 +28,17 @@ logging.basicConfig(
 )
 
 
-def get_var_from_ecdf(q, p):
-    """leslie implementation
+def get_mean_var_from_ecdf(q, p):
+    """Numerically estimate the mean and var from ECDF data
+
+    args:
+        q (array-like): quantiles
+        p (array-like): probabilities
 
     example:
-        # Given ECDF data an example
-        # q = [1, 2, 3, 4]
-        # p = [0.25, 0.5, 0.75, 1.0]
+        >>> # Given ECDF data an example
+        >>> q = [1, 2, 3, 4]
+        >>> p = [0.25, 0.5, 0.75, 1.0]
     """
 
     # Step 1: Recover PMF
@@ -244,8 +248,8 @@ class Staircase(Pbox):
 
         #! should we compute mean if it is a Cauchy, var if it's a t distribution?
         #! we assume that two extreme bounds are valid CDFs
-        self.mean_lo, self.var_lo = get_var_from_ecdf(self.left, self._pvalues)
-        self.mean_hi, self.var_hi = get_var_from_ecdf(self.right, self._pvalues)
+        self.mean_lo, self.var_lo = get_mean_var_from_ecdf(self.left, self._pvalues)
+        self.mean_hi, self.var_hi = get_mean_var_from_ecdf(self.right, self._pvalues)
         self.mean = I(self.mean_lo, self.mean_hi)
         # TODO tmp solution for computing var for pbox
         try:
