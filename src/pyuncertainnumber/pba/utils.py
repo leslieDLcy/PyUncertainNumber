@@ -231,3 +231,16 @@ def expose_functions_as_public(mapping, wrapper):
     caller_globals = sys._getframe(1).f_globals
     for name, fn in mapping.items():
         caller_globals[name] = wrapper(fn)
+
+
+def left_right_switch(left, right):
+    """
+    note:
+        right quantile should be greater and equal than left quantile
+    """
+    if np.all(left >= right):
+        # If left is greater than right, switch them
+        left, right = right, left
+        return left, right
+    else:
+        return left, right
