@@ -9,7 +9,13 @@ from .intervals.number import Interval as I
 from numbers import Number
 import operator
 import itertools
-from .utils import condensation, smooth_condensation, find_nearest, is_increasing
+from .utils import (
+    condensation,
+    smooth_condensation,
+    find_nearest,
+    is_increasing,
+    left_right_switch,
+)
 import logging
 
 if TYPE_CHECKING:
@@ -100,6 +106,7 @@ class Pbox(ABC):
         var=None,
         p_values=None,
     ):
+        left, right = left_right_switch(left, right)
         self.left = np.array(left)
         self.right = np.array(right)
         self.steps = steps
@@ -1032,7 +1039,7 @@ def convert_pbox(un):
         raise TypeError(f"Unable to convert {type(un)} object to Pbox")
 
 
-def pbox_number_ops(pbox: Staircase | Leaf, n: float | int, f: callable):
+def pbox_number_ops(pbox: Pbox, n: Number, f: callable):
     # TODO: ask Scott. pbox sqrt operaton how to do?
     """blueprint for arithmetic between pbox and real numbers"""
     l = f(pbox.left, n)
