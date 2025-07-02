@@ -141,4 +141,150 @@ def adec(a, c):
     return Staircase(left=b, right=r)
 
 
-# * --------------- arithmetic with plain numbers --------------- *#
+# * --------------- vectorisation --------------- *#
+
+###### base implementation of vector and matrix operations succeeds
+
+
+class Vector:
+    def __init__(self, components):
+        self.components = components
+
+    def __iter__(self):
+        return iter(self.components)
+
+    def __len__(self):
+        return len(self.components)
+
+    def __repr__(self):
+        return f"Vector({self.components})"
+
+    def __add__(self, other):
+        if isinstance(other, Vector | list):
+            if len(self) != len(other):
+                raise ValueError("Vectors must be the same length")
+            return Vector([a + b for a, b in zip(self, other)])
+        return NotImplemented
+
+    def __sub__(self, other):
+        if isinstance(other, Vector):
+            if len(self) != len(other):
+                raise ValueError("Vectors must be the same length")
+            return Vector([a - b for a, b in zip(self, other)])
+        return NotImplemented
+
+    def __mul__(self, other):
+        if isinstance(other, (int, float)):
+            return Vector([x * other for x in self.components])
+        return NotImplemented
+
+    def __rmul__(self, other):
+        return self * other
+
+    def __truediv__(self, other):
+        if isinstance(other, (int, float)):
+            return Vector([x / other for x in self.components])
+        return NotImplemented
+
+    def __matmul__(self, other):
+        if isinstance(other, Vector | list):
+            if len(self) != len(other):
+                raise ValueError("Vectors must be the same length")
+            return sum(x * y for x, y in zip(self, other))
+
+        elif isinstance(other, Matrix):
+            # Vector @ Matrix: treat self as row vector, multiply by matrix
+            n = len(self)
+            m_rows, m_cols = other.shape()
+            if n != m_rows:
+                raise ValueError(
+                    "Vector length must match matrix rows (row vector @ matrix)"
+                )
+            result = []
+            for col in zip(*other.rows):
+                result.append(sum(v * c for v, c in zip(self.components, col)))
+            return Vector(result)
+
+        return NotImplemented
+
+
+class Matrix:
+    def __init__(self, rows):
+        if not all(len(row) == len(rows[0]) for row in rows):
+            raise ValueError("All rows must have the same length")
+        self.rows = rows
+
+    def __getitem__(self, index):
+        return self.rows[index]
+
+    def __len__(self):
+        return len(self.rows)
+
+    def shape(self):
+        return len(self.rows), len(self.rows[0])
+
+    def __repr__(self):
+        return f"Matrix({self.rows})"
+
+    def __add__(self, other):
+        if isinstance(other, Matrix):
+            if self.shape() != other.shape():
+                raise ValueError("Matrices must have the same shape")
+            return Matrix(
+                [
+                    [a + b for a, b in zip(row1, row2)]
+                    for row1, row2 in zip(self.rows, other.rows)
+                ]
+            )
+        return NotImplemented
+
+    def __sub__(self, other):
+        if isinstance(other, Matrix):
+            if self.shape() != other.shape():
+                raise ValueError("Matrices must have the same shape")
+            return Matrix(
+                [
+                    [a - b for a, b in zip(row1, row2)]
+                    for row1, row2 in zip(self.rows, other.rows)
+                ]
+            )
+        return NotImplemented
+
+    def __mul__(self, other):
+        if isinstance(other, (int, float)):
+            return Matrix([[x * other for x in row] for row in self.rows])
+        return NotImplemented
+
+    def __rmul__(self, other):
+        return self * other
+
+    def __truediv__(self, other):
+        if isinstance(other, (int, float)):
+            return Matrix([[x / other for x in row] for row in self.rows])
+        return NotImplemented
+
+    def __matmul__(self, other):
+        if isinstance(other, Vector):
+            # Matrix @ Vector
+            m, n = self.shape()
+            if n != len(other):
+                raise ValueError("Matrix columns must match vector length")
+            return Vector(
+                [sum(r[i] * other.components[i] for i in range(n)) for r in self.rows]
+            )
+
+        elif isinstance(other, Matrix):
+            # Matrix @ Matrix
+            m1, n1 = self.shape()
+            m2, n2 = other.shape()
+            if n1 != m2:
+                raise ValueError("Incompatible shapes for matrix multiplication")
+            result_rows = []
+            for row in self.rows:
+                result_row = []
+                for col in zip(*other.rows):
+                    result_row.append(sum(r * c for r, c in zip(row, col)))
+                result_rows.append(result_row)
+            return Matrix(result_rows)
+
+        return NotImplemented
