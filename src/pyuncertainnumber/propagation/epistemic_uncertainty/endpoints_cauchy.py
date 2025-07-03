@@ -1,239 +1,200 @@
-import numpy as np
-import tqdm
-from typing import Callable, Union
-from scipy.optimize import brentq
-from pyuncertainnumber.propagation.utils import Propagation_results
+from __future__ import annotations
+from typing import TYPE_CHECKING, Callable
 
+import numpy as np
+from rich.progress import track
+from pyuncertainnumber.pba.intervals.number import Interval
+from scipy.optimize import brentq
+from pyuncertainnumber.propagation.utils import Propagation_results, Propagation_rawdata
 
 def cauchydeviates_method(
-    x: np.ndarray,
+    x: Interval | np.ndarray,
     f: Callable,
     results: Propagation_results = None,
+    analysis_data: Propagation_rawdata = None,
+    save_raw_data: bool = False, 
     n_sam: int = 500,
-    xtol: Union[float, np.ndarray]  = 2e-12,
-    rtol: Union[float, np.ndarray]  = 8.881784197001252e-16,
-    maxiter: Union[float, np.ndarray]  = 100,
-    min_y0: Union[float, np.ndarray] = 1e-6,   
-    save_raw_data="no",
-) -> Propagation_results:  # Specify return type
-    """This method propagates intervals through a balck box model with the Cauchy deviate method. 
-    It is an approximate method, so the user should expect non-identical results for different runs.
+    *,
+    xtol: float = 2e-12,
+    rtol: float = 8.88e-8,
+    maxiter: int = 100,
+    min_y0: float = 1e-6,
 
-    args:
-        x (np.ndarray): A 2D NumPy array representing the intervals for each input variable.
-                         Each row should contain two elements: the lower and upper bounds of the interval.
-        f (Callable): A callable function that takes a 1D NumPy array of input values
-                        and returns a single output value or an array of output values.
-                        Can be None, in which case only the Cauchy deviates (x) and the
-                        maximum Cauchy deviate (K) are returned.
-        n_sam (int): The number of samples (Cauchy deviates) to generate for each input variable (defaults 500 samples).
-        results (Propagation_results): The class to use for storing results (defaults to Propagation_results).
-        xtol (float): The absolute tolerance(s) for the root-finding algorithm (brentq). 
-                      If a float, the same xtol is used for all outputs.If an np.ndarray, it should have the same length 
-                      as the output of f, providing an absolute tolerance for brentq for each output. Default: 2e-12.
-        rtol (float): The relative tolerance(s) for the root-finding algorithm (brentq). 
-                      If a float, the same rtol is used for all outputs.If an np.ndarray, it should have the same length 
-                      as the output of f, providing a relative tolerance for brentq for each output. Default: 8.88e-16.
-        maxiter (int): The maximum number(s) of iterations for the root-finding algorithm (brentq). 
-                       If a float, the same maxiter is used for all outputs.If an np.ndarray, it should have the same length 
-                       as the output of f, providing a maximum number of iterations for brentq for each output. Default: 100.
-        min_y0 (float, or np.ndarray): The lower bound(s) for the interval(s) in the brentq root-finding algorithm.
-                                       If a float, the same lower bound is used for all outputs.
-                                       If an np.ndarray, it should have the same length as the output of f,
-                                       providing a separate lower bound for each output. Default: 1e-6.
-        save_raw_data (str, optional): Acts as a switch to enable or disable the storage of raw input data when a function (f) 
-          is not provided.
-          - 'no': Returns an error that no function is provided.
-          - 'yes': Returns the full arrays of unique input combinations.
+) -> tuple[Propagation_results, Propagation_rawdata]:
+    """
+    Propagates interval uncertainty using the approximate Cauchy deviates method.
 
-    signature:
-        cauchydeviate_method(x: np.ndarray, f: Callable, results_class = Propagation_results,
-                        n_sam: int, save_raw_data='no') -> Propagation_results
+    Args:
+        x (Interval | np.ndarray): A NumPy array where each row is an interval [lower, upper].
 
-    notes:
-        The interval for the `brentq` root-finding algorithm is chosen heuristically.
-        The lower bound is set to 1e-6, assuming the root (representing the change
-        in the function's value) is positive and not exactly zero.  The upper bound
-        is calculated as half the maximum absolute difference observed between the
-        function's value at the central point and the values at the Cauchy deviate
-        samples (`max(filtered_deltaF) / 2` or `max(filtered_deltaF_i) / 2`).
-        This choice is based on the assumption that the actual change in the 
-        function's value is likely to be smaller than the largest observed change.
+        f (Callable): A function that takes a 1D NumPy array of inputs and returns output(s).
+        
+        results (Propagation_results, optional): An existing results object to populate.
+        
+        analysis_data (Propagation_rawdata, optional): An existing raw data object to populate.
 
-        Users should be aware that these choices are heuristics and might need to be
-        adjusted depending on the specific function and problem being solved. If
-        `brentq` fails to converge, consider experimenting with different interval
-        bounds.  For example, if the function is highly sensitive to input changes,
-        the upper bound might be too large, and dividing by a larger number (e.g.,
-        4 or 8 instead of 2) might be necessary.  Alternatively, if the root is
-        expected to be very close to zero, the lower bound might need to be
-        reduced.
+        save_raw_data (bool, optional): If True and f is None, returns the generated Cauchy
+                                      deviate samples and K values. Defaults to False.
+        
+        n_sam (int, optional): The number of Cauchy deviate samples to generate. Defaults to 500.
+        
+        xtol (float, optional): Absolute tolerance for the `brentq` root-finding algorithm.
+        
+        rtol (float, optional): Relative tolerance for the `brentq` root-finding algorithm.
+        
+        maxiter (int, optional): Maximum iterations for the `brentq` algorithm.
+        
+        min_y0 (float, optional): The lower bound for the `brentq` root-finding interval.
+                                  This is a heuristic and may need adjustment.
 
-    returns:
-        A PropagationResult object containing the results.
-            - 'un': UncertainNumber object(s) representing the uncertainty in the output(s) of the function.
-            - 'raw_data': A dictionary containing raw data (if f is None):
-                - 'x': Cauchy deviates (x).
-                - 'K': Maximum Cauchy deviate (K).
-                - 'bounds': An np.ndarray of the bounds for each output parameter (if f is not None).
-                - 'min': A dictionary for lower bound results (if f is not None).
-                    - 'f': Minimum output value(s).
-                    - 'x': None (as input values corresponding to min/max are not tracked in this method).
-                - 'max':  A dictionary for upper bound results (if f is not None).
-                    - 'f': Maximum output value(s).
-                    - 'x': None (as input values corresponding to min/max are not tracked in this method).
+    Returns:
+        tuple[Propagation_results, Propagation_rawdata]:
+            - results: An object containing the final computed interval bounds of the output(s).
+            - analysis_data: An object containing raw data, including the generated
+              Cauchy samples (`x_samples`, `f_samples`) and K values (`K`).
+
+    Notes:
+        
+        This method generates samples based on the Cauchy distribution to estimate the
+        bounds of the function's output. It is computationally less expensive than
+        methods that require optimization but is non-deterministic and provides an
+        approximation of the true bounds.
+        This method does not track the specific input vectors (`x_min`, `x_max`) that
+        produce the minimum and maximum outputs.
+        The `brentq` root-finding can sometimes fail if the interval heuristic is
+        not suitable for the given function. The function will print a warning and
+        continue in such cases.
 
     raises:
-        ValueError if no function is provided and save_raw_data is 'no'.
+        ValueError: If no function `f` is provided and `save_raw_data` is False.
 
     example:
-        >>> f = lambda x: x[0] + x[1] + x[2]  # Example function
-        >>> x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-        >>> y = cauchydeviates_method(x_bounds,f=f, n_sam=50, save_raw_data = 'yes')
+        >>> # Define a model function with multiple inputs and outputs
+        >>> def myFunctionWithTwoOutputs(x):
+        ...     # This function takes a 5-element input vector and returns two outputs.
+        ...     i1, i2, i3, i4, i5 = x[0], x[1], x[2], x[3], x[4]
+        ...     output1 = i1 + i2 + i3 + i4 + i5
+        ...     output2 = i1 * i2 * i3 * i4 * i5
+        ...     return output1, output2
+        >>>
+        >>> # Define input intervals for the 5 variables
+        >>> input_intervals = np.array([
+        ...     [0.9, 1.1],
+        ...     [1.8, 2.2],
+        ...     [2.7, 3.3],
+        ...     [3.6, 4.4],
+        ...     [4.5, 5.5]
+        ... ])
+        >>>
+        >>> # Run the propagation
+        >>> results, _ = cauchydeviates_method(
+        ...     input_intervals, myFunctionWithTwoOutputs, n_sam=2000
+        ... )
+        >>>
+        >>> # Print the approximate output intervals
+        >>> print(results)
     """
-    print(
-        f"Total number of input combinations for the endpoints Cauchy deviates method: {n_sam}"
-    )
-
-    if results is None:
-        results = Propagation_results()  # Create an instance of Propagation_results
-
-    x = np.atleast_2d(x)  # Ensure x is 2D
-    lo, hi = x.T  # Unpack lower and upper bounds directly
-
+    print(f"Total number of function evaluations for Cauchy deviates method: {n_sam}")
+    x = np.atleast_2d(x)
+    lo, hi = x.T
     xtilde = (lo + hi) / 2
     Delta = (hi - lo) / 2
 
-    if f is not None:  # Only evaluate if f is provided
-        ytilde = f(xtilde)
+    # Initialize data containers if not provided
+    if analysis_data is None:
+        analysis_data = Propagation_rawdata()
+    if f is not None:
+        # --- ROBUSTNESS FIX: Check output dimension based on size, not type ---
+        ytilde = np.atleast_1d(f(xtilde))
 
-        if isinstance(ytilde, (float, np.floating)):  # Handle scalar output
+        if ytilde.size == 1:  # Handle scalar output
+            num_outputs = 1
+            ytilde_scalar = ytilde[0] # Use the actual scalar value
             deltaF = np.zeros(n_sam)
-            for k in tqdm.tqdm(range(1, n_sam), desc="Calculating Cauchy deviates"):
+            x_samples = np.zeros((n_sam, x.shape[0]))
+            K_values = np.zeros(n_sam)
+
+            for k in range(n_sam):
                 r = np.random.rand(x.shape[0])
                 c = np.tan(np.pi * (r - 0.5))
-                K = np.max(c)
-                delta = Delta * c / K
-                x_sample = xtilde - delta
-                deltaF[k] = K * (ytilde - f(x_sample))
+                K_values[k] = np.max(c)
+                delta = Delta * c / K_values[k]
+                x_samples[k, :] = xtilde - delta
+                # Ensure the function output is treated as a scalar
+                f_output_scalar = np.atleast_1d(f(x_samples[k, :]))[0]
+                deltaF[k] = K_values[k] * (ytilde_scalar - f_output_scalar)
 
             def Z(Del):
                 return n_sam / 2 - np.sum(1 / (1 + (deltaF / Del) ** 2))
-            
+
             mask = np.isnan(deltaF)
             filtered_deltaF = deltaF[~mask]
 
-            # Use a small value for the lower bound
-            zRoot = brentq(Z, min_y0, max(filtered_deltaF) / 2, 
-                                              xtol =  xtol, rtol = rtol,maxiter=maxiter )
-            min_candidate = np.array([ytilde - zRoot])
-            max_candidate = np.array([ytilde + zRoot])
-            bounds = np.array([min_candidate[0], max_candidate[0]])
-
-            results.raw_data["min"] = np.array([{"x": None, "f": min_candidate}])
-            results.raw_data["max"] = np.array([{"x": None, "f": max_candidate}])
-            results.raw_data["bounds"] = bounds
+            zRoot = brentq(Z, min_y0, max(filtered_deltaF) / 2, xtol=xtol, rtol=rtol, maxiter=maxiter)
+            bounds = np.array([ytilde_scalar - zRoot, ytilde_scalar + zRoot])
+            
+            if results is None:
+                results = Propagation_results(result_type='interval', num_outputs=num_outputs)
+            results.add_results(bounds)
+            analysis_data.add_sampling_data(x=x_samples, f=None, K=K_values) # f_samples not stored for scalar case
+            analysis_data.add_epistemic_data(message="Cauchy method does not track min/max inputs.")
 
         else:  # Handle array output
-            len_y = len(ytilde)
-            deltaF = np.zeros((n_sam, len_y))
-            min_candidate = np.empty(len_y)
-            max_candidate = np.empty(len_y)
+            num_outputs = len(ytilde)
+            deltaF = np.zeros((n_sam, num_outputs))
+            x_samples = np.zeros((n_sam, x.shape[0]))
+            f_samples = np.zeros((n_sam, num_outputs))
+            K_values = np.zeros(n_sam)
 
-            if isinstance(min_y0, float):
-                min_y0_arr = np.full(len_y, min_y0)
-            else:
-                min_y0_arr = min_y0
-            
-            if isinstance(xtol, float):
-                xtol_arr = np.full(len_y, xtol)
-            else:
-                xtol_arr = xtol
-            
-            if isinstance(rtol, float):
-                rtol_arr = np.full(len_y, rtol)
-            else:
-                rtol_arr = rtol
-            
-            if isinstance(maxiter, float):
-                maxiter_arr = np.full(len_y, maxiter)
-            else:
-                maxiter_arr = maxiter
+            # Parameter arrays for brentq
+            min_y0_arr = np.full(num_outputs, min_y0) if isinstance(min_y0, float) else min_y0
+            xtol_arr = np.full(num_outputs, xtol) if isinstance(xtol, float) else xtol
+            rtol_arr = np.full(num_outputs, rtol) if isinstance(rtol, float) else rtol
+            maxiter_arr = np.full(num_outputs, maxiter) if isinstance(maxiter, int) else maxiter
 
-
-            for k in tqdm.tqdm(range(n_sam), desc="Calculating Cauchy deviates"):
+            for k in track(range(n_sam), description="Calculating Cauchy deviates"):
                 r = np.random.rand(x.shape[0])
                 c = np.tan(np.pi * (r - 0.5))
-                K = np.max(c)
-                delta = Delta * c / K
-                x_sample = xtilde - delta
-                result = f(x_sample)
-                for i in range(len_y):
-                    deltaF[k, i] = K * (ytilde[i] - result[i])
+                K_values[k] = np.max(c)
+                delta = Delta * c / K_values[k]
+                x_samples[k, :] = xtilde - delta
+                f_samples[k, :] = f(x_samples[k, :])
+                for i in range(num_outputs):
+                    deltaF[k, i] = K_values[k] * (ytilde[i] - f_samples[k, i])
 
-            bounds = np.zeros((len_y, 2))  # Initialize bounds array
-            for i in range(len_y):
+            bounds_array = np.zeros((num_outputs, 2))
+            for i in range(num_outputs):
                 mask = np.isnan(deltaF[:, i])
                 filtered_deltaF_i = deltaF[:, i][~mask]
 
                 def Z(Del):
                     return n_sam / 2 - np.sum(1 / (1 + (filtered_deltaF_i / Del) ** 2))
 
-                try:  # Handle potential errors in brentq
-                    # Use a small value for the lower bound
-                    zRoot = brentq(Z, min_y0_arr[i], max(filtered_deltaF_i) / 2, 
-                                              xtol =  xtol_arr[i], rtol = rtol_arr[i],maxiter=maxiter_arr[i] )
+                try:
+                    zRoot = brentq(Z, min_y0_arr[i], max(filtered_deltaF_i) / 2, xtol=xtol_arr[i], rtol=rtol_arr[i], maxiter=maxiter_arr[i])
                 except ValueError:
                     print(f"Warning: brentq failed for output {i}. Using 0 for zRoot.")
-                    zRoot = 0  # Or handle the error in another way
-                min_candidate[i] = ytilde[i] - zRoot
-                max_candidate[i] = ytilde[i] + zRoot
-                bounds[i] = [min_candidate[i], max_candidate[i]]
+                    zRoot = 0
+                bounds_array[i, :] = [ytilde[i] - zRoot, ytilde[i] + zRoot]
 
-            # Populate the results object
-            results.raw_data["bounds"] = bounds
-            results.raw_data["min"] = np.append(
-                results.raw_data["min"],
-                [{"x": None, "f": min_val} for min_val in min_candidate],
-            )
-            results.raw_data["max"] = np.append(
-                results.raw_data["max"],
-                [{"x": None, "f": max_val} for max_val in max_candidate],
-            )
+            if results is None:
+                results = Propagation_results(result_type='interval', num_outputs=num_outputs)
+            results.add_results(bounds_array)
+            analysis_data.add_sampling_data(x=x_samples, f=f_samples, K=K_values)
+            analysis_data.x_central = xtilde # Also save central point here
+            analysis_data.add_epistemic_data(message="Cauchy method does not track min/max inputs.")
 
-        print("Input x for min max y are NOT available for the Cauchy method!")
-
-        if save_raw_data == "yes":
-            print("Input-Output raw data are NOT available for the Cauchy method!")
-
-    elif save_raw_data == "yes":  # If f is None and save_raw_data is 'yes'
-        x_samples = np.zeros((n_sam, x.shape[0]))
-        K_values = np.zeros(n_sam)
-        for k in tqdm.tqdm(range(n_sam), desc="Calculating Cauchy deviates"):
+    elif save_raw_data:
+        if results is None: results = Propagation_results(result_type='interval')
+        x_samples, K_values = np.zeros((n_sam, x.shape[0])), np.zeros(n_sam)
+        for k in range(n_sam):
             r = np.random.rand(x.shape[0])
             c = np.tan(np.pi * (r - 0.5))
-            K = np.max(c)
-            delta = Delta * c / K
-            x_samples[k] = xtilde - delta
-            K_values[k] = K
-
-        results.add_raw_data(x=x_samples, K=K_values)
-
+            K_values[k] = np.max(c)
+            x_samples[k] = xtilde - (Delta * c / K_values[k])
+        analysis_data.add_sampling_data(x=x_samples, f=None, K=K_values)
+        analysis_data.x_central = xtilde  # Also save central point here
     else:
-        print(
-            "No function is provided. Select save_raw_data = 'yes' to save the input combinations"
-        )
+        raise ValueError("No function `f` was provided. Set save_raw_data=True to get the input combinations.")
 
-    return results
-
-
-# # # Example usage with different parameters for minimization and maximization
-# f = lambda x: x[0] + x[1] + x[2]  # Example function
-
-# # Determine input parameters for function and method
-# x_bounds = np.array([[1, 2], [3, 4], [5, 6]])
-# n=50
-# # Call the method
-# y = cauchydeviates_method(x_bounds,f=f, n_sam=n, save_raw_data= 'yes')
-# # # print the results
-# # y.summary()
+    return results, analysis_data
