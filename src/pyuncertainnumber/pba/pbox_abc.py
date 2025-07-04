@@ -631,9 +631,14 @@ class Staircase(Pbox):
             y=self.right, x=self._pvalues
         )
 
-    def truncate(self, a, b, method="f"):
-        """Equivalent to self.min(a,method).max(b,method)"""
-        return self.min(a, method=method).max(b, method=method)
+    def truncate(self, a, b):
+        from .aggregation import _imposition
+        from .pbox_free import min_max
+
+        """Truncate the Pbox to the range [a, b]."""
+        # return self.min(a, method=method).max(b, method=method)
+        i = min_max(a, b, return_construct=True)
+        return _imposition(self, i)
 
     def min(self, other, method="f"):
         """Returns a new Pbox object that represents the element-wise minimum of two Pboxes.
@@ -738,7 +743,9 @@ class Staircase(Pbox):
         d = []
         for sL, sR, oL, oR in zip(self.left, self.right, other.left, other.right):
             if max(sL, oL) > min(sR, oR):
-                raise Exception("Imposition does not exist")
+                raise Exception(
+                    "Imposition does not exist as high left greater than low right"
+                )
             u.append(max(sL, oL))
             d.append(min(sR, oR))
         return Staircase(left=u, right=d)
