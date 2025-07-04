@@ -432,7 +432,7 @@ class UncertainNumber:
 
     # * ---------------------unary operations---------------------#
     def sqrt(self):
-        return self._construct.sqrt()
+        return UncertainNumber.fromConstruct(self._construct.sqrt())
 
     # * ---------------------binary operations---------------------#
 

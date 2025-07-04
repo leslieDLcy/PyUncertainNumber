@@ -159,6 +159,25 @@ class Vector:
     def __repr__(self):
         return f"Vector({self.components})"
 
+    def __getitem__(self, index):
+        if isinstance(index, slice):
+            return Vector(self.components[index])
+        else:
+            return self.components[index]
+
+    def __setitem__(self, index, value):
+        if isinstance(index, slice):
+            if isinstance(value, Vector):
+                self.components[index] = value.components
+            elif isinstance(value, list):
+                self.components[index] = value
+            else:
+                raise TypeError(
+                    "Assigned value must be a Vector or list for slice assignment"
+                )
+        else:
+            self.components[index] = value
+
     def __add__(self, other):
         if isinstance(other, Vector | list):
             if len(self) != len(other):
@@ -207,12 +226,35 @@ class Vector:
 
         return NotImplemented
 
+    def tanh(self):
+        """Pbox tanh operation elemenwise"""
+        return Vector([x.tanh() for x in self.components])
+
 
 class Matrix:
     def __init__(self, rows):
-        if not all(len(row) == len(rows[0]) for row in rows):
-            raise ValueError("All rows must have the same length")
-        self.rows = rows
+        # Handle case where input is a single Vector
+        if isinstance(rows, Vector):
+            # Turn Vector into a single-row Matrix
+            self.rows = [list(rows.components)]
+        elif isinstance(rows, list | np.ndarray):
+            # Check if each row is a Vector, if so convert to list
+            processed_rows = []
+            for row in rows:
+                if isinstance(row, Vector):
+                    processed_rows.append(list(row.components))
+                elif isinstance(row, list | np.ndarray):
+                    processed_rows.append(row)
+                else:
+                    raise TypeError(f"Unsupported row type: {type(row)}")
+
+            # Verify all rows have the same length
+            if not all(len(row) == len(processed_rows[0]) for row in processed_rows):
+                raise ValueError("All rows must have the same length")
+
+            self.rows = processed_rows
+        else:
+            raise TypeError(f"Unsupported input type: {type(rows)}")
 
     def __getitem__(self, index):
         return self.rows[index]
@@ -225,6 +267,46 @@ class Matrix:
 
     def __repr__(self):
         return f"Matrix({self.rows})"
+
+    def __getitem__(self, index):
+        if isinstance(index, tuple):
+            # Expecting (row, col)
+            row, col = index
+            return self.rows[row][col]
+        elif isinstance(index, slice):
+            # Slice rows, return a new Matrix
+            return Matrix(self.rows[index])
+        else:
+            # Single row, return it as Vector or list; here I use Vector for consistency
+            return Vector(self.rows[index])
+
+    def __setitem__(self, index, value):
+        if isinstance(index, tuple):
+            # index is (row, col)
+            row, col = index
+            self.rows[row][col] = value
+
+        elif isinstance(index, slice):
+            # index is a slice of rows
+            if isinstance(value, Matrix):
+                self.rows[index] = value.rows
+            elif isinstance(value, list):
+                self.rows[index] = value
+            else:
+                raise TypeError(
+                    "Assigned value must be a Matrix or list of rows for slice assignment"
+                )
+
+        else:
+            # Single row assignment
+            if isinstance(value, Vector):
+                self.rows[index] = value.components
+            elif isinstance(value, list):
+                self.rows[index] = value
+            else:
+                raise TypeError(
+                    "Assigned value must be a Vector or list for row assignment"
+                )
 
     def __add__(self, other):
         if isinstance(other, Matrix):
@@ -288,3 +370,120 @@ class Matrix:
             return Matrix(result_rows)
 
         return NotImplemented
+
+    def tanh(self):
+        return Matrix([[x.tanh() for x in row] for row in self.rows])
+
+
+### use this later as `x.mul(y, dependency="i")` affects generality with other data types
+class Vector_pbox(Vector):
+    """Vector of Pboxes"""
+
+    def __init__(self, components):
+        super().__init__(components)
+
+    def __matmul__(self, other):
+        if isinstance(other, Vector | list):
+            if len(self) != len(other):
+                raise ValueError("Vectors must be the same length")
+            return sum(x.mul(y, dependency="i") for x, y in zip(self, other))
+
+        elif isinstance(other, Matrix):
+            # Vector @ Matrix: treat self as row vector, multiply by matrix
+            n = len(self)
+            m_rows, m_cols = other.shape()
+            if n != m_rows:
+                raise ValueError(
+                    "Vector length must match matrix rows (row vector @ matrix)"
+                )
+            result = []
+            for col in zip(*other.rows):
+                result.append(
+                    sum(v.mul(c, dependency="i") for v, c in zip(self.components, col))
+                )
+            return Vector(result)
+
+        return NotImplemented
+
+
+#### backup ####
+# class Matrix:
+#     def __init__(self, rows):
+#         if not all(len(row) == len(rows[0]) for row in rows):
+#             raise ValueError("All rows must have the same length")
+#         self.rows = rows
+
+#     def __getitem__(self, index):
+#         return self.rows[index]
+
+#     def __len__(self):
+#         return len(self.rows)
+
+#     def shape(self):
+#         return len(self.rows), len(self.rows[0])
+
+#     def __repr__(self):
+#         return f"Matrix({self.rows})"
+
+#     def __add__(self, other):
+#         if isinstance(other, Matrix):
+#             if self.shape() != other.shape():
+#                 raise ValueError("Matrices must have the same shape")
+#             return Matrix(
+#                 [
+#                     [a + b for a, b in zip(row1, row2)]
+#                     for row1, row2 in zip(self.rows, other.rows)
+#                 ]
+#             )
+#         return NotImplemented
+
+#     def __sub__(self, other):
+#         if isinstance(other, Matrix):
+#             if self.shape() != other.shape():
+#                 raise ValueError("Matrices must have the same shape")
+#             return Matrix(
+#                 [
+#                     [a - b for a, b in zip(row1, row2)]
+#                     for row1, row2 in zip(self.rows, other.rows)
+#                 ]
+#             )
+#         return NotImplemented
+
+#     def __mul__(self, other):
+#         if isinstance(other, (int, float)):
+#             return Matrix([[x * other for x in row] for row in self.rows])
+#         return NotImplemented
+
+#     def __rmul__(self, other):
+#         return self * other
+
+#     def __truediv__(self, other):
+#         if isinstance(other, (int, float)):
+#             return Matrix([[x / other for x in row] for row in self.rows])
+#         return NotImplemented
+
+#     def __matmul__(self, other):
+#         if isinstance(other, Vector):
+#             # Matrix @ Vector
+#             m, n = self.shape()
+#             if n != len(other):
+#                 raise ValueError("Matrix columns must match vector length")
+#             return Vector(
+#                 [sum(r[i] * other.components[i] for i in range(n)) for r in self.rows]
+#             )
+
+#         elif isinstance(other, Matrix):
+#             # Matrix @ Matrix
+#             m1, n1 = self.shape()
+#             m2, n2 = other.shape()
+#             if n1 != m2:
+#                 raise ValueError("Incompatible shapes for matrix multiplication")
+#             result_rows = []
+#             for row in self.rows:
+#                 result_row = []
+#                 for col in zip(*other.rows):
+#                     result_row.append(sum(r * c for r, c in zip(row, col)))
+#                 result_rows.append(result_row)
+#             return Matrix(result_rows)
+
+#         return NotImplemented
