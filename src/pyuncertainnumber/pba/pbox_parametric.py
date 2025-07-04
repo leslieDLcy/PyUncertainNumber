@@ -1028,7 +1028,6 @@ named_pbox = {
     "trapz": trapz,
     "triang": triang,
     "truncexpon": truncexpon,
-    "truncnorm": truncnorm,
     "tukeylambda": tukeylambda,
     "uniform": uniform,
     "vonmises": vonmises,

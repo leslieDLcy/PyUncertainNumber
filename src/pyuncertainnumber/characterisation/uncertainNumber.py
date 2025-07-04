@@ -1101,11 +1101,6 @@ def truncexpon(*args):
 
 
 @makeUNPbox
-def truncnorm(*args):
-    return "truncnorm"
-
-
-@makeUNPbox
 def truncpareto(*args):
     return "truncpareto"
 
