@@ -218,14 +218,12 @@ class UncertainNumber:
     # * ---------------------object representation---------------------* #
 
     def __str__(self):
-        """the verbose user-friendly string representation
+        """string representation of the UncertainNumber
+
         note:
-            this has nothing to do with the logic of JSON serialisation
-            ergo, do whatever you fancy;
+            the same as __reor__ for now until a better idea is proposed
         """
-        field_values = {k: v for k, v in self.__dict__.items() if v is not None}
-        field_str = ", ".join(f"{k}={repr(v)}" for k, v in field_values.items())
-        return f"{self.__class__.__name__}({field_str})"
+        return self.__repr__()
 
     def __repr__(self) -> str:
         """Concise __repr__"""
