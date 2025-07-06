@@ -83,6 +83,8 @@ def makedist(shape: str):
 # TODO: tested with expon which seems incorrect.
 # TODO: stats.expon takes `1/lambda` as the scale, which is the inverse of the rate parameter.
 def singleParamPattern(x, shape: str):
+    from ..pba.intervals.intervalOperators import mean
+
     if isinstance(x, sps.CensoredData | np.ndarray | list):
         return D.dist_from_sps(named_dists.get(shape)(mean(x)), shape=shape)
     elif isinstance(x, Interval):
@@ -171,7 +173,7 @@ def MMchisquared(x):
 # TODO: this is incorrect as **kwargs are not passed.
 # TODO: expon takes (scale=1/lambda) as kwargs
 def MMexponential(x):
-    return singleParamPattern(x, "expon")
+    return singleParamPattern(x, "exponential")
 
 
 @makedist("f")

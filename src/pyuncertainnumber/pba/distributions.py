@@ -276,6 +276,11 @@ def lognormal_sane(mu, sigma):
     return sps.lognorm(s=shape, scale=scale)
 
 
+def expon_sane(lamb):
+    """Sane exponential distribution constructor"""
+    return sps.expon(scale=1 / lamb)
+
+
 named_dists = {
     "alpha": sps.alpha,
     "anglit": sps.anglit,
@@ -294,7 +299,8 @@ named_dists = {
     "dgamma": sps.dgamma,
     "dweibull": sps.dweibull,
     "erlang": sps.erlang,
-    "expon": sps.expon,
+    "expon": expon_sane,
+    "exponential": expon_sane,  # re-engineered exponential distribution
     "exponnorm": sps.exponnorm,
     "exponweib": sps.exponweib,
     "exponpow": sps.exponpow,
