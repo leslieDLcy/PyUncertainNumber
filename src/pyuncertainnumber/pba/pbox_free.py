@@ -114,8 +114,9 @@ def KS_bounds(s, alpha: float, display=True) -> tuple[eCDF_bundle]:
             pl_ecdf_bounding_bundles(
                 b_l,
                 b_r,
+                sig_level=(1 - 2 * alpha) * 100,
                 ax=ax,
-                title=f"Kolmogorov-Smirnoff confidence bounds at {(1-2*alpha)*100}% confidence level",
+                title=f"Kolmogorov-Smirnoff confidence bounds at {(1 - 2 * alpha) * 100} % confidence level",
             )
     else:
         raise ValueError("Invalid input data type")
