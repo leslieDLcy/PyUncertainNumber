@@ -11,6 +11,7 @@ from .intervals.intervalOperators import wc_scalar_interval
 
 if TYPE_CHECKING:
     from .pbox_abc import Pbox
+    from ..pba.intervals.number import Interval
 
 
 """ parametric pboxes"""
@@ -186,12 +187,6 @@ def dweibull(*args):
 @makePbox
 def erlang(*args):
     return "erlang"
-
-
-# special case due to kwargs (scale)
-# @makePbox
-# def expon(*args):
-#     return "expon"
 
 
 @makePbox
@@ -753,8 +748,35 @@ def uniform(a, b, steps=Params.steps):
     )
 
 
-def expon(scale, loc=0, steps=Params.steps):
-    return _bound_pcdf("expon", loc, scale)
+def exponential(lamb: list | Interval) -> Pbox:
+    """p-box for the exponential distribution
+
+    args:
+        - lamb: (list or Interval) the rate parameter of the exponential distribution
+    """
+    from .distributions import expon_sane
+    from .pbox_abc import Staircase
+
+    interval_lambda = wc_scalar_interval(lamb)
+
+    a = expon_sane(interval_lambda.lo)
+    b = expon_sane(interval_lambda.hi)
+
+    a_quantile = a.ppf(Params.p_values)
+    b_quantile = b.ppf(Params.p_values)
+
+    try:
+        p = Staircase(left=a_quantile, right=b_quantile)
+    except Exception as e:
+        p = Staircase(left=b_quantile, right=a_quantile)
+    return p
+
+
+# def exponential(lamb_interval):
+#     """Re-engineered exponential distribution p-box
+# TODO: need to change the _bound_cdf logic to add support for this way.
+#     scipy has weird parameterisation for exponential distribution"""
+#     return _bound_pcdf("exponential", 1 / lamb)
 
 
 def trapz(a, b, c, d, steps=Params.steps):
@@ -953,7 +975,7 @@ named_pbox = {
     "dgamma": dgamma,
     "dweibull": dweibull,
     "erlang": erlang,
-    "expon": expon,
+    "exponential": exponential,
     "exponnorm": exponnorm,
     "exponweib": exponweib,
     "exponpow": exponpow,
