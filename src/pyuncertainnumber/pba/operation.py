@@ -399,17 +399,17 @@ class iVector(Vector):
         super().__init__(components)
 
     def __add__(self, other):
-        if isinstance(other, Vector | list):
+        if isinstance(other, iVector | list):
             if len(self) != len(other):
                 raise ValueError("Vectors must be the same length")
             return iVector([isum(a, b) for a, b in zip(self, other)])
         return NotImplemented
 
     def __matmul__(self, other):
-        if isinstance(other, Vector | list):
+        if isinstance(other, iVector | list):
             if len(self) != len(other):
                 raise ValueError("Vectors must be the same length")
-            return isum(x.mul(y, dependency="i") for x, y in zip(self, other))
+            return isum([i_mul(x, y) for x, y in zip(self, other)])
 
         elif isinstance(other, Matrix):
             # Vector @ Matrix: treat self as row vector, multiply by matrix
@@ -421,9 +421,7 @@ class iVector(Vector):
                 )
             result = []
             for col in zip(*other.rows):
-                result.append(
-                    isum(v.mul(c, dependency="i") for v, c in zip(self.components, col))
-                )
+                result.append(isum(i_mul(v, c) for v, c in zip(self.components, col)))
             return Vector(result)
 
         return NotImplemented
@@ -448,21 +446,19 @@ class iMatrix(Matrix):
         return NotImplemented
 
     def __matmul__(self, other):
-        if isinstance(other, Vector):
+        if isinstance(other, iVector):
             # Matrix @ Vector
             m, n = self.shape()
             if n != len(other):
                 raise ValueError("Matrix columns must match vector length")
             return iVector(
                 [
-                    isum(
-                        r[i].mul(other.components[i], dependency="i") for i in range(n)
-                    )
+                    isum(i_mul(r[i], other.components[i]) for i in range(n))
                     for r in self.rows
                 ]
             )
 
-        elif isinstance(other, Matrix):
+        elif isinstance(other, iMatrix):
             # Matrix @ Matrix
             m1, n1 = self.shape()
             m2, n2 = other.shape()
@@ -472,7 +468,7 @@ class iMatrix(Matrix):
             for row in self.rows:
                 result_row = []
                 for col in zip(*other.rows):
-                    result_row.append(isum(r * c for r, c in zip(row, col)))
+                    result_row.append(isum(i_mul(r, c) for r, c in zip(row, col)))
                 result_rows.append(result_row)
             return iMatrix(result_rows)
 
