@@ -65,15 +65,15 @@ Many propagation methodologies are provided to rigorously propgate the uncertain
 a = pun.normal([2,3], [1])
 b = pun.normal([10,14], [1])
 
-# assume a response function
+# specify a response function
 def foo(x): return x[0] ** 3 + x[1] + x[2]
 
-# intrusive call signature
+# intrusive call signature which allows for drop-in replacements
 response = foo([a, b])
 
-# non-intrusive call signature
-p = Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='subinterval')
-response = p.run(n_slices=50, n_sub=4, style='endpoints')
+# alternatively, one can use a more generic call signature
+p = Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='direct')
+response = p.run(n_slices=50)
 ```
 
 ```{attention}
