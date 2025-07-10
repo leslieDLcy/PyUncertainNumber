@@ -20,7 +20,6 @@ class DempsterShafer:
     """Class for Dempester-Shafer structures.
 
     args:
-    # TODO: add type hints
     # TODO: restructure the constructor needed
         - the `intervals` argument accepts wildcard vector intervals {list of list pairs or vec Interval};
         - masses (list): probability masses

@@ -167,15 +167,14 @@ def make_vec_interval(vec):
 
     if isinstance(vec, Interval):
         return vec
-    elif isinstance(vec, list):
-        if all(isinstance(v, Interval) for v in vec):
-            return Interval(lo=[v.lo for v in vec], hi=[v.hi for v in vec])
+    # elif isinstance(vec, list):
+    #     if all(isinstance(v, Interval) for v in vec):
+    #         return Interval(lo=[v.lo for v in vec], hi=[v.hi for v in vec])
     elif isinstance(vec[0], Interval | list | tuple | np.ndarray):
         try:
             return intervalise(vec)
         except Exception:
             return intervalise(list(vec))
-
     elif isinstance(vec[0], UN):
         return intervalise([v.construct for v in vec])
     else:
