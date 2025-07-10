@@ -55,13 +55,13 @@ class UncertainNumber:
     """Uncertain Number class
 
     args:
-        - `bounds`;
+        - `intervals`;
         - `distribution_parameters`: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
         - `pbox_initialisation`: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
         -  naked_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
 
     Example:
-        >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", bounds=[1, 2])
+        >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", intervals=[1, 2])
     """
 
     Q_ = Quantity
@@ -75,7 +75,7 @@ class UncertainNumber:
         uncertainty_type=None,
         essence=None,
         masses=None,
-        bounds=None,
+        intervals=None,
         distribution_parameters=None,
         pbox_parameters=None,
         hedge=None,
@@ -102,7 +102,7 @@ class UncertainNumber:
         self.uncertainty_type = uncertainty_type
         self.essence = essence
         self.masses = masses
-        self.bounds = bounds
+        self.intervals = intervals
         self.distribution_parameters = distribution_parameters
         self.pbox_parameters = pbox_parameters
         self.hedge = hedge
@@ -134,7 +134,7 @@ class UncertainNumber:
 
         if not self.essence:
             check_initialisation_list = [
-                self.bounds,
+                self.intervals,
                 self.distribution_parameters,
                 self.pbox_parameters,
             ]
@@ -145,7 +145,7 @@ class UncertainNumber:
             if (self._construct is None) | (not self._construct):
                 print("a vacuous interval is created")
                 self.essence = "interval"
-                self.bounds = [-np.inf, np.inf]
+                self.intervals = [-np.inf, np.inf]
 
     def __init_construct(self):
         """the de facto parameterisation/instantiation procedure for the core constructs of the UN class
@@ -160,7 +160,7 @@ class UncertainNumber:
         if not self._skip_construct_init:
             match self.essence:
                 case "interval":
-                    self._construct = parse_bounds(self.bounds)
+                    self._construct = parse_bounds(self.intervals)
                 case "distribution" | "pbox":
                     if self.pbox_parameters is not None:
                         par = Parameterisation(
@@ -175,7 +175,7 @@ class UncertainNumber:
                     from ..pba.dss import DempsterShafer
 
                     self._construct = DempsterShafer(
-                        intervals=parse_bounds(self.bounds), masses=self.masses
+                        intervals=parse_bounds(self.intervals), masses=self.masses
                     )
 
     def parameterised_pbox_specification(self):
@@ -210,7 +210,7 @@ class UncertainNumber:
         note:
             a lot of things to double check. keep an growing list:
             1. unit
-            2. hedge: user cannot speficy both 'hedge' and 'bounds'. 'bounds' takes precedence.
+            2. hedge: user cannot speficy both 'hedge' and 'intervals'. 'intervals' takes precedence.
 
         """
         pass
@@ -351,7 +351,7 @@ class UncertainNumber:
         an_obj = hedge_interpret(hedged_language)
         essence = "interval"  # TODO: choose between interval, pbox
         left, right = an_obj.left, an_obj.right
-        return cls(essence=essence, bounds=[left, right])
+        return cls(essence=essence, intervals=[left, right])
 
     @classmethod
     def fromConstruct(cls, construct):
@@ -400,7 +400,7 @@ class UncertainNumber:
 
     @classmethod
     def from_Interval(cls, u):
-        return cls(essence="interval", bounds=u)
+        return cls(essence="interval", intervals=u)
 
     @classmethod
     def from_pbox(cls, p):
