@@ -433,6 +433,38 @@ class UncertainNumber:
     def sqrt(self):
         return UncertainNumber.fromConstruct(self._construct.sqrt())
 
+    def exp(self):
+        from ..pba.operation import convert
+
+        try:
+            return self.construct.exp()
+        except:
+            return convert(self.construct).exp()
+
+    def tanh(self):
+        from ..pba.operation import convert
+
+        try:
+            return self.construct.tanh()
+        except:
+            return convert(self.construct).tanh()
+
+    def log(self):
+        from ..pba.operation import convert
+
+        try:
+            return self.construct.log()
+        except:
+            return convert(self.construct).log()
+
+    def sin(self):
+        from ..pba.operation import convert
+
+        try:
+            return self.construct.sin()
+        except:
+            return convert(self.construct).sin()
+
     # * ---------------------binary operations---------------------#
 
     def bin_ops(self, other, ops):
