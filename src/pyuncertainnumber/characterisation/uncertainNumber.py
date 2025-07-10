@@ -32,6 +32,7 @@ __all__ = [
     "I",
     "norm",
     "gaussian",
+    "gamma",
     "normal",
     "alpha",
     "anglit",
