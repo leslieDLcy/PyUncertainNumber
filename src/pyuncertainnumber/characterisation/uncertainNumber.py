@@ -15,7 +15,7 @@ from ..pba.pbox_parametric import named_pbox
 from ..pba.intervals.intervalOperators import parse_bounds, wc_scalar_interval_feature
 from ..pba.intervals.number import Interval
 from numbers import Number
-from ..pba.distributions import Distribution
+from ..pba.distributions import Distribution as pbaDistribution
 import operator
 from pint import Quantity
 
@@ -24,7 +24,7 @@ from pint import Quantity
 
 if TYPE_CHECKING:
     from ..pba.intervals.number import Interval
-    from ..pba.distributions import Distribution
+    from ..pba.distributions import Distribution as pbaDistribution
 
 
 __all__ = [
@@ -32,6 +32,7 @@ __all__ = [
     "I",
     "norm",
     "gaussian",
+    "gamma",
     "normal",
     "alpha",
     "anglit",
@@ -55,13 +56,13 @@ class UncertainNumber:
     """Uncertain Number class
 
     args:
-        - `bounds`;
+        - `intervals`;
         - `distribution_parameters`: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
         - `pbox_initialisation`: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
         -  naked_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
 
     Example:
-        >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", bounds=[1, 2])
+        >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", intervals=[1, 2])
     """
 
     Q_ = Quantity
@@ -75,7 +76,7 @@ class UncertainNumber:
         uncertainty_type=None,
         essence=None,
         masses=None,
-        bounds=None,
+        intervals=None,
         distribution_parameters=None,
         pbox_parameters=None,
         hedge=None,
@@ -102,7 +103,7 @@ class UncertainNumber:
         self.uncertainty_type = uncertainty_type
         self.essence = essence
         self.masses = masses
-        self.bounds = bounds
+        self.intervals = intervals
         self.distribution_parameters = distribution_parameters
         self.pbox_parameters = pbox_parameters
         self.hedge = hedge
@@ -134,7 +135,7 @@ class UncertainNumber:
 
         if not self.essence:
             check_initialisation_list = [
-                self.bounds,
+                self.intervals,
                 self.distribution_parameters,
                 self.pbox_parameters,
             ]
@@ -145,7 +146,7 @@ class UncertainNumber:
             if (self._construct is None) | (not self._construct):
                 print("a vacuous interval is created")
                 self.essence = "interval"
-                self.bounds = [-np.inf, np.inf]
+                self.intervals = [-np.inf, np.inf]
 
     def __init_construct(self):
         """the de facto parameterisation/instantiation procedure for the core constructs of the UN class
@@ -160,7 +161,7 @@ class UncertainNumber:
         if not self._skip_construct_init:
             match self.essence:
                 case "interval":
-                    self._construct = parse_bounds(self.bounds)
+                    self._construct = parse_bounds(self.intervals)
                 case "distribution" | "pbox":
                     if self.pbox_parameters is not None:
                         par = Parameterisation(
@@ -175,7 +176,7 @@ class UncertainNumber:
                     from ..pba.dss import DempsterShafer
 
                     self._construct = DempsterShafer(
-                        intervals=parse_bounds(self.bounds), masses=self.masses
+                        intervals=parse_bounds(self.intervals), masses=self.masses
                     )
 
     def parameterised_pbox_specification(self):
@@ -210,7 +211,7 @@ class UncertainNumber:
         note:
             a lot of things to double check. keep an growing list:
             1. unit
-            2. hedge: user cannot speficy both 'hedge' and 'bounds'. 'bounds' takes precedence.
+            2. hedge: user cannot speficy both 'hedge' and 'intervals'. 'intervals' takes precedence.
 
         """
         pass
@@ -351,14 +352,14 @@ class UncertainNumber:
         an_obj = hedge_interpret(hedged_language)
         essence = "interval"  # TODO: choose between interval, pbox
         left, right = an_obj.left, an_obj.right
-        return cls(essence=essence, bounds=[left, right])
+        return cls(essence=essence, intervals=[left, right])
 
     @classmethod
     def fromConstruct(cls, construct):
         """create an Uncertain Number from a construct object"""
         from ..pba.pbox_abc import Leaf, Staircase
         from ..pba.dss import DempsterShafer
-        from ..pba.distributions import Distribution
+        from ..pba.distributions import Distribution as pbaDistribution
 
         if isinstance(construct, Leaf | Staircase):
             return cls.from_pbox(construct)
@@ -366,7 +367,7 @@ class UncertainNumber:
             return cls.from_Interval(construct)
         if isinstance(construct, DempsterShafer):
             return cls.from_ds(construct)
-        if isinstance(construct, Distribution):
+        if isinstance(construct, pbaDistribution):
             return cls.fromDistribution(construct)
         if isinstance(construct, cls):
             return construct
@@ -376,10 +377,10 @@ class UncertainNumber:
     @classmethod
     def fromDistribution(cls, D, **kwargs):
         # dist_family: str, dist_params,
-        """create an Uncertain Number from specification of distribution
+        """create an Uncertain Number from a Distribution object.
 
         args:
-            - D: Distribution object
+            - D (Distribution): a Distribution object
             dist_family (str): the distribution family
             dist_params (list, tuple or string): the distribution parameters
         """
@@ -400,7 +401,7 @@ class UncertainNumber:
 
     @classmethod
     def from_Interval(cls, u):
-        return cls(essence="interval", bounds=u)
+        return cls(essence="interval", intervals=u)
 
     @classmethod
     def from_pbox(cls, p):
@@ -431,6 +432,38 @@ class UncertainNumber:
     # * ---------------------unary operations---------------------#
     def sqrt(self):
         return UncertainNumber.fromConstruct(self._construct.sqrt())
+
+    def exp(self):
+        from ..pba.operation import convert
+
+        try:
+            return self.construct.exp()
+        except:
+            return convert(self.construct).exp()
+
+    def tanh(self):
+        from ..pba.operation import convert
+
+        try:
+            return self.construct.tanh()
+        except:
+            return convert(self.construct).tanh()
+
+    def log(self):
+        from ..pba.operation import convert
+
+        try:
+            return self.construct.log()
+        except:
+            return convert(self.construct).log()
+
+    def sin(self):
+        from ..pba.operation import convert
+
+        try:
+            return self.construct.sin()
+        except:
+            return convert(self.construct).sin()
 
     # * ---------------------binary operations---------------------#
 
@@ -480,6 +513,38 @@ class UncertainNumber:
         """power of two uncertain numbers"""
         return self.bin_ops(other, operator.pow)
 
+    # * ---------------------w/ dependency ---------------------#
+
+    def add(self, other, dependency="f"):
+        from ..pba.operation import convert
+
+        a, b = convert(self.construct), convert(other.construct)
+        return a.add(b, dependency=dependency)
+
+    def sub(self, other, dependency="f"):
+        from ..pba.operation import convert
+
+        a, b = convert(self.construct), convert(other.construct)
+        return a.sub(b, dependency=dependency)
+
+    def mul(self, other, dependency="f"):
+        from ..pba.operation import convert
+
+        a, b = convert(self.construct), convert(other.construct)
+        return a.mul(b, dependency=dependency)
+
+    def div(self, other, dependency="f"):
+        from ..pba.operation import convert
+
+        a, b = convert(self.construct), convert(other.construct)
+        return a.div(b, dependency=dependency)
+
+    def pow(self, other, dependency="f"):
+        from ..pba.operation import convert
+
+        a, b = convert(self.construct), convert(other.construct)
+        return a.pow(b, dependency=dependency)
+
     # * ---------------------serialisation functions---------------------*#
 
     def JSON_dump(self, filename="UN_data.json"):
@@ -520,6 +585,14 @@ def I(*args: str | list[Number] | Interval) -> UncertainNumber:
     return UncertainNumber.fromConstruct(wc_scalar_interval_feature(*args))
 
 
+def D(*args, **kwargs) -> UncertainNumber:
+    """a shortcut for the distribution-type UN object"""
+    from ..pba.distributions import Distribution as pbaDistribution
+
+    dist = pbaDistribution(*args, **kwargs)
+    return UncertainNumber.fromDistribution(dist)
+
+
 # * ---------------------parse inputs for UN only  --------------------- *#
 
 
@@ -549,7 +622,7 @@ class Parameterisation:
             )
             return pbox
         else:
-            dist = Distribution(
+            dist = pbaDistribution(
                 dist_family=self.parm_specification.family,
                 dist_params=self.parm_specification.parameters,
             )
@@ -616,7 +689,8 @@ def pass_down_units(a, b, ops, t):
 
 def is_un(sth):
 
-    from pyuncertainnumber import Interval, Pbox, Distribution, DempsterShafer
+    from pyuncertainnumber import Interval, Pbox, DempsterShafer
+    from ..pba.distributions import Distribution
 
     if isinstance(sth, Number):
         return 0

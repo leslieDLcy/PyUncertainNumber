@@ -64,7 +64,11 @@ class Distribution:
     def rep(self):
         """the dist object either sps dist or sample approximated or pbox dist"""
         if self.dist_family is not None:
-            return named_dists.get(self.dist_family)(*self.dist_params)
+            params = self.dist_params
+            if not isinstance(params, (tuple, list)):
+                params = (params,)
+
+            return named_dists.get(self.dist_family)(*params)
 
     def flag(self):
         """boolean flag for if the distribution is a parameterised distribution or not

@@ -137,7 +137,7 @@ class Pbox(ABC):
             raise Exception("Left and right arrays must be increasing")
 
         # pass along moments information
-        if (self.mean is None) and (self.var is None):
+        if (self.mean is None) or (self.var is None):
             self._init_moments()
 
         self._init_range()
@@ -1064,7 +1064,7 @@ def pbox_number_ops(pbox: Pbox, n: Number, f: callable):
         new_mean = f(pbox.mean, n)
     except:
         new_mean = None
-    return Staircase(left=l, right=r, mean=new_mean, var=pbox.var)
+    return Staircase(left=l, right=r, var=pbox.var)
 
     # Staircase(left=pbox.left + n, right=pbox.right + n)
 

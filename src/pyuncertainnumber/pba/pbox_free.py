@@ -308,7 +308,7 @@ def min_mean(minimum, mean, steps=Params.steps) -> UncertainNumber | Pbox:
     right = [((mean - minimum) / (1 - j) + minimum) for j in jjj]
 
     return Staircase(
-        left=np.repeat(minimum, Params.steps),
+        left=np.repeat(minimum, len(right)),
         right=right,
         mean=I(mean, mean),
     )
