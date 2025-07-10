@@ -15,7 +15,7 @@ from ..pba.pbox_parametric import named_pbox
 from ..pba.intervals.intervalOperators import parse_bounds, wc_scalar_interval_feature
 from ..pba.intervals.number import Interval
 from numbers import Number
-from ..pba.distributions import Distribution
+from ..pba.distributions import Distribution as pbaDistribution
 import operator
 from pint import Quantity
 
@@ -24,7 +24,7 @@ from pint import Quantity
 
 if TYPE_CHECKING:
     from ..pba.intervals.number import Interval
-    from ..pba.distributions import Distribution
+    from ..pba.distributions import Distribution as pbaDistribution
 
 
 __all__ = [
@@ -359,7 +359,7 @@ class UncertainNumber:
         """create an Uncertain Number from a construct object"""
         from ..pba.pbox_abc import Leaf, Staircase
         from ..pba.dss import DempsterShafer
-        from ..pba.distributions import Distribution
+        from ..pba.distributions import Distribution as pbaDistribution
 
         if isinstance(construct, Leaf | Staircase):
             return cls.from_pbox(construct)
@@ -367,7 +367,7 @@ class UncertainNumber:
             return cls.from_Interval(construct)
         if isinstance(construct, DempsterShafer):
             return cls.from_ds(construct)
-        if isinstance(construct, Distribution):
+        if isinstance(construct, pbaDistribution):
             return cls.fromDistribution(construct)
         if isinstance(construct, cls):
             return construct
@@ -377,10 +377,10 @@ class UncertainNumber:
     @classmethod
     def fromDistribution(cls, D, **kwargs):
         # dist_family: str, dist_params,
-        """create an Uncertain Number from specification of distribution
+        """create an Uncertain Number from a Distribution object.
 
         args:
-            - D: Distribution object
+            - D (Distribution): a Distribution object
             dist_family (str): the distribution family
             dist_params (list, tuple or string): the distribution parameters
         """
@@ -521,6 +521,14 @@ def I(*args: str | list[Number] | Interval) -> UncertainNumber:
     return UncertainNumber.fromConstruct(wc_scalar_interval_feature(*args))
 
 
+def D(*args, **kwargs) -> UncertainNumber:
+    """a shortcut for the distribution-type UN object"""
+    from ..pba.distributions import Distribution as pbaDistribution
+
+    dist = pbaDistribution(*args, **kwargs)
+    return UncertainNumber.fromDistribution(dist)
+
+
 # * ---------------------parse inputs for UN only  --------------------- *#
 
 
@@ -550,7 +558,7 @@ class Parameterisation:
             )
             return pbox
         else:
-            dist = Distribution(
+            dist = pbaDistribution(
                 dist_family=self.parm_specification.family,
                 dist_params=self.parm_specification.parameters,
             )
