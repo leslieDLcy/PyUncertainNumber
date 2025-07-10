@@ -66,7 +66,7 @@ a = pun.normal([2,3], [1])
 b = pun.normal([10,14], [1])
 
 # specify a response function
-def foo(x): return x[0] ** 3 + x[1] + x[2]
+def foo(x): return x[0] ** 3 + x[1] + 2
 
 # intrusive call signature which allows for drop-in replacements
 response = foo([a, b])
