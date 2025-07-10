@@ -29,12 +29,20 @@ class DistributionSpecification:
     def tell_i_flag(self):
         """boolean about if imprecise specification"""
 
-        if isinstance(self.dist_params[0], float | int):
-            self._i_flag = False
-        elif isinstance(self.dist_params[0], Interval | tuple | list):
-            self._i_flag = True
+        from collections.abc import Iterable
+
+        if not isinstance(self.dist_params, Iterable):
+            if isinstance(self.dist_params, Interval):
+                self._i_flag = True
+            else:
+                self._i_flag = False
         else:
-            raise ValueError("The disribution parameters are not clear")
+            if isinstance(self.dist_params[0], float | int):
+                self._i_flag = False
+            elif isinstance(self.dist_params[0], Interval | tuple | list):
+                self._i_flag = True
+            else:
+                raise ValueError("The disribution parameters are not clear")
 
     @property
     def i_flag(self):

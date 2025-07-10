@@ -481,6 +481,38 @@ class UncertainNumber:
         """power of two uncertain numbers"""
         return self.bin_ops(other, operator.pow)
 
+    # * ---------------------w/ dependency ---------------------#
+
+    def add(self, other, dependency="f"):
+        from ..pba.operation import convert
+
+        a, b = convert(self.construct), convert(other.construct)
+        return a.add(b, dependency=dependency)
+
+    def sub(self, other, dependency="f"):
+        from ..pba.operation import convert
+
+        a, b = convert(self.construct), convert(other.construct)
+        return a.sub(b, dependency=dependency)
+
+    def mul(self, other, dependency="f"):
+        from ..pba.operation import convert
+
+        a, b = convert(self.construct), convert(other.construct)
+        return a.mul(b, dependency=dependency)
+
+    def div(self, other, dependency="f"):
+        from ..pba.operation import convert
+
+        a, b = convert(self.construct), convert(other.construct)
+        return a.div(b, dependency=dependency)
+
+    def pow(self, other, dependency="f"):
+        from ..pba.operation import convert
+
+        a, b = convert(self.construct), convert(other.construct)
+        return a.pow(b, dependency=dependency)
+
     # * ---------------------serialisation functions---------------------*#
 
     def JSON_dump(self, filename="UN_data.json"):
@@ -625,7 +657,8 @@ def pass_down_units(a, b, ops, t):
 
 def is_un(sth):
 
-    from pyuncertainnumber import Interval, Pbox, Distribution, DempsterShafer
+    from pyuncertainnumber import Interval, Pbox, DempsterShafer
+    from ..pba.distributions import Distribution
 
     if isinstance(sth, Number):
         return 0
