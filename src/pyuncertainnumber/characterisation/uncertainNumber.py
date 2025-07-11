@@ -30,6 +30,8 @@ if TYPE_CHECKING:
 __all__ = [
     "UncertainNumber",
     "I",
+    "D",
+    "DSS",
     "norm",
     "gaussian",
     "gamma",
@@ -591,6 +593,14 @@ def D(*args, **kwargs) -> UncertainNumber:
 
     dist = pbaDistribution(*args, **kwargs)
     return UncertainNumber.fromDistribution(dist)
+
+
+def DSS(*args, **kwargs) -> UncertainNumber:
+    """a shortcut for the Dempster-Shafer-type UN object"""
+    from ..pba.dss import DempsterShafer
+
+    ds = DempsterShafer(*args, **kwargs)
+    return UncertainNumber.from_ds(ds)
 
 
 # * ---------------------parse inputs for UN only  --------------------- *#

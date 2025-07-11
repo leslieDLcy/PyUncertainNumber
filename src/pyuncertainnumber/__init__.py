@@ -16,8 +16,6 @@ from pyuncertainnumber.pba.intervals.intervalOperators import make_vec_interval
 from pyuncertainnumber.pba.intervals import intervalise
 from pyuncertainnumber.propagation.epistemic_uncertainty.helper import EpistemicDomain
 
-# * --------------------- Distribution ---------------------*#
-from pyuncertainnumber.characterisation.uncertainNumber import D
 
 # * --------------------- hedge---------------------*#
 from pyuncertainnumber.nlp.language_parsing import hedge_interpret
