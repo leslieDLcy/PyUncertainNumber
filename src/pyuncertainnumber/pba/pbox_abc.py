@@ -763,6 +763,35 @@ class Staircase(Pbox):
             lo = self.alpha_cut(lo_cut_level).lo
             return Interval(lo=lo, hi=hi)
 
+    def straddles(self, N, endpoints=True) -> bool:
+        """Check whether the p-box straddles a number N
+
+        args:
+            N (float): the Number to check
+            endpoints (Boolean): Whether to include the endpoints within the check
+
+        return:
+            True
+                If :math:`\\mathrm{left} \\leq N \\leq \mathrm{right}` (Assuming `endpoints=True`)
+            False
+                Otherwise
+
+        note:
+            This could affect the results of Frechet bounds
+        """
+        if endpoints:
+            if min(self.left) <= N and max(self.right) >= N:
+                return True
+        else:
+            if min(self.left) < N and max(self.right) > N:
+                return True
+
+        return False
+
+    def straddles_zero(self, endpoints=True) -> bool:
+        """Checks specifically whether :math:`0` is within the p-box"""
+        return self.straddles(0, endpoints)
+
     # * --------------------- aggregations--------------------- *#
     def env(self, other):
         """computes the envelope of two Pboxes.
