@@ -10,6 +10,23 @@ if TYPE_CHECKING:
     from .pbox_abc import Pbox
 
 
+# * --------------- vectorised Frechet ops --------------- *#
+def compute_Frechet(X, Y, n):
+    """template to compute Frechet sum of two pboxes"""
+    # Construct 2D arrays for pairwise sum
+    # For nright: X.right[i:] + Y.right[X.steps-1:i-1:-1]
+    right_sum = X.right[None, :] + Y.right[::-1][:, None]  # shape: (n, n)
+    mask_upper = np.triu(np.ones((n, n), dtype=bool))
+    nright = np.min(np.where(mask_upper, right_sum, np.inf), axis=0)
+
+    # For nleft: X.left[:i+1] + Y.left[i::-1]
+    left_sum = X.left[None, :] + Y.left[::-1][:, None]  # shape: (n, n)
+    mask_lower = np.tril(np.ones((n, n), dtype=bool))
+    nleft = np.max(np.where(mask_lower, left_sum, -np.inf), axis=0)
+
+    return nleft, nright
+
+
 def isum(l_p):
     """Sum of pboxes indepedently
 

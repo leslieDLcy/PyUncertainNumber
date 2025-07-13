@@ -902,6 +902,39 @@ class Staircase(Pbox):
         nright.sort()
         return Staircase(left=nleft, right=nright)
 
+    def vectorised_add(self, other, dependency="f"):
+        if isinstance(other, Number):
+            return pbox_number_ops(self, other, operator.add)
+        if is_un(other):
+            other = convert_pbox(other)
+        match dependency:
+            case "f":
+                nleft = np.empty(self.steps)
+                nright = np.empty(self.steps)
+                for i in range(0, self.steps):
+                    j = np.arange(i, self.steps)
+                    k = np.arange(self.steps - 1, i - 1, -1)
+                    nright[i] = np.min(self.right[j] + other.right[k])
+                    jj = np.arange(0, i + 1)
+                    kk = np.arange(i, -1, -1)
+                    nleft[i] = np.max(self.left[jj] + other.left[kk])
+            case "p":
+                nleft = self.left + other.left
+                nright = self.right + other.right
+            case "o":
+                nleft = self.left + np.flip(other.right)
+                nright = self.right + np.flip(other.left)
+            case "i":
+                nleft = []
+                nright = []
+                for l in itertools.product(self.left, other.left):
+                    nleft.append(operator.add(*l))
+                for r in itertools.product(self.right, other.right):
+                    nright.append(operator.add(*r))
+        nleft.sort()
+        nright.sort()
+        return Staircase(left=nleft, right=nright)
+
     def sub(self, other, dependency="f"):
 
         if dependency == "o":
