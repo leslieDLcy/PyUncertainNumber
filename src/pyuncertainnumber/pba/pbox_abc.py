@@ -207,6 +207,16 @@ class Pbox(ABC):
     def __iter__(self):
         return iter(self.to_interval())
 
+    def __eq__(self, other):
+        """Equality operator for Pbox objects
+
+        note:
+            - two pboxes are equal if their left and right bounds are equal
+        """
+        return np.array_equal(self.left, other.left) and np.array_equal(
+            self.right, other.right
+        )
+
     # * --------------------- functions ---------------------*#
     def to_interval(self):
         """discretise pbox into a vec-interval of length of default steps
