@@ -996,6 +996,31 @@ class Staircase(Pbox):
         nright.sort()
         return Staircase(left=nleft, right=nright)
 
+    def balchprod(self, other):
+        """Frechet convolution of two pboxes when any of them straddles zero"""
+        if self.straddles_zero() and other.straddles_zero():
+            x0 = self.lo
+            y0 = other.lo
+            xx0 = self - x0
+            yy0 = other - y0
+            a = xx0.mul(yy0, dependency="f")
+            b1, b2 = y0 * xx0, x0 * yy0
+            b = b1.add(b2, dependency="f")
+            return a.add(b, dependency="f") + x0 * y0
+        if self.straddles_zero():
+            x0 = self.lo
+            xx0 = self - x0
+            a = xx0.mul(other, dependency="f")
+            b = x0 * other
+            return a.mul(b, dependency="f")
+        if other.straddles_zero():
+            y0 = other.lo
+            yy0 = other - y0
+            a = self.mul(yy0, dependency="f")
+            b = self * y0
+            return a.add(b, dependency="f")
+        return self.mul(other, dependency="f")
+
 
 class Leaf(Staircase):
     """parametric pbox"""
