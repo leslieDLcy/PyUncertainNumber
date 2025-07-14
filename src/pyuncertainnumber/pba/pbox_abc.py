@@ -17,6 +17,8 @@ from .utils import (
     left_right_switch,
 )
 import logging
+from .operation import vectorized_cartesian_op
+
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
@@ -88,6 +90,24 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
         right=bounds[1],
         shape=shape,
     )
+
+
+def naive_frechet(x, y, op=operator.add):
+
+    assert x.steps == y.steps, "Pboxes must have the same number of steps"
+
+    n = x.steps
+    # right
+    c_r = vectorized_cartesian_op(x.right, y.right, op)
+    c_r.sort()
+    Zd = c_r[(n * n - n) : (n * n)]
+
+    # left
+    c = vectorized_cartesian_op(x.left, y.left, op)
+    c.sort()
+    Zu = c[:n]
+    p = Staircase(left=Zu, right=Zd)
+    return p
 
 
 class Pbox(ABC):
@@ -935,12 +955,11 @@ class Staircase(Pbox):
                 nleft = self.left + np.flip(other.right)
                 nright = self.right + np.flip(other.left)
             case "i":
-                nleft = []
-                nright = []
-                for l in itertools.product(self.left, other.left):
-                    nleft.append(operator.add(*l))
-                for r in itertools.product(self.right, other.right):
-                    nright.append(operator.add(*r))
+                from .operation import vectorized_cartesian_op
+
+                nleft = vectorized_cartesian_op(self.left, other.left, operator.add)
+                nright = vectorized_cartesian_op(self.right, other.right, operator.add)
+
         nleft.sort()
         nright.sort()
         return Staircase(left=nleft, right=nright)
@@ -1214,3 +1233,9 @@ def simple_stacking(itvls):
     cdf1 = eCDF_bundle(q1, p1)
     cdf2 = eCDF_bundle(q2, p2)
     return Staircase.from_CDFbundle(cdf1, cdf2)
+
+
+def inspect_pbox(pbox):
+    """quickly inspect a pbox object"""
+    print(pbox)
+    pbox.display()

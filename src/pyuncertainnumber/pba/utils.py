@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.path as mpath
 from matplotlib.legend_handler import HandlerBase
+import sys
 
 
 def extend_ecdf(cdf):
@@ -212,9 +213,6 @@ class CustomEdgeRectHandler(HandlerBase):
         for patch in rect_patches:
             patch.set_transform(trans)
         return rect_patches
-
-
-import sys
 
 
 def expose_functions_as_public(mapping, wrapper):
