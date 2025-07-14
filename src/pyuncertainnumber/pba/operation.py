@@ -51,6 +51,12 @@ def naive_frechet_op(x: Pbox, y: Pbox, op):
         Zu, Zd (tuple): left and right bounds of the pbox
         - Zu: lower bound of the pbox
         - Zd: upper bound of the pbox
+
+    example:
+        >>> from pyuncertainnumber import pba
+        >>> a = pba.normal([4,5], 1)
+        >>> b = pba.uniform([3,4], [7,8])
+        >>> left_bound, right_bound = pba.naive_frechet_op(a, b, operator.add)
     """
 
     assert x.steps == y.steps, "Pboxes must have the same number of steps"
