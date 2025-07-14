@@ -74,6 +74,39 @@ def naive_frechet_op(x: Pbox, y: Pbox, op):
     return Zu, Zd
 
 
+def perfect_op(x: Pbox, y: Pbox, op=operator.add):
+    """perfect operation on two pboxes
+
+    note:
+        defined for addition and multiplication. Different for subtraction and division.
+    """
+    nleft = op(x.left, y.left)
+    nright = op(x.right, y.right)
+    return nleft, nright
+
+
+def opposite_op(x: Pbox, y: Pbox, op=operator.add):
+    """opposite operation on two pboxes
+
+    note:
+        defined for addition and multiplication. Different for subtraction and division.
+    """
+    nleft = op(x.left, np.flip(y.left))
+    nright = op(x.right, np.flip(y.right))
+    return nleft, nright
+
+
+def independent_op(x: Pbox, y: Pbox, op=operator.add):
+    """independent operation on two pboxes
+
+    note:
+        defined for addition and multiplication. Different for subtraction and division.
+    """
+    nleft = vectorized_cartesian_op(x.left, y.left, op)
+    nright = vectorized_cartesian_op(x.right, y.right, op)
+    return nleft, nright
+
+
 def vectorized_cartesian_op(a, b, op):
     """vectorised cartesian operation for the bounds of pboxes
 

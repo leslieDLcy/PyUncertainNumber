@@ -18,7 +18,7 @@ from .utils import (
 )
 import logging
 from .operation import vectorized_cartesian_op
-
+from .context import get_current_dependency
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
@@ -528,37 +528,35 @@ class Staircase(Pbox):
         )
 
     def __add__(self, other):
-        return self.add(other, dependency="f")
+        return self.add(other, dependency=get_current_dependency())
 
     def __radd__(self, other):
-        return self.add(other, dependency="f")
+        return self.add(other, dependency=get_current_dependency())
 
     def __sub__(self, other):
-        return self.sub(other, dependency="f")
+        return self.sub(other, dependency=get_current_dependency())
 
     def __rsub__(self, other):
-        self = -self
-        return self.add(other, dependency="f")
+        return (-self).add(other, dependency=get_current_dependency())
 
     def __mul__(self, other):
-        return self.mul(other, dependency="f")
+        return self.mul(other, dependency=get_current_dependency())
 
     def __rmul__(self, other):
-        return self.mul(other, dependency="f")
+        return self.__mul__(other)
 
     def __truediv__(self, other):
 
-        return self.div(other, dependency="f")
+        return self.div(other, dependency=get_current_dependency())
 
     def __rtruediv__(self, other):
         try:
             return other * self.reciprocal()
         except:
             return NotImplemented
-        # print("right operand")
 
     def __pow__(self, other):
-        return self.pow(other, dependency="f")
+        return self.pow(other, dependency=get_current_dependency())
 
     def __rpow__(self, other: Number):
         # if not hasattr(other, "__iter__"):
@@ -918,7 +916,12 @@ class Staircase(Pbox):
     # * ---------------------binary operations--------------------- *#
 
     def add(self, other, dependency="f"):
-        from .operation import frechet_op, vectorized_cartesian_op
+        from .operation import (
+            frechet_op,
+            independent_op,
+            perfect_op,
+            opposite_op,
+        )
 
         if isinstance(other, Number):
             return pbox_number_ops(self, other, operator.add)
@@ -928,15 +931,13 @@ class Staircase(Pbox):
             case "f":
                 nleft, nright = frechet_op(self, other, operator.add)
             case "p":
-                nleft = self.left + other.left
-                nright = self.right + other.right
+                nleft, nright = perfect_op(self, other, operator.add)
             case "o":
-                nleft = self.left + np.flip(other.right)
-                nright = self.right + np.flip(other.left)
+                nleft, nright = opposite_op(self, other, operator.add)
             case "i":
-                nleft = vectorized_cartesian_op(self.left, other.left, operator.add)
-                nright = vectorized_cartesian_op(self.right, other.right, operator.add)
-
+                nleft, nright = independent_op(self, other, operator.add)
+            case _:
+                raise ValueError(f"Unknown dependency type: {dependency!r}")
         nleft.sort()
         nright.sort()
         return Staircase(left=nleft, right=nright)
@@ -952,7 +953,12 @@ class Staircase(Pbox):
 
     def mul(self, other, dependency="f"):
         """Multiplication of uncertain numbers with the defined dependency dependency"""
-        from .operation import frechet_op, vectorized_cartesian_op
+        from .operation import (
+            frechet_op,
+            independent_op,
+            perfect_op,
+            opposite_op,
+        )
         from .aggregation import _imposition
 
         if isinstance(other, Number):
@@ -963,6 +969,10 @@ class Staircase(Pbox):
         match dependency:
             case "f":
                 if self.straddles_zero() or other.straddles_zero():
+                    warnings.warn(
+                        "Multiplication of a pbox straddling zero needs attention",
+                        UserWarning,
+                    )
                     naive_base_p = naive_frechet_pbox(self, other, operator.mul)
                     balch_p = self.balchprod(other)
                     imp_p = _imposition(naive_base_p, balch_p)
@@ -970,14 +980,11 @@ class Staircase(Pbox):
                 else:
                     nleft, nright = frechet_op(self, other, operator.mul)
             case "p":
-                nleft = self.left * other.left
-                nright = self.right * other.right
+                nleft, nright = perfect_op(self, other, operator.mul)
             case "o":
-                nleft = self.left * np.flip(other.right)
-                nright = self.right * np.flip(other.left)
+                nleft, nright = opposite_op(self, other, operator.mul)
             case "i":
-                nleft = vectorized_cartesian_op(self.left, other.left, operator.mul)
-                nright = vectorized_cartesian_op(self.right, other.right, operator.mul)
+                nleft, nright = independent_op(self, other, operator.mul)
         nleft.sort()
         nright.sort()
         return Staircase(left=nleft, right=nright)
