@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-
+import warnings
 import numpy as np
 from abc import ABC, abstractmethod
 from .params import Params
@@ -266,7 +266,6 @@ class Pbox(ABC):
 class Staircase(Pbox):
     """distribution free p-box"""
 
-    # TODO with the automatic interpolation, there is no point still aving the `p_values` as a parameter
     def __init__(
         self,
         left,
@@ -559,7 +558,7 @@ class Staircase(Pbox):
 
     def __rtruediv__(self, other):
         try:
-            return other * self.recip()
+            return other * self.reciprocal()
         except:
             return NotImplemented
         # print("right operand")
@@ -673,11 +672,21 @@ class Staircase(Pbox):
         )
 
     def truncate(self, a, b):
+        """Truncate the Pbox to the range [a, b].
+
+        example:
+        >>> from pyuncertainnumber import pba
+        >>> p = pba.normal([4, 9], 1)
+        >>> tr = p.truncate(3, 8)
+        >>> fig, ax = plt.subplots()
+        >>> p.plot(ax=ax)
+        >>> tr.plot(ax=ax, fill_color='r')
+        >>> plt.show()
+        """
+
         from .aggregation import _imposition
         from .pbox_free import min_max
 
-        """Truncate the Pbox to the range [a, b]."""
-        # return self.min(a, method=method).max(b, method=method)
         i = min_max(a, b, return_construct=True)
         return _imposition(self, i)
 
@@ -871,7 +880,17 @@ class Staircase(Pbox):
     def sqrt(self):
         return self._unary_template(np.sqrt)
 
-    def recip(self):
+    def reciprocal(self):
+        """Calculate the reciprocal of the pbox
+
+        note:
+            the pbox should not straddle zero, otherwise a warning is raised
+        """
+
+        if self.straddles_zero():
+            warnings.warn(
+                "Division of a pbox straddling zero needs attention", UserWarning
+            )
         return Staircase(left=1 / np.flip(self.right), right=1 / np.flip(self.left))
 
     def log(self):
@@ -963,6 +982,11 @@ class Staircase(Pbox):
         return Staircase(left=nleft, right=nright)
 
     def div(self, other, dependency="f"):
+
+        if self.straddles_zero():
+            warnings.warn(
+                "Division of a pbox straddling zero needs attention", UserWarning
+            )
 
         if dependency == "o":
             dependency = "p"
