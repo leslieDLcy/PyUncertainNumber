@@ -93,6 +93,11 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
 
 
 def naive_frechet(x, y, op=operator.add):
+    """The real naive Frechet bounds implementation
+
+    note:
+        counterpart of `naivefrechetpbox` in `pba.r`
+    """
 
     assert x.steps == y.steps, "Pboxes must have the same number of steps"
 
@@ -553,11 +558,11 @@ class Staircase(Pbox):
         return self.div(other, dependency="f")
 
     def __rtruediv__(self, other):
-
         try:
             return other * self.recip()
         except:
             return NotImplemented
+        # print("right operand")
 
     def __pow__(self, other):
         return self.pow(other, dependency="f")
@@ -900,21 +905,15 @@ class Staircase(Pbox):
     # * ---------------------binary operations--------------------- *#
 
     def add(self, other, dependency="f"):
+        from .operation import frechet_op, vectorized_cartesian_op
+
         if isinstance(other, Number):
             return pbox_number_ops(self, other, operator.add)
         if is_un(other):
             other = convert_pbox(other)
         match dependency:
             case "f":
-                nleft = np.empty(self.steps)
-                nright = np.empty(self.steps)
-                for i in range(0, self.steps):
-                    j = np.array(range(i, self.steps))
-                    k = np.array(range(self.steps - 1, i - 1, -1))
-                    nright[i] = np.min(self.right[j] + other.right[k])
-                    jj = np.array(range(0, i + 1))
-                    kk = np.array(range(i, -1, -1))
-                    nleft[i] = np.max(self.left[jj] + other.left[kk])
+                nleft, nright = frechet_op(self, other, operator.add)
             case "p":
                 nleft = self.left + other.left
                 nright = self.right + other.right
@@ -922,41 +921,6 @@ class Staircase(Pbox):
                 nleft = self.left + np.flip(other.right)
                 nright = self.right + np.flip(other.left)
             case "i":
-                nleft = []
-                nright = []
-                for l in itertools.product(self.left, other.left):
-                    nleft.append(operator.add(*l))
-                for r in itertools.product(self.right, other.right):
-                    nright.append(operator.add(*r))
-        nleft.sort()
-        nright.sort()
-        return Staircase(left=nleft, right=nright)
-
-    def vectorised_add(self, other, dependency="f"):
-        if isinstance(other, Number):
-            return pbox_number_ops(self, other, operator.add)
-        if is_un(other):
-            other = convert_pbox(other)
-        match dependency:
-            case "f":
-                nleft = np.empty(self.steps)
-                nright = np.empty(self.steps)
-                for i in range(0, self.steps):
-                    j = np.arange(i, self.steps)
-                    k = np.arange(self.steps - 1, i - 1, -1)
-                    nright[i] = np.min(self.right[j] + other.right[k])
-                    jj = np.arange(0, i + 1)
-                    kk = np.arange(i, -1, -1)
-                    nleft[i] = np.max(self.left[jj] + other.left[kk])
-            case "p":
-                nleft = self.left + other.left
-                nright = self.right + other.right
-            case "o":
-                nleft = self.left + np.flip(other.right)
-                nright = self.right + np.flip(other.left)
-            case "i":
-                from .operation import vectorized_cartesian_op
-
                 nleft = vectorized_cartesian_op(self.left, other.left, operator.add)
                 nright = vectorized_cartesian_op(self.right, other.right, operator.add)
 
@@ -971,10 +935,11 @@ class Staircase(Pbox):
         elif dependency == "p":
             dependency = "o"
 
-        return self.add(-other, dependency)
+        return self.vec_add(-other, dependency)
 
     def mul(self, other, dependency="f"):
         """Multiplication of uncertain numbers with the defined dependency dependency"""
+        from .operation import frechet_op, vectorized_cartesian_op
 
         if isinstance(other, Number):
             return pbox_number_ops(self, other, operator.mul)
@@ -983,16 +948,7 @@ class Staircase(Pbox):
 
         match dependency:
             case "f":
-                nleft = np.empty(self.steps)
-                nright = np.empty(self.steps)
-
-                for i in range(0, self.steps):
-                    j = np.array(range(i, self.steps))
-                    k = np.array(range(self.steps - 1, i - 1, -1))
-                    nright[i] = np.min(self.right[j] * other.right[k])
-                    jj = np.array(range(0, i + 1))
-                    kk = np.array(range(i, -1, -1))
-                    nleft[i] = np.max(self.left[jj] * other.left[kk])
+                nleft, nright = frechet_op(self, other, operator.mul)
             case "p":
                 nleft = self.left * other.left
                 nright = self.right * other.right
@@ -1000,14 +956,8 @@ class Staircase(Pbox):
                 nleft = self.left * np.flip(other.right)
                 nright = self.right * np.flip(other.left)
             case "i":
-                nleft = []
-                nright = []
-                for i in self.left:
-                    for j in other.left:
-                        nleft.append(i * j)
-                for ii in self.right:
-                    for jj in other.right:
-                        nright.append(ii * jj)
+                nleft = vectorized_cartesian_op(self.left, other.left, operator.mul)
+                nright = vectorized_cartesian_op(self.right, other.right, operator.mul)
         nleft.sort()
         nright.sort()
         return Staircase(left=nleft, right=nright)
@@ -1019,7 +969,7 @@ class Staircase(Pbox):
         elif dependency == "p":
             dependency = "o"
 
-        return self.mul(1 / other, dependency)
+        return self.vec_mul(1 / other, dependency)
 
     def pow(self, other, dependency="f"):
 
@@ -1054,6 +1004,30 @@ class Staircase(Pbox):
                 for ii in self.right:
                     for jj in other.right:
                         nright.append(ii + jj)
+        nleft.sort()
+        nright.sort()
+        return Staircase(left=nleft, right=nright)
+
+    def vec_pow(self, other, dependency="f"):
+        from .operation import frechet_op, vectorized_cartesian_op
+
+        if isinstance(other, Number):
+            return pbox_number_ops(self, other, operator.pow)
+        if is_un(other):
+            other = convert_pbox(other)
+
+        match dependency:
+            case "f":
+                nleft, nright = frechet_op(self, other, operator.pow)
+            case "p":
+                nleft = self.left**other.left
+                nright = self.right**other.right
+            case "o":
+                nleft = self.left ** np.flip(other.right)
+                nright = self.right ** np.flip(other.left)
+            case "i":
+                nleft = vectorized_cartesian_op(self.left, other.left, operator.pow)
+                nright = vectorized_cartesian_op(self.right, other.right, operator.pow)
         nleft.sort()
         nright.sort()
         return Staircase(left=nleft, right=nright)
@@ -1238,4 +1212,4 @@ def simple_stacking(itvls):
 def inspect_pbox(pbox):
     """quickly inspect a pbox object"""
     print(pbox)
-    pbox.display()
+    pbox.display(nuance="curve")

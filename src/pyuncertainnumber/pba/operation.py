@@ -11,22 +11,30 @@ if TYPE_CHECKING:
     from .pbox_abc import Pbox
 
 
-# * --------------- vectorised Frechet ops --------------- *#
-#! not in use due to error.
-# def compute_Frechet(X, Y, n):
-#     """template to compute Frechet sum of two pboxes"""
-#     # Construct 2D arrays for pairwise sum
-#     # For nright: X.right[i:] + Y.right[X.steps-1:i-1:-1]
-#     right_sum = X.right[None, :] + Y.right[::-1][:, None]  # shape: (n, n)
-#     mask_upper = np.triu(np.ones((n, n), dtype=bool))
-#     nright = np.min(np.where(mask_upper, right_sum, np.inf), axis=0)
+# * ---------------  Frechet ops --------------- *#
+def frechet_op(x: Pbox, y: Pbox, op=operator.add):
+    """Frechet operation on two pboxes
 
-#     # For nleft: X.left[:i+1] + Y.left[i::-1]
-#     left_sum = X.left[None, :] + Y.left[::-1][:, None]  # shape: (n, n)
-#     mask_lower = np.tril(np.ones((n, n), dtype=bool))
-#     nleft = np.max(np.where(mask_lower, left_sum, -np.inf), axis=0)
+    note:
+        this corresponds to the Frank, Nelson and Sklar Frechet bounds implementation
+    """
 
-#     return nleft, nright
+    assert x.steps == y.steps, "Pboxes must have the same number of steps"
+
+    n = x.steps
+
+    nleft = np.empty(n)
+    nright = np.empty(n)
+
+    for i in range(0, n):
+        j = np.arange(i, n)
+        k = np.arange(n - 1, i - 1, -1)
+        nright[i] = np.min(op(x.right[j], y.right[k]))
+        jj = np.arange(0, i + 1)
+        kk = np.arange(i, -1, -1)
+        nleft[i] = np.max(op(x.left[jj], y.left[kk]))
+
+    return nleft, nright
 
 
 def vectorized_cartesian_op(a, b, op):
