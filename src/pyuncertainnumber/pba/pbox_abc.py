@@ -972,43 +972,6 @@ class Staircase(Pbox):
         return self.vec_mul(1 / other, dependency)
 
     def pow(self, other, dependency="f"):
-
-        if isinstance(other, Number):
-            return pbox_number_ops(self, other, operator.pow)
-        if is_un(other):
-            other = convert_pbox(other)
-
-        match dependency:
-            case "f":
-                nleft = np.empty(self.steps)
-                nright = np.empty(self.steps)
-                for i in range(0, self.steps):
-                    j = np.array(range(i, self.steps))
-                    k = np.array(range(self.steps - 1, i - 1, -1))
-                    nright[i] = np.min(self.right[j] ** other.right[k])
-                    jj = np.array(range(0, i + 1))
-                    kk = np.array(range(i, -1, -1))
-                    nleft[i] = np.max(self.left[jj] ** other.left[kk])
-            case "p":
-                nleft = self.left**other.left
-                nright = self.right**other.right
-            case "o":
-                nleft = self.left ** np.flip(other.right)
-                nright = self.right ** np.flip(other.left)
-            case "i":
-                nleft = []
-                nright = []
-                for i in self.left:
-                    for j in other.left:
-                        nleft.append(i + j)
-                for ii in self.right:
-                    for jj in other.right:
-                        nright.append(ii + jj)
-        nleft.sort()
-        nright.sort()
-        return Staircase(left=nleft, right=nright)
-
-    def vec_pow(self, other, dependency="f"):
         from .operation import frechet_op, vectorized_cartesian_op
 
         if isinstance(other, Number):
