@@ -37,6 +37,37 @@ def frechet_op(x: Pbox, y: Pbox, op=operator.add):
     return nleft, nright
 
 
+def naive_frechet_op(x: Pbox, y: Pbox, op):
+    """The real naive Frechet bounds implementation
+
+    note:
+        counterpart of `naivefrechetpbox` in `pba.r`
+
+    args:
+        x, y (Pbox): pboxes to be operated on
+        op (function): arithemtic operator to be applied, e.g. operator.add
+
+    return:
+        Zu, Zd (tuple): left and right bounds of the pbox
+        - Zu: lower bound of the pbox
+        - Zd: upper bound of the pbox
+    """
+
+    assert x.steps == y.steps, "Pboxes must have the same number of steps"
+
+    n = x.steps
+    # right
+    c_r = vectorized_cartesian_op(x.right, y.right, op)
+    c_r.sort()
+    Zd = c_r[(n * n - n) : (n * n)]
+
+    # left
+    c = vectorized_cartesian_op(x.left, y.left, op)
+    c.sort()
+    Zu = c[:n]
+    return Zu, Zd
+
+
 def vectorized_cartesian_op(a, b, op):
     """vectorised cartesian operation for the bounds of pboxes
 

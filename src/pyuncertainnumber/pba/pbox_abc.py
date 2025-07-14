@@ -92,26 +92,20 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
     )
 
 
-def naive_frechet(x, y, op=operator.add):
-    """The real naive Frechet bounds implementation
+def naive_frechet_pbox(x, y, op) -> Staircase:
+    """A wrapper that returns a Pbox from the naive Frechet operation"""
+    from .operation import naive_frechet_op
 
-    note:
-        counterpart of `naivefrechetpbox` in `pba.r`
-    """
-
-    assert x.steps == y.steps, "Pboxes must have the same number of steps"
-
-    n = x.steps
-    # right
-    c_r = vectorized_cartesian_op(x.right, y.right, op)
-    c_r.sort()
-    Zd = c_r[(n * n - n) : (n * n)]
-
-    # left
-    c = vectorized_cartesian_op(x.left, y.left, op)
-    c.sort()
-    Zu = c[:n]
+    Zu, Zd = naive_frechet_op(x, y, op)
     p = Staircase(left=Zu, right=Zd)
+    return p
+
+
+def frechet_pbox(x, y, op) -> Staircase:
+    from .operation import frechet_op
+
+    left, right = frechet_op(x, y, op)
+    p = Staircase(left=left, right=right)
     return p
 
 
@@ -954,11 +948,12 @@ class Staircase(Pbox):
         elif dependency == "p":
             dependency = "o"
 
-        return self.vec_add(-other, dependency)
+        return self.add(-other, dependency)
 
     def mul(self, other, dependency="f"):
         """Multiplication of uncertain numbers with the defined dependency dependency"""
         from .operation import frechet_op, vectorized_cartesian_op
+        from .aggregation import _imposition
 
         if isinstance(other, Number):
             return pbox_number_ops(self, other, operator.mul)
@@ -967,7 +962,13 @@ class Staircase(Pbox):
 
         match dependency:
             case "f":
-                nleft, nright = frechet_op(self, other, operator.mul)
+                if self.straddles_zero() or other.straddles_zero():
+                    naive_base_p = naive_frechet_pbox(self, other, operator.mul)
+                    balch_p = self.balchprod(other)
+                    imp_p = _imposition(naive_base_p, balch_p)
+                    nleft, nright = imp_p.left, imp_p.right
+                else:
+                    nleft, nright = frechet_op(self, other, operator.mul)
             case "p":
                 nleft = self.left * other.left
                 nright = self.right * other.right
@@ -993,7 +994,7 @@ class Staircase(Pbox):
         elif dependency == "p":
             dependency = "o"
 
-        return self.vec_mul(1 / other, dependency)
+        return self.mul(1 / other, dependency)
 
     def pow(self, other, dependency="f"):
         from .operation import frechet_op, vectorized_cartesian_op
@@ -1019,30 +1020,56 @@ class Staircase(Pbox):
         nright.sort()
         return Staircase(left=nleft, right=nright)
 
+    # def balchprod(self, other):
+    #     """Frechet convolution of two pboxes when any of them straddles zero"""
+    #     if self.straddles_zero() and other.straddles_zero():
+    #         x0 = self.lo
+    #         y0 = other.lo
+    #         xx0 = self - x0
+    #         yy0 = other - y0
+    #         a = xx0.mul(yy0, dependency="f")
+    #         b1, b2 = y0 * xx0, x0 * yy0
+    #         b = b1.add(b2, dependency="f")
+    #         return a.add(b, dependency="f") + x0 * y0
+    #     if self.straddles_zero():
+    #         x0 = self.lo
+    #         xx0 = self - x0
+    #         a = xx0.mul(other, dependency="f")
+    #         b = x0 * other
+    #         return a.mul(b, dependency="f")
+    #     if other.straddles_zero():
+    #         y0 = other.lo
+    #         yy0 = other - y0
+    #         a = self.mul(yy0, dependency="f")
+    #         b = self * y0
+    #         return a.add(b, dependency="f")
+    #     return self.mul(other, dependency="f")
+
     def balchprod(self, other):
         """Frechet convolution of two pboxes when any of them straddles zero"""
+
         if self.straddles_zero() and other.straddles_zero():
             x0 = self.lo
             y0 = other.lo
             xx0 = self - x0
             yy0 = other - y0
-            a = xx0.mul(yy0, dependency="f")
+            a = frechet_pbox(xx0, yy0, operator.mul)
             b1, b2 = y0 * xx0, x0 * yy0
-            b = b1.add(b2, dependency="f")
-            return a.add(b, dependency="f") + x0 * y0
+            b = frechet_pbox(b1, b2, operator.add)
+            return frechet_pbox(a, b, operator.add) + x0 * y0
         if self.straddles_zero():
             x0 = self.lo
             xx0 = self - x0
-            a = xx0.mul(other, dependency="f")
+            a = frechet_pbox(xx0, other, operator.mul)
             b = x0 * other
-            return a.mul(b, dependency="f")
+            return frechet_pbox(a, b, operator.mul)
         if other.straddles_zero():
             y0 = other.lo
             yy0 = other - y0
-            a = self.mul(yy0, dependency="f")
+            a = frechet_pbox(self, yy0, operator.mul)
             b = self * y0
-            return a.add(b, dependency="f")
-        return self.mul(other, dependency="f")
+            return frechet_pbox(a, b, operator.add)
+        return frechet_pbox(self, other, operator.mul)
 
 
 class Leaf(Staircase):
