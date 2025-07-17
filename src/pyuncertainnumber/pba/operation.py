@@ -74,6 +74,41 @@ def naive_frechet_op(x: Pbox, y: Pbox, op):
     return Zu, Zd
 
 
+def new_naive_frechet_op(
+    x: Pbox,
+    y: Pbox,
+    op,
+    n_sam=Params.steps,
+):
+
+    from functools import partial
+    from pyuncertainnumber import b2b, make_vec_interval
+
+    # p_vars = [convert_pbox(v) for v in vars]
+
+    n = n_sam  # number of samples to be taken
+
+    assert x.steps == y.steps, "Pboxes must have the same number of steps"
+
+    # if n < x.steps:
+    #     # this change when there's specified dependency structure
+    #     alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
+    #     itvs = [v.alpha_cut(alpha) for v in [x, y]]
+    # else:
+    itvs = [v.discretise(n_sam) for v in [x, y]]
+
+    # TODO add parallel logic herein
+    b2b_f = partial(b2b, func=lambda x: op(x[0], x[1]), interval_strategy="direct")
+    container = [b2b_f(_item) for _item in itertools.product(*itvs)]
+    container = make_vec_interval(container)
+
+    Zu = np.sort(container.lo)  # left
+    Zd = np.sort(container.hi)  # right
+    Zu = Zu[:n]  # take the first n elements
+    Zd = Zd[(n * n - n) : (n * n)]  # take the last n elements
+    return Zu, Zd
+
+
 def perfect_op(x: Pbox, y: Pbox, op=operator.add):
     """perfect operation on two pboxes
 
