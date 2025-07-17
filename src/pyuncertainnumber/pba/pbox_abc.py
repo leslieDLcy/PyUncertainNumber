@@ -114,6 +114,15 @@ def new_naive_frechet_pbox(x, y, op) -> Staircase:
     return p
 
 
+def new_vectorised_naive_frechet_pbox(x, y, op) -> Staircase:
+    """A wrapper that returns a Pbox from the naive Frechet operation"""
+    from .operation import new_vectorised_naive_frechet_op
+
+    Zu, Zd = new_vectorised_naive_frechet_op(x, y, op)
+    p = Staircase(left=Zu, right=Zd)
+    return p
+
+
 def frechet_pbox(x, y, op) -> Staircase:
     from .operation import frechet_op
 

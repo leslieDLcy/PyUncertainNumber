@@ -80,7 +80,7 @@ def new_naive_frechet_op(
     op,
     n_sam=Params.steps,
 ):
-
+    """this is a slow version"""
     from functools import partial
     from pyuncertainnumber import b2b, make_vec_interval
 
@@ -107,6 +107,28 @@ def new_naive_frechet_op(
     Zu = Zu[:n]  # take the first n elements
     Zd = Zd[(n * n - n) : (n * n)]  # take the last n elements
     return Zu, Zd
+
+
+# def new_vectorised_naive_frechet_op(x, y, op):
+#     """The new vectorised Frechet ops"""
+#     assert x.steps == y.steps, "Pboxes must have the same number of steps"
+#     n = x.steps
+#     Xd = np.tile(x.right, n)
+#     Xu = np.tile(x.left, n)
+#     Yd = np.tile(y.right, n)
+#     Yu = np.tile(y.left, n)
+
+#     c1 = op(Xu, Yu)
+#     c2 = op(Xu, Yd)
+#     c3 = op(Xd, Yu)
+#     c4 = op(Xd, Yd)
+#     Zu = np.sort(np.minimum.reduce([c1, c2, c3, c4]))
+#     Zd = np.sort(np.maximum.reduce([c1, c2, c3, c4]))
+
+#     # I believe there should not be condensation per se, but rather the following boundings
+#     Zu = Zu[:n]
+#     Zd = Zd[(n * n - n) : (n * n)]
+#     return Zu, Zd
 
 
 def perfect_op(x: Pbox, y: Pbox, op=operator.add):
@@ -140,6 +162,28 @@ def independent_op(x: Pbox, y: Pbox, op=operator.add):
     nleft = vectorized_cartesian_op(x.left, y.left, op)
     nright = vectorized_cartesian_op(x.right, y.right, op)
     return nleft, nright
+
+
+def new_vectorised_naive_frechet_op(x: Pbox, y: Pbox, op):
+    """independent operation on two pboxes
+
+    note:
+        defined for addition and multiplication. Different for subtraction and division.
+    """
+    n = x.steps
+
+    c1 = vectorized_cartesian_op(x.left, y.left, op)
+    c2 = vectorized_cartesian_op(x.left, y.right, op)
+    c3 = vectorized_cartesian_op(x.right, y.left, op)
+    c4 = vectorized_cartesian_op(x.right, y.right, op)
+
+    Zu = np.sort(np.minimum.reduce([c1, c2, c3, c4]))
+    Zd = np.sort(np.maximum.reduce([c1, c2, c3, c4]))
+
+    Zu = Zu[:n]
+    Zd = Zd[(n * n - n) : (n * n)]
+    return Zu, Zd
+    # return c1, c2, c3, c4
 
 
 def vectorized_cartesian_op(a, b, op):
