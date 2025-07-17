@@ -93,10 +93,23 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
 
 
 def naive_frechet_pbox(x, y, op) -> Staircase:
-    """A wrapper that returns a Pbox from the naive Frechet operation"""
+    """A wrapper that returns a Pbox from the naive Frechet operation
+
+    note:
+        old implementation from pba.r
+    """
     from .operation import naive_frechet_op
 
     Zu, Zd = naive_frechet_op(x, y, op)
+    p = Staircase(left=Zu, right=Zd)
+    return p
+
+
+def new_naive_frechet_pbox(x, y, op) -> Staircase:
+    """A wrapper that returns a Pbox from the naive Frechet operation"""
+    from .operation import new_naive_frechet_op
+
+    Zu, Zd = new_naive_frechet_op(x, y, op)
     p = Staircase(left=Zu, right=Zd)
     return p
 
@@ -1027,6 +1040,7 @@ class Staircase(Pbox):
         nright.sort()
         return Staircase(left=nleft, right=nright)
 
+    # TODO: add a function which can be imported in operation.py
     def balchprod(self, other):
         """Frechet convolution of two pboxes when any of them straddles zero"""
 
