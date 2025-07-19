@@ -996,7 +996,10 @@ class Staircase(Pbox):
                         UserWarning,
                     )
                     # naive_base_p = naive_frechet_pbox(self, other, operator.mul)
-                    naive_base_p = new_naive_frechet_pbox(self, other, operator.mul)
+                    # naive_base_p = new_naive_frechet_pbox(self, other, operator.mul)
+                    naive_base_p = new_vectorised_naive_frechet_pbox(
+                        self, other, operator.mul
+                    )
                     balch_p = self.balchprod(other)
                     imp_p = _imposition(naive_base_p, balch_p)
                     nleft, nright = imp_p.left, imp_p.right
