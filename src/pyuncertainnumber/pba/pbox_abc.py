@@ -131,6 +131,35 @@ def frechet_pbox(x, y, op) -> Staircase:
     return p
 
 
+def straddle_frechet_pbox(x, y):
+    """bespoke Frechet for multiplcation when anyone straddles 0"""
+    from .aggregation import _imposition
+
+    warnings.warn(
+        "Multiplication of a pbox straddling zero needs attention",
+        UserWarning,
+    )
+    naive_base_p = new_vectorised_naive_frechet_pbox(x, y, operator.mul)
+    balch_p = x.balchprod(y)
+    imp_p = _imposition(naive_base_p, balch_p)
+    # nleft, nright = imp_p.left, imp_p.right
+    # nleft.sort()
+    # nright.sort()
+    # return nleft, nright
+    return imp_p
+
+
+def nagative_frechet_pbox(x, y):
+    if x.hi <= 0 or y.hi <= 0:
+        warnings.warn("negative pbox encountered")
+        a = -x if x.hi <= 0 else x
+        b = -y if y.hi <= 0 else y
+        result = frechet_pbox(a, b, operator.mul)
+        return -result if (x.hi <= 0) ^ (y.hi <= 0) else result
+    else:
+        raise Exception("Not nagative Frechet case")
+
+
 class Pbox(ABC):
     """a base class for Pbox
 
@@ -821,6 +850,8 @@ class Staircase(Pbox):
             lo = self.alpha_cut(lo_cut_level).lo
             return Interval(lo=lo, hi=hi)
 
+    # * --------------------- states --------------------- *#
+
     def straddles(self, N, endpoints=True) -> bool:
         """Check whether the p-box straddles a number N
 
@@ -849,6 +880,12 @@ class Staircase(Pbox):
     def straddles_zero(self, endpoints=True) -> bool:
         """Checks specifically whether :math:`0` is within the p-box"""
         return self.straddles(0, endpoints)
+
+    def is_zero(self):
+        return self.lo == 0
+
+    def is_nagative(self):
+        return self.hi <= 0
 
     # * --------------------- aggregations--------------------- *#
     def env(self, other):
@@ -990,22 +1027,16 @@ class Staircase(Pbox):
 
         match dependency:
             case "f":
-                if self.straddles_zero() or other.straddles_zero():
-                    warnings.warn(
-                        "Multiplication of a pbox straddling zero needs attention",
-                        UserWarning,
-                    )
-                    # naive_base_p = naive_frechet_pbox(self, other, operator.mul)
-                    # naive_base_p = new_naive_frechet_pbox(self, other, operator.mul)
-                    naive_base_p = new_vectorised_naive_frechet_pbox(
-                        self, other, operator.mul
-                    )
-                    balch_p = self.balchprod(other)
-                    imp_p = _imposition(naive_base_p, balch_p)
-                    nleft, nright = imp_p.left, imp_p.right
-                    nleft.sort()
-                    nright.sort()
-                else:
+                if (
+                    self.straddles_zero() or other.straddles_zero()
+                ):  # if any one straddles
+                    if other.straddles_zero():  # other shall be straddle
+                        return straddle_frechet_pbox(self, other)
+                    else:
+                        return straddle_frechet_pbox(other, self)
+                elif self.hi <= 0 or other.hi <= 0:
+                    return nagative_frechet_pbox(self, other)
+                else:  # both positive
                     nleft, nright = frechet_op(self, other, operator.mul)
             case "p":
                 nleft, nright = perfect_op(self, other, operator.mul)
