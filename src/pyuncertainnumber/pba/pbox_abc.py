@@ -879,7 +879,7 @@ class Staircase(Pbox):
 
     def straddles_zero(self, endpoints=True) -> bool:
         """Checks specifically whether :math:`0` is within the p-box"""
-        return self.straddles(0, endpoints)
+        return self.straddles(0, False)
 
     def is_zero(self):
         return self.lo == 0
@@ -1027,6 +1027,8 @@ class Staircase(Pbox):
 
         match dependency:
             case "f":
+                if self.is_zero() or other.is_zero():
+                    return 0
                 if (
                     self.straddles_zero() or other.straddles_zero()
                 ):  # if any one straddles
