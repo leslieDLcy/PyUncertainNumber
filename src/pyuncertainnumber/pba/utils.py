@@ -96,8 +96,18 @@ class NotIncreasingError(Exception):
     pass
 
 
-def condensation(bound, number):
-    """a joint implementation for condensation"""
+# TODO: integrate the two sub-functions to make more consistent.
+def condensation(bound, number: int):
+    """a joint implementation for condensation
+
+    args:
+        number (int) : the number to be reduced
+        bound (array-like): either the left or right bound to be reduced
+
+    note:
+        It will keep the first and last from the bound
+    """
+
     if isinstance(bound, list | tuple):
         return condensation_bounds(bound, number)
     else:

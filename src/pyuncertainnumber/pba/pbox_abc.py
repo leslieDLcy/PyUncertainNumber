@@ -1000,6 +1000,8 @@ class Staircase(Pbox):
                     balch_p = self.balchprod(other)
                     imp_p = _imposition(naive_base_p, balch_p)
                     nleft, nright = imp_p.left, imp_p.right
+                    nleft.sort()
+                    nright.sort()
                 else:
                     nleft, nright = frechet_op(self, other, operator.mul)
             case "p":
@@ -1008,8 +1010,6 @@ class Staircase(Pbox):
                 nleft, nright = opposite_op(self, other, operator.mul)
             case "i":
                 nleft, nright = independent_op(self, other, operator.mul)
-        nleft.sort()
-        nright.sort()
         return Staircase(left=nleft, right=nright)
 
     def div(self, other, dependency="f"):

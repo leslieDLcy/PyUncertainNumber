@@ -34,6 +34,9 @@ def frechet_op(x: Pbox, y: Pbox, op=operator.add):
         kk = np.arange(i, -1, -1)
         nleft[i] = np.max(op(x.left[jj], y.left[kk]))
 
+    nleft.sort()
+    nright.sort()
+
     return nleft, nright
 
 
@@ -139,6 +142,9 @@ def perfect_op(x: Pbox, y: Pbox, op=operator.add):
     """
     nleft = op(x.left, y.left)
     nright = op(x.right, y.right)
+
+    nleft.sort()
+    nright.sort()
     return nleft, nright
 
 
@@ -150,6 +156,8 @@ def opposite_op(x: Pbox, y: Pbox, op=operator.add):
     """
     nleft = op(x.left, np.flip(y.left))
     nright = op(x.right, np.flip(y.right))
+    nleft.sort()
+    nright.sort()
     return nleft, nright
 
 
@@ -159,9 +167,27 @@ def independent_op(x: Pbox, y: Pbox, op=operator.add):
     note:
         defined for addition and multiplication. Different for subtraction and division.
     """
-    nleft = vectorized_cartesian_op(x.left, y.left, op)
-    nright = vectorized_cartesian_op(x.right, y.right, op)
+    c1 = vectorized_cartesian_op(x.left, y.left, op)
+    c2 = vectorized_cartesian_op(x.left, y.right, op)
+    c3 = vectorized_cartesian_op(x.right, y.left, op)
+    c4 = vectorized_cartesian_op(x.right, y.right, op)
+
+    nleft = np.sort(np.minimum.reduce([c1, c2, c3, c4]))
+    nright = np.sort(np.maximum.reduce([c1, c2, c3, c4]))
+
     return nleft, nright
+
+
+# backup
+# def independent_op(x: Pbox, y: Pbox, op=operator.add):
+#     """independent operation on two pboxes
+
+#     note:
+#         defined for addition and multiplication. Different for subtraction and division.
+#     """
+#     nleft = vectorized_cartesian_op(x.left, y.left, op)
+#     nright = vectorized_cartesian_op(x.right, y.right, op)
+#     return nleft, nright
 
 
 def new_vectorised_naive_frechet_op(x: Pbox, y: Pbox, op):
