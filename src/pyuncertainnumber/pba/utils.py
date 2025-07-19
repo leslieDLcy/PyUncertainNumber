@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.path as mpath
 from matplotlib.legend_handler import HandlerBase
+import sys
 
 
 def extend_ecdf(cdf):
@@ -95,8 +96,18 @@ class NotIncreasingError(Exception):
     pass
 
 
-def condensation(bound, number):
-    """a joint implementation for condensation"""
+# TODO: integrate the two sub-functions to make more consistent.
+def condensation(bound, number: int):
+    """a joint implementation for condensation
+
+    args:
+        number (int) : the number to be reduced
+        bound (array-like): either the left or right bound to be reduced
+
+    note:
+        It will keep the first and last from the bound
+    """
+
     if isinstance(bound, list | tuple):
         return condensation_bounds(bound, number)
     else:
@@ -212,9 +223,6 @@ class CustomEdgeRectHandler(HandlerBase):
         for patch in rect_patches:
             patch.set_transform(trans)
         return rect_patches
-
-
-import sys
 
 
 def expose_functions_as_public(mapping, wrapper):

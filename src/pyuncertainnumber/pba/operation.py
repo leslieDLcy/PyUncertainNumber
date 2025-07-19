@@ -5,9 +5,226 @@ import functools
 import numpy as np
 from numbers import Number
 from .params import Params
+import operator
 
 if TYPE_CHECKING:
     from .pbox_abc import Pbox
+
+
+# * ---------------  Frechet ops --------------- *#
+
+
+def frechet_op(x: Pbox, y: Pbox, op=operator.add):
+    """Frechet operation on two pboxes
+
+    note:
+        this corresponds to the Frank, Nelson and Sklar Frechet bounds implementation
+    """
+
+    assert x.steps == y.steps, "Pboxes must have the same number of steps"
+
+    n = x.steps
+
+    nleft = np.empty(n)
+    nright = np.empty(n)
+
+    for i in range(0, n):
+        j = np.arange(i, n)
+        k = np.arange(n - 1, i - 1, -1)
+        nright[i] = np.min(op(x.right[j], y.right[k]))
+        jj = np.arange(0, i + 1)
+        kk = np.arange(i, -1, -1)
+        nleft[i] = np.max(op(x.left[jj], y.left[kk]))
+
+    nleft.sort()
+    nright.sort()
+
+    return nleft, nright
+
+
+def naive_frechet_op(x: Pbox, y: Pbox, op):
+    """The real naive Frechet bounds implementation
+
+    note:
+        counterpart of `naivefrechetpbox` in `pba.r`
+
+    args:
+        x, y (Pbox): pboxes to be operated on
+        op (function): arithemtic operator to be applied, e.g. operator.add
+
+    return:
+        Zu, Zd (tuple): left and right bounds of the pbox
+        - Zu: lower bound of the pbox
+        - Zd: upper bound of the pbox
+
+    example:
+        >>> from pyuncertainnumber import pba
+        >>> a = pba.normal([4,5], 1)
+        >>> b = pba.uniform([3,4], [7,8])
+        >>> left_bound, right_bound = pba.naive_frechet_op(a, b, operator.add)
+    """
+
+    assert x.steps == y.steps, "Pboxes must have the same number of steps"
+
+    n = x.steps
+    # right
+    c_r = vectorized_cartesian_op(x.right, y.right, op)
+    c_r.sort()
+    Zd = c_r[(n * n - n) : (n * n)]
+
+    # left
+    c = vectorized_cartesian_op(x.left, y.left, op)
+    c.sort()
+    Zu = c[:n]
+    return Zu, Zd
+
+
+def new_naive_frechet_op(
+    x: Pbox,
+    y: Pbox,
+    op,
+    n_sam=Params.steps,
+):
+    """this is a slow version"""
+    from functools import partial
+    from pyuncertainnumber import b2b, make_vec_interval
+
+    # p_vars = [convert_pbox(v) for v in vars]
+
+    n = n_sam  # number of samples to be taken
+
+    assert x.steps == y.steps, "Pboxes must have the same number of steps"
+
+    # if n < x.steps:
+    #     # this change when there's specified dependency structure
+    #     alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
+    #     itvs = [v.alpha_cut(alpha) for v in [x, y]]
+    # else:
+    itvs = [v.discretise(n_sam) for v in [x, y]]
+
+    # TODO add parallel logic herein
+    b2b_f = partial(b2b, func=lambda x: op(x[0], x[1]), interval_strategy="direct")
+    container = [b2b_f(_item) for _item in itertools.product(*itvs)]
+    container = make_vec_interval(container)
+
+    Zu = np.sort(container.lo)  # left
+    Zd = np.sort(container.hi)  # right
+    Zu = Zu[:n]  # take the first n elements
+    Zd = Zd[(n * n - n) : (n * n)]  # take the last n elements
+    return Zu, Zd
+
+
+# def new_vectorised_naive_frechet_op(x, y, op):
+#     """The new vectorised Frechet ops"""
+#     assert x.steps == y.steps, "Pboxes must have the same number of steps"
+#     n = x.steps
+#     Xd = np.tile(x.right, n)
+#     Xu = np.tile(x.left, n)
+#     Yd = np.tile(y.right, n)
+#     Yu = np.tile(y.left, n)
+
+#     c1 = op(Xu, Yu)
+#     c2 = op(Xu, Yd)
+#     c3 = op(Xd, Yu)
+#     c4 = op(Xd, Yd)
+#     Zu = np.sort(np.minimum.reduce([c1, c2, c3, c4]))
+#     Zd = np.sort(np.maximum.reduce([c1, c2, c3, c4]))
+
+#     # I believe there should not be condensation per se, but rather the following boundings
+#     Zu = Zu[:n]
+#     Zd = Zd[(n * n - n) : (n * n)]
+#     return Zu, Zd
+
+
+def perfect_op(x: Pbox, y: Pbox, op=operator.add):
+    """perfect operation on two pboxes
+
+    note:
+        defined for addition and multiplication. Different for subtraction and division.
+    """
+    nleft = op(x.left, y.left)
+    nright = op(x.right, y.right)
+
+    nleft.sort()
+    nright.sort()
+    return nleft, nright
+
+
+def opposite_op(x: Pbox, y: Pbox, op=operator.add):
+    """opposite operation on two pboxes
+
+    note:
+        defined for addition and multiplication. Different for subtraction and division.
+    """
+    nleft = op(x.left, np.flip(y.left))
+    nright = op(x.right, np.flip(y.right))
+    nleft.sort()
+    nright.sort()
+    return nleft, nright
+
+
+def independent_op(x: Pbox, y: Pbox, op=operator.add):
+    """independent operation on two pboxes
+
+    note:
+        defined for addition and multiplication. Different for subtraction and division.
+    """
+    c1 = vectorized_cartesian_op(x.left, y.left, op)
+    c2 = vectorized_cartesian_op(x.left, y.right, op)
+    c3 = vectorized_cartesian_op(x.right, y.left, op)
+    c4 = vectorized_cartesian_op(x.right, y.right, op)
+
+    nleft = np.sort(np.minimum.reduce([c1, c2, c3, c4]))
+    nright = np.sort(np.maximum.reduce([c1, c2, c3, c4]))
+
+    return nleft, nright
+
+
+# backup
+# def independent_op(x: Pbox, y: Pbox, op=operator.add):
+#     """independent operation on two pboxes
+
+#     note:
+#         defined for addition and multiplication. Different for subtraction and division.
+#     """
+#     nleft = vectorized_cartesian_op(x.left, y.left, op)
+#     nright = vectorized_cartesian_op(x.right, y.right, op)
+#     return nleft, nright
+
+
+def new_vectorised_naive_frechet_op(x: Pbox, y: Pbox, op):
+    """independent operation on two pboxes
+
+    note:
+        defined for addition and multiplication. Different for subtraction and division.
+    """
+    n = x.steps
+
+    c1 = vectorized_cartesian_op(x.left, y.left, op)
+    c2 = vectorized_cartesian_op(x.left, y.right, op)
+    c3 = vectorized_cartesian_op(x.right, y.left, op)
+    c4 = vectorized_cartesian_op(x.right, y.right, op)
+
+    Zu = np.sort(np.minimum.reduce([c1, c2, c3, c4]))
+    Zd = np.sort(np.maximum.reduce([c1, c2, c3, c4]))
+
+    Zu = Zu[:n]
+    Zd = Zd[(n * n - n) : (n * n)]
+    return Zu, Zd
+    # return c1, c2, c3, c4
+
+
+def vectorized_cartesian_op(a, b, op):
+    """vectorised cartesian operation for the bounds of pboxes
+
+    note:
+        used on self.left, other.left
+
+    example:
+        >>> nleft = vectorized_cartesian_op(self.left, other.left, operator.add)
+        >>> nright = vectorized_cartesian_op(self.right, other.right, operator.add)
+    """
+    return op(a[:, np.newaxis], b).ravel()
 
 
 def isum(l_p):

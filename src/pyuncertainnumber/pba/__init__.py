@@ -5,3 +5,5 @@ from .dss import DempsterShafer
 from .distributions import Distribution as D
 from .distributions import JointDistribution, ECDF
 from .dependency import Dependency
+from .context import dependency
+from .pbox_abc import inspect_pbox
