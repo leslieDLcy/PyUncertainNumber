@@ -57,9 +57,6 @@ def _parametric_bounds(dist_family, *args, steps=Params.steps):
     from .distributions import named_dists
     from .intervals.number import Interval as I
 
-    # TODO logically speaking, it can be (0,1) ergo support will be [-inf, inf] see it works with other part codes
-    # define percentile range thus getting the support
-
     i_args = [wc_scalar_interval(b) for b in args]
 
     p = Params.p_values
@@ -718,11 +715,6 @@ def lognormal_weird(
     return Leaf(left=Left, right=Right, steps=steps, shape="lognormal")
 
 
-# @makePbox
-# def lognormal(*args):
-#     return "lognormal"
-
-
 def uniform(a, b, steps=Params.steps):
     """special case of Uniform distribution as
     Scipy has an unbelivably strange parameterisation than common sense
@@ -749,7 +741,7 @@ def uniform(a, b, steps=Params.steps):
 
 
 def exponential(lamb: list | Interval) -> Pbox:
-    """p-box for the exponential distribution
+    """Bespoke p-box constructor for the exponential distribution
 
     args:
         - lamb: (list or Interval) the rate parameter of the exponential distribution
@@ -770,13 +762,6 @@ def exponential(lamb: list | Interval) -> Pbox:
     except Exception as e:
         p = Staircase(left=b_quantile, right=a_quantile)
     return p
-
-
-# def exponential(lamb_interval):
-#     """Re-engineered exponential distribution p-box
-# TODO: need to change the _bound_cdf logic to add support for this way.
-#     scipy has weird parameterisation for exponential distribution"""
-#     return _bound_pcdf("exponential", 1 / lamb)
 
 
 def trapz(a, b, c, d, steps=Params.steps):

@@ -62,7 +62,11 @@ class Distribution:
             return "wrong initialisation"
 
     def rep(self):
-        """the dist object either sps dist or sample approximated or pbox dist"""
+        """the dist object either sps dist or sample approximated or pbox dist
+
+        note:
+            underlying constructor to create the scipy.stats distribution object
+        """
         if self.dist_family is not None:
             params = self.dist_params
             if not isinstance(params, (tuple, list)):
