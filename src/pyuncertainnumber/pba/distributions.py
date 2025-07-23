@@ -176,8 +176,10 @@ class Distribution:
             - later on work with sample-approximated dist until `fit()`is implemented
         """
         if self._flag:
-            # pass
-            return named_pbox.get(self.dist_family)(*self.dist_params)
+            params = self.dist_params
+            if not isinstance(params, (tuple, list)):
+                params = (params,)
+            return named_pbox.get(self.dist_family)(*params)
 
     def __neg__(self):
         return -self.to_pbox()
