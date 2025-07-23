@@ -68,11 +68,15 @@ class Distribution:
             underlying constructor to create the scipy.stats distribution object
         """
         if self.dist_family is not None:
-            params = self.dist_params
-            if not isinstance(params, (tuple, list)):
-                params = (params,)
+            return self._fetch_distribution()
 
-            return named_dists.get(self.dist_family)(*params)
+    def _fetch_distribution(self):
+        """fetch the distribution object based on the family and parameters"""
+        params = self.dist_params
+        if not isinstance(params, (tuple, list)):
+            params = (params,)
+
+        return named_dists.get(self.dist_family)(*params)
 
     def flag(self):
         """boolean flag for if the distribution is a parameterised distribution or not
@@ -146,6 +150,15 @@ class Distribution:
         hi = self.alpha_cut(hi_cut_level)
         lo = self.alpha_cut(lo_cut_level)
         return Interval(lo, hi)
+
+    def get_cdf(self):
+        """return the cumulative distribution function (cdf)"""
+        return self._dist.cdf(Params.p_values)
+
+    @property
+    def dist(self):
+        """the underlying sps.dist object"""
+        return self._dist
 
     @property
     def naked_value(self):
