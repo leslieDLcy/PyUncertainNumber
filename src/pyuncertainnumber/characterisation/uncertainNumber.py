@@ -625,13 +625,12 @@ class Parameterisation:
         self.essence = essence
 
     def yield_construct(self):
-        # to ouput Distribution or Pbox accordingly
-        if "pbox" in (self.essence, self.parm_specification._true_type):
+        try:
             pbox = match_pbox(
                 self.parm_specification.family, self.parm_specification.parameters
             )
             return pbox
-        else:
+        except Exception as e:
             dist = pbaDistribution(
                 dist_family=self.parm_specification.family,
                 dist_params=self.parm_specification.parameters,
@@ -651,20 +650,21 @@ class ParamSpecification:
             not isinstance(input, list)
             or len(input) != 2
             or not isinstance(input[0], str)
-            or not isinstance(input[1], tuple)
         ):
             raise ValueError("Input must be in the format ['str', (a, b)]")
 
         self.family = input[0]
         self.parameters = input[1]
-        self.un_type_check()
+        # self.un_type_check()
 
     def supported_distribution_check(self):
         """check if the family is implemented"""
         pass
 
     def un_type_check(self):
-        """infer the real type of UN given the specification"""
+        """infer the real type of UN given the specification
+        # NOT in USE. lousy logic
+        """
 
         # distribution case
         if all(isinstance(x, Number) for x in self.parameters):

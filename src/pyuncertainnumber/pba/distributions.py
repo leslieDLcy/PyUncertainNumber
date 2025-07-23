@@ -68,10 +68,10 @@ class Distribution:
             underlying constructor to create the scipy.stats distribution object
         """
         if self.dist_family is not None:
-            return self._fetch_distribution()
+            return self._match_distribution()
 
-    def _fetch_distribution(self):
-        """fetch the distribution object based on the family and parameters"""
+    def _match_distribution(self):
+        """match the distribution object based on the family and parameters"""
         params = self.dist_params
         if not isinstance(params, (tuple, list)):
             params = (params,)
