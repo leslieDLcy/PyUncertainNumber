@@ -295,7 +295,7 @@ class MixedPropagation(P):
         >>> a = pba.normal([2, 3], [1])
         >>> b = pba.normal([10, 14], [1])
         >>> c = pba.normal([4, 5], [1])
-        >>> mix = MixedPropagation(vars=[a,b,c], func=foo, method='slicing', interval_strategy='direct')
+        >>> mix = MixedPropagation(vars=[a,b,c], func=foo, method='slicing', interval_strategy='subinterval')
         >>> result = mix(n_slices=20)
     """
 
