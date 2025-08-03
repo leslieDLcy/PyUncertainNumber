@@ -38,7 +38,7 @@ Refer to the `requirements.txt` file from the [GitHub repository](https://github
 
 ## Contributions
 
-If you feel like make contributions to the developement, which is highly encouraged, have a fork on GitHub, `git` clone it, `cd` to the project root directory and install it in editable mode. Once you are happy, `pull request` your changes.
+If you feel like make contributions to the developement, which is highly encouraged, please have a fork on the [GitHub repository](https://github.com/leslieDLcy/PyUncertainNumber/), `git clone` it, change directory to the project root directory and install it in editable mode. Once you are happy, `pull request` your changes.
 
 ```shell
 pip install -e .
@@ -46,4 +46,4 @@ pip install -e .
 
 ## Questions
 
-Raise an issue on the GitHub page if you run into problems.
+Raise an issue on the [GitHub page](https://github.com/leslieDLcy/PyUncertainNumber/) if you run into problems. Note that this libary is under active develpment, so APIs will change across different versions.
