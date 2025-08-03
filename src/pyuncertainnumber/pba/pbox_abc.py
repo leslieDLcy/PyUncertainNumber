@@ -105,16 +105,17 @@ def naive_frechet_pbox(x, y, op) -> Staircase:
     return p
 
 
-def new_naive_frechet_pbox(x, y, op) -> Staircase:
-    """A wrapper that returns a Pbox from the naive Frechet operation"""
-    from .operation import new_naive_frechet_op
+# deprecated
+# def new_naive_frechet_pbox(x, y, op) -> Staircase:
+#     """A wrapper that returns a Pbox from the naive Frechet operation"""
+#     from .operation import new_naive_frechet_op
 
-    Zu, Zd = new_naive_frechet_op(x, y, op)
-    p = Staircase(left=Zu, right=Zd)
-    return p
+#     Zu, Zd = new_naive_frechet_op(x, y, op)
+#     p = Staircase(left=Zu, right=Zd)
+#     return p
 
 
-def new_vectorised_naive_frechet_pbox(x, y, op) -> Staircase:
+def vectorised_naive_frechet_pbox(x, y, op) -> Staircase:
     """A wrapper that returns a Pbox from the naive Frechet operation"""
     from .operation import new_vectorised_naive_frechet_op
 
@@ -123,7 +124,8 @@ def new_vectorised_naive_frechet_pbox(x, y, op) -> Staircase:
     return p
 
 
-def frechet_pbox(x, y, op) -> Staircase:
+def classic_frechet_pbox(x, y, op) -> Staircase:
+    """this corresponds to the Frank, Nelson and Sklar Frechet bounds implementation"""
     from .operation import frechet_op
 
     left, right = frechet_op(x, y, op)
@@ -139,13 +141,9 @@ def straddle_frechet_pbox(x, y):
         "Multiplication of a pbox straddling zero needs attention",
         UserWarning,
     )
-    naive_base_p = new_vectorised_naive_frechet_pbox(x, y, operator.mul)
+    naive_base_p = vectorised_naive_frechet_pbox(x, y, operator.mul)
     balch_p = x.balchprod(y)
     imp_p = _imposition(naive_base_p, balch_p)
-    # nleft, nright = imp_p.left, imp_p.right
-    # nleft.sort()
-    # nright.sort()
-    # return nleft, nright
     return imp_p
 
 
@@ -154,10 +152,26 @@ def nagative_frechet_pbox(x, y):
         warnings.warn("negative pbox encountered")
         a = -x if x.hi <= 0 else x
         b = -y if y.hi <= 0 else y
-        result = frechet_pbox(a, b, operator.mul)
+        result = classic_frechet_pbox(a, b, operator.mul)
         return -result if (x.hi <= 0) ^ (y.hi <= 0) else result
     else:
         raise Exception("Not nagative Frechet case")
+
+
+def frechet_pbox_mul(x, y):
+    """the overall pbox"""
+
+    if x.straddles_zero() or y.straddles_zero():  # if any one straddles
+        if y.straddles_zero():  # y shall be straddle
+            return straddle_frechet_pbox(x, y)
+        else:
+            return straddle_frechet_pbox(y, x)
+    # elif x.is_zero() or y.is_zero():
+    #     return 0
+    elif x.hi <= 0 or y.hi <= 0:
+        return nagative_frechet_pbox(x, y)
+    else:  # both positive
+        return classic_frechet_pbox(x, y, operator.mul)
 
 
 class Pbox(ABC):
@@ -877,7 +891,7 @@ class Staircase(Pbox):
 
         return False
 
-    def straddles_zero(self, endpoints=True) -> bool:
+    def straddles_zero(self) -> bool:
         """Checks specifically whether :math:`0` is within the p-box"""
         return self.straddles(0, False)
 
@@ -1027,19 +1041,7 @@ class Staircase(Pbox):
 
         match dependency:
             case "f":
-                if self.is_zero() or other.is_zero():
-                    return 0
-                if (
-                    self.straddles_zero() or other.straddles_zero()
-                ):  # if any one straddles
-                    if other.straddles_zero():  # other shall be straddle
-                        return straddle_frechet_pbox(self, other)
-                    else:
-                        return straddle_frechet_pbox(other, self)
-                elif self.hi <= 0 or other.hi <= 0:
-                    return nagative_frechet_pbox(self, other)
-                else:  # both positive
-                    nleft, nright = frechet_op(self, other, operator.mul)
+                return frechet_pbox_mul(self, other)
             case "p":
                 nleft, nright = perfect_op(self, other, operator.mul)
             case "o":
@@ -1095,23 +1097,23 @@ class Staircase(Pbox):
             y0 = other.lo
             xx0 = self - x0
             yy0 = other - y0
-            a = frechet_pbox(xx0, yy0, operator.mul)
+            a = frechet_pbox_mul(xx0, yy0)
             b1, b2 = y0 * xx0, x0 * yy0
-            b = frechet_pbox(b1, b2, operator.add)
-            return frechet_pbox(a, b, operator.add) + x0 * y0
+            b = classic_frechet_pbox(b1, b2, operator.add)
+            return classic_frechet_pbox(a, b, operator.add) + x0 * y0
         if self.straddles_zero():
             x0 = self.lo
             xx0 = self - x0
-            a = frechet_pbox(xx0, other, operator.mul)
+            a = frechet_pbox_mul(xx0, other)
             b = x0 * other
-            return frechet_pbox(a, b, operator.mul)
+            return frechet_pbox_mul(a, b)
         if other.straddles_zero():
             y0 = other.lo
             yy0 = other - y0
-            a = frechet_pbox(self, yy0, operator.mul)
+            a = frechet_pbox_mul(self, yy0)
             b = self * y0
-            return frechet_pbox(a, b, operator.add)
-        return frechet_pbox(self, other, operator.mul)
+            return classic_frechet_pbox(a, b, operator.add)
+        return frechet_pbox_mul(self, other)
 
 
 class Leaf(Staircase):

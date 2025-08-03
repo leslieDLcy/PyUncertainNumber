@@ -14,6 +14,12 @@ from matplotlib.legend_handler import HandlerBase
 import sys
 
 
+def inspect_un(x):
+    """Inspect the any type of uncertain number x."""
+    print(x.__str__())
+    x.display()
+
+
 def extend_ecdf(cdf):
     """add zero and one to the ecdf
 
