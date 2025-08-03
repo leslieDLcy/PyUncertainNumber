@@ -27,19 +27,37 @@ This package is underpined by a framework of **uncertain number** which allows f
 
 `PyUncertainNumber` can be used to easily create an `UncertainNumber` object, which may embody a mathematical construct such as `PBox`, `Interval`, `Distribution`, or `DempsterShafer` structure.
 
+<!-- add some pbox plots herein -->
+<img src="./assets/myAnimation.gif" alt="drapbox dynamic visualisationwing" width="500"/>
+
 ```python
 from pyuncertainnumber import UncertainNumber as UN
+import pyuncertainnumber as pun
 
+# a verbose to instantiate uncertain numbers with ancillary fields
 e = UN(
     name='elas_modulus', 
     symbol='E', 
     units='Pa', 
     essence='pbox', 
     distribution_parameters=['gaussian', ([0,12],[1,4])])
+
+# or simply use shortcut to create uncertain numbers
+a = pun.normal([2,3], [1])
+b = pun.normal([10,14], [1])
+
+# specify a response function
+def foo(x): return x[0] ** 3 + x[1] + 2
+
+# intrusive call signature which allows for drop-in replacements
+response = foo([a, b])
+
+# alternatively, one can use a more generic call signature for propagation
+p = Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='direct')
+response = p.run(n_slices=50)
 ```
 
-<!-- add some pbox plots herein -->
-<img src="./assets/myAnimation.gif" alt="drapbox dynamic visualisationwing" width="500"/>
+
 
 ## installation
 
