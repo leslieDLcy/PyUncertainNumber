@@ -515,6 +515,12 @@ class UncertainNumber:
         """power of two uncertain numbers"""
         return self.bin_ops(other, operator.pow)
 
+    def __rpow__(self, other):
+        """power of two uncertain numbers"""
+        from ..pba.operation import convert
+
+        return other ** convert(self.construct)
+
     # * ---------------------w/ dependency ---------------------#
 
     def add(self, other, dependency="f"):
@@ -698,7 +704,13 @@ def pass_down_units(a, b, ops, t):
 
 
 def is_un(sth):
+    """utility function to decide the essence of the object
 
+    returns:
+        - 0: if sth is a regular number, float or int
+        - 1: if sth is an UncertainNumber object
+        - 2: if sth is a construct in {Interval, Pbox, DempsterShafer, or Distribution}
+    """
     from pyuncertainnumber import Interval, Pbox, DempsterShafer
     from ..pba.distributions import Distribution
 
