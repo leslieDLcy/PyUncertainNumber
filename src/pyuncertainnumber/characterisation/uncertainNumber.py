@@ -467,6 +467,14 @@ class UncertainNumber:
         except:
             return convert(self.construct).sin()
 
+    def cos(self):
+        from ..pba.operation import convert
+
+        try:
+            return self.construct.cos()
+        except:
+            return convert(self.construct).cos()
+
     # * ---------------------binary operations---------------------#
 
     def bin_ops(self, other, ops):
