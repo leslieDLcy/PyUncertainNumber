@@ -18,7 +18,6 @@ interval_analysis
 
 ```{toctree}
 :caption: Examples
-:hidden:
 
 uncertainty characterisation.ipynb
 uncertainty aggregation.ipynb

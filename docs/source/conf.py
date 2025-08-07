@@ -11,7 +11,7 @@ import datetime
 # -- Project information -----------------------------------------------------
 
 project = "PyUncertainNumber"
-author = "(Leslie) Yu Chen & Ioanna Ioannou & Scott Ferson"
+author = "(Leslie) Yu Chen"
 copyright = f"{datetime.datetime.now().year}, (Leslie) Yu Chen"
 
 # -- General configuration ---------------------------------------------------
@@ -21,7 +21,7 @@ copyright = f"{datetime.datetime.now().year}, (Leslie) Yu Chen"
 # ones.
 
 extensions = [
-    #   "myst_nb",
+    "myst_nb",
     "sphinx_prompt",
     "myst_parser",
     # 'sphinx.ext.autodoc',
@@ -32,6 +32,7 @@ extensions = [
     "sphinx_copybutton",
 ]
 
+nb_execution_mode = "off"  # or "auto", "force", "cache"
 
 # Napoleon settings
 napoleon_google_docstring = True
