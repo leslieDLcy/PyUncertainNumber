@@ -467,6 +467,14 @@ class UncertainNumber:
         except:
             return convert(self.construct).sin()
 
+    def cos(self):
+        from ..pba.operation import convert
+
+        try:
+            return self.construct.cos()
+        except:
+            return convert(self.construct).cos()
+
     # * ---------------------binary operations---------------------#
 
     def bin_ops(self, other, ops):
@@ -514,6 +522,12 @@ class UncertainNumber:
     def __pow__(self, other):
         """power of two uncertain numbers"""
         return self.bin_ops(other, operator.pow)
+
+    def __rpow__(self, other):
+        """power of two uncertain numbers"""
+        from ..pba.operation import convert
+
+        return other ** convert(self.construct)
 
     # * ---------------------w/ dependency ---------------------#
 
@@ -698,7 +712,13 @@ def pass_down_units(a, b, ops, t):
 
 
 def is_un(sth):
+    """utility function to decide the essence of the object
 
+    returns:
+        - 0: if sth is a regular number, float or int
+        - 1: if sth is an UncertainNumber object
+        - 2: if sth is a construct in {Interval, Pbox, DempsterShafer, or Distribution}
+    """
     from pyuncertainnumber import Interval, Pbox, DempsterShafer
     from ..pba.distributions import Distribution
 

@@ -297,9 +297,13 @@ class Pbox(ABC):
         note:
             - two pboxes are equal if their left and right bounds are equal
         """
-        return np.array_equal(self.left, other.left) and np.array_equal(
+        # equal = np.array_equal(self.left, other.left) and np.array_equal(
+        #     self.right, other.right
+        # )
+        close = np.allclose(self.left, other.left) and np.allclose(
             self.right, other.right
         )
+        return close
 
     # * --------------------- functions ---------------------*#
     def to_interval(self):
@@ -624,11 +628,10 @@ class Staircase(Pbox):
         return self.pow(other, dependency=get_current_dependency())
 
     def __rpow__(self, other: Number):
-        # if not hasattr(other, "__iter__"):
-        #     other = np.array((other))
+        """Power operation with the base as `other` and self as the exponent"""
         from functools import partial
 
-        bar = partial(np.power, other)
+        bar = partial(np.power, other)  # other as the base
         return self._unary_template(bar)
 
     # * --------------------- methods ---------------------*#
@@ -940,9 +943,11 @@ class Staircase(Pbox):
         return Staircase(left=l, right=r)
 
     def exp(self):
+        """exponential function: e^x"""
         return self._unary_template(np.exp)
 
     def sqrt(self):
+        """square root function: √x"""
         return self._unary_template(np.sqrt)
 
     def reciprocal(self):

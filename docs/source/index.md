@@ -11,15 +11,18 @@ Home <self>
 guides/installation
 guides/uc
 guides/up
-```
-
-```{toctree}
-:caption: probability bounds analysis
-:hidden:
-
 pbox
 cbox
 interval_analysis
+```
+
+```{toctree}
+:caption: Examples
+:hidden:
+
+uncertainty characterisation.ipynb
+uncertainty aggregation.ipynb
+uncertainty propagation.ipynb
 ```
 
 ```{toctree}
