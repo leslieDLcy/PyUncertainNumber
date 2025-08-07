@@ -17,7 +17,8 @@ interval_analysis
 ```
 
 ```{toctree}
-:caption: Examples
+:caption: Tutorials
+:hidden:
 
 uncertainty characterisation.ipynb
 uncertainty aggregation.ipynb
@@ -27,6 +28,7 @@ uncertainty propagation.ipynb
 ```{toctree}
 :caption: API references
 :hidden:
+
 autoapi/index
 ```
 
@@ -34,7 +36,11 @@ autoapi/index
 
 <br>
 
-**Uncertain Number** refers to a class of mathematical objects useful for risk analysis that generalize real numbers, [intervals](https://en.wikipedia.org/wiki/Interval_arithmetic), probability distributions, interval bounds on probability distributions (i.e. [probability boxes](https://en.wikipedia.org/wiki/Probability_box)), and [finite DempsterShafer structures](https://en.wikipedia.org/wiki/Dempster%E2%80%93Shafer_theory#:~:text=Often%20used%20as%20a%20method,on%20independent%20items%20of%20evidence.).
+Scientific computations of complex systems are surrounded by various forms of uncertainty,  requiring appropriate treatment to maximise the credibility of computations. Empirical information for characterisation is often scarce, vague, conflicting and imprecise, requiring expressive uncertainty structures for trustful representation, aggregation and propagation.
+
+This package is underpined by a framework of **uncertain number** which allows for a closed computation ecosystem whereby trustworthy computations can be conducted in a rigorous manner.
+
+**Uncertain Number** refers to a class of mathematical objects useful for risk analysis that generalize real numbers, intervals, probability distributions, interval bounds on probability distributions (i.e. [probability boxes](https://en.wikipedia.org/wiki/Probability_box)), and [finite DempsterShafer structures](https://en.wikipedia.org/wiki/Dempster–Shafer_theory). Refer to the [source code repository](https://github.com/leslieDLcy/PyUncertainNumber) of this package for additional introduction.
 
 ## features
 

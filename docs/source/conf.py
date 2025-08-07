@@ -23,7 +23,7 @@ copyright = f"{datetime.datetime.now().year}, (Leslie) Yu Chen"
 extensions = [
     "myst_nb",
     "sphinx_prompt",
-    "myst_parser",
+    # "myst_parser",
     # 'sphinx.ext.autodoc',
     "autoapi.extension",
     "sphinx.ext.mathjax",
@@ -51,7 +51,7 @@ napoleon_type_aliases = None
 napoleon_attr_annotations = True
 
 
-autoapi_dirs = ["../../src"]  # location to parse for API reference
+autoapi_dirs = ["../../src/pyuncertainnumber"]  # location to parse for API reference
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
