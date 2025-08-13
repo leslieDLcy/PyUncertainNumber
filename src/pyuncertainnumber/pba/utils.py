@@ -60,10 +60,10 @@ def find_nearest(array, value):
     Efficient for both scalar and array inputs.
     """
     array = np.asarray(array)
-    value = np.atleast_1d(value)
+    value_arr = np.atleast_1d(value)
 
     # Compute distances using broadcasting
-    diff = np.abs(array[None, :] - value[:, None])
+    diff = np.abs(array[None, :] - value_arr[:, None])
 
     # Find index of minimum difference along axis 1
     indices = np.argmin(diff, axis=1)
