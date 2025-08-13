@@ -179,6 +179,12 @@ class Interval:
         self.plot()
         plt.show()
 
+    def is_degenerate(self) -> bool:
+        """Check if the interval is degenerate (i.e., has zero width)."""
+        if np.all(self._lo == self._hi):
+            return True
+        return False
+
     @property
     def lo(self) -> Union[ndarray, float]:
         return self._lo
@@ -502,6 +508,12 @@ class LightweightInterval(Interval):
 def is_Interval(x: Any) -> bool:
     x_class_name = x.__class__.__name__
     return x_class_name == "Interval"
+
+
+def interval_degenerate(vec_interval):
+    if vec_interval.is_degenerate():
+        return vec_interval.lo
+    return vec_interval
 
 
 def lo(x: Interval) -> Union[float, ndarray]:

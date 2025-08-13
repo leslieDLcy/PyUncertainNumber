@@ -1,4 +1,6 @@
 import numpy as np
+from ..pba.dependency import Dependency
+from ..pba.distributions import JointDistribution
 
 """independence of input pboxes are assumed to get started"""
 
@@ -13,7 +15,7 @@ def middle_pinch(pbox_list: list):
 
     def middle_pinch_function(pbox):
         q = (pbox.left + pbox.right) / 2
-        return Staircase(left=q)
+        return Staircase(left=q, right=q)
 
     return [middle_pinch_function(pbox) for pbox in pbox_list]
 
@@ -48,7 +50,7 @@ class SurrogatePropagation:
         surrogate_model,
         N1=100,
         N2=200,
-        dependency=None,
+        dependency: Dependency = None,
         auxiliary_input_distribution=None,
     ):
         self.vars = vars
@@ -59,25 +61,32 @@ class SurrogatePropagation:
         self.dependency = dependency
         self.auxiliary_input_distribution = (
             middle_pinch(self.vars)
-            if auxiliary_input_distribution is not None
+            if auxiliary_input_distribution is None
             else auxiliary_input_distribution
         )
         ### add the level-1 and level-2 logic herein
-        self.level_1_meta_modelling()
-        self.level_2_meta_modelling()
-        self.use_l2_get_response()
+        # self.level_1_meta_modelling()
+        # self.level_2_meta_modelling()
+        # self.use_l2_get_response()
 
     def level_1_meta_modelling(self):
         # Implement level-1 meta-modelling here
-        # independence of input p-boxes is assumed
-        # TODO: dependency using JointDistribution and vector alpha to be used
-        X_level_1 = [
-            X.sample(self.N1) for X in self.auxiliary_input_distribution
-        ]  # list of arrays
-        X_tilda_input = np.array(X_level_1).T  # (N1, d)
+        from pyuncertainnumber.pba.intervals.number import interval_degenerate
+
+        alpha_l1 = self.dependency.u_sample(self.N1)  # (N1, d)
+
+        X_tilda_input = []
+        for i, v in enumerate(self.auxiliary_input_distribution):
+            arr = interval_degenerate(v.alpha_cut(alpha_l1[:, i]))
+            X_tilda_input.append(arr)
+        X_tilda_input = np.array(X_tilda_input).T  # (N1, d)
+
+        # get real y_obs
         y_tilda_output = self.f(X_tilda_input)
+
+        return y_tilda_output
         ### to train a level-1 surrogate model ###
-        self.l1_model = self.surrogate_model.fit(X_tilda_input, y_tilda_output)
+        # self.l1_model = self.surrogate_model.fit(X_tilda_input, y_tilda_output)
 
     def level_2_meta_modelling(self):
         """Level-2 meta-modelling.
