@@ -659,6 +659,7 @@ class Staircase(Pbox):
         return I(lo=self.left[ind], hi=self.right[ind])
 
     def sample(self, n_sam):
+        """LHS sampling by default"""
         from scipy.stats import qmc
 
         alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
