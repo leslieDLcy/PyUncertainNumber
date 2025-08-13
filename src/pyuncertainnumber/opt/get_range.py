@@ -78,10 +78,16 @@ def get_range_GA(
 ):
     """compute the range of the black-box function using GA
 
+    args:
+        varbound (np.ndarray): The variable bounds for the optimization.
+
     return:
         Tuple[Interval, dict]: A tuple containing:
             - response_itvl: The interval of the minimum and maximum from the optimization of the black-box function.
             - opt_hint: A dictionary with optimal input points for the minimum and maximum values.
+
+    note:
+        It's suggested to use `EpistemicDomain` which facilitate the specification of varbound.
     """
 
     from ..pba.intervals.number import Interval

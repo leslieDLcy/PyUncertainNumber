@@ -653,9 +653,10 @@ class Staircase(Pbox):
             alpha (array-like): probability levels
         """
         from .intervals.number import LightweightInterval as lwI
+        from .intervals.number import Interval as I
 
         ind = find_nearest(Params.p_values, alpha)
-        return lwI(lo=self.left[ind], hi=self.right[ind])
+        return I(lo=self.left[ind], hi=self.right[ind])
 
     def sample(self, n_sam):
         from scipy.stats import qmc
