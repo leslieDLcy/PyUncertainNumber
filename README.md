@@ -1,4 +1,4 @@
-![Python Version](https://img.shields.io/pypi/pyversions/pyuncertainnumber)
+![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)
 ![version](https://img.shields.io/pypi/v/pyuncertainnumber)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15658422.svg)](https://doi.org/10.5281/zenodo.15658422)
 ![Documentation Status](https://readthedocs.org/projects/pyuncertainnumber/badge/?version=latest)
