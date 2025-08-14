@@ -935,3 +935,12 @@ def cosh(x: Interval):
 
 def tanh_deriv(x: Interval):
     return (1 / cosh(x)) ** 2
+
+
+def unpack(x: Interval):
+
+    if x.is_scalar:
+        raise ValueError("a scalar interval cannot be unpacked.")
+
+    if len(x) >= 0:
+        return [item for item in x]
