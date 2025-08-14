@@ -84,7 +84,7 @@ class SurrogatePropagation:
         # get real y_obs
         y_tilda_output = self.f(X_tilda_input)
 
-        return y_tilda_output
+        return X_tilda_input, y_tilda_output
         ### to train a level-1 surrogate model ###
         # self.l1_model = self.surrogate_model.fit(X_tilda_input, y_tilda_output)
 

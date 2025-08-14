@@ -11,14 +11,13 @@
 # from intervals.methods import (lo,hi,width,rad,mag,straddlezero,isinterval)
 
 from __future__ import annotations
-from typing import Sequence, Sized, Iterable, Optional, Any, Tuple, Union
+from typing import Optional, Any, Union
 import numpy as np
 import numpy
-from numpy import ndarray, asarray, stack, transpose, ascontiguousarray, zeros
+from numpy import ndarray, asarray, stack, transpose, zeros
 import matplotlib.pyplot as plt
 from .utils import safe_asarray
 
-# float32=numpy.float32
 
 from .arithmetic import multiply, divide
 
@@ -191,12 +190,10 @@ class Interval:
 
     # if len(self.shape)==0: return self._lo
     # return self._lo # return transpose(transpose(self.__val)[0]) # from shape (3,7,2) to (2,7,3) to (3,7)
+
     @property
     def hi(self) -> Union[ndarray, float]:
         return self._hi
-
-    # if len(self.shape)==0: return self._hi
-    # return self._hi # return transpose(transpose(self.__val)[1])
 
     @property
     def left(self):
@@ -227,6 +224,7 @@ class Interval:
 
     @property
     def val(self):
+        """seemingly equivalent to `self.to_numpy()`"""
         if self.unsized:
             return asarray([self._lo, self._hi], dtype=float)
         else:
@@ -234,7 +232,21 @@ class Interval:
 
     @property
     def scalar(self):
+        """Check if the interval is wide sense scalar
+
+        note:
+            wide sense: I(1,2) and I([1],[2]) are both scalars
+        """
         return (self.shape == ()) | (self.shape == (1,))
+
+    @property
+    def is_scalar(self):
+        """Check if the interval is a strict-sense scalar
+
+        note:
+            strict sense: I(1,2) is a scalar, but I([1],[2]) is not
+        """
+        return self.shape == ()
 
     @property
     def shape(self):
