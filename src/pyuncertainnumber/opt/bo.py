@@ -2,8 +2,6 @@ from bayes_opt import BayesianOptimization
 from bayes_opt import acquisition
 import numpy as np
 import inspect
-from functools import partial
-import warnings
 
 
 class BayesOpt:
@@ -47,6 +45,24 @@ class BayesOpt:
         >>> bo.run(verbose=True)
         >>> print(bo.optimal)  # get the optimal parameters and target value
 
+    .. admonition:: Implementation
+
+        The range of the design space is defined by `varbound`, which is a 2D numpy array with shape (n, 2), where n is the number of parameters.
+        This is a different signature compared to the Bayesian Optimisation class, which uses a dictionary for bounds.
+        For consistency, it is recommended to use the class `EpistemicDomain.to_varbound()` to automatically take care of the format of the bounds.
+
+        example:
+        >>> ed = EpistemicDomain(pba.I(-5, 5), pba.I(-5, 5))
+        >>> BayesOpt(f=foo,
+        ...     dimension=2,
+        ...     xc_bounds= ed.to_BayesOptBounds(),  # the trick
+        ...     task='maximisation',
+        ...     num_explorations=3,
+        ...     num_iterations=20,
+        ... )
+
+
+
     """
 
     # TODO add a descriptor for `task`
@@ -64,10 +80,17 @@ class BayesOpt:
         self.task = task  # either minimisation or maximisation
         self.num_explorations = num_explorations  # initial exploration points
         self.num_iterations = num_iterations
-        self.xc_bounds = xc_bounds
+        self.xc_bounds = xc_bounds  # the bounds for the design space
         self.dimension = dimension
         self.acquisition_function = self.parse_acq(acquisition_function)
         self.f = f  # the function to be optimised
+        self.transform_xc_bounds()
+
+    def transform_xc_bounds(
+        self,
+    ):
+        if "0" in self.xc_bounds.keys():
+            self.xc_bounds = rekey_bounds_by_func(self.xc_bounds, self.f)
 
     def parse_acq(self, acq, parameter=None):
         """parse the acquisition function
@@ -112,7 +135,17 @@ class BayesOpt:
         if self.task == "maximisation":
             self._f = f
         elif self.task == "minimisation":
-            self._f = lambda *args, **kwargs: -f(*args, **kwargs)
+            from functools import wraps
+
+            if self.task == "maximisation":
+                self._f = f
+            elif self.task == "minimisation":
+
+                @wraps(f)  # <-- preserves f's signature for inspect.signature
+                def _f(*args, **kwargs):
+                    return -f(*args, **kwargs)
+
+                self._f = _f
 
     def get_results(self):
         """inspect the results, to save or not"""
@@ -215,3 +248,57 @@ def check_argument_count(func):
 def transform_func(fb, **kwargs):
     args = [p for p in kwargs.values()]
     return fb(args)
+
+
+import inspect
+from collections import OrderedDict
+
+
+def rekey_bounds_by_func(bounds_indexed: dict, func, *, allow_extras=False):
+    """
+    Convert bounds like {'0': (lo,hi), '1': (lo,hi), ...}
+    into {'param_name': (lo,hi), ...} using func's signature.
+    """
+    sig = inspect.signature(func)
+    params = list(sig.parameters.values())
+
+    # Supported kinds: positional-only, positional-or-keyword, keyword-only.
+    # (We disallow *args/**kwargs because they cannot be bounded cleanly.)
+    if any(p.kind == p.VAR_POSITIONAL for p in params):
+        raise ValueError("Functions with *args are not supported for bounds mapping.")
+    if any(p.kind == p.VAR_KEYWORD for p in params):
+        raise ValueError(
+            "Functions with **kwargs are not supported for bounds mapping."
+        )
+
+    # Parameter order is the function's declared order
+    param_names = [
+        p.name
+        for p in params
+        if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD, p.KEYWORD_ONLY)
+    ]
+
+    # Sort incoming bounds by their numeric key: "0","1","2",...
+    try:
+        sorted_bounds = sorted(bounds_indexed.items(), key=lambda kv: int(kv[0]))
+    except ValueError:
+        raise ValueError("All bounds keys must be numeric strings like '0','1',...")
+
+    if len(sorted_bounds) < len(param_names):
+        raise ValueError(
+            f"Not enough bounds: got {len(sorted_bounds)} for {len(param_names)} parameters {param_names}"
+        )
+    if not allow_extras and len(sorted_bounds) > len(param_names):
+        raise ValueError(
+            f"Too many bounds: got {len(sorted_bounds)} for {len(param_names)} parameters {param_names} "
+            "(pass allow_extras=True to ignore extras)."
+        )
+
+    # Map 1:1 in order; if extras exist and allowed, ignore the tail
+    sorted_bounds = sorted_bounds[: len(param_names)]
+
+    # Build renamed OrderedDict to preserve function param order
+    renamed = OrderedDict(
+        (param_names[i], sorted_bounds[i][1]) for i in range(len(param_names))
+    )
+    return renamed
