@@ -47,20 +47,6 @@ class BayesOpt:
         >>> bo.run(verbose=True)
         >>> print(bo.optimal)  # get the optimal parameters and target value
 
-    .. admonition:: Implementation
-
-        For 2D (or higher) optimisation task, the variable bounds can be specified using `EpistemicDomain` class.
-
-        example:
-            >>> from from pyuncertainnumber import pba, EpistemicDomain
-            >>> ed = EpistemicDomain(pba.I(-5, 5), pba.I(-5, 5))
-            >>> BayesOpt(f=foo,
-            ...     dimension=2,
-            ...     xc_bounds= ed.to_BayesOptBounds(),  # the trick
-            ...     task='maximisation',
-            ...     num_explorations=3,
-            ...     num_iterations=20,
-            ...     )
     """
 
     # TODO add a descriptor for `task`
@@ -112,14 +98,15 @@ class BayesOpt:
 
     @f.setter
     def f(self, f):
-        # step 1: dimension check
-        if not check_argument_count(f) == "Single argument":
-            warnings.warn(
-                "The function to be optimised should have a single argument",
-                category=RuntimeWarning,
-            )
-        if self.dimension > 1 and (check_argument_count(f) == "Single argument"):
-            f = partial(transform_func, fb=f)
+        # # step 1: signatute tuning
+        # if self.dimension > 1 and (check_argument_count(f) == "Single argument"):
+        #     warnings.warn(
+        #         "The function to be optimised should have a single argument",
+        #         category=RuntimeWarning,
+        #     )
+        #     f = partial(transform_func, fb=f)
+        # print("wrapping the function f")
+
         # step 2: flip check by the task
         # the first flip is to make the function minimisation
         if self.task == "maximisation":
