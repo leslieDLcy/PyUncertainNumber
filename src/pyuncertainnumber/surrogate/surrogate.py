@@ -98,8 +98,10 @@ class SurrogatePropagation:
     def level_2_meta_modelling(self, trained_surrogate):
         """Level-2 meta-modelling.
 
+        This step involves interval propagation accomplished by optimisation, therefore it takes some time to execute.
+
         note:
-            mapping between ɑ and y_low, ɑ and y_high
+            mapping between ɑ and y_low, ɑ and y_high. an IPM model can achieve the mapping using just one model.
         """
         from pyuncertainnumber import b2b
 
@@ -128,12 +130,30 @@ class SurrogatePropagation:
         return prob_proxy_input, y_lo, y_hi
         # with (ɑ, y_lo) and (ɑ, y_hi), train 2 level-2 surrogate models
 
-    def use_l2_get_response(self, meta_model_lo, meta_model_hi, n=1000_000):
+    def l2_get_response(
+        self, meta_model_lo=None, meta_model_hi=None, ipm_model=None, n=1000_000
+    ):
         """with l2 model, predict the vector of probability to get the quantile"""
 
+        if not (
+            (meta_model_lo is not None and meta_model_hi is not None)
+            or (ipm_model is not None)
+        ):
+            raise ValueError(
+                "You must provide either both meta_model_lo and meta_model_hi, or ipm_model."
+            )
+
+        # Xnew
         alpha_new_ = self.dependency.u_sample(n=n, random_state=self.random_state)
-        mean_lo = meta_model_lo(X_new=alpha_new_)
-        mean_hi = meta_model_hi(X_new=alpha_new_)
+
+        if ipm_model is not None:
+            mean_hi, mean_lo = ipm_model(
+                alpha_new_
+            )  # not technically mean_lo but reuse the name for convenience
+        else:
+            mean_lo = meta_model_lo(X_new=alpha_new_)
+            mean_hi = meta_model_hi(X_new=alpha_new_)
+
         q_l, _ = pba.get_ecdf(np.sort(mean_lo))
         q_r, _ = pba.get_ecdf(np.sort(mean_hi))
         response = Staircase(left=q_l, right=q_r)
