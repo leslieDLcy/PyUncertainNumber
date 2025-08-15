@@ -8,7 +8,7 @@ class BayesOpt:
     """Bayesian Optimisation class
 
     args:
-        f (callable): the target function to be optimised, should have a single argument
+        f (callable): the target function to be optimised, should have individual function signature. See notes.
 
         xc_bounds (dict): the bounds for the design space, e.g. {'x1': (0, 1), 'x2': (0, 1)}
 
@@ -28,6 +28,11 @@ class BayesOpt:
         If a string is provided, the parameter for the acquisition function can be passed as an additional
         argument to the class constructor. For example, for 'UCB', you can pass a `kappa` value, and for 'EI' or 'PI', you can pass an `xi` value.
         For low-level controls, if a callable function is provided, it should already be parameterised.
+
+        About the function signature of $f$, by default it should be expecting individual arguments in the form of $f(x_0, x_1, \ldots, x_n)$, often
+        one needs to write a wrapper function to unpack the input arguments when working with a black-box model, which typically has vectorisation calling signature.
+        Also, one can specify the `xc_bound` accordingly. When `EpistemicDomain` is used as a shortcut to specify the `xc_bound`, the keys will be automatically
+        mapped to the corresponding arguments of the function.
 
     example:
         >>> import numpy as np
