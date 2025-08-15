@@ -10,3 +10,5 @@ from .context import dependency
 from .pbox_abc import inspect_pbox
 from .utils import inspect_un
 from pyuncertainnumber.pba.ecdf import get_ecdf
+
+from .aggregation import stacking

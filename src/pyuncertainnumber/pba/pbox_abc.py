@@ -665,11 +665,14 @@ class Staircase(Pbox):
         alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
         return self.alpha_cut(alpha)
 
-    def discretise(self, n=None):
+    def discretise(self, n=None) -> Interval:
         """alpha-cut discretisation of the p-box without outward rounding
 
         args:
             n (int): number of steps to be used in the discretisation.
+
+        return:
+            vector Interval
         """
 
         if (n is None) or (n == Params.steps):

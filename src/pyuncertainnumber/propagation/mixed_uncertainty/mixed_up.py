@@ -39,11 +39,15 @@ def interval_monte_carlo(
 
     args:
         vars (list): a list of constructs
-        func (callable) : response function
+
+        func (callable) : response function. By default, iterable signature is expected.
+
         interval_strategy (str) :
             strategy for interval discretisation, options include {'direct', 'endpoints', 'subinterval'}
+
         n_sam (int):
             number of samples for each input
+
         dependency: dependency structure (e.g. vine copula or archimedean copula
 
     tip:

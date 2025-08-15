@@ -1,4 +1,7 @@
 import numpy as np
+
+from pyuncertainnumber import pba
+from pyuncertainnumber.pba.pbox_abc import Staircase
 from ..pba.dependency import Dependency
 from ..pba.distributions import JointDistribution
 
@@ -52,6 +55,7 @@ class SurrogatePropagation:
         N2=200,
         dependency: Dependency = None,
         auxiliary_input_distribution=None,
+        random_state=None,
     ):
         self.vars = vars
         self.f = f
@@ -64,6 +68,7 @@ class SurrogatePropagation:
             if auxiliary_input_distribution is None
             else auxiliary_input_distribution
         )
+        self.random_state = random_state
         ### add the level-1 and level-2 logic herein
         # self.level_1_meta_modelling()
         # self.level_2_meta_modelling()
@@ -73,7 +78,9 @@ class SurrogatePropagation:
         # Implement level-1 meta-modelling here
         from pyuncertainnumber.pba.intervals.number import interval_degenerate
 
-        alpha_l1 = self.dependency.u_sample(self.N1)  # (N1, d)
+        alpha_l1 = self.dependency.u_sample(
+            self.N1, random_state=self.random_state
+        )  # (N1, d)
 
         X_tilda_input = []
         for i, v in enumerate(self.auxiliary_input_distribution):
@@ -81,14 +88,14 @@ class SurrogatePropagation:
             X_tilda_input.append(arr)
         X_tilda_input = np.array(X_tilda_input).T  # (N1, d)
 
-        # get real y_obs
-        y_tilda_output = self.f(X_tilda_input)
+        y_tilda_output = self.f(X_tilda_input)  # get real y_obs
 
         return X_tilda_input, y_tilda_output
+
         ### to train a level-1 surrogate model ###
         # self.l1_model = self.surrogate_model.fit(X_tilda_input, y_tilda_output)
 
-    def level_2_meta_modelling(self):
+    def level_2_meta_modelling(self, trained_surrogate):
         """Level-2 meta-modelling.
 
         note:
@@ -96,16 +103,10 @@ class SurrogatePropagation:
         """
         from pyuncertainnumber import b2b
 
-        # Implement level-2 meta-modelling here
         ndim = len(self.vars)
-        # TODO: dependency using JointDistribution and vector alpha to be used
-        from scipy.stats import qmc
-
-        sampler = qmc.LatinHypercube(d=ndim)
-        prob_proxy_input = sampler.random(n=self.N2)
-
-        # assuming independence of input p-boxes
-
+        prob_proxy_input = self.dependency.u_sample(
+            self.N2, random_state=self.random_state
+        )  # (N2, d)
         y_lo = np.zeros(len(prob_proxy_input))
         y_hi = np.zeros(len(prob_proxy_input))
 
@@ -113,18 +114,27 @@ class SurrogatePropagation:
             x_domain = [
                 v.alpha_cut(a) for v, a in zip(self.vars, row)
             ]  # yield a list of intervals
-            # TODO: double check the calling signature of level1-surrogate model and what `b2b` wants
+            # TODO: fix the issue of being too slow when using surrogate model for optimisation
             response_y_itvl = b2b(
-                vars=x_domain, func=self.l1_model, interval_strategy="ga"
+                vars=x_domain,
+                func=self.f,  # temporarily use true DGM to replace surrogate
+                # func=trained_surrogate,
+                interval_strategy="ga",
             )
 
             y_lo[i] = response_y_itvl.lo
             y_hi[i] = response_y_itvl.hi
 
+        return prob_proxy_input, y_lo, y_hi
         # with (ɑ, y_lo) and (ɑ, y_hi), train 2 level-2 surrogate models
 
-    def use_l2_get_response(self):
+    def use_l2_get_response(self, meta_model_lo, meta_model_hi, n=1000_000):
         """with l2 model, predict the vector of probability to get the quantile"""
 
-        # return response_p_box
-        pass
+        alpha_new_ = self.dependency.u_sample(n=n, random_state=self.random_state)
+        mean_lo = meta_model_lo(X_new=alpha_new_)
+        mean_hi = meta_model_hi(X_new=alpha_new_)
+        q_l, _ = pba.get_ecdf(np.sort(mean_lo))
+        q_r, _ = pba.get_ecdf(np.sort(mean_hi))
+        response = Staircase(left=q_l, right=q_r)
+        return response

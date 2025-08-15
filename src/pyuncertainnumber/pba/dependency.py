@@ -144,9 +144,10 @@ class Dependency:
     def cdf(self, u):
         return self._copula.cdf(u)
 
-    def u_sample(self, n: int):
+    def u_sample(self, n: int, random_state=None):
         """draws n samples in the U space (unit hypercube)"""
-        return self._copula.rvs(n)
+        rd = 42 if random_state is None else random_state
+        return self._copula.rvs(n, random_state=rd)
 
     def display(self, style="3d", ax=None):
         """show the PDF in the u space"""
