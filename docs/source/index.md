@@ -26,6 +26,14 @@ uncertainty propagation.ipynb
 ```
 
 ```{toctree}
+:caption: Examples
+:maxdepth: 2
+:hidden:
+
+examples/index
+```
+
+```{toctree}
 :caption: API references
 :hidden:
 
