@@ -153,9 +153,12 @@ because it has to import UN which creates circular import issue.
 
 
 def make_vec_interval(vec):
-    """parse into a vector interval
+    """parse an array-like structure into a vector interval
 
-    Example:
+    For most part, it works same to `intervalise`, except that this function
+    can also handle a list of UN objects.
+
+    example:
         >>> a, b = pba.I(1, 2), pba.I(3, 4)
         >>> make_vec_interval([a, b])
         Interval([1, 3], [2, 4])

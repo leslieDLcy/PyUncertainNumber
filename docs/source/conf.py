@@ -23,6 +23,7 @@ copyright = f"{datetime.datetime.now().year}, (Leslie) Yu Chen"
 extensions = [
     "myst_nb",
     "sphinx_prompt",
+    "sphinx_design",
     # "myst_parser",
     # 'sphinx.ext.autodoc',
     "autoapi.extension",
@@ -75,20 +76,8 @@ html_logo = "_static/UNlogo3.png"
 myst_enable_extensions = [
     "dollarmath",
     "html_admonition",
+    "colon_fence",
 ]
-
-### LaTeX settings ###
-# f = open("latex-styling.tex", "r+")
-# PREAMBLE = f.read()
-
-# latex_elements = {
-#     # The paper size ('letterpaper' or 'a4paper').
-#     #'papersize': 'a4paper',
-#     # The font size ('10pt', '11pt' or '12pt').
-#     #'pointsize': '10pt',
-#     # Additional stuff for the LaTeX preamble.
-#     "preamble": PREAMBLE
-# }
 
 latex_elements = {
     # Additional stuff for the LaTeX preamble.

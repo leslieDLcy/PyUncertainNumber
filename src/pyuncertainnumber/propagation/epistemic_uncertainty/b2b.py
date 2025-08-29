@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from ...pba.intervals import Interval
 
 
-# TODO: integrate GA and BO implementations
 # TODO: add discussion of `func` signature (args, collection, matrix) in the notes section
 def b2b(
     vars: Interval | list[Interval],
@@ -32,7 +31,7 @@ def b2b(
     Optimisation to the rescue and two of them particularly: GA and BO.
 
     args:
-        vars (Interval): a vector Interval or a list or tuple of scalar Interval
+        vars (Interval): a vector Interval or a list or tuple of scalar Intervals, or an EpistemicDomain object;
 
         func (callable): performance or response function or a black-box model as in subprocess.
             Expect 2D inputs therefore `func` shall have the matrix signature. See Notes for additional details.
@@ -45,7 +44,7 @@ def b2b(
 
             - 'bo': bayesian optimisation
 
-            - 'diret': direct apply function to the input intervals (the default)
+            - 'direct': directly apply function to the input intervals (the default)
 
         style (str):
             the style only used for subinterval propagation, including {''direct'', ''endpoints''}.
@@ -145,12 +144,12 @@ def b2b(
             return func(vec_itvl)
         case _:
             raise NotImplementedError(
-                f"Method {interval_strategy} is not supported yet."
+                f"Method {interval_strategy} is not supported yet. Supported methods are: {'endpoints', 'subinterval', 'ga', 'bo', 'direct'}"
             )
 
 
 def endpoints(vec_itvl: Interval, func) -> Interval:
-    """Implementation of endpoints method
+    """Implementation of endpoints method, a.k.a vertex method.
 
     args:
         vec_itvl (Interval): a vector type Interval object

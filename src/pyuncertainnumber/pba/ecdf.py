@@ -132,7 +132,7 @@ def get_ecdf(s, w=None, display=False) -> tuple:
     """compute the weighted ecdf from (precise) sample data
 
     args:
-        s (array-like) : precise sample data
+        s (array-like) : 1 dimensional precise sample data
         w (array-like) : weights
 
     note:
@@ -141,6 +141,10 @@ def get_ecdf(s, w=None, display=False) -> tuple:
     return:
         ecdf in the form of a tuple of q and p
     """
+
+    s = np.array(s)
+    if s.ndim != 1:
+        s = np.squeeze(s)
 
     if w is None:
         # weights

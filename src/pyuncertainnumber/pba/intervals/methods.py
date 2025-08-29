@@ -935,3 +935,22 @@ def cosh(x: Interval):
 
 def tanh_deriv(x: Interval):
     return (1 / cosh(x)) ** 2
+
+
+def unpack(x: Interval) -> list[Interval]:
+    """unpack an array-like Interval object into a list of item intervals
+
+    return:
+        a list of scalar Interval objects
+
+    example:
+        >>> x = Interval(lo=([0, 1]), hi=([1, 2]))
+        >>> unpack(x)
+        [Interval(0, 1), Interval(1, 2)]
+    """
+
+    if x.is_scalar:
+        raise ValueError("a scalar interval cannot be unpacked.")
+
+    if len(x) >= 0:
+        return [item for item in x]
