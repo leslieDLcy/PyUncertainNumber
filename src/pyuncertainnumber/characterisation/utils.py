@@ -259,7 +259,7 @@ def get_concise_repr(a_dict):
             "pbox_parameters",
             "bounds",
             "masses",
-            "_unit",
+            "_units",
             "_physical_quantity",
             "_skip_construct_init",
             "_UnitsRep",

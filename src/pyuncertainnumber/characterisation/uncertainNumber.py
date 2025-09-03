@@ -239,7 +239,8 @@ class UncertainNumber:
 
         # fancy string formatting of unit
         u_str = f", physical_quantity={self._physical_quantity:~P}"
-        field_str += u_str
+        if not self._physical_quantity.dimensionless:
+            field_str += u_str
 
         return f"{self.__class__.__name__}({field_str})"
 
