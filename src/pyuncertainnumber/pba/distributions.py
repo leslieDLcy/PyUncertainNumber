@@ -14,6 +14,7 @@ from statsmodels.distributions.copula.api import CopulaDistribution
 from .pbox_abc import Staircase
 from .ecdf import get_ecdf
 from numbers import Number
+from .mixins import NominalValueMixin
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
@@ -25,7 +26,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class Distribution:
+class Distribution(NominalValueMixin):
     """Two signature are currentlly supported, either a parametric specification or from a nonparametric empirical data set
 
     note:
@@ -155,14 +156,13 @@ class Distribution:
         """return the cumulative distribution function (cdf)"""
         return self._dist.cdf(Params.p_values)
 
+    def _compute_nominal_value(self):
+        return np.round(self._naked_value, 3)
+
     @property
     def dist(self):
         """the underlying sps.dist object"""
         return self._dist
-
-    @property
-    def naked_value(self):
-        return np.round(self._naked_value, 3)
 
     @property
     def low(self):

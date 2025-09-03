@@ -3,7 +3,9 @@ from .intervals.methods import intervalise
 from .pbox_parametric import *
 from .pbox_free import *
 from .dss import DempsterShafer
+from .dss import DempsterShafer as DSS
 from .distributions import Distribution as D
+from .distributions import Distribution
 from .distributions import JointDistribution, ECDF
 from .dependency import Dependency
 from .context import dependency
