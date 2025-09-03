@@ -36,6 +36,7 @@ def hedge_interpret(hedge: str, return_type="interval") -> I | Pbox:
 
     example:
         >>> hedge_interpret("about 200", return_type="pbox")
+        >>> hedge_interpret("200.00", return_type="pbox")
     """
 
     assert isinstance(hedge, str), "hedge must be a string"
@@ -68,8 +69,13 @@ def hedge_interpret(hedge: str, return_type="interval") -> I | Pbox:
         match kwd:
             case "exactly":
                 return I.from_meanform(x, 10 ** (-(d + 1)))
-            case "":
-                return I.from_meanform(x, 0.5 * 10 ** (-d))
+            case "":  # to decipher a number
+                from ..characterisation.utils import sgnumber
+
+                # old Leslie implementation due to different interpretation of the confused
+                # definition of "d" in the paper
+                # return I.from_meanform(x, 0.5 * 10 ** (-d))
+                return I(*sgnumber(hedge))
             case "about":
                 return I.from_meanform(x, 2 * 10 ** (-d))
             case "around":

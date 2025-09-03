@@ -597,7 +597,7 @@ def constructUN(func):
 
 
 def I(*args: str | list[Number] | Interval) -> UncertainNumber:
-    """a shortcut for the interval-type UN object"""
+    """a shortcut to construct the interval-type UN object"""
     return UncertainNumber.fromConstruct(wc_scalar_interval_feature(*args))
 
 
