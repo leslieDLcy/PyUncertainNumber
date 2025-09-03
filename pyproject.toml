@@ -12,6 +12,7 @@ dependencies = [
   "matplotlib",
   "numpy",
   "pandas",
+  "seaborn",
   "Pint",
   "pymongo",
   "pymoo",
