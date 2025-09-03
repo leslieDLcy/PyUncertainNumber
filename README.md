@@ -38,7 +38,7 @@ import pyuncertainnumber as pun
 e = UN(
     name='elas_modulus', 
     symbol='E', 
-    units='Pa', 
+    unit='Pa', 
     essence='pbox', 
     distribution_parameters=['gaussian', ([0,12],[1,4])])
 
