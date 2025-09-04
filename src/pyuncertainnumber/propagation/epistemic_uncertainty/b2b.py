@@ -31,7 +31,7 @@ def b2b(
     Optimisation to the rescue and two of them particularly: GA and BO.
 
     args:
-        vars (Interval): a vector Interval or a list or tuple of scalar Intervals, or an EpistemicDomain object;
+        vars (Interval): a vector Interval or a list or tuple of scalar Intervals, or an EpistemicDomain object, or a scalar Interval;
 
         func (callable): performance or response function or a black-box model as in subprocess.
             Expect 2D inputs therefore `func` shall have the matrix signature. See Notes for additional details.
@@ -45,6 +45,8 @@ def b2b(
             - 'bo': bayesian optimisation
 
             - 'direct': directly apply function to the input intervals (the default)
+
+            - 'subinterval': apply function to subintervals
 
         style (str):
             the style only used for subinterval propagation, including {''direct'', ''endpoints''}.
@@ -106,8 +108,16 @@ def b2b(
         >>> bar_individual(a, b)
         [38.0, 156.0]
     """
+    from ...pba.intervals.intervalOperators import wc_scalar_interval
 
-    vec_itvl = make_vec_interval(vars)
+    try:
+        vec_itvl = make_vec_interval(vars)
+    except Exception as e:
+        try:
+            vec_itvl = wc_scalar_interval(vars)
+        except Exception as e:
+            raise ValueError(f"Error in making  interval: {e}")
+
     match interval_strategy:
         case "endpoints":
             return endpoints(vec_itvl, func)
