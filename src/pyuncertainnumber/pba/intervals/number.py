@@ -17,7 +17,7 @@ import numpy
 from numpy import ndarray, asarray, stack, transpose, zeros
 import matplotlib.pyplot as plt
 from .utils import safe_asarray
-
+from ..mixins import NominalValueMixin
 
 from .arithmetic import multiply, divide
 
@@ -76,7 +76,7 @@ def show(x: Interval) -> str:
         return f"{x.val}"
 
 
-class Interval:
+class Interval(NominalValueMixin):
     """Interval is the main class"""
 
     def __init__(
@@ -184,6 +184,9 @@ class Interval:
             return True
         return False
 
+    def _compute_nominal_value(self):
+        return self.mid
+
     @property
     def lo(self) -> Union[ndarray, float]:
         return self._lo
@@ -255,10 +258,6 @@ class Interval:
     @property
     def ndim(self):
         return len(self.__shape)
-
-    @property
-    def naked_value(self):
-        return self.mid
 
     # * -------------- ARITHMETIC -------------- *#
     # unary operators #

@@ -7,6 +7,7 @@ from .intervals.intervalOperators import make_vec_interval
 from collections import namedtuple
 import pyuncertainnumber.pba.aggregation as agg
 from .intervals import Interval
+from .mixins import NominalValueMixin
 
 dempstershafer_element = namedtuple("dempstershafer_element", ["interval", "mass"])
 """ Named tuple for Dempster-Shafer elements.
@@ -16,7 +17,7 @@ note:
 """
 
 
-class DempsterShafer:
+class DempsterShafer(NominalValueMixin):
     """Class for Dempester-Shafer structures.
 
     args:
@@ -40,6 +41,9 @@ class DempsterShafer:
     def __repr__(self):
         return f"Dempster Shafer structure with {len(self._intervals)} focal elements"
 
+    def _compute_nominal_value(self):
+        return np.round(np.sum(self._intervals.mid * self._masses), 3)
+
     @property
     def structures(self):
         return self._create_DSstructure()
@@ -57,10 +61,6 @@ class DempsterShafer:
     @property
     def masses(self):
         return self._masses
-
-    @property
-    def naked_value(self):
-        return np.round(np.sum(self._intervals.mid * self._masses), 3)
 
     def plot(self, style="box", ax=None, **kwargs):
         """for box type transform dss into a pbox and plot"""
