@@ -61,7 +61,7 @@ class UncertainNumber:
         - `intervals`;
         - `distribution_parameters`: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
         - `pbox_initialisation`: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
-        -  naked_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
+        -  nominal_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
 
     Example:
         >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", intervals=[1, 2])
@@ -83,7 +83,7 @@ class UncertainNumber:
         pbox_parameters=None,
         hedge=None,
         _construct=None,
-        naked_value=1.0,
+        nominal_value=1.0,
         p_flag=True,
         _skip_construct_init=False,
         measurand=None,
@@ -110,7 +110,7 @@ class UncertainNumber:
         self.pbox_parameters = pbox_parameters
         self.hedge = hedge
         self._construct = _construct
-        self.naked_value = naked_value
+        self.nominal_value = nominal_value
         self.p_flag = p_flag
         self._skip_construct_init = _skip_construct_init
         self.measurand = measurand
@@ -127,7 +127,7 @@ class UncertainNumber:
         self._samples = _samples
         self.__init_check()
         self.__init_construct()
-        self.naked_value = self._construct.naked_value
+        self.nominal_value = self._construct.nominal_value
         self.unit = unit
 
     # *  ---------------------more on initialisation---------------------*#
@@ -187,10 +187,10 @@ class UncertainNumber:
                 self.distribution_parameters[0],
                 self.distribution_parameters[1],
             )
-            self.naked_value = self._construct.mean().midpoint()
+            self.nominal_value = self._construct.mean().midpoint()
 
     def _update_physical_quantity(self):
-        self._physical_quantity = self.Q_(self.naked_value, self.unit)
+        self._physical_quantity = self.Q_(self.nominal_value, self.unit)
 
     @staticmethod
     def match_pbox(keyword, parameters):
@@ -239,7 +239,8 @@ class UncertainNumber:
 
         # fancy string formatting of unit
         u_str = f", physical_quantity={self._physical_quantity:~P}"
-        field_str += u_str
+        if not self._physical_quantity.dimensionless:
+            field_str += u_str
 
         return f"{self.__class__.__name__}({field_str})"
 
@@ -256,7 +257,7 @@ class UncertainNumber:
                     case "pbox":
                         return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}"
             case "one-number":
-                return f"This is an {self.essence}-type Uncertain Number whose naked value is {self.naked_value:.2f}"
+                return f"This is an {self.essence}-type Uncertain Number whose naked value is {self.nominal_value:.2f}"
             case "concise":
                 return self.__repr__()
             case "range":
@@ -597,7 +598,7 @@ def constructUN(func):
 
 
 def I(*args: str | list[Number] | Interval) -> UncertainNumber:
-    """a shortcut for the interval-type UN object"""
+    """a shortcut to construct the interval-type UN object"""
     return UncertainNumber.fromConstruct(wc_scalar_interval_feature(*args))
 
 

@@ -6,6 +6,7 @@ import itertools
 from ...pba.pbox_abc import convert_pbox
 from ...pba.aggregation import stacking
 from ..epistemic_uncertainty.b2b import b2b
+from ...pba.dependency import Dependency
 
 if TYPE_CHECKING:
     from ...pba.intervals import Interval
@@ -26,24 +27,28 @@ note:
 """
 
 
-# TODO: add vine copula
 def interval_monte_carlo(
     vars: list[Interval | Distribution | Pbox],
     func: callable,
     interval_strategy,
-    n_sam,
-    dependency=None,
+    n_sam: int,
+    dependency: Dependency = None,
+    random_state=None,
     **kwargs,
 ) -> Pbox:
     """Interval Monte Carlo for propagation of pbox
 
     args:
         vars (list): a list of constructs
-        func (callable) : response function
+
+        func (callable) : response function. By default, iterable signature is expected.
+
         interval_strategy (str) :
             strategy for interval discretisation, options include {'direct', 'endpoints', 'subinterval'}
+
         n_sam (int):
             number of samples for each input
+
         dependency: dependency structure (e.g. vine copula or archimedean copula
 
     tip:
@@ -67,17 +72,35 @@ def interval_monte_carlo(
         >>> ...       n_sam=20,
         >>> ...       interval_strategy='direct')
     """
-    from scipy.stats import qmc
 
-    p_vars = [convert_pbox(v) for v in vars]
+    n_sam = int(n_sam) if isinstance(n_sam, float) else n_sam
 
-    # this change when there's specified dependency structure
-    alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
-    itvs = [v.alpha_cut(alpha) for v in p_vars]
-
-    # TODO add parallel logic herein
     b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
-    container = [b2b_f(_item) for _item in itertools.product(*itvs)]
+
+    if dependency is None:
+        ndim = len(vars)
+        dependency = Dependency(family="independence", k_dim=ndim)
+        """old code for independent case only, which is driven by a cartesian product implementation"""
+        # from scipy.stats import qmc
+
+        # p_vars = [convert_pbox(v) for v in vars]
+
+        # # this change when there's specified dependency structure
+        # alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
+        # itvs = [v.alpha_cut(alpha) for v in p_vars]
+        # container = [b2b_f(_item) for _item in itertools.product(*itvs)]
+
+    prob_proxy_input = dependency.u_sample(n_sam, random_state=random_state)
+
+    container = []
+    for i, row in enumerate(prob_proxy_input):
+        x_domain = [
+            v.alpha_cut(a) for v, a in zip(vars, row)
+        ]  # yield a list of intervals
+
+        response_y_itvl = b2b_f(x_domain)
+        container.append(response_y_itvl)
+
     return stacking(container)
 
 
@@ -90,19 +113,24 @@ def slicing(
     dependency=None,
     **kwargs,
 ) -> Pbox:
-    """slicing algoritm for rigorous propagation of pbox
+    """classic slicing algoritm for rigorous propagation of pbox
 
     args:
         vars (list): list of constructs
+
         func (callable) : response function
+
         interval_strategy (str) : strategy for interval discretisation, options include {'direct', 'endpoints', 'subinterval'}
+
         n_slices: number of slices for each input
+
         outer_discretisation (bool): whether to use outer discretisation for pbox.
             By default is True for rigorous propagation; however, alpha-cut style interval are also supported.
-        dependency: dependency structure (e.g. vine copula or archimedean copula
+
+        dependency: dependency structure (e.g. vine copula or archimedean copula).
 
     tip:
-        Independence assumption by now. Dependency structure is at beta developement now.
+        Merely independence assumption is supported by now. Other dependency structures are at beta developement now.
 
     note:
         When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,

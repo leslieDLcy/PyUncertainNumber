@@ -19,6 +19,8 @@ from .utils import (
 import logging
 from .operation import vectorized_cartesian_op
 from .context import get_current_dependency
+from .mixins import NominalValueMixin
+
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
@@ -174,7 +176,7 @@ def frechet_pbox_mul(x, y):
         return classic_frechet_pbox(x, y, operator.mul)
 
 
-class Pbox(ABC):
+class Pbox(NominalValueMixin, ABC):
     """a base class for Pbox
 
     danger:
@@ -232,6 +234,9 @@ class Pbox(ABC):
             self.right
         ), "Length of lower and upper bounds is not consistent"
 
+    def _compute_nominal_value(self):
+        return np.round(self.mean.mid, 3)
+
     @property
     def p_values(self):
         return self._pvalues
@@ -275,10 +280,6 @@ class Pbox(ABC):
     @property
     def median(self):
         return I(np.median(self.left), np.median(self.right))
-
-    @property
-    def naked_value(self):
-        return np.round(self.mean.mid, 3)
 
     @property
     def area_metric(self):
@@ -659,16 +660,20 @@ class Staircase(Pbox):
         return I(lo=self.left[ind], hi=self.right[ind])
 
     def sample(self, n_sam):
+        """LHS sampling by default"""
         from scipy.stats import qmc
 
         alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
         return self.alpha_cut(alpha)
 
-    def discretise(self, n=None):
+    def discretise(self, n=None) -> Interval:
         """alpha-cut discretisation of the p-box without outward rounding
 
         args:
             n (int): number of steps to be used in the discretisation.
+
+        return:
+            vector Interval
         """
 
         if (n is None) or (n == Params.steps):

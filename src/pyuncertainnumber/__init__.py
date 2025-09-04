@@ -28,6 +28,10 @@ from pyuncertainnumber.pba.cbox import infer_cbox, infer_predictive_distribution
 # * --------------------- DempsterShafer ---------------------*#
 from pyuncertainnumber.pba.dss import dempstershafer_element, DempsterShafer
 
+
+# * --------------------- Dependency ---------------------*#
+from pyuncertainnumber.pba.dependency import Dependency
+
 # * ---------------------  aggregation ---------------------*#
 from pyuncertainnumber.pba.aggregation import *
 

@@ -11,14 +11,13 @@
 # from intervals.methods import (lo,hi,width,rad,mag,straddlezero,isinterval)
 
 from __future__ import annotations
-from typing import Sequence, Sized, Iterable, Optional, Any, Tuple, Union
+from typing import Optional, Any, Union
 import numpy as np
 import numpy
-from numpy import ndarray, asarray, stack, transpose, ascontiguousarray, zeros
+from numpy import ndarray, asarray, stack, transpose, zeros
 import matplotlib.pyplot as plt
 from .utils import safe_asarray
-
-# float32=numpy.float32
+from ..mixins import NominalValueMixin
 
 from .arithmetic import multiply, divide
 
@@ -77,7 +76,7 @@ def show(x: Interval) -> str:
         return f"{x.val}"
 
 
-class Interval:
+class Interval(NominalValueMixin):
     """Interval is the main class"""
 
     def __init__(
@@ -179,18 +178,25 @@ class Interval:
         self.plot()
         plt.show()
 
+    def is_degenerate(self) -> bool:
+        """Check if the interval is degenerate (i.e., has zero width)."""
+        if np.all(self._lo == self._hi):
+            return True
+        return False
+
+    def _compute_nominal_value(self):
+        return self.mid
+
     @property
     def lo(self) -> Union[ndarray, float]:
         return self._lo
 
     # if len(self.shape)==0: return self._lo
     # return self._lo # return transpose(transpose(self.__val)[0]) # from shape (3,7,2) to (2,7,3) to (3,7)
+
     @property
     def hi(self) -> Union[ndarray, float]:
         return self._hi
-
-    # if len(self.shape)==0: return self._hi
-    # return self._hi # return transpose(transpose(self.__val)[1])
 
     @property
     def left(self):
@@ -221,6 +227,7 @@ class Interval:
 
     @property
     def val(self):
+        """seemingly equivalent to `self.to_numpy()`"""
         if self.unsized:
             return asarray([self._lo, self._hi], dtype=float)
         else:
@@ -228,7 +235,21 @@ class Interval:
 
     @property
     def scalar(self):
+        """Check if the interval is wide sense scalar
+
+        note:
+            wide sense: I(1,2) and I([1],[2]) are both scalars
+        """
         return (self.shape == ()) | (self.shape == (1,))
+
+    @property
+    def is_scalar(self):
+        """Check if the interval is a strict-sense scalar
+
+        note:
+            strict sense: I(1,2) is a scalar, but I([1],[2]) is not
+        """
+        return self.shape == ()
 
     @property
     def shape(self):
@@ -237,10 +258,6 @@ class Interval:
     @property
     def ndim(self):
         return len(self.__shape)
-
-    @property
-    def naked_value(self):
-        return self.mid
 
     # * -------------- ARITHMETIC -------------- *#
     # unary operators #
@@ -502,6 +519,12 @@ class LightweightInterval(Interval):
 def is_Interval(x: Any) -> bool:
     x_class_name = x.__class__.__name__
     return x_class_name == "Interval"
+
+
+def interval_degenerate(vec_interval):
+    if vec_interval.is_degenerate():
+        return vec_interval.lo
+    return vec_interval
 
 
 def lo(x: Interval) -> Union[float, ndarray]:
