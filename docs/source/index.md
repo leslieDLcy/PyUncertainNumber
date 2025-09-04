@@ -20,9 +20,10 @@ interval_analysis
 :caption: Tutorials
 :hidden:
 
-uncertainty characterisation.ipynb
-uncertainty aggregation.ipynb
-uncertainty propagation.ipynb
+getting_started.ipynb
+uncertainty_characterisation.ipynb
+uncertainty_aggregation.ipynb
+uncertainty_propagation.ipynb
 ```
 
 ```{toctree}

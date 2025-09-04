@@ -72,6 +72,7 @@ html_static_path = ["_static"]
 html_theme = "furo"
 html_title = " "
 html_logo = "_static/UNlogo3.png"
+html_css_files = ["custom.css"]  # make sure this is loaded
 
 myst_enable_extensions = [
     "dollarmath",
