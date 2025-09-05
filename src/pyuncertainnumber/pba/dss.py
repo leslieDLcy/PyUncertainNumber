@@ -21,9 +21,10 @@ class DempsterShafer(NominalValueMixin):
     """Class for Dempester-Shafer structures.
 
     args:
-    # TODO: restructure the constructor needed
-        - the `intervals` argument accepts wildcard vector intervals, vec-Interval; list of scalar intervals; list of list pairs; or 2D array;
-        - masses (array-like): probability masses
+
+        intervals: expect wildcard vector intervals, vec-Interval; list of scalar intervals; list of list pairs; or 2D array;
+
+        masses (array-like): probability masses
 
     example:
         >>> from pyuncertainnumber import pba
@@ -36,9 +37,13 @@ class DempsterShafer(NominalValueMixin):
         Dempster-Shafer structures are also called belief structures or evidence structures,
         and it can be converted to p-boxes.
 
-        .. image:: _static/dss_pbox_illustration.png
-            :alt: pbox and dss illustration
+
+        .. figure:: /_static/dss_pbox_illustration.png
+            :alt: p-box and DSS illustration
             :align: center
+            :width: 80%
+
+            P-box and Dempster Shafer structure illustration.
     """
 
     def __init__(
