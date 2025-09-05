@@ -22,8 +22,8 @@ class DempsterShafer(NominalValueMixin):
 
     args:
     # TODO: restructure the constructor needed
-        - the `intervals` argument accepts wildcard vector intervals, or list of Intervals, or nested list or {list of list pairs or vec Interval};
-        - masses (list): probability masses
+        - the `intervals` argument accepts wildcard vector intervals, vec-Interval; list of scalar intervals; list of list pairs; or 2D array;
+        - masses (array-like): probability masses
 
     example:
         >>> from pyuncertainnumber import pba
@@ -32,6 +32,13 @@ class DempsterShafer(NominalValueMixin):
         [dempstershafer_element(interval=[1.0,5.0], mass=0.5),
          dempstershafer_element(interval=[3.0,6.0], mass=0.5)]
 
+    note:
+        Dempster-Shafer structures are also called belief structures or evidence structures,
+        and it can be converted to p-boxes.
+
+        .. image:: _static/dss_pbox_illustration.png
+            :alt: pbox and dss illustration
+            :align: center
     """
 
     def __init__(
@@ -72,10 +79,14 @@ class DempsterShafer(NominalValueMixin):
     def masses(self):
         return self._masses
 
-    def plot(self, style="box", ax=None, **kwargs):
+    def plot(self, style="pbox", ax=None, **kwargs):
         """for box type transform dss into a pbox and plot"""
+        if ax is None:
+            fig, ax = plt.subplots()
         match style:
-            case "box":
+            case "raw" | "box":
+                plot_dss_raw(self.intervals.to_numpy(), self.masses, ax=ax, **kwargs)
+            case "pbox":
                 dss_pbox = self.to_pbox()
                 dss_pbox.plot(ax=ax, **kwargs)
             case "interval":
@@ -104,17 +115,54 @@ class DempsterShafer(NominalValueMixin):
         return cls(intervals, masses)
 
 
+def plot_dss_raw(intervals, masses, ax=None):
+    """plot the Dempster-Shafer structures in a raw (boxes)form
+
+    args:
+        intervals: vec-Interval; list of scalar intervals; list of list pairs; or 2D array;
+        masses (array-like): masses of the intervals
+        ax: matplotlib axis object
+    """
+    from matplotlib.patches import Rectangle
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    # bottoms of each slab
+    bottoms = np.concatenate(([0], np.cumsum(masses)[:-1]))
+
+    for (a, b), bottom, h in zip(intervals, bottoms, masses):
+        rect = Rectangle(
+            (a, bottom),
+            b - a,
+            h,
+            facecolor="lightgray",
+            edgecolor="red",
+            linewidth=1,
+            alpha=0.5,
+        )
+        ax.add_patch(rect)
+
+    # autoscale to rectangle data
+    ax.autoscale_view()
+
+    # add relative margins (x=0.05 = 5%, y=0.2 = 20%)
+    ax.margins(x=0.05, y=0.05)
+
+    ax.set_xlabel("$X$")
+
+
 def plot_DS_structure(
-    vec_interval: list[Interval],
+    vec_interval: list[Interval] | np.ndarray | list[list],
     masses=None,
     offset=0.3,
     ax=None,
     **kwargs,
 ):
-    """plot the intervals in a vectorised form
+    """plot the Dempster-Shafer structures in intervals form
 
     args:
-        vec_interval: vectorised interval objects
+        vec_interval: vec-Interval; list of scalar intervals; list of list pairs; or 2D array;
         masses: masses of the intervals
         offset: offset for display the masses next to the intervals
     """
@@ -145,7 +193,7 @@ def plot_DS_structure_with_labels(
     """temp use: plot the intervals in a vectorised form
 
     args:
-        vec_interval: vectorised interval objects
+        vec_interval: vec-Interval; list of scalar intervals; list of list pairs; or 2D array;
         masses: masses of the intervals
         offset: offset for display the masses next to the intervals
     """
