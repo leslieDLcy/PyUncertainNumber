@@ -24,6 +24,14 @@ class DempsterShafer(NominalValueMixin):
     # TODO: restructure the constructor needed
         - the `intervals` argument accepts wildcard vector intervals, or list of Intervals, or nested list or {list of list pairs or vec Interval};
         - masses (list): probability masses
+
+    example:
+        >>> from pyuncertainnumber import pba
+        >>> dss = pba.DempsterShafer(intervals=[[1,5], [3,6]], masses=[0.5, 0.5])
+        >>> dss.structures
+        [dempstershafer_element(interval=[1.0,5.0], mass=0.5),
+         dempstershafer_element(interval=[3.0,6.0], mass=0.5)]
+
     """
 
     def __init__(
