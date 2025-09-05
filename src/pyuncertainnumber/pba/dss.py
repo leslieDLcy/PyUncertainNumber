@@ -22,12 +22,14 @@ class DempsterShafer(NominalValueMixin):
 
     args:
     # TODO: restructure the constructor needed
-        - the `intervals` argument accepts wildcard vector intervals {list of list pairs or vec Interval};
+        - the `intervals` argument accepts wildcard vector intervals, or list of Intervals, or nested list or {list of list pairs or vec Interval};
         - masses (list): probability masses
     """
 
     def __init__(
-        self, intervals: Interval | list[list] | np.ndarray, masses: list[float]
+        self,
+        intervals: Interval | list[list] | list[Interval] | np.ndarray,
+        masses: list[float],
     ):
 
         self._intervals = make_vec_interval(intervals)
