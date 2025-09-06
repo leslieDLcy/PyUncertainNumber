@@ -16,7 +16,7 @@ from ..decorator import exposeUN
 
 
 __all__ = [
-    "known_constraints",
+    "known_properties",
     "min_max",
     "min_max_mean",
     "min_mean",
@@ -182,8 +182,8 @@ def known_properties(
         It's also possible to directly call a function given the known information, such as ``pun.mean_std(mean=1, std=0.5)``.
 
     example:
-        >>> from pyuncertainnumber.pba import known_constraints
-        >>> known_constraints(
+        >>> from pyuncertainnumber.pba import known_properties
+        >>> known_properties(
         ...     maximum = 2,
         ...     mean = 1,
         ...     var = 0.25,
