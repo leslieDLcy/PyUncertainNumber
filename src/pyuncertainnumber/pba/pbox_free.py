@@ -152,7 +152,7 @@ def d_alpha(n, alpha):
 # * ---------top level func for known statistical properties------*#
 
 
-def known_constraints(
+def known_properties(
     maximum=None,
     mean=None,
     median=None,
@@ -163,7 +163,7 @@ def known_constraints(
     var=None,
     **kwargs,
 ) -> UncertainNumber:
-    """Construct a uncertain number given known statistical properties specified as constraints.
+    """Construct a uncertain number given known statistical properties served as constraints.
 
     args:
         maximum (number): maximum value of the variable
@@ -243,7 +243,7 @@ def known_constraints(
 
 
 def handle_default(**kwargs):
-    return f"No match. Received: {kwargs}"
+    return f"Combination not supported. Received: {kwargs}"
 
 
 # * --------------------- supporting functions---------------------*#
