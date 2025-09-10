@@ -40,7 +40,7 @@ from .core import makeUN
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
 
-""" Here we define the statistical inference functions from data for the UncertainNumber class. """
+""" statistical inference functions from data for the UncertainNumber class. """
 
 
 @makeUN
@@ -261,6 +261,14 @@ def MMgumbel(x):  # **
     return gumbel_r(loc, scale)
 
 
+@makedist("gumbel")
+def mm_gumbel(mean, std):
+    """from given moments, return a gumbel distribution"""
+    scale = np.sqrt(6) / np.pi * std
+    loc = mean - np.euler_gamma * scale
+    return gumbel_r(loc, scale)
+
+
 @makedist("extremevalue")
 def MMextremevalue(x):
     return gumbel_r(
@@ -268,9 +276,92 @@ def MMextremevalue(x):
     )  # **
 
 
+# TODO possibly incorrect. See the function below.
 @makedist("lognormal")
 def MMlognormal(x):
     return lognorm(x.mean(), x.std())  # **
+
+
+def lognormal_mom_estimator(data=None, sample_mean=None, sample_variance=None):
+    """
+    Method of Moments estimator for Lognormal(μ, σ^2).
+
+    Parameters
+    ----------
+    data : array-like, optional
+        Raw data sample. If provided, mean and variance are computed from it.
+    sample_mean : float, optional
+        Precomputed sample mean (ignored if data is provided).
+    sample_variance : float, optional
+        Precomputed sample variance (ignored if data is provided).
+
+    Returns
+    -------
+    mu_hat : float
+        Estimated mean of the underlying normal distribution.
+    sigma2_hat : float
+        Estimated variance of the underlying normal distribution.
+    """
+    # If raw data is provided, compute mean and variance
+    if data is not None:
+        data = np.asarray(data)
+        if np.any(data <= 0):
+            raise ValueError(
+                "All data points must be positive for lognormal distribution."
+            )
+        sample_mean = data.mean()
+        sample_variance = data.var(ddof=0)  # population variance
+    elif sample_mean is None or sample_variance is None:
+        raise ValueError(
+            "Provide either raw data or both sample_mean and sample_variance."
+        )
+
+    if sample_mean <= 0:
+        raise ValueError("Sample mean must be positive for lognormal distribution.")
+
+    # Method of moments formulas
+    sigma2_hat = np.log(1 + sample_variance / (sample_mean**2))
+    mu_hat = np.log(sample_mean) - sigma2_hat / 2
+
+    return mu_hat, sigma2_hat
+
+
+def mm_lognormal(mean: float, std: float):
+    """
+    Method of Moments estimator for Lognormal(μ, σ^2).
+
+    args
+        mean (float):
+            Sample mean of the data (m1).
+        std (float):
+            Sample standard deviation of the data (s).
+
+    returns
+        mu_hat (float):
+            Estimated mean of the underlying normal distribution.
+        sigma2_hat (float):
+            Estimated variance of the underlying normal distribution.
+    """
+
+    var = std**2
+
+    if mean <= 0:
+        raise ValueError("Sample mean must be positive for lognormal distribution.")
+
+    # Estimate sigma^2
+    sigma2_hat = np.log(1 + var / (mean**2))
+
+    # Estimate mu
+    mu_hat = np.log(mean) - sigma2_hat / 2
+
+    return mu_hat, sigma2_hat
+
+
+# Example usage
+m1 = 10.0  # sample mean
+s2 = 25.0  # sample variance
+mu_hat, sigma2_hat = lognormal_mom_estimator(m1, s2)
+print(f"mu_hat = {mu_hat:.4f}, sigma2_hat = {sigma2_hat:.4f}")
 
 
 @makedist("laplace")
@@ -1075,4 +1166,8 @@ def parse_moments(
             return mm_gamma(mean=mean, std=std)
         case "beta":
             return mm_beta(mean=mean, std=std)
+        case "gumbel":
+            return mm_gumbel(mean=mean, std=std)
+        case "lognormal":
+            return mm_lognormal(mean=mean, std=std)
         #
