@@ -191,6 +191,20 @@ def erlang(*args):
 
 
 @makePbox
+def exponential_by_scale(*args, **kwargs):
+    """p-box constructor for the exponential distribution with scale parameterisation
+
+    note:
+        scale parameterisation due to scipy.stats. Note that the "scale" argument is a must.
+        There is an "exponential" constructor which uses the rate parameterisation.
+
+    example:
+        >>> pba.pbox_parametric.exponential_by_scale(scale=[1, 2])
+    """
+    return "exponential"
+
+
+@makePbox
 def exponnorm(*args):
     return "exponnorm"
 
