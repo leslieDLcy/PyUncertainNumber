@@ -21,7 +21,7 @@ def makePbox(func) -> Pbox:
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
         family_str = func(*args, **kwargs)
-        return _bound_pcdf(family_str, *args)
+        return _bound_pcdf(family_str, *args, **kwargs)
 
     return wrapper_decorator
 
@@ -42,7 +42,7 @@ def _bound_pcdf(dist_family, *args, **kwargs):
     )
 
 
-def _parametric_bounds(dist_family, *args, steps=Params.steps):
+def _parametric_bounds(dist_family, *args, steps=Params.steps, **kwargs):
     """from parametric distribution specification to define the lower and upper bound of the p-box
 
     args:
@@ -59,10 +59,14 @@ def _parametric_bounds(dist_family, *args, steps=Params.steps):
 
     i_args = [wc_scalar_interval(b) for b in args]
 
-    p = Params.p_values
+    if kwargs:
+        kw_args = [wc_scalar_interval(v) for v in kwargs.values()]
+        i_args = I(0.0, 0.0)
+        new_args = itertools.product(i_args.val, *[i.to_numpy() for i in kw_args])
+    else:
+        new_args = itertools.product(*[i.to_numpy() for i in i_args])
 
-    # get bound arguments
-    new_args = itertools.product(*[i.to_numpy() for i in i_args])
+    p = Params.p_values
 
     bounds = []
 
@@ -550,7 +554,7 @@ def rdist(*args):
 
 
 @makePbox
-def rayleigh(*args):
+def rayleigh(*args, **kwargs):
     return "rayleigh"
 
 
