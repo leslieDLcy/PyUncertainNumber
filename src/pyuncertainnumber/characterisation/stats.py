@@ -1,4 +1,7 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import numpy as np
+from numbers import Number
 from scipy.stats import (
     bernoulli,
     beta,
@@ -17,6 +20,7 @@ from scipy.stats import (
     logistic,
     pareto,
     powerlaw,
+    rayleigh,
     triang,
     geom,
     loguniform,
@@ -33,6 +37,8 @@ from ..pba.pbox_parametric import named_pbox
 import functools
 from .core import makeUN
 
+if TYPE_CHECKING:
+    from pyuncertainnumber import Interval
 
 """ Here we define the statistical inference functions from data for the UncertainNumber class. """
 
@@ -130,6 +136,17 @@ def MMbeta(x: np.ndarray):
     return beta(alpha, beta_p)
 
 
+@makedist("beta")
+def mm_beta(mean, std):
+    """from given moments, return a beta distribution"""
+    m = mean
+    s = std**2
+
+    alpha = m * (m * (1 - m) / s - 1)
+    beta_p = (1 - m) * (m * (1 - m) / s - 1)
+    return beta(alpha, beta_p)
+
+
 @makedist("betabinom")
 def MMbetabinomial(n: int, x):  # **
     #! 'x**2' variable repetition
@@ -176,6 +193,13 @@ def MMexponential(x):
     return singleParamPattern(x, "exponential")
 
 
+# TODO it does not take Interval input yet.
+@makedist("exponential")
+def mm_exponential(mean):
+    """from given moments, return an exponential distribution"""
+    return expon(scale=mean)  # scale is 1/lambda
+
+
 @makedist("f")
 def MMF(x):  # **
     w = 2 / (1 - 1 / x.mean())
@@ -192,6 +216,15 @@ def MMgamma(x):  # **
     a = x.mean()
     b = x.std()
     return gamma(b**2 / a, 1 / (a / b) ** 2)  # gamma1(a, b) ~ gamma(b²/a, (a/b)²)
+
+
+@makedist("gamma")
+def mm_gamma(mean, std=None):
+    """from given moments, return a gamma distribution"""
+
+    return gamma(
+        std**2 / mean, 1 / (mean / std) ** 2
+    )  # gamma1(a, b) ~ gamma(b²/a, (a/b)²)
 
 
 @makedist("geometric")
@@ -263,6 +296,13 @@ def MMloguniform(x):
 @makedist("norm")
 def MMnormal(x):
     return norm(x.mean(), x.std())  # **
+
+
+@makedist("norm")
+def mm_normal(mean, std=None):
+    """from given moments, return a normal distribution"""
+
+    return norm(loc=mean, scale=std)
 
 
 @makedist("gaussian")
@@ -370,6 +410,17 @@ def MMtriangular(x, iters=100, dives=10):  # **
     return triang(aa, cc, bb)
 
 
+@makedist("rayleigh")
+def MMrayleigh(x):
+    return mm_rayleigh(x.mean())
+
+
+@makedist("rayleigh")
+def mm_rayleigh(mean):
+    """from given moments, return a rayleigh distribution"""
+    return rayleigh(scale=mean / np.sqrt(np.pi / 2))
+
+
 mom = {
     "bernoulli": MMbernoulli,
     "beta": MMbeta,
@@ -395,6 +446,7 @@ mom = {
     "pareto": MMpareto,
     "poisson": MMpoisson,
     "powerfunction": MMpowerfunction,
+    "rayleigh": MMrayleigh,
     "t": MMt,
     "student": MMstudent,
     "uniform": MMuniform,
@@ -943,38 +995,84 @@ def fermilnormconfband(x1, x2, n, pr=0.9, conf=0.95, bOt=0.001, tOp=0.999):
 # * --------------- moments shape distribution constructors --------------- *#
 
 
-def mmmshape(mean, var, shape):
-    """return a distributional object based on moment and shape information"""
-    if shape == "beta":
-        return mm_beta(mean, var)
-    elif shape == "normal":
-        return mm_normal(mean, var)
-    elif shape == "gamma":
-        return mm_gamma(mean, var)
-    else:
-        raise ValueError(f"Shape '{shape}' not supported for moment matching.")
+# def mmmshape(mean, var, shape):
+#     """return a distributional object based on moment and shape data"""
+#     if shape == "beta":
+#         return mm_beta(mean, var)
+#     elif shape == "normal":
+#         return mm_normal(mean, var)
+#     elif shape == "gamma":
+#         return mm_gamma(mean, var)
+#     else:
+#         raise ValueError(f"Shape '{shape}' not supported for moment matching.")
 
 
-def mm_beta(mean_sample, var_sample):
-    """return distributional parameters for beta distribution"""
-    common = mean_sample * (1 - mean_sample) / var_sample - 1
-    alpha = mean_sample * common
-    beta_param = (1 - mean_sample) * common
+# def mm_beta(mean_sample, var_sample):
+#     """return distributional parameters for beta distribution"""
+#     common = mean_sample * (1 - mean_sample) / var_sample - 1
+#     alpha = mean_sample * common
+#     beta_param = (1 - mean_sample) * common
 
-    return alpha, beta_param
-
-
-def mm_normal(mean_sample, var_sample):
-    """return distributional parameters for normal distribution"""
-    return mean_sample, np.sqrt(var_sample)
+#     return alpha, beta_param
 
 
-def mm_gamma(mean_sample, var_sample):
-    """return distributional parameters for gamma distribution"""
-    alpha = mean_sample**2 / var_sample
-    theta = var_sample / mean_sample
+# def mm_normal(mean_sample, var_sample):
+#     """return distributional parameters for normal distribution"""
+#     return mean_sample, np.sqrt(var_sample)
 
-    return alpha, theta
+
+# def mm_gamma(mean_sample, var_sample):
+#     """return distributional parameters for gamma distribution"""
+#     alpha = mean_sample**2 / var_sample
+#     theta = var_sample / mean_sample
+
+#     return alpha, theta
 
 
 # TODO: add more distributions in the future
+
+
+def parse_moments(
+    family: str, mean: Number | Interval, std: Number = None, var: Number = None
+):
+    """parse the moments input to a standard form for dist construction
+
+    Only accept up to 2nd moment for now
+
+    args:
+        family (str): distribution family
+        mean (Number | Interval): mean value
+        std (Number): standard deviation
+        var (Number): variance
+    """
+    if not family in ["rayleigh", "normal", "beta", "gamma", "lognormal"]:
+        raise ValueError(f"distribution family {family} not yet supported")
+
+    # var --> std
+    # Enforce that exactly one of std or var is given
+    if (std is None and var is None) or (std is not None and var is not None):
+        raise ValueError(
+            "You must provide exactly one of 'std' or 'var', not both or none."
+        )
+
+    # If variance is provided, convert to std
+    if var is not None:
+        try:
+            std = np.sqrt(var)
+        except:
+            raise ValueError("Variance must be non-negative.")
+
+    match family:
+        # 1 parameter distributions
+        case "exponential":
+            return mm_exponential(mean=mean)
+        case "rayleigh":
+            return mm_rayleigh(mean=mean)
+        # 2 parameter distributions
+        case "normal":
+            return mm_normal(mean=mean, std=std)
+        case "gamma":
+            return mm_gamma(mean=mean, std=std)
+        case "beta":
+            return mm_beta(mean=mean, std=std)
+        #
