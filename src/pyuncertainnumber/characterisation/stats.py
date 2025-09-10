@@ -193,10 +193,26 @@ def MMexponential(x):
     return singleParamPattern(x, "exponential")
 
 
+def universal_exponential(mean):
+    """single parameter pattern exponential distribution constructor
+
+    note:
+        mean can be a precise number or an interval; Exponential is parameterised by scale, which is the inverse of the rate parameter (lambda).
+    """
+    if isinstance(mean, Number):
+        return mm_exponential(mean)
+    elif isinstance(mean, Interval):
+        return pba.exponential_by_scale(scale=mean)
+
+
 # TODO it does not take Interval input yet.
 @makedist("exponential")
 def mm_exponential(mean):
-    """from given moments, return an exponential distribution"""
+    """from given moments, return an exponential distribution
+
+    note:
+        This constructor is parameterised by scale, which is the inverse of the rate parameter (lambda).
+    """
     return expon(scale=mean)  # scale is 1/lambda
 
 
@@ -357,13 +373,6 @@ def mm_lognormal(mean: float, std: float):
     return mu_hat, sigma2_hat
 
 
-# Example usage
-m1 = 10.0  # sample mean
-s2 = 25.0  # sample variance
-mu_hat, sigma2_hat = lognormal_mom_estimator(m1, s2)
-print(f"mu_hat = {mu_hat:.4f}, sigma2_hat = {sigma2_hat:.4f}")
-
-
 @makedist("laplace")
 def MMlaplace(x):
     return laplace(x.mean(), x.std() / np.sqrt(2))  # **
@@ -501,9 +510,23 @@ def MMtriangular(x, iters=100, dives=10):  # **
     return triang(aa, cc, bb)
 
 
-@makedist("rayleigh")
+# no decorator needed herein
 def MMrayleigh(x):
     return mm_rayleigh(x.mean())
+
+
+def universal_rayleigh(mean):
+    """single parameter pattern rayleigh distribution constructor
+
+    note:
+        mean can be a precise number or an interval;
+    """
+    if isinstance(mean, Number):
+        return mm_rayleigh(mean)
+    elif isinstance(mean, Interval):
+        #! wrong code. input mean -> scale NOT mean...
+        _scale = mean / np.sqrt(np.pi / 2)
+        return pba.rayleigh(scale=_scale)
 
 
 @makedist("rayleigh")
@@ -1128,13 +1151,15 @@ def parse_moments(
 ):
     """parse the moments input to a standard form for dist construction
 
-    Only accept up to 2nd moment for now
-
     args:
         family (str): distribution family
         mean (Number | Interval): mean value
         std (Number): standard deviation
         var (Number): variance
+
+    note:
+        Only accept up to 2nd moment for now. Interval mean is supported due to single parameter construction.
+        Combined mean and std intervals are not supported as they are deemed NP hard question.
     """
     if not family in ["rayleigh", "normal", "beta", "gamma", "lognormal"]:
         raise ValueError(f"distribution family {family} not yet supported")
@@ -1156,9 +1181,9 @@ def parse_moments(
     match family:
         # 1 parameter distributions
         case "exponential":
-            return mm_exponential(mean=mean)
+            return universal_exponential(mean=mean)
         case "rayleigh":
-            return mm_rayleigh(mean=mean)
+            return universal_rayleigh(mean=mean)
         # 2 parameter distributions
         case "normal":
             return mm_normal(mean=mean, std=std)
