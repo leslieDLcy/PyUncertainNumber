@@ -386,8 +386,9 @@ named_dists = {
     "dgamma": sps.dgamma,
     "dweibull": sps.dweibull,
     "erlang": sps.erlang,
-    "expon": expon_sane,
-    "exponential": expon_sane,  # re-engineered exponential distribution
+    "expon": sps.expon,
+    "exponential": sps.expon,  # re-engineered exponential distribution
+    "exponential_by_lambda": expon_sane,  # re-engineered exponential distribution
     "exponnorm": sps.exponnorm,
     "exponweib": sps.exponweib,
     "exponpow": sps.exponpow,

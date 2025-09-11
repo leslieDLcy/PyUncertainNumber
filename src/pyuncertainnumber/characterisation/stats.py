@@ -1160,8 +1160,6 @@ def parse_moments(
         Only accept up to 2nd moment for now. Interval mean is supported due to single parameter construction.
         Combined mean and std intervals are not supported as they are deemed NP hard question.
     """
-    if not family in ["rayleigh", "normal", "beta", "gamma", "lognormal"]:
-        raise ValueError(f"distribution family {family} not yet supported")
 
     # var --> std
     # Enforce that exactly one of std or var is given
@@ -1192,4 +1190,5 @@ def parse_moments(
             return mm_gumbel(mean=mean, std=std)
         case "lognormal":
             return mm_lognormal(mean=mean, std=std)
-        #
+        case _:
+            raise ValueError(f"distribution family {family} not yet supported")
