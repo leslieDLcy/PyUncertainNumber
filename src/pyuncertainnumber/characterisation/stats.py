@@ -524,7 +524,6 @@ def universal_rayleigh(mean):
     if isinstance(mean, Number):
         return mm_rayleigh(mean)
     elif isinstance(mean, Interval):
-        #! wrong code. input mean -> scale NOT mean...
         _scale = mean / np.sqrt(np.pi / 2)
         return pba.rayleigh(scale=_scale)
 
@@ -1166,10 +1165,8 @@ def parse_moments(
 
     # var --> std
     # Enforce that exactly one of std or var is given
-    if (std is None and var is None) or (std is not None and var is not None):
-        raise ValueError(
-            "You must provide exactly one of 'std' or 'var', not both or none."
-        )
+    if std is not None and var is not None:
+        raise ValueError("You cannot provide boh 'std' or 'var'.")
 
     # If variance is provided, convert to std
     if var is not None:
@@ -1185,7 +1182,7 @@ def parse_moments(
         case "rayleigh":
             return universal_rayleigh(mean=mean)
         # 2 parameter distributions
-        case "normal":
+        case "normal" | "gaussian":
             return mm_normal(mean=mean, std=std)
         case "gamma":
             return mm_gamma(mean=mean, std=std)
