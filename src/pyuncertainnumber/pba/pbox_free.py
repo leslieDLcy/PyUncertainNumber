@@ -237,10 +237,15 @@ def known_properties(
             "maximum",
             "minimum",
         ): min_max,  # TODO: to implement trucate_parse_moments
-        ("family", "maximum", "minimum", "mean"): parse_moments,
-        ("family", "maximum", "minimum", "mean", "std"): parse_moments,
-        ("family", "maximum", "minimum", "mean", "var"): parse_moments,
-        ("family", "maximum", "minimum", "mean", "std", "var"): parse_moments,
+        (
+            "family",
+            "maximum",
+            "mean",
+            "minimum",
+        ): parse_moments,
+        ("family", "maximum", "mean", "minimum", "std"): truncate_parse_moments,
+        ("family", "maximum", "mean", "minimum", "var"): truncate_parse_moments,
+        ("family", "maximum", "mean", "minimum", "std", "var"): truncate_parse_moments,
     }
 
     handler1 = routes.get(present_keys, handle_default)
@@ -273,16 +278,13 @@ def not_enough_info(**kwargs):
 
 def truncate_parse_moments(**kwargs):
     from ..characterisation.stats import parse_moments
+    from .operation import convert
 
     if "maximum" in kwargs and "minimum" in kwargs:
-        base_pbox = parse_moments(
-            **{k: kwargs[k] for k in ["mean", "std", "var"] if k in kwargs}
-        )
-        truncated_pbox = min_max(
-            **{k: kwargs[k] for k in ["minimum", "maximum"] if k in kwargs}
-        )
-        if base_pbox.hi <= truncated_pbox.hi and base_pbox.lo >= truncated_pbox.lo:
-            return truncated_pbox.imp(base_pbox)
+        base_pbox = convert(parse_moments(**kwargs))
+        box = min_max(**{k: kwargs[k] for k in ["minimum", "maximum"] if k in kwargs})
+        if base_pbox.hi <= box.hi and base_pbox.lo >= box.lo:
+            return base_pbox.imp(box)
         else:
             raise Exception("No intersection found")
 
@@ -293,7 +295,6 @@ def truncate_parse_moments(**kwargs):
 # * --------------------- supporting functions---------------------*#
 
 
-@exposeUN
 def min_max(minimum: Number, maximum: Number) -> UncertainNumber | Pbox:
     """Equivalent to an interval object constructed as a nonparametric Pbox.
 
@@ -325,7 +326,6 @@ def min_max(minimum: Number, maximum: Number) -> UncertainNumber | Pbox:
     )
 
 
-@exposeUN
 def min_mean(minimum, mean, steps=Params.steps) -> UncertainNumber | Pbox:
     """Nonparametric pbox construction based on constraint of minimum and mean
 
@@ -358,7 +358,6 @@ def min_mean(minimum, mean, steps=Params.steps) -> UncertainNumber | Pbox:
     )
 
 
-@exposeUN
 def max_mean(
     maximum: Number,
     mean: Number,
@@ -387,7 +386,6 @@ def max_mean(
     return min_mean(-maximum, -mean).__neg__()
 
 
-@exposeUN
 def mean_std(mean: Number, std: Number, steps=Params.steps) -> UncertainNumber | Pbox:
     """Nonparametric pbox construction based on constraint of mean and std
 
@@ -418,7 +416,6 @@ def mean_std(mean: Number, std: Number, steps=Params.steps) -> UncertainNumber |
     return Staircase(left=left, right=right, mean=I(mean, mean), var=I(std**2, std**2))
 
 
-@exposeUN
 def mean_var(
     mean: Number,
     var: Number,
@@ -446,7 +443,6 @@ def mean_var(
     return mean_std(mean, np.sqrt(var))
 
 
-@exposeUN
 def min_max_mean(
     minimum: Number,
     maximum: Number,
@@ -487,7 +483,6 @@ def min_max_mean(
 
 
 # TODO: to verify if this is correct
-@exposeUN
 def pos_mean_std(
     mean: Number,
     std: Number,
@@ -525,7 +520,6 @@ def pos_mean_std(
     )
 
 
-@exposeUN
 def min_max_mode(
     minimum: Number,
     maximum: Number,
@@ -568,7 +562,6 @@ def min_max_mode(
     return Staircase(left=l, right=r, mean=I(mean_l, mean_r), var=I(var_l, var_r))
 
 
-@exposeUN
 def min_max_median(
     minimum: Number,
     maximum: Number,
@@ -616,7 +609,6 @@ def min_max_median(
     )
 
 
-@exposeUN
 def min_max_mean_std(
     minimum: Number,
     maximum: Number,
@@ -761,7 +753,6 @@ def min_max_mean_std(
     )
 
 
-@exposeUN
 def min_max_mean_var(
     minimum: Number,
     maximum: Number,
@@ -800,7 +791,6 @@ def min_max_mean_var(
     return min_max_mean_std(minimum, maximum, mean, np.sqrt(var), **kwargs)
 
 
-@exposeUN
 def from_percentiles(
     percentiles: dict, steps: int = Params.steps
 ) -> UncertainNumber | Pbox:

@@ -1146,7 +1146,11 @@ def fermilnormconfband(x1, x2, n, pr=0.9, conf=0.95, bOt=0.001, tOp=0.999):
 
 
 def parse_moments(
-    family: str, mean: Number | Interval, std: Number = None, var: Number = None
+    family: str,
+    mean: Number | Interval,
+    std: Number = None,
+    var: Number = None,
+    **kwargs,
 ):
     """parse the moments input to a standard form for dist construction
 

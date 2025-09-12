@@ -189,6 +189,12 @@ class Distribution(NominalValueMixin):
         return self._dist.ppf(Params.p_hboundary)
 
     @property
+    def range(self):
+        from pyuncertainnumber import Interval
+
+        return Interval(self.lo, self.hi)
+
+    @property
     def hint(self):
         pass
 
