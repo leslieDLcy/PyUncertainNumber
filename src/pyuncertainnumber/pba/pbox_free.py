@@ -152,6 +152,7 @@ def d_alpha(n, alpha):
 # * ---------top level func for known statistical properties------*#
 
 
+@exposeUN
 def known_properties(
     maximum=None,
     mean=None,
@@ -161,6 +162,7 @@ def known_properties(
     percentiles=None,
     std=None,
     var=None,
+    family=None,
     **kwargs,
 ) -> UncertainNumber:
     """Construct a uncertain number given known statistical properties served as constraints.
@@ -174,6 +176,7 @@ def known_properties(
         percentiles (dict): dictionary of percentiles and their values, e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: pun.I(3,4), 1:5}
         std (number): standard deviation of the variable
         var (number): variance of the variable
+        family (str): name of the distribution family, e.g. 'normal', 'lognormal', 'uniform', 'triangular', etc.
 
     returns:
         uncertain number
@@ -190,6 +193,9 @@ def known_properties(
         ...     minimum=0,
         ...     )
     """
+
+    from ..characterisation.stats import parse_moments
+
     args = {
         "maximum": maximum,
         "mean": mean,
@@ -199,6 +205,7 @@ def known_properties(
         "percentiles": percentiles,
         "std": std,
         "var": var,
+        "family": family,
     }
     shape_control = ["percentiles", "symmetric"]
     present_keys = tuple(
@@ -220,6 +227,25 @@ def known_properties(
         ("maximum", "median", "minimum"): min_max_median,
         ("maximum", "mean", "minimum", "std"): min_max_mean_std,
         ("maximum", "mean", "minimum", "var"): min_max_mean_var,
+        ("family"): not_enough_info,
+        ("family", "mean"): parse_moments,
+        ("family", "mean", "std"): parse_moments,
+        ("family", "mean", "var"): parse_moments,
+        ("family", "mean", "std", "var"): parse_moments,
+        (
+            "family",
+            "maximum",
+            "minimum",
+        ): min_max,  # TODO: to implement trucate_parse_moments
+        (
+            "family",
+            "maximum",
+            "mean",
+            "minimum",
+        ): parse_moments,
+        ("family", "maximum", "mean", "minimum", "std"): truncate_parse_moments,
+        ("family", "maximum", "mean", "minimum", "var"): truncate_parse_moments,
+        ("family", "maximum", "mean", "minimum", "std", "var"): truncate_parse_moments,
     }
 
     handler1 = routes.get(present_keys, handle_default)
@@ -243,13 +269,32 @@ def known_properties(
 
 
 def handle_default(**kwargs):
-    return f"Combination not supported. Received: {kwargs}"
+    raise Exception(f"Combination not supported. Received: {kwargs}")
+
+
+def not_enough_info(**kwargs):
+    raise Exception(f"Not enough information provided. Received: {kwargs}")
+
+
+def truncate_parse_moments(**kwargs):
+    from ..characterisation.stats import parse_moments
+    from .operation import convert
+
+    if "maximum" in kwargs and "minimum" in kwargs:
+        base_pbox = convert(parse_moments(**kwargs))
+        box = min_max(**{k: kwargs[k] for k in ["minimum", "maximum"] if k in kwargs})
+        if base_pbox.hi <= box.hi and base_pbox.lo >= box.lo:
+            return base_pbox.imp(box)
+        else:
+            raise Exception("No intersection found")
+
+    else:
+        return parse_moments(**kwargs)
 
 
 # * --------------------- supporting functions---------------------*#
 
 
-@exposeUN
 def min_max(minimum: Number, maximum: Number) -> UncertainNumber | Pbox:
     """Equivalent to an interval object constructed as a nonparametric Pbox.
 
@@ -281,7 +326,6 @@ def min_max(minimum: Number, maximum: Number) -> UncertainNumber | Pbox:
     )
 
 
-@exposeUN
 def min_mean(minimum, mean, steps=Params.steps) -> UncertainNumber | Pbox:
     """Nonparametric pbox construction based on constraint of minimum and mean
 
@@ -314,7 +358,6 @@ def min_mean(minimum, mean, steps=Params.steps) -> UncertainNumber | Pbox:
     )
 
 
-@exposeUN
 def max_mean(
     maximum: Number,
     mean: Number,
@@ -343,7 +386,6 @@ def max_mean(
     return min_mean(-maximum, -mean).__neg__()
 
 
-@exposeUN
 def mean_std(mean: Number, std: Number, steps=Params.steps) -> UncertainNumber | Pbox:
     """Nonparametric pbox construction based on constraint of mean and std
 
@@ -374,7 +416,6 @@ def mean_std(mean: Number, std: Number, steps=Params.steps) -> UncertainNumber |
     return Staircase(left=left, right=right, mean=I(mean, mean), var=I(std**2, std**2))
 
 
-@exposeUN
 def mean_var(
     mean: Number,
     var: Number,
@@ -402,7 +443,6 @@ def mean_var(
     return mean_std(mean, np.sqrt(var))
 
 
-@exposeUN
 def min_max_mean(
     minimum: Number,
     maximum: Number,
@@ -443,7 +483,6 @@ def min_max_mean(
 
 
 # TODO: to verify if this is correct
-@exposeUN
 def pos_mean_std(
     mean: Number,
     std: Number,
@@ -481,7 +520,6 @@ def pos_mean_std(
     )
 
 
-@exposeUN
 def min_max_mode(
     minimum: Number,
     maximum: Number,
@@ -524,7 +562,6 @@ def min_max_mode(
     return Staircase(left=l, right=r, mean=I(mean_l, mean_r), var=I(var_l, var_r))
 
 
-@exposeUN
 def min_max_median(
     minimum: Number,
     maximum: Number,
@@ -572,7 +609,6 @@ def min_max_median(
     )
 
 
-@exposeUN
 def min_max_mean_std(
     minimum: Number,
     maximum: Number,
@@ -717,7 +753,6 @@ def min_max_mean_std(
     )
 
 
-@exposeUN
 def min_max_mean_var(
     minimum: Number,
     maximum: Number,
@@ -756,7 +791,6 @@ def min_max_mean_var(
     return min_max_mean_std(minimum, maximum, mean, np.sqrt(var), **kwargs)
 
 
-@exposeUN
 def from_percentiles(
     percentiles: dict, steps: int = Params.steps
 ) -> UncertainNumber | Pbox:
