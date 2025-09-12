@@ -1,3 +1,4 @@
+(propagation_guide)=
 # Propagation
 
 Methods to efficiently propagate different types of uncertainty through computational models are of vital interests.
@@ -5,7 +6,7 @@ Methods to efficiently propagate different types of uncertainty through computat
 
 It is suggested to use [interval analysis](../interval_analysis.md) for propagating ignorance and the methods of probability theory for propagating variability. But realistic engineering problems or risk analyses will most likely involve a mixture of both types and as such probability bounds analysis provides means to rigourously propagate the uncertainty.
 
-For aleatoric uncertainty, probability theory already provides some established approaches, such as Taylor expansion or sampling methods, etc. This guide will mostly focuses on the propagation of intervals due to the close relations with propagation of p-boxes. A detailed review can be found in this [report](https://sites.google.com/view/dawsreports/up/report).
+For aleatoric uncertainty, probability theory already provides some established approaches, such as Taylor expansion or sampling methods, etc. This guide will mostly focuses on the propagation of intervals due to the close relations with propagation of p-boxes. A detailed review can be found in this [report](https://sites.google.com/view/dawsreports/up/report). Importantly, see {ref}`up` for a hands-on tutorial.
 
 ### Vertex method
 
