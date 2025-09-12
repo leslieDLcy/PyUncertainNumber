@@ -24,13 +24,13 @@ extensions = [
     "myst_nb",
     "sphinx_prompt",
     "sphinx_design",
-    # "myst_parser",
     # 'sphinx.ext.autodoc',
     "autoapi.extension",
     "sphinx.ext.mathjax",
     "sphinx_inline_tabs",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
+    "sphinxcontrib.bibtex",
 ]
 
 nb_execution_mode = "off"  # or "auto", "force", "cache"
@@ -87,3 +87,5 @@ latex_elements = {
     "fncychap": "\\usepackage[Conny]{fncychap}",
     "extraclassoptions": "openany,oneside",
 }
+
+bibtex_bibfiles = ["refs.bib"]
