@@ -16,7 +16,7 @@ import sys
 
 def inspect_un(x):
     """Inspect the any type of uncertain number x."""
-    print(x.__str__())
+    print(x.__repr__())
     x.display()
 
 

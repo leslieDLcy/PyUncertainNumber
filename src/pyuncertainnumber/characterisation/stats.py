@@ -187,7 +187,7 @@ def MMchisquared(x):
 #         raise TypeError('Input data type not supported')
 
 
-# TODO: this is incorrect as **kwargs are not passed.
+# !: this function is deprecated since incorrect as **kwargs are not passed.
 # TODO: expon takes (scale=1/lambda) as kwargs
 def MMexponential(x):
     return singleParamPattern(x, "exponential")
@@ -202,7 +202,7 @@ def universal_exponential(mean):
     if isinstance(mean, Number):
         return mm_exponential(mean)
     elif isinstance(mean, Interval):
-        return pba.exponential_by_scale(scale=mean)
+        return pba.exponential(scale=mean)
 
 
 # TODO it does not take Interval input yet.
@@ -399,7 +399,7 @@ def MMnormal(x):
 
 
 @makedist("norm")
-def mm_normal(mean, std=None):
+def mm_normal(mean, std):
     """from given moments, return a normal distribution"""
 
     return norm(loc=mean, scale=std)
@@ -1152,7 +1152,7 @@ def parse_moments(
 
     args:
         family (str): distribution family
-        mean (Number | Interval): mean value
+        mean (Number | Interval): mean value, which could be either precise value or an Interval object. Python list is not supported.
         std (Number): standard deviation
         var (Number): variance
 

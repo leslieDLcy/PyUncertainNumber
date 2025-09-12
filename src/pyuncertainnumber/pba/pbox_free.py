@@ -152,6 +152,7 @@ def d_alpha(n, alpha):
 # * ---------top level func for known statistical properties------*#
 
 
+@exposeUN
 def known_properties(
     maximum=None,
     mean=None,
@@ -161,6 +162,7 @@ def known_properties(
     percentiles=None,
     std=None,
     var=None,
+    family=None,
     **kwargs,
 ) -> UncertainNumber:
     """Construct a uncertain number given known statistical properties served as constraints.
@@ -174,6 +176,7 @@ def known_properties(
         percentiles (dict): dictionary of percentiles and their values, e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: pun.I(3,4), 1:5}
         std (number): standard deviation of the variable
         var (number): variance of the variable
+        family (str): name of the distribution family, e.g. 'normal', 'lognormal', 'uniform', 'triangular', etc.
 
     returns:
         uncertain number
@@ -190,6 +193,9 @@ def known_properties(
         ...     minimum=0,
         ...     )
     """
+
+    from ..characterisation.stats import parse_moments
+
     args = {
         "maximum": maximum,
         "mean": mean,
@@ -199,6 +205,7 @@ def known_properties(
         "percentiles": percentiles,
         "std": std,
         "var": var,
+        "family": family,
     }
     shape_control = ["percentiles", "symmetric"]
     present_keys = tuple(
@@ -220,6 +227,20 @@ def known_properties(
         ("maximum", "median", "minimum"): min_max_median,
         ("maximum", "mean", "minimum", "std"): min_max_mean_std,
         ("maximum", "mean", "minimum", "var"): min_max_mean_var,
+        ("family"): not_enough_info,
+        ("family", "mean"): parse_moments,
+        ("family", "mean", "std"): parse_moments,
+        ("family", "mean", "var"): parse_moments,
+        ("family", "mean", "std", "var"): parse_moments,
+        (
+            "family",
+            "maximum",
+            "minimum",
+        ): min_max,  # TODO: to implement trucate_parse_moments
+        ("family", "maximum", "minimum", "mean"): parse_moments,
+        ("family", "maximum", "minimum", "mean", "std"): parse_moments,
+        ("family", "maximum", "minimum", "mean", "var"): parse_moments,
+        ("family", "maximum", "minimum", "mean", "std", "var"): parse_moments,
     }
 
     handler1 = routes.get(present_keys, handle_default)
@@ -243,7 +264,30 @@ def known_properties(
 
 
 def handle_default(**kwargs):
-    return f"Combination not supported. Received: {kwargs}"
+    raise Exception(f"Combination not supported. Received: {kwargs}")
+
+
+def not_enough_info(**kwargs):
+    raise Exception(f"Not enough information provided. Received: {kwargs}")
+
+
+def truncate_parse_moments(**kwargs):
+    from ..characterisation.stats import parse_moments
+
+    if "maximum" in kwargs and "minimum" in kwargs:
+        base_pbox = parse_moments(
+            **{k: kwargs[k] for k in ["mean", "std", "var"] if k in kwargs}
+        )
+        truncated_pbox = min_max(
+            **{k: kwargs[k] for k in ["minimum", "maximum"] if k in kwargs}
+        )
+        if base_pbox.hi <= truncated_pbox.hi and base_pbox.lo >= truncated_pbox.lo:
+            return truncated_pbox.imp(base_pbox)
+        else:
+            raise Exception("No intersection found")
+
+    else:
+        return parse_moments(**kwargs)
 
 
 # * --------------------- supporting functions---------------------*#

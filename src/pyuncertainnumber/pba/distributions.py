@@ -83,8 +83,9 @@ class Distribution(NominalValueMixin):
         return named_dists.get(self.dist_family)(*params)
 
     def parse_params_from_dist(self):
-        """parse the parameters from the underlying dist object"""
-        self.dist_params = str(self._dist.args + tuple(self._dist.kwds.values()))
+        self.dist_params = tuple(self._dist.args) + tuple(
+            v for k, v in sorted(self._dist.kwds.items())
+        )
 
     def flag(self):
         """boolean flag for if the distribution is a parameterised distribution or not
@@ -174,7 +175,8 @@ class Distribution(NominalValueMixin):
     @dist.setter
     def dist(self, value):
         self._dist = value
-        self.parse_params_from_dist()
+        if self.dist_params is None:
+            self.parse_params_from_dist()
         self.flag()
         self.make_nominal_value()
 
