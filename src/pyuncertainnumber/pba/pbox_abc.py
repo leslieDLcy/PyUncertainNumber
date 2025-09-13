@@ -1149,7 +1149,7 @@ class Leaf(Staircase):
 
     def __repr__(self):
         base_repr = super().__repr__().rstrip(")")  # remove trailing ')'
-        return f"{base_repr}, shape={self.shape}"
+        return f"{base_repr}, shape={self.shape})"  # added back trailing ')'
 
     def sample(self, n_sam):
         """sample from a parametric pbox or distribution"""

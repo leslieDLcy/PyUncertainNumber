@@ -21,7 +21,7 @@ def makePbox(func) -> Pbox:
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
         family_str = func(*args, **kwargs)
-        return _bound_pcdf(family_str, *args)
+        return _bound_pcdf(family_str, *args, **kwargs)
 
     return wrapper_decorator
 
@@ -42,7 +42,7 @@ def _bound_pcdf(dist_family, *args, **kwargs):
     )
 
 
-def _parametric_bounds(dist_family, *args, steps=Params.steps):
+def _parametric_bounds(dist_family, *args, steps=Params.steps, **kwargs):
     """from parametric distribution specification to define the lower and upper bound of the p-box
 
     args:
@@ -59,10 +59,14 @@ def _parametric_bounds(dist_family, *args, steps=Params.steps):
 
     i_args = [wc_scalar_interval(b) for b in args]
 
-    p = Params.p_values
+    if kwargs:
+        kw_args = [wc_scalar_interval(v) for v in kwargs.values()]
+        i_args = I(0.0, 0.0)
+        new_args = itertools.product(i_args.val, *[i.to_numpy() for i in kw_args])
+    else:
+        new_args = itertools.product(*[i.to_numpy() for i in i_args])
 
-    # get bound arguments
-    new_args = itertools.product(*[i.to_numpy() for i in i_args])
+    p = Params.p_values
 
     bounds = []
 
@@ -189,6 +193,20 @@ def erlang(*args):
 @makePbox
 def exponnorm(*args):
     return "exponnorm"
+
+
+@makePbox
+def exponential(*args, **kwargs):
+    """The default p-box constructor for the exponential distribution with scale parameterisation
+
+    note:
+        scale parameterisation due to scipy.stats. Note that the "scale" argument is a must.
+        There is an "exponential_by_lambda" constructor which uses the rate parameterisation.
+
+    example:
+        >>> pba.pbox_parametric.exponential(scale=[1, 2])
+    """
+    return "exponential"
 
 
 @makePbox
@@ -550,7 +568,7 @@ def rdist(*args):
 
 
 @makePbox
-def rayleigh(*args):
+def rayleigh(*args, **kwargs):
     return "rayleigh"
 
 
@@ -602,21 +620,6 @@ def trapezoid(*args):
 @makePbox
 def triang(*args):
     return "triang"
-
-
-@makePbox
-def truncexpon(*args):
-    return "truncexpon"
-
-
-@makePbox
-def truncnorm(*args):
-    return "truncnorm"
-
-
-@makePbox
-def truncpareto(*args):
-    return "truncpareto"
 
 
 @makePbox
@@ -740,7 +743,7 @@ def uniform(a, b, steps=Params.steps):
     )
 
 
-def exponential(lamb: list | Interval) -> Pbox:
+def exponential_by_lambda(lamb: list | Interval) -> Pbox:
     """Bespoke p-box constructor for the exponential distribution
 
     args:
@@ -783,33 +786,6 @@ def trapz(a, b, c, d, steps=Params.steps):
     )
 
     return Pbox(left, right, steps=steps, shape="trapz")
-
-
-def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
-
-    if left.__class__.__name__ != "wc_scalar_interval":
-        left = wc_scalar_interval(left)
-    if right.__class__.__name__ != "wc_scalar_interval":
-        right = wc_scalar_interval(right)
-    if mean.__class__.__name__ != "wc_scalar_interval":
-        mean = wc_scalar_interval(mean)
-    if stddev.__class__.__name__ != "wc_scalar_interval":
-        stddev = wc_scalar_interval(stddev)
-
-    a, b = (left - mean) / stddev, (right - mean) / stddev
-
-    Left, Right, mean, var = _parametric_bounds("truncnorm", steps, a, b, mean, stddev)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="truncnorm",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
 
 
 def weibull(*args, steps=Params.steps):
@@ -1034,7 +1010,6 @@ named_pbox = {
     "t": t,
     "trapz": trapz,
     "triang": triang,
-    "truncexpon": truncexpon,
     "tukeylambda": tukeylambda,
     "uniform": uniform,
     "vonmises": vonmises,

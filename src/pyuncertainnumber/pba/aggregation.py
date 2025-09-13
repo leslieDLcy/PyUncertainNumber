@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from .dss import DempsterShafer
 
 
+# * --------------- construct levels ----------------- * #
 # envelope
 def _envelope(*l_constructs: Pbox | DempsterShafer | Number) -> Staircase:
     """calculates the envelope of uncertain number constructs
@@ -56,7 +57,7 @@ def _imposition(*l_constructs: Staircase | DempsterShafer | Number) -> Staircase
     return functools.reduce(binary_imp, xs)
 
 
-# mixture
+# TODO: temp logic for  mixture for constructs only
 def _stochastic_mixture(*l_constructs, weights=None, display=False, **kwargs):
     """it could work for either Pbox, distribution, DS structure or Intervals
 
@@ -79,9 +80,6 @@ def _stochastic_mixture(*l_constructs, weights=None, display=False, **kwargs):
         return mixture_pbox(*l_constructs, weights, display=display)
     elif isinstance(l_constructs[0], DempsterShafer):
         return mixture_ds(*l_constructs, display=display)
-
-
-# * --------------- construct levels ----------------- * #
 
 
 def stacking(

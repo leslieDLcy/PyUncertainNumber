@@ -1,3 +1,9 @@
+# read version from installed package
+from importlib.metadata import version
+
+__version__ = version(__name__)
+
+
 from pyuncertainnumber.characterisation.uncertainNumber import UncertainNumber as UN
 from pyuncertainnumber.characterisation.uncertainNumber import *
 
