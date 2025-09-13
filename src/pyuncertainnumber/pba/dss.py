@@ -148,6 +148,8 @@ def plot_dss_raw(intervals, masses, ax=None):
         )
         ax.add_patch(rect)
 
+    ax.set_ylabel("Probability mass")
+
     # autoscale to rectangle data
     ax.autoscale_view()
 
