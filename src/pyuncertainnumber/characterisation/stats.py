@@ -187,10 +187,11 @@ def MMchisquared(x):
 #         raise TypeError('Input data type not supported')
 
 
-# !: this function is deprecated since incorrect as **kwargs are not passed.
-# TODO: expon takes (scale=1/lambda) as kwargs
 def MMexponential(x):
-    return singleParamPattern(x, "exponential")
+    import pyuncertainnumber.pba.intervals.intervalOperators as io
+
+    mean_ = io.mean(x)
+    return universal_exponential(mean_)
 
 
 def universal_exponential(mean):
@@ -205,7 +206,6 @@ def universal_exponential(mean):
         return pba.exponential(scale=mean)
 
 
-# TODO it does not take Interval input yet.
 @makedist("exponential")
 def mm_exponential(mean):
     """from given moments, return an exponential distribution
