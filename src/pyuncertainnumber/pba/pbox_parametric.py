@@ -623,21 +623,6 @@ def triang(*args):
 
 
 @makePbox
-def truncexpon(*args):
-    return "truncexpon"
-
-
-@makePbox
-def truncnorm(*args):
-    return "truncnorm"
-
-
-@makePbox
-def truncpareto(*args):
-    return "truncpareto"
-
-
-@makePbox
 def truncweibull_min(*args):
     return "truncweibull_min"
 
@@ -801,33 +786,6 @@ def trapz(a, b, c, d, steps=Params.steps):
     )
 
     return Pbox(left, right, steps=steps, shape="trapz")
-
-
-def truncnorm(left, right, mean=None, stddev=None, steps=Params.steps):
-
-    if left.__class__.__name__ != "wc_scalar_interval":
-        left = wc_scalar_interval(left)
-    if right.__class__.__name__ != "wc_scalar_interval":
-        right = wc_scalar_interval(right)
-    if mean.__class__.__name__ != "wc_scalar_interval":
-        mean = wc_scalar_interval(mean)
-    if stddev.__class__.__name__ != "wc_scalar_interval":
-        stddev = wc_scalar_interval(stddev)
-
-    a, b = (left - mean) / stddev, (right - mean) / stddev
-
-    Left, Right, mean, var = _parametric_bounds("truncnorm", steps, a, b, mean, stddev)
-
-    return Pbox(
-        Left,
-        Right,
-        steps=steps,
-        shape="truncnorm",
-        mean_left=mean.left,
-        mean_right=mean.right,
-        var_left=var.left,
-        var_right=var.right,
-    )
 
 
 def weibull(*args, steps=Params.steps):
@@ -1052,7 +1010,6 @@ named_pbox = {
     "t": t,
     "trapz": trapz,
     "triang": triang,
-    "truncexpon": truncexpon,
     "tukeylambda": tukeylambda,
     "uniform": uniform,
     "vonmises": vonmises,
