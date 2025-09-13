@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from numbers import Number
 import scipy.stats as sps
-from ..pba.intervals.intervalOperators import mean
+import pyuncertainnumber.pba.intervals.intervalOperators as io
 from ..pba.intervals import Interval
 from pyuncertainnumber import pba
 from ..pba.distributions import Distribution as D
@@ -39,11 +39,11 @@ def fit(method: str, family: str, data: np.ndarray):
     match method:
         case "mle":
             try:
-                return mle.get(family)(data)
+                return named_mle_methods.get(family)(data)
             except:
-                return smle.get(family)(data)
+                return named_smle_methods.get(family)(data)
         case "mom":
-            return mom.get(family)(data)
+            return named_mom_methods.get(family)(data)
         case _:
             raise ValueError("method not supported")
 
@@ -59,19 +59,6 @@ def makedist(shape: str):
         return wrapper_decorator
 
     return decorator_make_dist
-
-
-# TODO: tested with expon which seems incorrect.
-# TODO: stats.expon takes `1/lambda` as the scale, which is the inverse of the rate parameter.
-def singleParamPattern(x, shape: str):
-    from ..pba.intervals.intervalOperators import mean
-
-    if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return D.dist_from_sps(named_dists.get(shape)(mean(x)), shape=shape)
-    elif isinstance(x, Interval):
-        return named_pbox.get(shape)(mean(x))
-    else:
-        raise TypeError("Input data type not supported")
 
 
 ###############################################################################
@@ -96,7 +83,7 @@ def MMbernoulli(x):
     if isinstance(x, sps.CensoredData | np.ndarray | list):
         return D.dist_from_sps(sps.expon(*sps.bernoulli.fit(x)), shape="bernoulli")
     elif isinstance(x, Interval):
-        return pba.bernoulli(mean(x))
+        return pba.bernoulli(io.mean(x))
     else:
         raise TypeError("Input data type not supported")
 
@@ -141,7 +128,7 @@ def MMbinomial(x, n: int):  # **
     args:
          - n (int): number of trials
     """
-    return sps.binom(n, mean() / n)
+    return sps.binom(n, io.mean() / n)
     # a = x.mean()
     # b = x.std()
     # return binom(int(np.abs(np.round(a/(1-b**2/a)))), np.abs(1-b**2/a))
@@ -225,18 +212,18 @@ def MMgeometric(x):
 
 def MMgeometric(x):
     if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return D.dist_from_sps(sps.geom(1 / (1 + mean(x))), shape="geometric")
+        return D.dist_from_sps(sps.geom(1 / (1 + io.mean(x))), shape="geometric")
     elif isinstance(x, Interval):
-        return pba.geom(1 / (1 + mean(x)))
+        return pba.geom(1 / (1 + io.mean(x)))
     else:
         raise TypeError("Input data type not supported")
 
 
 def MMpascal(x):
     if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return D.dist_from_sps(sps.geom(1 / (1 + mean(x))), shape="pascal")
+        return D.dist_from_sps(sps.geom(1 / (1 + io.mean(x))), shape="pascal")
     elif isinstance(x, Interval):
-        return pba.geom(1 / (1 + mean(x)))
+        return pba.geom(1 / (1 + io.mean(x)))
     else:
         raise TypeError("Input data type not supported")
 
@@ -395,7 +382,13 @@ def MMpareto(x):  # **
 
 
 def MMpoisson(x):
-    return singleParamPattern(x, "poisson")
+    shape = "poisson"
+    if isinstance(x, sps.CensoredData | np.ndarray | list):
+        return D.dist_from_sps(named_dists.get(shape)(io.mean(x)), shape=shape)
+    elif isinstance(x, Interval):
+        return named_pbox.get(shape)(io.mean(x))
+    else:
+        raise TypeError("Input data type not supported")
 
 
 @makedist("powerlaw")
@@ -501,7 +494,7 @@ def mm_rayleigh(mean):
     return sps.rayleigh(scale=mean / np.sqrt(np.pi / 2))
 
 
-mom = {
+named_mom_methods = {
     "bernoulli": MMbernoulli,
     "beta": MMbeta,
     "betabinomial": MMbetabinomial,
@@ -674,7 +667,7 @@ def MLuniform(x):
     return sps.uniform(*sps.uniform.fit(x))
 
 
-mle = {
+named_mle_methods = {
     "bernoulli": MLbernoulli,
     "beta": MLbeta,
     "betabinomial": MLbetabinomial,
@@ -811,7 +804,7 @@ def sMLgamma(data):  # **
     return sps.gamma(shape=shape, rate=rate)
 
 
-smle = {
+named_smle_methods = {
     "bernoulli": sMLbernoulli,
     "normal": sMLnormal,
     "gaussian": sMLgaussian,
