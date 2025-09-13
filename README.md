@@ -1,13 +1,13 @@
+<p align="center">
+  <img src="./assets/UNlogo3.png" alt="Logo" width="200"/>
+</p>
+
 ![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)
 ![version](https://img.shields.io/pypi/v/pyuncertainnumber)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15658422.svg)](https://doi.org/10.5281/zenodo.15658422)
 ![Documentation Status](https://readthedocs.org/projects/pyuncertainnumber/badge/?version=latest)
 ![license](https://img.shields.io/github/license/leslieDLcy/PyUncertainNumber)
 ![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
-
-<p align="center">
-  <img src="./assets/UNlogo3.png" alt="Logo" width="200"/>
-</p>
 
 
 # PyUncertainNumber

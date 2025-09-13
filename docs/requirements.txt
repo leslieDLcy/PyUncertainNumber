@@ -8,3 +8,4 @@ sphinx_design
 myst_nb
 sphinx
 myst-parser
+sphinxcontrib-bibtex
