@@ -2,31 +2,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import numpy as np
 from numbers import Number
-from scipy.stats import (
-    bernoulli,
-    beta,
-    betabinom,
-    binom,
-    chi2,
-    expon,
-    gamma,
-    norm,
-    poisson,
-    uniform,
-    t,
-    gumbel_r,
-    lognorm,
-    laplace,
-    logistic,
-    pareto,
-    powerlaw,
-    rayleigh,
-    triang,
-    geom,
-    loguniform,
-    f as F,
-)
-import scipy
 import scipy.stats as sps
 from ..pba.intervals.intervalOperators import mean
 from ..pba.intervals import Interval
@@ -119,7 +94,7 @@ def MMbernoulli(x):
         - interval data can return either a precise distribution or a pbox
     """
     if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return D.dist_from_sps(expon(*sps.bernoulli.fit(x)), shape="bernoulli")
+        return D.dist_from_sps(sps.expon(*sps.bernoulli.fit(x)), shape="bernoulli")
     elif isinstance(x, Interval):
         return pba.bernoulli(mean(x))
     else:
@@ -133,7 +108,7 @@ def MMbeta(x: np.ndarray):
 
     alpha = m * (m * (1 - m) / s - 1)
     beta_p = (1 - m) * (m * (1 - m) / s - 1)
-    return beta(alpha, beta_p)
+    return sps.beta(alpha, beta_p)
 
 
 @makedist("beta")
@@ -144,7 +119,7 @@ def mm_beta(mean, std):
 
     alpha = m * (m * (1 - m) / s - 1)
     beta_p = (1 - m) * (m * (1 - m) / s - 1)
-    return beta(alpha, beta_p)
+    return sps.beta(alpha, beta_p)
 
 
 @makedist("betabinom")
@@ -156,7 +131,7 @@ def MMbetabinomial(n: int, x):  # **
     m1 = x.mean()
     m2 = (x**2).mean()
     d = n * (m2 / m1 - m1 - 1) + m1
-    return betabinom(n, (n * m1 - m2) / d, (n - m1) * (n - m2 / m1) / d)
+    return sps.betabinom(n, (n * m1 - m2) / d, (n - m1) * (n - m2 / m1) / d)
 
 
 @makedist("binom")
@@ -166,7 +141,7 @@ def MMbinomial(x, n: int):  # **
     args:
          - n (int): number of trials
     """
-    return binom(n, mean() / n)
+    return sps.binom(n, mean() / n)
     # a = x.mean()
     # b = x.std()
     # return binom(int(np.abs(np.round(a/(1-b**2/a)))), np.abs(1-b**2/a))
@@ -174,7 +149,7 @@ def MMbinomial(x, n: int):  # **
 
 @makedist("chi2")
 def MMchisquared(x):
-    return chi2(np.round(x.mean()))
+    return sps.chi2(np.round(x.mean()))
 
 
 # def MMchisquared(x):
@@ -213,13 +188,13 @@ def mm_exponential(mean):
     note:
         This constructor is parameterised by scale, which is the inverse of the rate parameter (lambda).
     """
-    return expon(scale=mean)  # scale is 1/lambda
+    return sps.expon(scale=mean)  # scale is 1/lambda
 
 
 @makedist("f")
 def MMF(x):  # **
     w = 2 / (1 - 1 / x.mean())
-    return F(
+    return sps.f(
         np.round(
             (2 * w**3 - 4 * w**2) / ((w - 2) ** 2 * (w - 4) * x.std() ** 2 - 2 * w**2)
         ),
@@ -231,14 +206,14 @@ def MMF(x):  # **
 def MMgamma(x):  # **
     a = x.mean()
     b = x.std()
-    return gamma(b**2 / a, 1 / (a / b) ** 2)  # gamma1(a, b) ~ gamma(b²/a, (a/b)²)
+    return sps.gamma(b**2 / a, 1 / (a / b) ** 2)  # gamma1(a, b) ~ gamma(b²/a, (a/b)²)
 
 
 @makedist("gamma")
 def mm_gamma(mean, std=None):
     """from given moments, return a gamma distribution"""
 
-    return gamma(
+    return sps.gamma(
         std**2 / mean, 1 / (mean / std) ** 2
     )  # gamma1(a, b) ~ gamma(b²/a, (a/b)²)
 
@@ -250,7 +225,7 @@ def MMgeometric(x):
 
 def MMgeometric(x):
     if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return D.dist_from_sps(geom(1 / (1 + mean(x))), shape="geometric")
+        return D.dist_from_sps(sps.geom(1 / (1 + mean(x))), shape="geometric")
     elif isinstance(x, Interval):
         return pba.geom(1 / (1 + mean(x)))
     else:
@@ -259,7 +234,7 @@ def MMgeometric(x):
 
 def MMpascal(x):
     if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return D.dist_from_sps(geom(1 / (1 + mean(x))), shape="pascal")
+        return D.dist_from_sps(sps.geom(1 / (1 + mean(x))), shape="pascal")
     elif isinstance(x, Interval):
         return pba.geom(1 / (1 + mean(x)))
     else:
@@ -274,7 +249,7 @@ def MMgumbel(x):  # **
     # https://stackoverflow.com/questions/51427764/using-method-of-moments-with-gumbel-r-in-python-scipy-stats-gumbel-r
     scale = np.sqrt(6) / np.pi * np.std(x)
     loc = np.mean(x) - np.euler_gamma * scale
-    return gumbel_r(loc, scale)
+    return sps.gumbel_r(loc, scale)
 
 
 @makedist("gumbel")
@@ -282,12 +257,12 @@ def mm_gumbel(mean, std):
     """from given moments, return a gumbel distribution"""
     scale = np.sqrt(6) / np.pi * std
     loc = mean - np.euler_gamma * scale
-    return gumbel_r(loc, scale)
+    return sps.gumbel_r(loc, scale)
 
 
 @makedist("extremevalue")
 def MMextremevalue(x):
-    return gumbel_r(
+    return sps.gumbel_r(
         x.mean() - 0.57721 * x.std() * np.sqrt(6) / np.pi, x.std() * np.sqrt(6) / np.pi
     )  # **
 
@@ -295,7 +270,7 @@ def MMextremevalue(x):
 # TODO possibly incorrect. See the function below.
 @makedist("lognormal")
 def MMlognormal(x):
-    return lognorm(x.mean(), x.std())  # **
+    return sps.lognorm(x.mean(), x.std())  # **
 
 
 def lognormal_mom_estimator(data=None, sample_mean=None, sample_variance=None):
@@ -375,87 +350,79 @@ def mm_lognormal(mean: float, std: float):
 
 @makedist("laplace")
 def MMlaplace(x):
-    return laplace(x.mean(), x.std() / np.sqrt(2))  # **
+    return sps.laplace(x.mean(), x.std() / np.sqrt(2))  # **
 
 
 @makedist("doubleexponential")
 def MMdoubleexponential(x):
-    return laplace(x.mean(), x.std() / np.sqrt(2))  # **
+    return sps.laplace(x.mean(), x.std() / np.sqrt(2))  # **
 
 
 @makedist("logistic")
 def MMlogistic(x):
-    return logistic(x.mean(), x.std() * np.sqrt(3) / np.pi)  # **
+    return sps.logistic(x.mean(), x.std() * np.sqrt(3) / np.pi)  # **
 
 
 @makedist("loguniform")
 def MMloguniform(x):
-    return loguniform(mean=x.mean(), std=x.std())  # **
+    return sps.loguniform(mean=x.mean(), std=x.std())  # **
 
 
 @makedist("norm")
 def MMnormal(x):
-    return norm(x.mean(), x.std())  # **
+    return sps.norm(x.mean(), x.std())  # **
 
 
 @makedist("norm")
 def mm_normal(mean, std):
     """from given moments, return a normal distribution"""
 
-    return norm(loc=mean, scale=std)
+    return sps.norm(loc=mean, scale=std)
 
 
 @makedist("gaussian")
 def MMgaussian(x):
-    return norm(x.mean(), x.std())  # **
+    return sps.norm(x.mean(), x.std())  # **
 
 
 @makedist("pareto")
 def MMpareto(x):  # **
     a = x.mean()
     b = x.std()
-    return pareto(a / (1 + 1 / np.sqrt(1 + a**2 / b**2)), 1 + np.sqrt(1 + a**2 / b**2))
+    return sps.pareto(
+        a / (1 + 1 / np.sqrt(1 + a**2 / b**2)), 1 + np.sqrt(1 + a**2 / b**2)
+    )
 
 
 def MMpoisson(x):
     return singleParamPattern(x, "poisson")
 
 
-# test if below is correct
-# def MMpoisson(x):
-#     if isinstance(x, sps.CensoredData | np.ndarray | list):
-#         return D.dist_from_sps(poisson(mean(x)), shape='poisson')
-#     elif isinstance(x, Interval):
-#         return pba.poisson(mean(x))
-#     else:
-#         raise TypeError('Input data type not supported')
-
-
 @makedist("powerlaw")
 def MMpowerfunction(x):  # **
     a = x.mean()
     b = x.std()
-    return powerlaw(
+    return sps.powerlaw(
         a / (1 - 1 / np.sqrt(1 + (a / b) ** 2)), np.sqrt(1 + (a / b) ** 2) - 1
     )
 
 
 @makedist("t")
 def MMt(x):
-    return t(2 / (1 - 1 / x.std() ** 2))
+    return sps.t(2 / (1 - 1 / x.std() ** 2))
 
 
 @makedist("student")
 def MMstudent(x):
     assert not (1 < x.std()), "Improper standard deviation for student distribution"
-    return t(2 / (1 - 1 / x.std() ** 2))
+    return sps.t(2 / (1 - 1 / x.std() ** 2))
 
 
 @makedist("uniform")
 def MMuniform(x):  # **
     a = x.mean()
     b = np.sqrt(3) * x.std()
-    return uniform(a - b, a + b)
+    return sps.uniform(a - b, a + b)
 
 
 @makedist("rectangular")
@@ -507,7 +474,7 @@ def MMtriangular(x, iters=100, dives=10):  # **
     # -#green(triangular(aa,bb,cc))
     # -#A;aa; B;bb; C;cc  # the order is min, max, mode
     print(aa, bb, cc)
-    return triang(aa, cc, bb)
+    return sps.triang(aa, cc, bb)
 
 
 # no decorator needed herein
@@ -531,7 +498,7 @@ def universal_rayleigh(mean):
 @makedist("rayleigh")
 def mm_rayleigh(mean):
     """from given moments, return a rayleigh distribution"""
-    return rayleigh(scale=mean / np.sqrt(np.pi / 2))
+    return sps.rayleigh(scale=mean / np.sqrt(np.pi / 2))
 
 
 mom = {
@@ -578,17 +545,17 @@ mom = {
 
 @makedist("bernoulli")
 def MLbernoulli(x):
-    return bernoulli(*sps.bernoulli.fit(x))
+    return sps.bernoulli(*sps.bernoulli.fit(x))
 
 
 @makedist("beta")
 def MLbeta(x):
-    return beta(*sps.beta.fit(x))
+    return sps.beta(*sps.beta.fit(x))
 
 
 @makedist("betabinom")
 def MLbetabinomial(x):
-    return betabinom(*sps.betabinom.fit(x))
+    return sps.betabinom(*sps.betabinom.fit(x))
 
 
 @makedist("binom")
@@ -597,29 +564,29 @@ def MLbinomial(x):
     # TODO to check
     #! no fitting func for scipy discrete distributions
     """
-    return binom(*sps.binom.fit(x))
+    return sps.binom(*sps.binom.fit(x))
 
 
 @makedist("chi2")
 def MLchisquared(x):
-    return chi2(*sps.chi2.fit(x))
+    return sps.chi2(*sps.chi2.fit(x))
 
 
 @makedist("expon")
 def MLexponential(x):
     """a standalone caller for exponential distribution with interval data (not in use yet)"""
     if isinstance(x, sps.CensoredData | np.ndarray | list):
-        return expon(*sps.expon.fit(x))
+        return sps.expon(*sps.expon.fit(x))
 
 
 @makedist("f")
 def MLF(x):
-    return F(*sps.f.fit(x))
+    return sps.f(*sps.f.fit(x))
 
 
 @makedist("gamma")
 def MLgamma(x):
-    return gamma(*sps.gamma.fit(x))
+    return sps.gamma(*sps.gamma.fit(x))
 
 
 @makedist("gammaexpon")
@@ -629,27 +596,27 @@ def MLgammaexponential(x):
 
 @makedist("geom")
 def MLgeometric(x):
-    return geom(*sps.geom.fit(x))
+    return sps.geom(*sps.geom.fit(x))
 
 
 @makedist("gumbel")
 def MLgumbel(x):
-    return gumbel_r(*sps.gumbel_r.fit(x))
+    return sps.gumbel_r(*sps.gumbel_r.fit(x))
 
 
 @makedist("laplace")
 def MLlaplace(x):
-    return laplace(*sps.laplace.fit(x))
+    return sps.laplace(*sps.laplace.fit(x))
 
 
 @makedist("logistic")
 def MLlogistic(x):
-    return logistic(*sps.logistic.fit(x))
+    return sps.logistic(*sps.logistic.fit(x))
 
 
 @makedist("lognorm")
 def MLlognormal(x):
-    return lognorm(*sps.lognorm.fit(x))
+    return sps.lognorm(*sps.lognorm.fit(x))
 
 
 # TODO why not use `sps.lognorm.fit(x)`` directly?
@@ -659,7 +626,7 @@ def MLlognormal(x):
 
 @makedist("loguniform")
 def MLloguniform(x):
-    return loguniform(*sps.loguniform.fit(x))
+    return sps.loguniform(*sps.loguniform.fit(x))
 
 
 @makedist("nbinom")
@@ -669,22 +636,22 @@ def MLnegativebinomial(x):
 
 @makedist("norm")
 def MLnormal(x):
-    return norm(*sps.norm.fit(x))
+    return sps.norm(*sps.norm.fit(x))
 
 
 @makedist("pareto")
 def MLpareto(x):
-    return pareto(*sps.pareto.fit(x))
+    return sps.pareto(*sps.pareto.fit(x))
 
 
 @makedist("poisson")
 def MLpoisson(x):
-    return poisson(*sps.poisson.fit(x))
+    return sps.poisson(*sps.poisson.fit(x))
 
 
 @makedist("powerlaw")
 def MLpowerfunction(x):
-    return powerlaw(*sps.powerlaw.fit(x))
+    return sps.powerlaw(*sps.powerlaw.fit(x))
 
 
 @makedist("rayleigh")
@@ -694,17 +661,17 @@ def MLrayleigh(x):
 
 @makedist("t")
 def MLstudent(x):
-    return t(*sps.t.fit(x))
+    return sps.t(*sps.t.fit(x))
 
 
 @makedist("triang")
 def MLtriangular(x):
-    return triang(*sps.t.fit(x))
+    return sps.triang(*sps.triang.fit(x))
 
 
 @makedist("uniform")
 def MLuniform(x):
-    return uniform(*sps.uniform.fit(x))
+    return sps.uniform(*sps.uniform.fit(x))
 
 
 mle = {
@@ -747,11 +714,11 @@ mle = {
 
 
 def sMLbernoulli(x):
-    return bernoulli(x.mean())
+    return sps.bernoulli(x.mean())
 
 
 def sMLnormal(x):
-    return norm(x.mean(), x.sd())  # **
+    return sps.norm(x.mean(), x.sd())  # **
 
 
 def sMLgaussian(x):
@@ -759,20 +726,20 @@ def sMLgaussian(x):
 
 
 def sMLexponential(x):
-    return expon(x.mean())
+    return sps.expon(x.mean())
 
 
 def sMLpoisson(x):
-    return poisson(x.mean())
+    return sps.poisson(x.mean())
 
 
 def sMLgeometric(x):
-    return geom(1 / (1 + x.mean()))
+    return sps.geom(1 / (1 + x.mean()))
 
 
 def sMLgumbel(x):
     loc, scale = sps.gumbel_r.fit(x)
-    return gumbel_r(loc, scale)
+    return sps.gumbel_r(loc, scale)
 
 
 def sMLpascal(x):
@@ -780,7 +747,7 @@ def sMLpascal(x):
 
 
 def sMLuniform(x):
-    return uniform(min(x), max(x))  # **
+    return sps.uniform(min(x), max(x))  # **
 
 
 def sMLrectangular(x):
@@ -788,11 +755,11 @@ def sMLrectangular(x):
 
 
 def sMLpareto(x):
-    return pareto(min(x), len(x) / np.sum(np.log(x) - np.log(min(x))))  # **
+    return sps.pareto(min(x), len(x) / np.sum(np.log(x) - np.log(min(x))))  # **
 
 
 def sMLlaplace(x):
-    return laplace(x.median(), np.sum(np.abs(x - x.median()) / len(x)))  # **
+    return sps.laplace(x.median(), np.sum(np.abs(x - x.median()) / len(x)))  # **
 
 
 def sMLdoubleexponential(x):
@@ -803,7 +770,7 @@ def sMLlognormal2(x):  # **
     n = len(x)
     mu = np.sum(np.log(x)) / n
     # this function gives clearly poor results
-    return lognormal2(mlog=mu, slog=np.sum((np.log(x) - mu) ** 2) / n)
+    return sps.lognormal2(mlog=mu, slog=np.sum((np.log(x) - mu) ** 2) / n)
 
 
 # just uses transformation, which seems unlikely to be true, but fitdistrplus package uses it too
@@ -813,7 +780,7 @@ def sMLlognormal(x):
 
 def sMLloguniform(x):
     a, b, _, _ = sps.loguniform.fit(x)
-    return loguniform(a, b)
+    return sps.loguniform(a, b)
 
 
 def sMLweibull(x, shapeinterval=None):  # **
@@ -825,8 +792,8 @@ def sMLweibull(x, shapeinterval=None):  # **
             np.sum(x**k * np.log(x)) / np.sum(x**k) - np.sum(np.log(x)) / len(x) - 1 / k
         )
 
-    k = uniroot(wf, shapeinterval)
-    el = np.exp(np.log(np.sum(x ^ k) / len(x)) / k)
+    k = sps.uniroot(wf, shapeinterval)
+    el = np.exp(np.log(np.sum(x**k) / len(x)) / k)
     return sps.weibull_min.rvs(scale=el, shape=k)
 
 
@@ -839,9 +806,9 @@ def sMLgamma(data):  # **
     def f(x):
         return np.log(x) - np.digamma(x) - logxbar + meanlog
 
-    shape = uniroot(f, shape * np.array((0.5, 1.5))).root()
+    shape = sps.uniroot(f, shape * np.array((0.5, 1.5))).root()
     rate = shape / xbar
-    return gamma(shape=shape, rate=rate)
+    return sps.gamma(shape=shape, rate=rate)
 
 
 smle = {
@@ -872,23 +839,20 @@ smle = {
 
 
 def MEminmax(min, max):
-    return uniform(min, max)
+    return sps.uniform(min, max)
 
 
 # http://mathoverflow.net/questions/116667/whats-the-maximum-entropy-probability-distribution-given-bounds-a-b-and-mean, http://www.math.uconn.edu/~kconrad/blurbs/analysis/entropypost.pdf for discussion of this solution.
 def MEminmaxmean(min, max, mean):
-    return sawinconrad(min, mean, max)
+    return sps.sawinconrad(min, mean, max)
 
 
 def MEmeansd(mean, sd):
-    return normal(mean, sd)
+    return sps.normal(mean, sd)
 
 
 def MEminmean(min, mean):
-    return min + exponential(mean - min)
-
-
-# def MEmeangeomean(mean, geomean)
+    return min + sps.exponential(mean - min)
 
 
 def MEdiscretemean(x, mu, steps=10, iterations=50):  # e.g., MEdiscretemean(1:10,2.3)
@@ -976,7 +940,7 @@ def MEminmaxmeanvar(min, max, mean, var):
 
 # https://wernerantweiler.ca/blog.php?item=2019-06-05       #**
 def antweiler(x):
-    return triang(min=min(x), mode=3 * np.mean(x) - max(x) - min(x), max=max(x))
+    return sps.triang(min=min(x), mode=3 * np.mean(x) - max(x) - min(x), max=max(x))
 
 
 def betapert(min, max, mode):  # N.B.  Not in numerical order!
@@ -986,7 +950,7 @@ def betapert(min, max, mode):  # N.B.  Not in numerical order!
     else:
         alpha1 = (mu - min) * (2 * mode - min - max) / ((mode - mu) * (max - min))
         alpha2 = alpha1 * (max - mu) / (mu - min)
-    return min + (max - min) * beta(alpha1, alpha2)
+    return min + (max - min) * sps.beta(alpha1, alpha2)
 
 
 def mnr(n, many=10000):
@@ -1001,7 +965,7 @@ def mnr(n, many=10000):
 def fermilnorm(x1, x2, n=None, pr=0.9):
     gm = np.sqrt(x1 * x2)
     if n is None:
-        gsd = np.sqrt(x2 / x1) ** (1 / scipy.stats.norm.ppf(pr))  # qnorm(pr)
+        gsd = np.sqrt(x2 / x1) ** (1 / sps.norm.ppf(pr))  # qnorm(pr)
     else:
         gsd = np.exp((np.log(x2) - np.log(x1)) / mnr(n))
     return np.log((gm, gsd))
@@ -1010,7 +974,7 @@ def fermilnorm(x1, x2, n=None, pr=0.9):
 def ferminorm(x1, x2, n=None, pr=0.9):
     m = (x1 + x2) / 2
     if n is None:
-        s = (x2 - x1) / (2 * scipy.stats.norm.ppf(pr))  # qnorm(pr)
+        s = (x2 - x1) / (2 * sps.norm.ppf(pr))  # qnorm(pr)
     else:
         s = (x2 - x1) / mnr(n)
     return np.array((m, s))
@@ -1106,40 +1070,6 @@ def fermilnormconfband(x1, x2, n, pr=0.9, conf=0.95, bOt=0.001, tOp=0.999):
 
 
 # * --------------- moments shape distribution constructors --------------- *#
-
-
-# def mmmshape(mean, var, shape):
-#     """return a distributional object based on moment and shape data"""
-#     if shape == "beta":
-#         return mm_beta(mean, var)
-#     elif shape == "normal":
-#         return mm_normal(mean, var)
-#     elif shape == "gamma":
-#         return mm_gamma(mean, var)
-#     else:
-#         raise ValueError(f"Shape '{shape}' not supported for moment matching.")
-
-
-# def mm_beta(mean_sample, var_sample):
-#     """return distributional parameters for beta distribution"""
-#     common = mean_sample * (1 - mean_sample) / var_sample - 1
-#     alpha = mean_sample * common
-#     beta_param = (1 - mean_sample) * common
-
-#     return alpha, beta_param
-
-
-# def mm_normal(mean_sample, var_sample):
-#     """return distributional parameters for normal distribution"""
-#     return mean_sample, np.sqrt(var_sample)
-
-
-# def mm_gamma(mean_sample, var_sample):
-#     """return distributional parameters for gamma distribution"""
-#     alpha = mean_sample**2 / var_sample
-#     theta = var_sample / mean_sample
-
-#     return alpha, theta
 
 
 # TODO: add more distributions in the future
