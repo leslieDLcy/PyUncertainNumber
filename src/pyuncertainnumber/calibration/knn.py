@@ -4,9 +4,7 @@ from calibration import *
 
 
 class KNNCalibrator(Calibrator):
-    r"""
-    General-purpose calibration for black-box models via k-Nearest Neighbors.
-
+    r""" General-purpose calibration for black-box / given simulation data via k-Nearest Neighbors.
     .. math::
         p(\theta \mid y_{obs}, \xi^*) \;\propto\; \sum_{i=1}^N K_h \!\left( y_{obs} - g(\theta_i, \xi^*) \right)
 
@@ -48,31 +46,32 @@ class KNNCalibrator(Calibrator):
     Returns
     -------
     - Single-design: posterior θ samples (array)
-    - Multi-design: (θ_grid, weights) if resample_n=None,
-      or (θ_resampled, weights) if resample_n given
+    - Multi-design: (θ_grid, weights) if resample_n=None, or (θ_resampled, weights) if resample_n given
 
     Tip
     ---
-    Use kNN mode for fast plausibility mapping at a single design;
-    use joint kernel mode for Bayesian model updating across multiple experimental designs.
+    Use kNN + pre-existing input-output simulations for very fast calibration;
+    Consider joint kernel mode for Bayesian model updating across multiple experimental designs.
 
     Caution
     -------
-    The joint kernel assumes all observations arise from the *same* θ.
+    The joint kernel assumes all observations arise from the same θ.
     If you want to handle multiple θ sources, run calibration separately
     for each source and overlay the results.
 
     Example
     -------
-    >>> def paraboloid_model(theta, xi=0):
+    >>> def paraboloid_model(theta, xi=0.0):
     ...     x1, x2 = theta
     ...     return np.array([x1**2 + 0.5*x1*x2 + (x2+xi)**2])
-    >>> def theta_sampler(n): return np.random.uniform(-5, 5, size=(n, 2))
-    >>>
-    >>> calib = KNNCalibrator(knn=50)
+    >>> def theta_sampler(n):
+    >>>     return np.random.uniform(-5, 5, size=(n, 2))
+    >>> calib = KNNCalibrator(knn=100)
+    >>> xi_base = 1.0
     >>> calib.setup(model=paraboloid_model, theta_sampler=theta_sampler, xi_list=[0.0], n_samples=5000)
-    >>> y_obs = paraboloid_model([-4, 2.5], xi=0.0).reshape(1, -1)
-    >>> theta_post = calib.calibrate([(y_obs, 0.0)])
+    >>> true_thetas = [[-4, 2.5],[-4.1, 2.4],[-4.2, 2.2],[-3.4, 2.2]]
+    >>> y_obs = paraboloid_model(true_thetas, xi=xi_base).reshape(1, -1)
+    >>> theta_post = calib.calibrate(observations=[(y_obs, xi_base)])
     """
 
     def __init__(self, knn: int = 100, a_tol: float = 1e-3, kernel_bandwidth: Optional[float] = None):
@@ -87,43 +86,44 @@ class KNNCalibrator(Calibrator):
         self._neigh = None
         self._theta_sim_single = None
         self._theta_sim_joint = None
-        self._y_sim_by_xi: Dict[Tuple[float, ...], np.ndarray] = {}
-        self._dy_joint: Optional[int] = None
-        self._posterior: Optional[Any] = None
+        self._y_sim_by_xi = {}
+        self._dy_joint = None
+        self._posterior = None
 
     # ---------- utilities ----------
     @staticmethod
     def _key_from_xi(xi) -> Tuple[float, ...]:
         return tuple(np.atleast_1d(np.asarray(xi, float)).ravel())
 
+
     # ---------- setup ----------
-    def setup(
-        self,
-        model: Optional[Callable] = None,
-        theta_sampler: Optional[Callable[[int], np.ndarray]] = None,
-        xi_sampler: Optional[Callable[[int], np.ndarray]] = None,
-        simulated_data: Optional[Dict[str, np.ndarray]] = None,
-        xi_list: Optional[List] = None,
-        n_samples: int = 2000,
-    ):
-        # acquire simulations
-        if simulated_data is not None:
+    def setup(self,
+              model: Optional[Callable] = None,
+              theta_sampler: Optional[Callable[[int], np.ndarray]] = None,
+              xi_sampler: Optional[Callable[[int], np.ndarray]] = None,
+              simulated_data: Optional[Dict[str, np.ndarray]] = None,
+              xi_list: Optional[List] = None,
+              n_samples: int = 10000,
+              ):
+
+        """setting up the calibration model"""
+        if xi_list is None: # if no design is provided --> default
+            xi_list = [0.0]
+
+        if simulated_data is not None:  # if simulation input-output data is provided ---- > acquire simulations
             y_sim = simulated_data["y"]
             theta_sim = simulated_data["theta"]
             xi_sim = simulated_data.get("xi", np.zeros((len(theta_sim), 1)))
         else:
-            if model is None or theta_sampler is None:
+            if model is None or theta_sampler is None: # if we have no data and no model or no sampler error
                 raise ValueError("Provide either simulated_data or (model + theta_sampler).")
-            theta_sim = theta_sampler(n_samples)
-            xi_sim = xi_sampler(n_samples) if xi_sampler else np.zeros((n_samples, 1))
+            theta_sim = theta_sampler(n_samples)  # sample from prior, e.g., uniformly inputs (params & vars)
+            xi_sim = xi_sampler(n_samples) if xi_sampler else np.zeros((n_samples, 1))  # sample design
             y_sim = np.vstack([np.atleast_1d(model(th, xi)).astype(float)
-                               for th, xi in zip(theta_sim, xi_sim)])
+                               for th, xi in zip(theta_sim, xi_sim)]) # get model response
 
-        if xi_list is None:
-            xi_list = [0.0]
 
-        # single-design
-        if len(xi_list) == 1:
+        if len(xi_list) == 1: # single-design
             self._mode = "single"
             xi_star = np.asarray(xi_list[0])
             mask = np.all(np.abs(xi_sim - xi_star) < self.a_tol, axis=1)
@@ -135,15 +135,14 @@ class KNNCalibrator(Calibrator):
             self._scaler = StandardScaler().fit(y_sim)
             self._neigh = NearestNeighbors(n_neighbors=self.knn).fit(self._scaler.transform(y_sim))
 
-        # multi-design
-        else:
+
+        else: # multi-design
             self._mode = "joint"
             self._theta_sim_joint = np.asarray(theta_sim, float)
             self._y_sim_by_xi.clear()
             for xi in xi_list:
                 key = self._key_from_xi(xi)
-                y_sim_xi = np.vstack([np.atleast_1d(model(th, xi)).astype(float)
-                                      for th in theta_sim]) if model else y_sim
+                y_sim_xi = np.vstack([np.atleast_1d(model(th, xi)).astype(float)  for th in theta_sim]) if model else y_sim
                 self._dy_joint = y_sim_xi.shape[1]
                 self._y_sim_by_xi[key] = y_sim_xi
 
@@ -157,9 +156,12 @@ class KNNCalibrator(Calibrator):
 
     # ---------- calibration ----------
     def calibrate(self, observations: List[Tuple[np.ndarray, np.ndarray]], resample_n: Optional[int] = None):
+        """calibration method """
+
         if not self.is_ready:
             raise RuntimeError("Call setup() before calibrate().")
-        if self._mode == "single":
+
+        if self._mode == "single":  # if single data set
             y_obs = np.atleast_2d(np.asarray(observations[0][0], float))
             y_obs = y_obs[~np.isnan(y_obs).any(axis=1)]
             _, idx = self._neigh.kneighbors(self._scaler.transform(y_obs))
@@ -172,7 +174,7 @@ class KNNCalibrator(Calibrator):
             for y_obs, xi in observations:
                 xi_key = self._key_from_xi(xi)
                 if xi_key not in self._y_sim_by_xi:
-                    raise KeyError(f"Design {xi} not in joint model. Known: {list(self._y_sim_by_xi.keys())}")
+                    raise KeyError("Design {xi} not in joint model. Known: {list(self._y_sim_by_xi.keys())}")
                 y_sim = self._y_sim_by_xi[xi_key]
                 for y in np.atleast_2d(y_obs):
                     r2 = np.sum((y_sim - y) ** 2, axis=1)
