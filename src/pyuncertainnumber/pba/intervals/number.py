@@ -428,6 +428,27 @@ class Interval(NominalValueMixin):
     def __ne__(self, other):
         return not (self == other)
 
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        if method != "__call__":
+            return NotImplemented
+        if "out" in kwargs and kwargs["out"] is not None:
+            return NotImplemented
+
+        if ufunc is np.sin:
+            return self.sin()
+        if ufunc is np.cos:
+            return self.cos()
+        if ufunc is np.tan:
+            return self.tan()
+        if ufunc is np.exp:
+            return self.exp()
+        if ufunc is np.sqrt:
+            return self.sqrt()
+        if ufunc is np.log:
+            return self.log()
+
+        return NotImplemented
+
     # * -------------- unary functions -------------- *#
 
     def abs(self):
