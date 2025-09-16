@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import functools
 
+from pyuncertainnumber.pba.operation import convert
+
 # from .measurand import Measurand
 # from .variability import Variability
 from .uncertainty_types import Uncertainty_types
@@ -268,7 +270,11 @@ class UncertainNumber:
                     case "distribution":
                         return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}. Probability distributios are typically empolyed to model aleatoric uncertainty, which represents inherent randomness. The distribution is defined by the probability density function (pdf) or cumulative distribution function (cdf)."
                     case "pbox":
-                        return f"This is a {self.essence}-type Uncertain Number that follows a {self.pbox_parameters[0]} distribution with parameters {self.pbox_parameters[1]}"
+                        try:
+                            return f"This is a {self.essence}-type Uncertain Number that follows a {self.pbox_parameters[0]} distribution with parameters {self.pbox_parameters[1]}"
+                        except:
+                            return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}"
+
             case "one-number":
                 return f"This is an {self.essence}-type Uncertain Number whose naked value is {self.nominal_value:.2f}"
             case "concise":
@@ -373,11 +379,11 @@ class UncertainNumber:
     @classmethod
     def fromConstruct(cls, construct):
         """create an Uncertain Number from a construct object"""
-        from ..pba.pbox_abc import Leaf, Staircase
+        from ..pba.pbox_abc import Pbox
         from ..pba.dss import DempsterShafer
         from ..pba.distributions import Distribution as pbaDistribution
 
-        if isinstance(construct, Leaf | Staircase):
+        if isinstance(construct, Pbox):
             return cls.from_pbox(construct)
         if isinstance(construct, Interval):
             return cls.from_Interval(construct)
@@ -445,49 +451,72 @@ class UncertainNumber:
 
     # * ---------------------arithmetic operations---------------------#
 
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        if method != "__call__":
+            return NotImplemented
+        if len(inputs) != 1 or inputs[0] is not self:
+            return NotImplemented
+        if "out" in kwargs and kwargs["out"] is not None:
+            return NotImplemented
+
+        if ufunc is np.sin:
+            return self.sin()
+        if ufunc is np.cos:
+            return self.cos()
+        if ufunc is np.tan:
+            return self.tan()
+        if ufunc is np.tanh:
+            return self.tanh()
+        if ufunc is np.exp:
+            return self.exp()
+        if ufunc is np.sqrt:
+            return self.sqrt()
+        if ufunc is np.log:
+            return self.log()
+        if ufunc is np.reciprocal:
+            return self.reciprocal()
+
+        return NotImplemented
+
     # * ---------------------unary operations---------------------#
+
     def sqrt(self):
         return UncertainNumber.fromConstruct(self._construct.sqrt())
 
     def exp(self):
         from ..pba.operation import convert
 
-        try:
-            return self.construct.exp()
-        except:
-            return convert(self.construct).exp()
+        return UncertainNumber.fromConstruct(convert(self.construct).exp())
 
     def tanh(self):
         from ..pba.operation import convert
 
-        try:
-            return self.construct.tanh()
-        except:
-            return convert(self.construct).tanh()
+        return UncertainNumber.fromConstruct(convert(self.construct).tanh())
+
+    def tan(self):
+        from ..pba.operation import convert
+
+        return UncertainNumber.fromConstruct(convert(self.construct).tan())
 
     def log(self):
         from ..pba.operation import convert
 
-        try:
-            return self.construct.log()
-        except:
-            return convert(self.construct).log()
+        return UncertainNumber.fromConstruct(convert(self.construct).log())
 
     def sin(self):
         from ..pba.operation import convert
 
-        try:
-            return self.construct.sin()
-        except:
-            return convert(self.construct).sin()
+        return UncertainNumber.fromConstruct(convert(self.construct).sin())
 
     def cos(self):
         from ..pba.operation import convert
 
-        try:
-            return self.construct.cos()
-        except:
-            return convert(self.construct).cos()
+        return UncertainNumber.fromConstruct(convert(self.construct).cos())
+
+    def reciprocal(self):
+        from ..pba.operation import convert
+
+        return UncertainNumber.fromConstruct(convert(self.construct).reciprocal())
 
     # * ---------------------binary operations---------------------#
 
@@ -587,7 +616,7 @@ class UncertainNumber:
 
 # * ---------------------shortcuts --------------------- *#
 def makeUNPbox(func):
-
+    """Constructor decorator to create a UN from a parametric pbox"""
     from ..pba.pbox_parametric import _bound_pcdf
 
     @functools.wraps(func)
