@@ -212,6 +212,7 @@ class Interval(NominalValueMixin):
 
     @property
     def rad(self):
+        """half width"""
         return rad(self)
 
     @property
@@ -466,7 +467,12 @@ class Interval(NominalValueMixin):
 
     @classmethod
     def from_meanform(cls, x, half_width):
-        return cls(x - half_width, x + half_width)
+        if np.isscalar(x):
+            return cls(x - half_width, x + half_width)
+        else:
+            x = np.asarray(x)
+            half_width = np.asarray(half_width)
+            return cls(lo=x - half_width, hi=x + half_width)
 
 
 # * -------------- lightweight Interval
