@@ -257,10 +257,10 @@ class UncertainNumber:
 
         return f"{self.__class__.__name__}({field_str})"
 
-    def describe(self, type="verbose"):
+    def describe(self, style="verbose"):
         """print out a verbose description of the uncertain number"""
 
-        match type:
+        match style:
             case "verbose":
                 match self.essence:
                     case "interval":
@@ -268,7 +268,7 @@ class UncertainNumber:
                     case "distribution":
                         return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}. Probability distributios are typically empolyed to model aleatoric uncertainty, which represents inherent randomness. The distribution is defined by the probability density function (pdf) or cumulative distribution function (cdf)."
                     case "pbox":
-                        return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}"
+                        return f"This is a {self.essence}-type Uncertain Number that follows a {self.pbox_parameters[0]} distribution with parameters {self.pbox_parameters[1]}"
             case "one-number":
                 return f"This is an {self.essence}-type Uncertain Number whose naked value is {self.nominal_value:.2f}"
             case "concise":
