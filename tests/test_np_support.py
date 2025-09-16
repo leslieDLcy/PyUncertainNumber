@@ -3,6 +3,10 @@ import pytest
 
 from pyuncertainnumber import pba
 
+""" Numpy support tests"""
+
+# *  --------------------- for pbox
+
 
 @pytest.fixture
 def example_staircase():
@@ -38,3 +42,12 @@ def test_log_matches_method(example_staircase):
 def test_sqrt_matches_method(example_staircase):
     d = example_staircase
     assert np.sqrt(d) == d.sqrt()
+
+
+# *  --------------------- for Interval
+
+
+# *  --------------------- for Distribution
+
+
+# *  --------------------- for UN

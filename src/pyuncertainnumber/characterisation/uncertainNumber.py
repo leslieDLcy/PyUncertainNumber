@@ -387,12 +387,12 @@ class UncertainNumber:
             dist_family (str): the distribution family
             dist_params (list, tuple or string): the distribution parameters
         """
-        distSpec = DistributionSpecification(D.dist_family, D.dist_params)
+        # distSpec = DistributionSpecification(D.dist_family, D.dist_params)
 
         if D.empirical_data is None:
             return cls(
                 essence="distribution",
-                distribution_parameters=distSpec.get_specification(),
+                distribution_parameters=[D.dist_family, D.dist_params],
                 **kwargs,
             )
         else:
@@ -603,7 +603,7 @@ def I(*args: str | list[Number] | Interval) -> UncertainNumber:
 
 
 def D(*args, **kwargs) -> UncertainNumber:
-    """a shortcut for the distribution-type UN object"""
+    """a shortcut to construct the distribution-type UN object"""
     from ..pba.distributions import Distribution as pbaDistribution
 
     dist = pbaDistribution(*args, **kwargs)
@@ -635,17 +635,26 @@ def match_pbox(keyword, parameters):
 
 
 class Parameterisation:
-    def __init__(self, parm_specification, essence: str):
-        self.parm_specification = ParamSpecification(parm_specification)
+    """Parameterisation specification of the UN object
+
+    args:
+        - parm_specification (list): a combo of the distribution family and its parameters; e.g. ['norm', [0, 1]];
+        - essence (str): 'distribution' or 'pbox'
+    """
+
+    def __init__(self, parm_specification: list, essence: str):
+        self.parm_specification = ParamSpecification(
+            parm_specification
+        )  # combo e.g. ['norm', (0, 1)]
         self.essence = essence
 
     def yield_construct(self):
-        try:
+        if self.essence == "pbox":
             pbox = match_pbox(
                 self.parm_specification.family, self.parm_specification.parameters
             )
             return pbox
-        except Exception as e:
+        elif self.essence == "distribution":
             dist = pbaDistribution(
                 dist_family=self.parm_specification.family,
                 dist_params=self.parm_specification.parameters,
@@ -654,9 +663,10 @@ class Parameterisation:
 
 
 class ParamSpecification:
-    """only for the format of specification
+    """The combo specification of the distribution family and its parameters
 
     note:
+        Only used for the format of specification.
         a recommended specification: ['gaussian', (12,4)] or ['gaussian', ([0,12],[1,4])]
     """
 
