@@ -635,6 +635,31 @@ class Staircase(Pbox):
         bar = partial(np.power, other)  # other as the base
         return self._unary_template(bar)
 
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        if method != "__call__":
+            return NotImplemented
+        if len(inputs) != 1 or inputs[0] is not self:
+            return NotImplemented
+        if "out" in kwargs and kwargs["out"] is not None:
+            return NotImplemented
+
+        if ufunc is np.sin:
+            return self.sin()
+        if ufunc is np.cos:
+            return self.cos()
+        if ufunc is np.tanh:
+            return self.tanh()
+        if ufunc is np.exp:
+            return self.exp()
+        if ufunc is np.sqrt:
+            return self.sqrt()
+        if ufunc is np.log:
+            return self.log()
+        if ufunc is np.reciprocal:
+            return self.reciprocal()
+
+        return NotImplemented
+
     # * --------------------- methods ---------------------*#
 
     def cdf(self, x: np.ndarray):
