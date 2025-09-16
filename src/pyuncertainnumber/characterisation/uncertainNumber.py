@@ -480,43 +480,35 @@ class UncertainNumber:
 
     # * ---------------------unary operations---------------------#
 
+    def _apply(self, method):
+        from ..pba.operation import convert
+
+        target = convert(self.construct)
+        return UncertainNumber.fromConstruct(getattr(target, method)())
+
     def sqrt(self):
-        return UncertainNumber.fromConstruct(self._construct.sqrt())
+        return self._apply("sqrt")
 
     def exp(self):
-        from ..pba.operation import convert
-
-        return UncertainNumber.fromConstruct(convert(self.construct).exp())
+        return self._apply("exp")
 
     def tanh(self):
-        from ..pba.operation import convert
-
-        return UncertainNumber.fromConstruct(convert(self.construct).tanh())
+        return self._apply("tanh")
 
     def tan(self):
-        from ..pba.operation import convert
-
-        return UncertainNumber.fromConstruct(convert(self.construct).tan())
+        return self._apply("tan")
 
     def log(self):
-        from ..pba.operation import convert
-
-        return UncertainNumber.fromConstruct(convert(self.construct).log())
+        return self._apply("log")
 
     def sin(self):
-        from ..pba.operation import convert
-
-        return UncertainNumber.fromConstruct(convert(self.construct).sin())
+        return self._apply("sin")
 
     def cos(self):
-        from ..pba.operation import convert
-
-        return UncertainNumber.fromConstruct(convert(self.construct).cos())
+        return self._apply("cos")
 
     def reciprocal(self):
-        from ..pba.operation import convert
-
-        return UncertainNumber.fromConstruct(convert(self.construct).reciprocal())
+        return self._apply("reciprocal")
 
     # * ---------------------binary operations---------------------#
 
