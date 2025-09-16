@@ -28,7 +28,7 @@ def b2b(
     where :math:`I_{x1}, I_{x2}, ..., I_{xn}` are intervals.
 
     In a general case, the function :math:`g` is not necessarily monotonic and :math:`g` may be a black-box model.
-    Optimisation to the rescue and two of them particularly: GA and BO.
+    Optimisation to the rescue and two of them particularly: Genetic Algorithm and Bayesian Optimisation.
 
     args:
         vars (Interval): a vector Interval or a list or tuple of scalar Intervals, or an EpistemicDomain object, or a scalar Interval;
