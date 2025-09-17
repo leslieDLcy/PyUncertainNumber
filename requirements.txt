@@ -12,3 +12,4 @@ tqdm==4.67.1
 statsmodels>=0.14,<0.15
 bayesian-optimization==2.0.4
 geneticalgorithm==1.0.2
+jax

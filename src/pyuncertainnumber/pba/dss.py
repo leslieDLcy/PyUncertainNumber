@@ -7,7 +7,7 @@ from .intervals.intervalOperators import make_vec_interval
 from collections import namedtuple
 import pyuncertainnumber.pba.aggregation as agg
 from .intervals import Interval
-from .mixins import NominalValueMixin
+from .mixins import NominalValueMixin, _PboxOpsMixin
 
 dempstershafer_element = namedtuple("dempstershafer_element", ["interval", "mass"])
 """ Named tuple for Dempster-Shafer elements.
@@ -17,7 +17,7 @@ note:
 """
 
 
-class DempsterShafer(NominalValueMixin):
+class DempsterShafer(NominalValueMixin, _PboxOpsMixin):
     """Class for Dempester-Shafer structures.
 
     args:
@@ -84,7 +84,7 @@ class DempsterShafer(NominalValueMixin):
     def masses(self):
         return self._masses
 
-    def plot(self, style="pbox", ax=None, **kwargs):
+    def plot(self, style="raw", ax=None, **kwargs):
         """for box type transform dss into a pbox and plot"""
         if ax is None:
             fig, ax = plt.subplots()
@@ -109,6 +109,10 @@ class DempsterShafer(NominalValueMixin):
             return_type="pbox",
         )
         return dss_pbox
+
+    def _to_pbox(self):
+        """for mixin use only"""
+        return self.to_pbox()
 
     @classmethod
     def from_dsElements(cls, *ds_elements: dempstershafer_element):

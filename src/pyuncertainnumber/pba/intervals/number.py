@@ -212,6 +212,7 @@ class Interval(NominalValueMixin):
 
     @property
     def rad(self):
+        """half width"""
         return rad(self)
 
     @property
@@ -427,6 +428,27 @@ class Interval(NominalValueMixin):
     def __ne__(self, other):
         return not (self == other)
 
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        if method != "__call__":
+            return NotImplemented
+        if "out" in kwargs and kwargs["out"] is not None:
+            return NotImplemented
+
+        if ufunc is np.sin:
+            return self.sin()
+        if ufunc is np.cos:
+            return self.cos()
+        if ufunc is np.tan:
+            return self.tan()
+        if ufunc is np.exp:
+            return self.exp()
+        if ufunc is np.sqrt:
+            return self.sqrt()
+        if ufunc is np.log:
+            return self.log()
+
+        return NotImplemented
+
     # * -------------- unary functions -------------- *#
 
     def abs(self):
@@ -466,7 +488,12 @@ class Interval(NominalValueMixin):
 
     @classmethod
     def from_meanform(cls, x, half_width):
-        return cls(x - half_width, x + half_width)
+        if np.isscalar(x):
+            return cls(x - half_width, x + half_width)
+        else:
+            x = np.asarray(x)
+            half_width = np.asarray(half_width)
+            return cls(lo=x - half_width, hi=x + half_width)
 
 
 # * -------------- lightweight Interval
