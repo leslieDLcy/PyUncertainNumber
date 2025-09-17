@@ -24,9 +24,6 @@ UNARY = {
     "log": np.log,
     "exp": np.exp,
     "sqrt": np.sqrt,
-    "sin": np.sin,
-    "cos": np.cos,
-    "tanh": np.tanh,
 }
 
 
