@@ -647,8 +647,6 @@ class Staircase(Pbox):
             return self.sin()
         if ufunc is np.cos:
             return self.cos()
-        if ufunc is np.tan:
-            return self.tan()
         if ufunc is np.tanh:
             return self.tanh()
         if ufunc is np.exp:
@@ -1016,12 +1014,6 @@ class Staircase(Pbox):
         from .intervals.methods import cos
 
         itvls = cos(self.to_interval())
-        return simple_stacking(itvls)
-
-    def tan(self):
-        from .intervals.methods import tan
-
-        itvls = tan(self.to_interval())
         return simple_stacking(itvls)
 
     def tanh(self):
