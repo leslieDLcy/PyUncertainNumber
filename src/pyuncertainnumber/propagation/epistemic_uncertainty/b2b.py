@@ -149,8 +149,7 @@ def b2b(
 
             opt_result = get_range_BO(
                 f=func,
-                dimension=len(vec_itvl),
-                xc_bounds=ep.to_BayesOptBounds(),
+                design_bounds=ep.to_BayesOptBounds(),
                 verbose=False,
             )
             return opt_result[0]  # return the interval only

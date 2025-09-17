@@ -86,13 +86,14 @@ class BayesOpt_args_signature:
         self.design_bounds = design_bounds  # the bounds for the design space
         self.acquisition_function = self.parse_acq(acquisition_function)
         self.f = f  # the function to be optimised
-        self.transform_xc_bounds()
 
-    def transform_xc_bounds(
-        self,
-    ):
-        if "0" in self.design_bounds.keys():
-            self.design_bounds = rekey_bounds_by_func(self.design_bounds, self.f)
+    #     self.transform_xc_bounds()
+
+    # def transform_xc_bounds(
+    #     self,
+    # ):
+    #     if "0" in self.design_bounds.keys():
+    #         self.design_bounds = rekey_bounds_by_func(self.design_bounds, self.f)
 
     def parse_acq(self, acq, parameter=None):
         """parse the acquisition function
