@@ -442,7 +442,10 @@ class KNNCalibrator(Calibrator):
 
 
 def estimate_p_theta_knn(observed_data,
-                         simulated_data, xi_star,  knn: int = 10,  a_tol: float =0.1):
+                         simulated_data,
+                         xi_star,
+                         knn: int = 20,
+                         a_tol: float =0.05):
     """
     Estimate the posterior distribution p(θ) of θ using a k-Nearest Neighbors (kNN)
     filter on a pre-computed simulation archive, conditioned on a design ξ*.
