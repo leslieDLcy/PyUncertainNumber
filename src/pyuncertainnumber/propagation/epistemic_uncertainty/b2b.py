@@ -17,6 +17,7 @@ def b2b(
     interval_strategy: str = None,
     subinterval_style: str = None,
     n_sub: int = None,
+    n_sam: int = 200,
     **kwargs,
 ) -> Interval:
     """General implementation of interval propagation through a function:
@@ -47,8 +48,15 @@ def b2b(
 
             - 'subinterval': apply function to subintervals
 
+            - 'cauchy_deviate': use the Cauchy Deviate Method for interval propagation
+
         subinterval_style (str):
             the subinterval_style only used for subinterval propagation, including {''direct'', ''endpoints''}.
+
+
+        n_sub (int): number of subintervals, only used for subinterval propagation.
+
+        n_sam (int): number of samples, only used for Cauchy deviate method
 
         **kwargs: additional keyword arguments to be passed to the function
 
@@ -74,14 +82,14 @@ def b2b(
         >>> import numpy as np
         >>> import pyuncertainnumber as pba
 
-        >>> # Define a universal function that handles both vectorised and iterable inputs
+        >>> # Define a universal function that handles a performance function with both `vectorised` and `iterable` signatures
         >>> def bar_universal(x):
-        ...     if isinstance(x, np.ndarray):
+        ...     if isinstance(x, np.ndarray):  # foo_vectorised signature
         ...         if x.ndim == 1:
         ...             x = x[None, :]
-        ...         return x[:, 0] ** 3 + x[:, 1] + 5  # vectorised signature
+        ...         return x[:, 0] ** 3 + x[:, 1] + 5
         ...     else:
-        ...         return x[0] ** 3 + x[1] + 5  # iterable signature
+        ...         return x[0] ** 3 + x[1] + 5  # foo_iterable signature
 
         >>> # Define input intervals
         >>> a = pba.I(3., 5.)
@@ -91,7 +99,6 @@ def b2b(
         >>> b2b(vars=[a, b],
         ...     func=bar_universal,
         ...     interval_strategy='endpoints')  # replace with {"direct", ga", "bo"}
-        [38.0, 156.0]
 
         >>> # using the 'subinterval' strategy
         >>> b2b(vars=[a, b],
@@ -99,7 +106,12 @@ def b2b(
         ...     interval_strategy='subinterval',
         ...     subinterval_style='endpoints',
         ...     n_sub=2)
-        [38.0, 156.0]
+
+        >>> # using the 'cauchy_deviate' strategy
+        >>> b2b(vars=[a, b],
+        ...     func=bar_universal,
+        ...     interval_strategy='cauchy_deviate',
+        ...     n_sam=1000)
 
         >>> # in comparison, one can compare with the result of interval arithmetic
         >>> def bar_individual(x1, x2):
@@ -155,6 +167,20 @@ def b2b(
             return opt_result[0]  # return the interval only
         case "direct":
             return func(vars)
+        case (
+            "cauchy_deviate"
+            | "cauchy_deviate_method"
+            | "Cauchy_deviate"
+            | "Cauchy_deviate_method"
+        ):
+            from ..cauchy_deviate import cauchy_deviate_method
+
+            y_bound = cauchy_deviate_method(
+                input_vector_interval=vec_itvl,
+                func=func,
+                n_sam=n_sam,
+            )
+            return y_bound
         case _:
             raise NotImplementedError(
                 f"Method {interval_strategy} is not supported yet. Supported methods are: {'endpoints', 'subinterval', 'ga', 'bo', 'direct'}"
