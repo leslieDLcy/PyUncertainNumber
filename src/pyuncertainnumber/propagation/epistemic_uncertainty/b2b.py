@@ -141,6 +141,7 @@ def b2b(
             )
             return opt_result[0]  # return the interval only
         case "bo":
+            # assumes vectorised func signature
             from ...opt.get_range import get_range_BO
             from pyuncertainnumber import EpistemicDomain
 

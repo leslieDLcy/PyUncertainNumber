@@ -90,10 +90,15 @@ class EpistemicDomain:
             varbound = varbound.reshape(-1, 2)
         return varbound
 
-    def to_BayesOptBounds(self) -> dict:
+    def to_BayesOptBounds(self, func_signature="vectorisation") -> dict:
         """convert the epistemic space to bounds for the Bayesian optimisation optimizer"""
 
         # new_dict = self.__dict__.copy()
         # new_dict = {k: tuple(v) for k, v in new_dict.items()}
         # return new_dict
-        return {str(i): tuple(r) for i, r in enumerate(self.to_GA_varBounds())}
+        if func_signature == "arguments":
+            return {f"x{i}": tuple(r) for i, r in enumerate(self.to_GA_varBounds())}
+        elif func_signature == "vectorisation" or func_signature == "iterable":
+            return self.to_GA_varBounds()
+        else:
+            return self.to_GA_varBounds()

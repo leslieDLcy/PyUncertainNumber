@@ -23,7 +23,7 @@ def foo_args(x0, x1, x2):
     return x0**3 + x1 + x2
 
 
-def foo(x):
+def foo_iter(x):
     """func signature with iterable input (list, tuple, np.ndarray)"""
     return x[0] ** 3 + x[1] + x[2]
 
