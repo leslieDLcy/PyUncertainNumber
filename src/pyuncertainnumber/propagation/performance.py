@@ -23,7 +23,7 @@ def foo_args(x0, x1, x2):
     return x0**3 + x1 + x2
 
 
-def foo(x):
+def foo_iter(x):
     """func signature with iterable input (list, tuple, np.ndarray)"""
     return x[0] ** 3 + x[1] + x[2]
 
@@ -40,15 +40,13 @@ def foo_universal(x):
         - this function works with a vector Interval object
         - but wrong answer with a 2d matrix Interval object due to unclear broadcasting rules
     """
-    from ..pba.intervals.number import Interval
 
-    # foo_iterable signature
-    if isinstance(x, list | tuple | Interval):
-        return x[0] ** 3 + x[1] + x[2]
-    elif isinstance(x, np.ndarray):
+    if isinstance(x, np.ndarray):  # foo_vectorised signature
         if x.ndim == 1:
             x = x[None, :]
         return x[:, 0] ** 3 + x[:, 1] + x[:, 2]
+    else:
+        return x[0] ** 3 + x[1] + x[2]  # foo_iterable signature
 
 
 def bar(x):
