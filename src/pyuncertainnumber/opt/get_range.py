@@ -1,3 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pyuncertainnumber import Interval
+
 from .bo import BayesOpt
 from .ga import GA
 import numpy as np
@@ -5,20 +11,17 @@ import numpy as np
 
 def get_range_BO(
     f: callable,
-    dimension: int,
     design_bounds: list | np.ndarray,
     acquisition_function="UCB",
     verbose=False,
     **kwargs,
-):
-    """compute the range of a black-box function using BayesOpt with any function signature
+) -> tuple[Interval, dict]:
+    """compute the range of a black-box function using BayesOpt with vectorised or iterable function signature
 
     args:
-        f: callable function to be optimized
+        f: callable function as the objective to be optimized, with vectorised or iterable function signature
 
-        dimension (int): the number of dimensions of the input space
-
-        design_bounds (list): each tuple contains the lower and upper bounds for each dimension
+        design_bounds (list | np.ndarray): nested list or 2D array, containing the lower and upper bounds for each dimension; e.g. [[0, 1], [0, 1]] for 2D input space.
 
         acquisition_function (str or callable, optional): the acquisition function to be used, e.g. 'UCB', 'EI', 'PI'. If None, defaults to 'UCB'.
 
@@ -42,7 +45,6 @@ def get_range_BO(
 
     min_task = BayesOpt(
         f=f,
-        dimension=dimension,
         task="minimisation",
         design_bounds=design_bounds,
         acquisition_function=acquisition_function,
@@ -53,7 +55,6 @@ def get_range_BO(
 
     max_task = BayesOpt(
         f=f,
-        dimension=dimension,  # type: ignore
         task="maximisation",
         design_bounds=design_bounds,
         acquisition_function=acquisition_function,
