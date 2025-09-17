@@ -5,13 +5,14 @@ import inspect
 
 
 class BayesOpt_args_signature:
-    """Bayesian Optimisation class
+    """Bayesian Optimisation class with original function signature (arguments signature).
+
+    It requires the ``design_bound`` to be a dictionary, e.g. {'x1': (0, 1), 'x2': (0, 1)}.
 
     args:
         f (callable): the target function to be optimised, should have individual function signature. See notes.
 
         design_bounds (dict): the bounds for the design space, e.g. {'x1': (0, 1), 'x2': (0, 1)}
-
 
         task (str): either 'minimisation' or 'maximisation'
 
@@ -35,10 +36,10 @@ class BayesOpt_args_signature:
 
     example:
         >>> import numpy as np
-        >>> from pyuncertainnumber.opt.bo import BayesOpt
+        >>> from pyuncertainnumber.opt.bo import BayesOpt_args_signature
         >>> def black_box_function(x):
         ...     return np.exp(-(x - 2)**2) + np.exp(-(x - 6)**2 / 10) + 1 / (x**2 + 1)
-        >>> bo = BayesOpt(
+        >>> bo = BayesOpt_args_signature(
         ...     f=black_box_function,
         ...     dimension=1,
         ...     design_bounds={'x': (-2, 10)},
@@ -51,15 +52,13 @@ class BayesOpt_args_signature:
 
     .. admonition:: Implementation
 
-        The range of the design space is defined by `varbound`, which is a 2D numpy array with shape (n, 2), where n is the number of parameters.
-        This is a different signature compared to the Bayesian Optimisation class, which uses a dictionary for bounds.
-        For consistency, it is recommended to use the class `EpistemicDomain.to_varbound()` to automatically take care of the format of the bounds.
+        This represents the original function signature. The range of the design space, defined in `design_bound`, is a dictionary mapping parameter names to their bounds.
+        However, in later versions, such as the `BayesOpt` class, the design bounds can be specified as a list or 2D numpy array of shape (n, 2), and the function signature can be automatically detected.
 
         example:
         >>> ed = EpistemicDomain(pba.I(-5, 5), pba.I(-5, 5))
         >>> BayesOpt(f=foo,
-        ...     dimension=2,
-        ...     design_bounds= ed.to_BayesOptBounds(),  # the trick
+        ...     design_bounds= ed.to_BayesOptBounds(func_signature="arguments"),  # the trick
         ...     task='maximisation',
         ...     num_explorations=3,
         ...     num_iterations=20,
@@ -230,30 +229,7 @@ class BayesOpt_args_signature:
 class BayesOpt_iterable_signature(BayesOpt_args_signature):
     """Bayesian Optimisation class for iterable function style
 
-    args:
-        f (callable): the target function to be optimised, should have the iterable function signature. If the function is vec-signature only, must use a wrapper.  See notes.
-
-        design_bounds (list): the bounds for the design space, e.g. [[0, 1], [0, 1]]
-
-        dimension (int): the dimension of the design space, i.e. the number of parameters
-
-        task (str): either 'minimisation' or 'maximisation'
-
-        acquisition_function (str or callable, optional): the acquisition function to be used, e.g. 'UCB', 'EI', 'PI'. If None, defaults to 'UCB'.
-
-        num_explorations (int, optional): the number of initial exploration points. Defaults to 100.
-
-        num_iterations (int, optional): the number of iterations to run the optimisation. Defaults to 100.
-
-    note:
-        Acquisition functions can be either a string (e.g. 'UCB', 'EI', 'PI') or a callable function.
-        'UCB' stands for Upper Confidence Bound, 'EI' for Expected Improvement, and 'PI' for Probability of Improvement.
-        If a string is provided, the parameter for the acquisition function can be passed as an additional
-        argument to the class constructor
-
-        - function wrapper:
-            bla ...
-
+    See `BayesOpt` for additional details.
     """
 
     def __init__(
@@ -283,30 +259,7 @@ class BayesOpt_iterable_signature(BayesOpt_args_signature):
 class BayesOpt_vectorised_signature(BayesOpt_args_signature):
     """Bayesian Optimisation class for vectorised function style
 
-    args:
-        f (callable): the target function to be optimised, should have the vectorised function signature.  See notes.
-
-        design_bounds (list): the bounds for the design space, e.g. [[0, 1], [0, 1]]
-
-        dimension (int): the dimension of the design space, i.e. the number of parameters
-
-        task (str): either 'minimisation' or 'maximisation'
-
-        acquisition_function (str or callable, optional): the acquisition function to be used, e.g. 'UCB', 'EI', 'PI'. If None, defaults to 'UCB'.
-
-        num_explorations (int, optional): the number of initial exploration points. Defaults to 100.
-
-        num_iterations (int, optional): the number of iterations to run the optimisation. Defaults to 100.
-
-    note:
-        Acquisition functions can be either a string (e.g. 'UCB', 'EI', 'PI') or a callable function.
-        'UCB' stands for Upper Confidence Bound, 'EI' for Expected Improvement, and 'PI' for Probability of Improvement.
-        If a string is provided, the parameter for the acquisition function can be passed as an additional
-        argument to the class constructor
-
-        - function wrapper:
-            bla ...
-
+    See `BayesOpt` for additional details.
     """
 
     def __init__(
@@ -334,11 +287,12 @@ class BayesOpt_vectorised_signature(BayesOpt_args_signature):
 class BayesOpt(BayesOpt_args_signature):
     """Bayesian Optimisation class with automatic function signature detection
 
+    The go to class for Bayesian Optimisation
+
     args:
         f (callable): the target function to be optimised, it could be vectorised or iterable signature but NOT arguments signature. See notes.
 
         design_bounds (list | np.ndarray): the bounds for the design space, e.g. [[0, 1], [0, 1]]
-
 
         task (str): either 'minimisation' or 'maximisation'
 
@@ -365,12 +319,11 @@ class BayesOpt(BayesOpt_args_signature):
     example:
         >>> import numpy as np
         >>> from pyuncertainnumber.opt.bo import BayesOpt
-        >>> def black_box_function(x):
-        ...     return np.exp(-(x - 2)**2) + np.exp(-(x - 6)**2 / 10) + 1 / (x**2 + 1)
+        >>> def foo_vec(x):
+        ...     return x[:, 0] ** 3 + x[:, 1] + x[:, 2]
         >>> bo = BayesOpt(
-        ...     f=black_box_function,
-        ...     dimension=1,
-        ...     design_bounds={'x': (-2, 10)},
+        ...     f=foo_vec,
+        ...     design_bounds=[(-2, 2), (-3, 3), (-1, 1)],
         ...     task='maximisation',
         ...     num_explorations=3,
         ...     num_iterations=20
@@ -380,15 +333,12 @@ class BayesOpt(BayesOpt_args_signature):
 
     .. admonition:: Implementation
 
-        The range of the design space is defined by `varbound`, which is a 2D numpy array with shape (n, 2), where n is the number of parameters.
-        This is a different signature compared to the Bayesian Optimisation class, which uses a dictionary for bounds.
-        For consistency, it is recommended to use the class `EpistemicDomain.to_varbound()` to automatically take care of the format of the bounds.
+        The range of the design space is defined by `design_bounds`, which is a 2D numpy array with shape (n, 2), where n is the number of parameters.
+        For consistency, it is recommended to use the class `EpistemicDomain.to_BayesOptBounds()` to automatically take care of the format of the bounds.
 
         example:
-        >>> ed = EpistemicDomain(pba.I(-5, 5), pba.I(-5, 5))
-        >>> BayesOpt(f=foo,
-        ...     dimension=2,
-        ...     design_bounds= ed.to_BayesOptBounds(),  # the trick
+        >>> BayesOpt(f=foo_vec,
+        ...     design_bounds= [(-2, 2), (-3, 3), (-1, 1)],
         ...     task='maximisation',
         ...     num_explorations=3,
         ...     num_iterations=20,
