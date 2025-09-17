@@ -40,12 +40,10 @@ def foo_universal(x):
         - this function works with a vector Interval object
         - but wrong answer with a 2d matrix Interval object due to unclear broadcasting rules
     """
-    from ..pba.intervals.number import Interval
 
-    # foo_iterable signature
-    if isinstance(x, list | tuple | Interval):
+    if isinstance(x, list | tuple):  # foo_iterable signature
         return x[0] ** 3 + x[1] + x[2]
-    elif isinstance(x, np.ndarray):
+    elif isinstance(x, np.ndarray):  # foo_vectorised signature
         if x.ndim == 1:
             x = x[None, :]
         return x[:, 0] ** 3 + x[:, 1] + x[:, 2]

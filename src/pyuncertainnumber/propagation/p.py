@@ -204,24 +204,9 @@ class EpistemicPropagation(P):
         ), "Not all variables are intervals"
 
     def method_check(self):
-        assert self.method in [
-            "endpoint",
-            "endpoints",
-            "vertex",
-            "extremepoints",
-            "subinterval",
-            "subinterval_reconstitution",
-            "cauchy",
-            "endpoint_cauchy",
-            "endpoints_cauchy",
-            "local_optimisation",
-            "local_optimization",
-            "local optimisation",
-            "genetic_optimisation",
-            "genetic_optimization",
-        ], f"Method {self.method} not supported for epistemic uncertainty propagation"
+        pass
 
-    def __call__(self, **kwargs):
+    def run(self, **kwargs):
         #! caveat: possibly requires more kwargs for some methods
         """doing the propagation"""
         match self.method:
