@@ -37,11 +37,11 @@ logging.basicConfig(level=logging.INFO)
 class P(ABC):
     """Base class blueprint. Not for direct use"""
 
-    def __init__(self, vars, func, method, save_raw_data: bool = False):
+    def __init__(self, vars, func, method, dependency=None):
         self._vars = vars
         self.func = func
         self.method = method
-        self.save_raw_data = save_raw_data
+        self.dependency = dependency
 
     def post_init_check(self):
         """some checks"""
@@ -97,8 +97,8 @@ class AleatoryPropagation(P):
 
     from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
 
-    def __init__(self, vars, func, method, save_raw_data: bool = False):
-        super().__init__(vars, func, method, save_raw_data)
+    def __init__(self, vars, func, method, dependency=None):
+        super().__init__(vars, func, method, dependency)
         self.post_init_check()
 
     def type_check(self):
@@ -277,9 +277,8 @@ class MixedPropagation(P):
 
 
     note:
-        Discussion of the methods and strategies.
-        When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
-        whereas "subinterval" and "endpoints" require the function to take a vectorised signature.
+        Discussion of the methods and strategies. When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
+        whereas "subinterval" and "endpoints" require the function to take a vectorised signature. Currently, only "interval_monte_carlo" supports with dependency structures (e.g. copulas).
 
     example:
         >>> from pyuncertainnumber import pba
@@ -292,9 +291,9 @@ class MixedPropagation(P):
         >>> result = mix(n_slices=20, n_sub=2, style='endpoints')
     """
 
-    def __init__(self, vars, func, method, interval_strategy=None):
+    def __init__(self, vars, func, method, dependency=None, interval_strategy=None):
 
-        super().__init__(vars, func, method)
+        super().__init__(vars, func, method, dependency)
         self.interval_strategy = interval_strategy
         self.post_init_check()
 
@@ -320,7 +319,8 @@ class MixedPropagation(P):
         """doing the propagation"""
         match self.method:
             case "interval_monte_carlo":
-                handler = interval_monte_carlo
+                imc_w_d = partial(interval_monte_carlo, dependency=self.dependency)
+                handler = imc_w_d
             case "slicing":
                 handler = slicing
             case "double_monte_carlo":
