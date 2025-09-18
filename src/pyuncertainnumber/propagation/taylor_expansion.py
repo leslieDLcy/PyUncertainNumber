@@ -5,7 +5,7 @@ import jax.numpy as jnp
 """ Taylor expansions for the moments of functions of random variables """
 
 
-def taylor_expansion_method(func, mean, *, var=None, cov=None):
+def taylor_expansion_method(func, mean, *, var=None, cov=None) -> tuple:
     """Performs uncertainty propagation using the Taylor expansion method.
 
     args:

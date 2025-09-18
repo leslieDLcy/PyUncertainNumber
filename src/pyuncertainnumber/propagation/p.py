@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from functools import partial
+
+from pyuncertainnumber import pba
 from .epistemic_uncertainty.extremepoints import extremepoints_method
 from .epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
 from .epistemic_uncertainty.local_optimisation import local_optimisation_method
@@ -62,7 +64,7 @@ class P(ABC):
 
 
 class AleatoryPropagation(P):
-    """Aleatoric uncertainty propagation class for construct
+    """Aleatoric uncertainty propagation class for Distribution constructs only
 
     args:
         vars (Distribution): a list of uncertain numbers objects
@@ -71,9 +73,12 @@ class AleatoryPropagation(P):
 
         method (str): a string indicating the method to be used for propagation.
 
+        dependency (string or Dependency): a Dependency object(i.e. a copula function) to model the dependency structure among input variables.
+            Strings such as "independence" accepted for independence.
+
 
     note:
-        Supported methods include "monte_carlo", "latin_hypercube".
+        Supported methods include "monte_carlo". Note that "taylor_expansion" is not supported herein but implemented as a standalone function in the module `taylor_expansion.py`.
 
     caution:
         This function supports with low-level constructs NOT the high-level `UN` (uncertain number) objects.
@@ -96,6 +101,7 @@ class AleatoryPropagation(P):
     """
 
     from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
+    from .taylor_expansion import taylor_expansion_method
 
     def __init__(self, vars, func, method, dependency=None):
         super().__init__(vars, func, method, dependency)
@@ -120,38 +126,28 @@ class AleatoryPropagation(P):
         """doing the propagation"""
         match self.method:
             case "monte_carlo":
-                # regular sampling style
-                try:
+                if self.dependency is None or self.dependency == "independence":
                     # regular sampling style
-                    input_samples = [v.sample(n_sam) for v in self._vars]
-                    output_samples = self.func(input_samples)
-                except Exception as e:
-                    # vectorised sampling style
-                    input_samples = np.array(
-                        [v.sample(n_sam) for v in self._vars]
-                    ).T  # (n_sam, n_vars) == (n, d)
-                    output_samples = self.func(input_samples)
-            case "latin_hypercube" | "lhs":
-                sampler = qmc.LatinHypercube(d=len(self._vars))
-                lhs_samples = sampler.random(n=n_sam)  # u-space (n, d)
+                    try:
+                        # regular sampling style
+                        input_samples = [v.sample(n_sam) for v in self._vars]
+                        output_samples = self.func(input_samples)
+                    except Exception as e:
+                        # vectorised sampling style
+                        input_samples = np.array(
+                            [v.sample(n_sam) for v in self._vars]
+                        ).T  # (n_sam, n_vars) == (n, d)
+                        output_samples = self.func(input_samples)
+                        return output_samples
+                else:
+                    j = pba.JointDistribution(
+                        copula=self.dependency, marginals=self._vars
+                    )
 
-                try:
-                    # regular sampling style
-                    input_samples = [
-                        v.alpha_cut(lhs_samples[:, i]) for i, v in enumerate(self._vars)
-                    ]
-                    output_samples = self.func(input_samples)
-                except Exception as e:
-                    # vectorised sampling style
-                    input_samples = np.array(
-                        [
-                            v.alpha_cut(lhs_samples[:, i])
-                            for i, v in enumerate(self._vars)
-                        ]
-                    ).T
-                    output_samples = self.func(input_samples)
-            case "taylor_expansion":
-                pass
+                    s_inputs = j.sample(n_sam)  # (n_sam, n_vars)
+
+                    output_samples = self.func(s_inputs)
+                    return output_samples
             case _:
                 raise ValueError("method not yet supported")
         return output_samples
