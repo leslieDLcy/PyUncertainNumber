@@ -1,7 +1,15 @@
 import numpy as np
 import random as rd
 
-def iterative_filter(func,variables,nsamples,thresholds,conditions,folder,max_repetitions=3,index=None,controls=None):
+def iterative_filter(func,
+                     variables,
+                     nsamples,
+                     thresholds,
+                     conditions,
+                     folder,
+                     max_repetitions=3,
+                     index=None,
+                     controls=None):
     '''func is the function being used to get the outputs.
     variables is a dictionary that contains the names and bounds of all variables within the function.
     nsamples is the number of samples taken for each variable.
@@ -9,7 +17,8 @@ def iterative_filter(func,variables,nsamples,thresholds,conditions,folder,max_re
     conditions are a set/dictionary of optimal/correct values that the outputs of interest will need to meet.
     folder is where all outputs of this function will be stored in.
     index is a list of indexes referring to the list of variables that are being filtered.
-    controls are the list of indexes referring to the variables whose values are unique to the condition being used.'''
+    controls are the list of indexes referring to the variables whose values are unique to the condition being used.
+    '''
 
     if index == None: #If i is None, that means that no variables are selected for filtering which does not make sense and so returns an error
         raise ValueError("No variables selected for filtering, use the index to list variables to be filtered.")
