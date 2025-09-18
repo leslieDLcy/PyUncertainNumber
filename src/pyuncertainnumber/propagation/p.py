@@ -88,9 +88,9 @@ class AleatoryPropagation(P):
         >>> from pyuncertainnumber import pba
         >>> from pyuncertainnumber.propagation.p import AleatoryPropagation
         >>> def foo(x): return x[0] ** 3 + x[1] + x[2]
-        >>> a = pba.Distribution('gaussian', (3,1))
-        >>> b = pba.Distribution('gaussian', (10, 1))
-        >>> c = pba.Distribution('uniform', (5, 10))
+        >>> a_d = pba.Distribution('gaussian', (3,1))
+        >>> b_d = pba.Distribution('gaussian', (10, 1))
+        >>> c_d = pba.Distribution('uniform', (5, 10))
         >>> aleatory = AleatoryPropagation(vars=[a_d, b_d, c_d], func=foo, method='monte_carlo')
         >>> result = aleatory(n_sam=1000)
     """
