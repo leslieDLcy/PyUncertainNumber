@@ -1,8 +1,13 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
 from functools import partial
-
+from abc import ABC, abstractmethod
 from pyuncertainnumber import pba
+from ..characterisation.uncertainNumber import UncertainNumber
+from ..pba.pbox_abc import Pbox
+from ..pba.intervals.number import Interval
+from ..pba.distributions import Distribution
+from ..pba.dependency import Dependency
+from ..propagation.epistemic_uncertainty.b2b import b2b
+from ..decorator import constructUN
 from .epistemic_uncertainty.extremepoints import extremepoints_method
 from .epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
 from .epistemic_uncertainty.local_optimisation import local_optimisation_method
@@ -14,21 +19,9 @@ from .mixed_uncertainty.mixed_up import (
 )
 from ..pba.intervals.intervalOperators import make_vec_interval
 import numpy as np
-from scipy.stats import qmc
 
-from abc import ABC, abstractmethod
-from ..pba.pbox_abc import Pbox
-from ..pba.intervals.number import Interval
-from ..pba.distributions import Distribution
-from ..propagation.epistemic_uncertainty.b2b import b2b
-from ..decorator import constructUN
 
 """the new top-level module for the propagation of uncertain numbers"""
-
-
-if TYPE_CHECKING:
-    from ..characterisation.uncertainNumber import UncertainNumber
-
 
 import logging
 
@@ -352,6 +345,9 @@ class Propagation:
             a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.) which may depend on the constructs of the uncertain numbers.
             See notes about function signature.
 
+        dependency (string or Dependency): a Dependency object(i.e. a copula function) to model the dependency structure among input variables.
+            Strings such as "independence" accepted for independence.
+
         interval_strategy (str):
             a strategy for interval propagation, including {'direct', 'subinterval', 'endpoints'} which will
             affect the function signature of the response function. See notes about function signature.
@@ -394,12 +390,14 @@ class Propagation:
         vars: list[UncertainNumber],
         func: callable,
         method: str,
+        dependency: str | Dependency = None,
         interval_strategy: str = None,
     ):
 
         self._vars = vars
         self._func = func
         self.method = method
+        self.dependency = dependency
         self.interval_strategy = interval_strategy
         self._post_init_check()
 
@@ -433,15 +431,18 @@ class Propagation:
         elif all_D:
             logging.info("distribution propagation")
             # all distributions
-            self.p = AleatoryPropagation(self._constructs, self._func, self.method)
+            self.p = AleatoryPropagation(
+                self._constructs, self._func, self.method, self.dependency
+            )
         elif (has_I and has_D) or has_P:
             # mixed uncertainty
             logging.info("mixed uncertainty propagation")
             self.p = MixedPropagation(
-                self._constructs,
-                self._func,
-                self.method,
-                self.interval_strategy,
+                vars=self._constructs,
+                func=self._func,
+                method=self.method,
+                dependency=self.dependency,
+                interval_strategy=self.interval_strategy,
                 # interval_strategy=self.kwargs.get("interval_strategy", None),
             )
         else:
