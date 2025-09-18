@@ -393,6 +393,10 @@ class UncertainNumber:
             return cls.fromDistribution(construct)
         if isinstance(construct, cls):
             return construct
+        if isinstance(
+            construct, np.ndarray
+        ):  # a fail-safe exit, which may be coerced into a Distribution UN later on
+            return construct
         else:
             raise ValueError("The construct object is not recognised")
 
