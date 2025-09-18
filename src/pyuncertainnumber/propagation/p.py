@@ -23,12 +23,6 @@ from ..decorator import constructUN
 
 """the new top-level module for the propagation of uncertain numbers"""
 
-"""crossover logic
-
-UncertainNumber: ops are indeed the ops for the underlying constructs
-
-"""
-
 
 if TYPE_CHECKING:
     from ..characterisation.uncertainNumber import UncertainNumber
@@ -36,7 +30,6 @@ if TYPE_CHECKING:
 
 import logging
 
-# Basic configuration for logging
 logging.basicConfig(level=logging.INFO)
 
 
@@ -73,7 +66,9 @@ class AleatoryPropagation(P):
 
     args:
         vars (Distribution): a list of uncertain numbers objects
+
         func (callable): the response or performance function applied to the uncertain numbers
+
         method (str): a string indicating the method to be used for propagation.
 
 
@@ -93,9 +88,9 @@ class AleatoryPropagation(P):
         >>> from pyuncertainnumber import pba
         >>> from pyuncertainnumber.propagation.p import AleatoryPropagation
         >>> def foo(x): return x[0] ** 3 + x[1] + x[2]
-        >>> a = pba.Distribution('gaussian', (3,1))
-        >>> b = pba.Distribution('gaussian', (10, 1))
-        >>> c = pba.Distribution('uniform', (5, 10))
+        >>> a_d = pba.Distribution('gaussian', (3,1))
+        >>> b_d = pba.Distribution('gaussian', (10, 1))
+        >>> c_d = pba.Distribution('uniform', (5, 10))
         >>> aleatory = AleatoryPropagation(vars=[a_d, b_d, c_d], func=foo, method='monte_carlo')
         >>> result = aleatory(n_sam=1000)
     """
@@ -121,7 +116,7 @@ class AleatoryPropagation(P):
             "latin_hypercube",
         ], "Method not supported for aleatory uncertainty propagation"
 
-    def __call__(self, n_sam: int = 1000):
+    def run(self, n_sam: int = 1000):
         """doing the propagation"""
         match self.method:
             case "monte_carlo":
@@ -167,8 +162,11 @@ class EpistemicPropagation(P):
 
     args:
         vars (Interval): a list of interval objects
+
         func (callable): the response or performance function applied to the uncertain numbers
+
         method (str): a string indicating the method to be used for propagation
+
         interval_strategy (str): a strategy for interval propagation, including {'endpoints', 'subinterval'}
 
     caution:
@@ -214,9 +212,14 @@ class EpistemicPropagation(P):
                 handler = partial(b2b, interval_strategy="endpoints")
             case "extremepoints":
                 handler = extremepoints_method
-            case "subinterval" | "subinterval_reconstitution":
+            case "subinterval" | "subintervals" | "subinterval_reconstitution":
                 handler = partial(b2b, interval_strategy="subinterval")
-            case "cauchy" | "endpoint_cauchy" | "endpoints_cauchy":
+            case (
+                "cauchy"
+                | "cauchy_deviate_method"
+                | "endpoint_cauchy"
+                | "endpoints_cauchy"
+            ):
                 handler = cauchydeviates_method
             case (
                 "local_optimization"
@@ -232,6 +235,8 @@ class EpistemicPropagation(P):
                 | "genetic optimisation"
             ):
                 handler = genetic_optimisation_method
+            case "bayesian_optimisation" | "bo":
+                handler = partial(b2b, interval_strategy="bo")
             case _:
                 raise ValueError("Unknown method")
 
@@ -250,9 +255,12 @@ class MixedPropagation(P):
 
     args:
         vars (Pbox or DempsterShafer): a list of uncertain numbers objects
+
         func (callable): the response or performance function applied to the uncertain numbers
+
         method (str): a string indicating the method to be used for pbox propagation, including {'interval_monte_carlo', 'slicing', 'double_monte_carlo'}.
-        interval_strategy (str): a strategy for interval propagation, including {'direct', 'subinterval', 'endpoints'}.
+
+        interval_strategy (str): a sub-level strategy selector for interval propagation, including {'direct', 'subinterval', 'endpoints'}.
 
     caution:
         This function supports with low-level constructs NOT the high-level `UN` (uncertain number) objects.
@@ -308,7 +316,7 @@ class MixedPropagation(P):
             "double_monte_carlo",
         ], f"Method {self.method} not supported for mixed uncertainty propagation"
 
-    def __call__(self, **kwargs):
+    def run(self, **kwargs):
         """doing the propagation"""
         match self.method:
             case "interval_monte_carlo":
@@ -332,10 +340,13 @@ class Propagation:
 
     args:
         vars (UncertainNumber): a list of uncertain numbers objects
+
         func (Callable): the response or performance function applied to the uncertain numbers
+
         method (str):
             a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.) which may depend on the constructs of the uncertain numbers.
             See notes about function signature.
+
         interval_strategy (str):
             a strategy for interval propagation, including {'direct', 'subinterval', 'endpoints'} which will
             affect the function signature of the response function. See notes about function signature.
@@ -448,4 +459,4 @@ class Propagation:
         """
 
         # choose the method accordingly
-        return self.p(**kwargs)
+        return self.p.run(**kwargs)

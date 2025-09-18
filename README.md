@@ -53,7 +53,7 @@ def foo(x): return x[0] ** 3 + x[1] + 2
 response = foo([a, b])
 
 # alternatively, one can use a more generic call signature for propagation
-p = Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='direct')
+p = pun.Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='direct')
 response = p.run(n_slices=50)
 ```
 

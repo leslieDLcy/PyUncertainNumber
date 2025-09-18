@@ -36,18 +36,19 @@ def _bound_pcdf(dist_family, *args, **kwargs):
     """
     from .pbox_abc import Leaf
 
-    Left, Right, mean, var = _parametric_bounds(dist_family, *args, **kwargs)
+    Left, Right, mean, var = _parametric_bounds_array(dist_family, *args, **kwargs)
     return Leaf(
         left=Left, right=Right, shape=dist_family, dist_params=args, mean=mean, var=var
     )
 
 
-def _parametric_bounds(dist_family, *args, steps=Params.steps, **kwargs):
+def _parametric_bounds_array(dist_family, *args, **kwargs):
     """from parametric distribution specification to define the lower and upper bound of the p-box
 
     args:
-        - dist_family: (str) the name of the distribution
-        - *args : several parameter (interval or list)
+        dist_family: (str) the name of the distribution
+        *args : several parameter (interval or list)
+        **kwargs : scale parameters (interval or list)
 
     note:
         - middle level implementation
@@ -66,33 +67,17 @@ def _parametric_bounds(dist_family, *args, steps=Params.steps, **kwargs):
     else:
         new_args = itertools.product(*[i.to_numpy() for i in i_args])
 
-    p = Params.p_values
+    dist = named_dists[dist_family]
+    g1, g2 = itertools.tee(new_args, 2)
+    bounds = [dist.ppf(Params.p_values, *a) for a in g1]
+    stats = [dist.stats(*a, moments="mv") for a in g2]
 
-    bounds = []
+    means, vars_ = zip(*stats)
+    mean = I(min(means), max(means))
+    var = I(min(vars_), max(vars_))
 
-    mean_hi = -np.inf
-    mean_lo = np.inf
-    var_lo = np.inf
-    var_hi = 0
-
-    for a in new_args:
-        bounds.append(named_dists[dist_family].ppf(p, *a))  # bounds quantiles
-        bmean, bvar = named_dists[dist_family].stats(*a, moments="mv")
-
-        if bmean < mean_lo:
-            mean_lo = bmean
-        if bmean > mean_hi:
-            mean_hi = bmean
-        if bvar > var_hi:
-            var_hi = bvar
-        if bvar < var_lo:
-            var_lo = bvar
-
-    Left = np.array([min([b[i] for b in bounds]) for i in range(steps)])
-    Right = np.array([max([b[i] for b in bounds]) for i in range(steps)])
-
-    var = I(var_lo, var_hi)
-    mean = I(mean_lo, mean_hi)
+    Left = np.min(bounds, axis=0)
+    Right = np.max(bounds, axis=0)
 
     return Left, Right, mean, var
 
