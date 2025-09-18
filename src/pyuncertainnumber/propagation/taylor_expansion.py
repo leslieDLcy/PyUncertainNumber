@@ -9,7 +9,7 @@ def taylor_expansion_method(func, mean, *, var=None, cov=None) -> tuple:
     """Performs uncertainty propagation using the Taylor expansion method.
 
     args:
-        func: function to propagate uncertainty through
+        func: function to propagate uncertainty through. Expecting a iterable-signature function.
         mean: mean of the input random variable (scalar or vector)
         var: variance of the input random variable (scalar only)
         cov: covariance matrix of the input random vector (vector only)
@@ -22,6 +22,15 @@ def taylor_expansion_method(func, mean, *, var=None, cov=None) -> tuple:
         Currently it only supports scalar-output functions. Also, for multivariate function, the
         calling signature is assumed to be func(x) where x is a 1D array, i.e. func: R^n -> R, the vec style.
         For best compatibility to work with derivatives, the `func` is better written in jax.numpy.
+
+
+    example:
+    >>> import jax.numpy as jnp
+    >>> from pyuncertainnumber import taylor_expansion_method
+    >>> MEAN= jnp.array([3., 2.5])
+    >>> COV = jnp.array([[4, 0.3], [0.3, 0.25]])
+    >>> def bar(x): return x[0]**2 + x[1] + 3
+    >>> mu_, var_ = taylor_expansion_method(func=bar, mean=MEAN, cov=COV)
 
     """
     if mean.ndim == 1:  # random vector
