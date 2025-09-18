@@ -292,8 +292,6 @@ class Distribution(NominalValueMixin):
 class JointDistribution:
     """Joint distribution class
 
-    tip:
-        Bivariate implementation supported by now. Multivariate case is under development.
 
     example:
         >>> from pyuncertainnumber import pba

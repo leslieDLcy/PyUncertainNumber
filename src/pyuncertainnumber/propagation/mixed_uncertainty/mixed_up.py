@@ -81,14 +81,6 @@ def interval_monte_carlo(
         ndim = len(vars)
         dependency = Dependency(family="independence", k_dim=ndim)
         """old code for independent case only, which is driven by a cartesian product implementation"""
-        # from scipy.stats import qmc
-
-        # p_vars = [convert_pbox(v) for v in vars]
-
-        # # this change when there's specified dependency structure
-        # alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
-        # itvs = [v.alpha_cut(alpha) for v in p_vars]
-        # container = [b2b_f(_item) for _item in itertools.product(*itvs)]
 
     prob_proxy_input = dependency.u_sample(n_sam, random_state=random_state)
 
