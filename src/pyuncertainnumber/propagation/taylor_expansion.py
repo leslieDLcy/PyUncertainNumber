@@ -10,9 +10,9 @@ def taylor_expansion_method(func, mean, *, var=None, cov=None) -> tuple:
 
     args:
         func: function to propagate uncertainty through. Expecting a iterable-signature function.
-        mean: mean of the input random variable (scalar or vector)
-        var: variance of the input random variable (scalar only)
-        cov: covariance matrix of the input random vector (vector only)
+        mean (Jax array): mean of the input random variable (scalar or vector)
+        var (Jax array): variance of the input random variable (scalar only)
+        cov (Jax array): covariance matrix of the input random vector (vector only)
 
     returns:
         mu_f: mean of the output random variable through the function

@@ -256,6 +256,9 @@ class MixedPropagation(P):
 
         method (str): a string indicating the method to be used for pbox propagation, including {'interval_monte_carlo', 'slicing', 'double_monte_carlo'}.
 
+        dependency (string or Dependency): a Dependency object(i.e. a copula function) to model the dependency structure among input variables.
+            Strings such as "independence" accepted for independence.
+
         interval_strategy (str): a sub-level strategy selector for interval propagation, including {'direct', 'subinterval', 'endpoints'}.
 
     caution:
@@ -276,6 +279,9 @@ class MixedPropagation(P):
         Discussion of the methods and strategies. When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
         whereas "subinterval" and "endpoints" require the function to take a vectorised signature. Currently, only "interval_monte_carlo" supports with dependency structures (e.g. copulas).
 
+        When calling the `run` function to do propagation, extra keyword arguments are needed to be passed down to the selected `method`.
+        For example, `n_sam` for "interval_monte_carlo"; `n_slices` for "slicing"; `n_outer`, `n_inner` for "double_monte_carlo".
+
     example:
         >>> from pyuncertainnumber import pba
         >>> from pyuncertainnumber.propagation.p import MixedPropagation
@@ -284,7 +290,7 @@ class MixedPropagation(P):
         >>> b = pba.normal([10, 14], [1])
         >>> c = pba.normal([4, 5], [1])
         >>> mix = MixedPropagation(vars=[a,b,c], func=foo, method='slicing', interval_strategy='subinterval')
-        >>> result = mix(n_slices=20, n_sub=2, style='endpoints')
+        >>> result = mix.run(n_slices=20, n_sub=2, style='endpoints')
     """
 
     def __init__(self, vars, func, method, dependency=None, interval_strategy=None):
@@ -312,11 +318,14 @@ class MixedPropagation(P):
         ], f"Method {self.method} not supported for mixed uncertainty propagation"
 
     def run(self, **kwargs):
-        """doing the propagation"""
+        """doing the propagation. Extra keyword are needed to be passed down to the selected `method`"""
         match self.method:
             case "interval_monte_carlo":
-                imc_w_d = partial(interval_monte_carlo, dependency=self.dependency)
-                handler = imc_w_d
+                if self.dependency is None or self.dependency == "independence":
+                    handler = partial(interval_monte_carlo, dependency=None)
+                else:
+                    imc_w_d = partial(interval_monte_carlo, dependency=self.dependency)
+                    handler = imc_w_d
             case "slicing":
                 handler = slicing
             case "double_monte_carlo":
