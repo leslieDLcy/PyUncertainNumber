@@ -121,7 +121,7 @@ class AleatoryPropagation(P):
             "latin_hypercube",
         ], "Method not supported for aleatory uncertainty propagation"
 
-    def __call__(self, n_sam: int = 1000):
+    def run(self, n_sam: int = 1000):
         """doing the propagation"""
         match self.method:
             case "monte_carlo":
@@ -308,7 +308,7 @@ class MixedPropagation(P):
             "double_monte_carlo",
         ], f"Method {self.method} not supported for mixed uncertainty propagation"
 
-    def __call__(self, **kwargs):
+    def run(self, **kwargs):
         """doing the propagation"""
         match self.method:
             case "interval_monte_carlo":
@@ -448,4 +448,4 @@ class Propagation:
         """
 
         # choose the method accordingly
-        return self.p(**kwargs)
+        return self.run(**kwargs)

@@ -67,6 +67,7 @@ This package is underpined by a framework of **uncertain number** which allows f
 
 ```python
 from pyuncertainnumber import UncertainNumber as UN
+import pyuncertainnumber as pun
 
 e = UN(
     name='elas_modulus', 
@@ -91,7 +92,7 @@ def foo(x): return x[0] ** 3 + x[1] + 2
 response = foo([a, b])
 
 # alternatively, one can use a more generic call signature
-p = Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='direct')
+p = pun.Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='direct')
 response = p.run(n_slices=50)
 ```
 
