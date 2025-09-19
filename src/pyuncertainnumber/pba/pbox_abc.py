@@ -11,10 +11,10 @@ import operator
 import itertools
 from .utils import (
     condensation,
-    smooth_condensation,
     find_nearest,
     is_increasing,
     left_right_switch,
+    variance_bounds_via_lp,
 )
 import logging
 from .operation import vectorized_cartesian_op
@@ -30,30 +30,6 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(levelname)s: %(message)s",
 )
-
-
-def get_mean_var_from_ecdf(q, p):
-    """Numerically estimate the mean and var from ECDF data
-
-    args:
-        q (array-like): quantiles
-        p (array-like): probabilities
-
-    example:
-        >>> # Given ECDF data an example
-        >>> q = [1, 2, 3, 4]
-        >>> p = [0.25, 0.5, 0.75, 1.0]
-    """
-
-    # Step 1: Recover PMF
-    pmf = [p[0]] + [p[i] - p[i - 1] for i in range(1, len(p))]
-
-    # Step 2: Compute Mean
-    mean = sum(x * p for x, p in zip(q, pmf))
-
-    # Step 3: Compute Variance
-    variance = sum(p * (x - mean) ** 2 for x, p in zip(q, pmf))
-    return mean, variance
 
 
 def bound_steps_check(bound):
@@ -345,9 +321,16 @@ class Staircase(Pbox):
         """initialised `mean`, `var` and `range` bounds"""
 
         #! should we compute mean if it is a Cauchy, var if it's a t distribution?
-        #! we assume that two extreme bounds are valid CDFs
-        self.mean_lo, self.var_lo = get_mean_var_from_ecdf(self.left, self._pvalues)
-        self.mean_hi, self.var_hi = get_mean_var_from_ecdf(self.right, self._pvalues)
+        dict_moments = variance_bounds_via_lp(
+            q_a=self.left,
+            p_a=self._pvalues,
+            q_b=self.right,
+            p_b=self._pvalues,
+            x_grid=np.linspace(self.lo, self.hi, 50),
+        )
+
+        self.mean_lo, self.mean_hi = dict_moments["mu_min"], dict_moments["mu_max"]
+        self.var_lo, self.var_hi = dict_moments["var_min"], dict_moments["var_max"]
         try:
             self.mean = I(self.mean_lo, self.mean_hi)
         except:
