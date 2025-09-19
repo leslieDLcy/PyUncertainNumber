@@ -349,6 +349,10 @@ def variance_bounds_via_lp(q_a, p_a, q_b, p_b, x_grid, n=None, mu_grid=101):
     """
     if n is None:
         n = len(p_a)
+
+    if np.array_equal(q_a, q_b):
+        mean, var = get_mean_var_from_ecdf(q_a, p_a)
+        return dict(var_min=var, var_max=var, mu_min=mean, mu_max=mean)
     x, L, U, n = build_constraints_from_pbox(q_a, p_a, q_b, p_b, x_grid, n=n)
     mu_min, mu_max, A_ub, b_ub, A_eq, b_eq, bounds = lp_mean_bounds(x, L, U, n)
     mus = np.linspace(mu_min, mu_max, mu_grid)
@@ -390,9 +394,6 @@ def get_mean_var_from_ecdf(q, p):
     # Step 3: Compute Variance
     variance = sum(p * (x - mean) ** 2 for x, p in zip(q, pmf))
     return mean, variance
-
-
-import numpy as np
 
 
 def sample_ecdf_in_pbox(q_a, p_a, q_b, p_b, x_grid=None, n=None, rng=None, eps=1e-12):

@@ -45,6 +45,11 @@ from pyuncertainnumber.pba.aggregation import *
 from pyuncertainnumber.propagation.epistemic_uncertainty.b2b import b2b
 from pyuncertainnumber.propagation.p import Propagation
 from pyuncertainnumber.propagation.taylor_expansion import taylor_expansion_method
+from pyuncertainnumber.propagation.mixed_uncertainty.mixed_up import (
+    interval_monte_carlo,
+    slicing,
+    double_monte_carlo,
+)
 
 # * ---------------------  utils ---------------------*#
 from pyuncertainnumber.pba import inspect_un

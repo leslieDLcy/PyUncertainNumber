@@ -319,27 +319,28 @@ class Staircase(Pbox):
 
     def _init_moments(self):
         """initialised `mean`, `var` and `range` bounds"""
+        if (self.mean is None) or (self.var is None):
 
-        #! should we compute mean if it is a Cauchy, var if it's a t distribution?
-        dict_moments = variance_bounds_via_lp(
-            q_a=self.left,
-            p_a=self._pvalues,
-            q_b=self.right,
-            p_b=self._pvalues,
-            x_grid=np.linspace(self.lo, self.hi, 50),
-        )
+            #! should we compute mean if it is a Cauchy, var if it's a t distribution?
+            dict_moments = variance_bounds_via_lp(
+                q_a=self.left,
+                p_a=self._pvalues,
+                q_b=self.right,
+                p_b=self._pvalues,
+                x_grid=np.linspace(self.lo, self.hi, 50),
+            )
 
-        self.mean_lo, self.mean_hi = dict_moments["mu_min"], dict_moments["mu_max"]
-        self.var_lo, self.var_hi = dict_moments["var_min"], dict_moments["var_max"]
-        try:
-            self.mean = I(self.mean_lo, self.mean_hi)
-        except:
-            self.mean = I(666, 666)
-        # TODO tmp solution for computing var for pbox
-        try:
-            self.var = I(self.var_lo, self.var_hi)
-        except:
-            self.var = I(666, 666)
+            self.mean_lo, self.mean_hi = dict_moments["mu_min"], dict_moments["mu_max"]
+            self.var_lo, self.var_hi = dict_moments["var_min"], dict_moments["var_max"]
+            try:
+                self.mean = I(self.mean_lo, self.mean_hi)
+            except:
+                self.mean = I(666, 666)
+            # TODO tmp solution for computing var for pbox
+            try:
+                self.var = I(self.var_lo, self.var_hi)
+            except:
+                self.var = I(666, 666)
 
     def __repr__(self):
         def format_interval(interval):
