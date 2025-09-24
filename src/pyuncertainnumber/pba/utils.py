@@ -262,112 +262,131 @@ def left_right_switch(left, right):
 
 
 # * ----------------------- pbox variance bounds via LP -----------------------*#
+import numpy as np
+from scipy.optimize import linprog
 
 
-def build_constraints_from_pbox(q_a, p_a, q_b, p_b, x_grid, n=200, eps=1e-12):
+def build_constraints_from_pbox_robust(q_a, p_a, q_b, p_b, x_grid, n=None, eps=1e-12):
+    """
+    Returns x, L, U, n and also the envelopes F_L, F_U on x_grid.
+    If F_L==F_U (degenerate p-box), we set L=U=round(n*F) exactly to avoid infeasibility.
+    """
     x = np.asarray(x_grid, float)
-    p_a = np.asarray(p_a, float)
     q_a = np.asarray(q_a, float)
-    p_b = np.asarray(p_b, float)
+    p_a = np.asarray(p_a, float)
     q_b = np.asarray(q_b, float)
+    p_b = np.asarray(p_b, float)
+    if n is None:
+        n = len(p_a)
 
-    # envelopes on x-grid
     def step_cdf_from_quantile(q, p, xg):
         idx = np.searchsorted(q, xg, side="right") - 1
         F = np.where(idx >= 0, p[np.clip(idx, 0, len(p) - 1)], 0.0)
         return np.clip(np.maximum.accumulate(F), 0.0, 1.0)
 
-    F_L = step_cdf_from_quantile(q_b, p_b, x)  # lower CDF uses upper quantile curve
-    F_U = step_cdf_from_quantile(q_a, p_a, x)  # upper CDF uses lower quantile curve
+    # Envelopes on x-grid
+    F_L = step_cdf_from_quantile(q_b, p_b, x)  # lower CDF via upper quantiles
+    F_U = step_cdf_from_quantile(q_a, p_a, x)  # upper CDF via lower quantiles
     F_L = np.minimum(F_L, F_U)
-    # integer bounds with tolerance; convert to probabilities
-    L = np.maximum.accumulate(np.ceil(n * (F_L - eps)).astype(int))
-    U = np.maximum.accumulate(np.floor(n * (F_U + eps)).astype(int))
-    U[-1] = n
-    return x, L, U, n
+
+    if np.allclose(F_L, F_U, atol=1e-12, rtol=0):
+        # Degenerate case: one distribution. Build exact integer cumulatives.
+        C = np.rint(n * F_U).astype(int)
+        C = np.clip(np.maximum.accumulate(C), 0, n)
+        C[-1] = n
+        L = C.copy()
+        U = C.copy()
+    else:
+        # General case with tolerant integer bounds
+        L = np.ceil(n * (F_L - eps)).astype(int)
+        U = np.floor(n * (F_U + eps)).astype(int)
+        L = np.clip(np.maximum.accumulate(L), 0, n)
+        U = np.clip(np.maximum.accumulate(U), 0, n)
+        U[-1] = n
+        # Safety
+        if np.any(L > U):
+            raise RuntimeError("Infeasible cumulative bounds (L>U) after rounding.")
+
+    return x, L, U, n, F_L, F_U
 
 
-def lp_mean_bounds(x, L, U, n):
+def variance_bounds_via_lp(q_a, p_a, q_b, p_b, x_grid, n=None, mu_grid=101):
+    x, L, U, n, F_L, F_U = build_constraints_from_pbox_robust(
+        q_a, p_a, q_b, p_b, x_grid, n=n
+    )
+
+    # Degenerate p-box → single distribution
+    if np.allclose(F_L, F_U, atol=1e-12, rtol=0):
+        counts = np.diff(np.concatenate(([0], U)))  # because L==U==C
+        probs = counts / n
+        mu = float(np.dot(probs, x))
+        E2 = float(np.dot(probs, x**2))
+        var = E2 - mu**2
+        return dict(var_min=var, var_max=var, mu_min=mu, mu_max=mu, probs_on_grid=probs)
+
+    # General case (same as before): build LPs
     m = len(x)
-    # Variables p_i >= 0
     A_ub = []
     b_ub = []
-    # cumulative upper: sum_{j<=i} p_j <= U[i]/n
+    # cumulative uppers
     for i in range(m):
         row = np.zeros(m)
         row[: i + 1] = 1.0
         A_ub.append(row)
         b_ub.append(U[i] / n)
-    # cumulative lower: -sum_{j<=i} p_j <= -L[i]/n
+    # cumulative lowers
     for i in range(m):
         row = np.zeros(m)
         row[: i + 1] = -1.0
         A_ub.append(row)
         b_ub.append(-L[i] / n)
-    # equality sum p_i = 1 → as two inequalities (linprog has A_eq too if you prefer)
     A_eq = [np.ones(m)]
     b_eq = [1.0]
     bounds = [(0, 1) for _ in range(m)]
-    # μmin
-    res1 = linprog(
+
+    # Mean bounds
+    r1 = linprog(
         c=x, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method="highs"
     )
-    # μmax
-    res2 = linprog(
+    r2 = linprog(
         c=-x, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method="highs"
     )
-    if not (res1.success and res2.success):
+    if not (r1.success and r2.success):
         raise RuntimeError("Mean LP infeasible.")
-    return res1.fun, -res2.fun, A_ub, b_ub, A_eq, b_eq, bounds
+    mu_min, mu_max = r1.fun, -r2.fun
 
-
-def lp_E2_at_mean(x, A_ub, b_ub, A_eq, b_eq, bounds, mu, maximize=True):
-    # add equality for mean: sum p_i x_i = mu
-    Aeq = A_eq + [x]
-    beq = b_eq + [mu]
-    c = -(x**2) if maximize else (x**2)
-    res = linprog(
-        c=c, A_ub=A_ub, b_ub=b_ub, A_eq=Aeq, b_eq=beq, bounds=bounds, method="highs"
-    )
-    if not res.success:
-        return None
-    E2 = -res.fun if maximize else res.fun
-    return E2
-
-
-def variance_bounds_via_lp(q_a, p_a, q_b, p_b, x_grid, n=None, mu_grid=101):
-    """Approximate variance bounds of a p-box via linear programming.
-
-    It is based on discretisation.
-
-    args:
-        q_a, p_a: lower quantile and its probabilities (upper CDF bound)
-        q_b, p_b: upper quantile and its probabilities (lower CDF bound)
-        x_grid: grid of x values to build constraints on; e.g., np.linspace(xmin, xmax, 200)
-        n: number of discrete points to represent the p-box; if None, use len(p_a)
-        mu_grid: number of mean values to scan between μmin and μmax
-    """
-    if n is None:
-        n = len(p_a)
-
-    if np.array_equal(q_a, q_b):
-        mean, var = get_mean_var_from_ecdf(q_a, p_a)
-        return dict(var_min=var, var_max=var, mu_min=mean, mu_max=mean)
-    x, L, U, n = build_constraints_from_pbox(q_a, p_a, q_b, p_b, x_grid, n=n)
-    mu_min, mu_max, A_ub, b_ub, A_eq, b_eq, bounds = lp_mean_bounds(x, L, U, n)
+    # Sweep μ (or replace with a 1D optimizer if you like)
     mus = np.linspace(mu_min, mu_max, mu_grid)
-    vmin = np.inf
-    vmax = -np.inf
-    qmin_mu = qmax_mu = None
+    vmin, vmax = np.inf, -np.inf
     for mu in mus:
-        E2_max = lp_E2_at_mean(x, A_ub, b_ub, A_eq, b_eq, bounds, mu, maximize=True)
-        E2_min = lp_E2_at_mean(x, A_ub, b_ub, A_eq, b_eq, bounds, mu, maximize=False)
-        if E2_max is not None:
-            vmax = max(vmax, E2_max - mu**2)
-            qmax_mu = mu if vmax == E2_max - mu**2 else qmax_mu
-        if E2_min is not None:
-            vmin = min(vmin, E2_min - mu**2)
-            qmin_mu = mu if vmin == E2_min - mu**2 else qmin_mu
+        # Add mean equality
+        Aeq = A_eq + [x]
+        beq = b_eq + [mu]
+        # Max E[X^2]
+        res_max = linprog(
+            c=-(x**2),
+            A_ub=A_ub,
+            b_ub=b_ub,
+            A_eq=Aeq,
+            b_eq=beq,
+            bounds=bounds,
+            method="highs",
+        )
+        if res_max.success:
+            vmax = max(vmax, -res_max.fun - mu**2)
+        # Min E[X^2]
+        res_min = linprog(
+            c=(x**2),
+            A_ub=A_ub,
+            b_ub=b_ub,
+            A_eq=Aeq,
+            b_eq=beq,
+            bounds=bounds,
+            method="highs",
+        )
+        if res_min.success:
+            vmin = min(vmin, res_min.fun - mu**2)
+
     return dict(var_min=vmin, var_max=vmax, mu_min=mu_min, mu_max=mu_max)
 
 

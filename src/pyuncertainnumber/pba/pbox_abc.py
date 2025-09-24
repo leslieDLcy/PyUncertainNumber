@@ -12,6 +12,7 @@ import itertools
 from .utils import (
     condensation,
     find_nearest,
+    get_mean_var_from_ecdf,
     is_increasing,
     left_right_switch,
     variance_bounds_via_lp,
@@ -20,7 +21,7 @@ import logging
 from .operation import vectorized_cartesian_op
 from .context import get_current_dependency
 from .mixins import NominalValueMixin
-
+from contextlib import suppress
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
@@ -318,10 +319,22 @@ class Staircase(Pbox):
         super().__init__(left, right, steps, mean, var, p_values)
 
     def _init_moments(self):
-        """initialised `mean`, `var` and `range` bounds"""
-        if (self.mean is None) or (self.var is None):
+        """
+        Initialize mean/var interval estimates.
+        Strategy:
+        1) Try LP-based bounds.
+        2) If that fails, try ECDF-based bounds.
+        3) If that also fails, set to NaN intervals so the program continues.
+        This function NEVER raises.
+        """
+        # Defaults
+        mean_I = None
+        var_I = None
+        method_used = None
+        errors = []
 
-            #! should we compute mean if it is a Cauchy, var if it's a t distribution?
+        # --- Attempt 1: LP bounds ---
+        try:
             dict_moments = variance_bounds_via_lp(
                 q_a=self.left,
                 p_a=self._pvalues,
@@ -329,18 +342,53 @@ class Staircase(Pbox):
                 p_b=self._pvalues,
                 x_grid=np.linspace(self.lo, self.hi, 50),
             )
-
             self.mean_lo, self.mean_hi = dict_moments["mu_min"], dict_moments["mu_max"]
             self.var_lo, self.var_hi = dict_moments["var_min"], dict_moments["var_max"]
+            mean_I = I(self.mean_lo, self.mean_hi)
+            var_I = I(self.var_lo, self.var_hi)
+            method_used = "lp_bounds"
+        except Exception as e:
+            errors.append(("lp_bounds", repr(e)))
+
+        # --- Attempt 2: ECDF fallback (only if needed) ---
+        if mean_I is None or var_I is None:
             try:
-                self.mean = I(self.mean_lo, self.mean_hi)
-            except:
-                self.mean = I(666, 666)
-            # TODO tmp solution for computing var for pbox
-            try:
-                self.var = I(self.var_lo, self.var_hi)
-            except:
-                self.var = I(666, 666)
+                mean_lo, var_lo = get_mean_var_from_ecdf(self.left, self._pvalues)
+                mean_hi, var_hi = get_mean_var_from_ecdf(self.right, self._pvalues)
+                self.mean_lo, self.mean_hi = mean_lo, mean_hi
+                self.var_lo, self.var_hi = var_lo, var_hi
+                mean_I = I(self.mean_lo, self.mean_hi)
+                var_I = I(self.var_lo, self.var_hi)
+                method_used = "ecdf_fallback"
+            except Exception as e:
+                errors.append(("ecdf_fallback", repr(e)))
+
+        # --- Last resort: make it unambiguous and safe ---
+        if mean_I is None or var_I is None:
+            # Use NaN to signal “unknown/unavailable” without risking real-number collisions.
+            mean_I = I(666, 666)
+            var_I = I(666, 666)
+            method_used = method_used or "unavailable"
+
+        # --- Assign + annotate; nothing in here may raise ---
+        self.mean = mean_I
+        self.var = var_I
+        # Optional: stash debug info for inspection; never let this crash.
+        with suppress(Exception):
+            self._moments_meta = {
+                "method": method_used,
+                "errors": errors,  # list of (stage, repr(error))
+                "lo_hi": {
+                    "mean": (
+                        getattr(self, "mean_lo", None),
+                        getattr(self, "mean_hi", None),
+                    ),
+                    "var": (
+                        getattr(self, "var_lo", None),
+                        getattr(self, "var_hi", None),
+                    ),
+                },
+            }
 
     def __repr__(self):
         def format_interval(interval):

@@ -7,6 +7,7 @@ from ...pba.pbox_abc import convert_pbox
 from ...pba.aggregation import stacking
 from ..epistemic_uncertainty.b2b import b2b
 from ...pba.dependency import Dependency
+from ...pba.params import Params
 
 if TYPE_CHECKING:
     from ...pba.intervals import Interval
@@ -63,6 +64,8 @@ def interval_monte_carlo(
         >>> ...       interval_strategy='direct')
     """
 
+    vars = [convert_pbox(v) for v in vars]
+
     n_sam = int(n_sam) if isinstance(n_sam, float) else n_sam
 
     b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
@@ -74,6 +77,7 @@ def interval_monte_carlo(
 
     prob_proxy_input = dependency.u_sample(n_sam, random_state=random_state)
 
+    # TODO chanege alpha_cut to get outer_approximation
     container = []
     for i, row in enumerate(prob_proxy_input):
         x_domain = [
@@ -135,17 +139,48 @@ def slicing(
     """
     p_vars = [convert_pbox(v) for v in vars]
 
-    if outer_discretisation:
-        itvs = [p.outer_discretisation(n_slices) for p in p_vars]
-    else:
-        itvs = [v.discretise(n_slices) for v in p_vars]
+    # if outer_discretisation:
+    #     itvs = [p.outer_discretisation(n_slices) for p in p_vars]
+    # else:
+    #     itvs = [v.discretise(n_slices) for v in p_vars]
 
-    if len(itvs) == 1:
-        response_intvl = response_intvl = func(itvs[0])
-        response_pbox = stacking(response_intvl)
-        return response_pbox
+    # if len(itvs) == 1:
+    #     response_intvl = func(itvs[0])
+    #     response_pbox = stacking(response_intvl)
+    #     return response_pbox
+
     b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
-    container = [b2b_f(_item) for _item in itertools.product(*itvs)]
+    # cartesian product of intervals -- original implementation but really slow and not efficient;
+    # container = [b2b_f(_item) for _item in itertools.product(*itvs)]
+
+    def make_u_sample(n, num_points):
+        # 200 equally spaced points between 0 and 1
+        grid_1d = np.linspace(0.01, 0.99, num_points)
+        # grid_1d = np.arange(Params.p_lboundary, Params.p_hboundary, 1 / num_points)
+
+        # Create n-dimensional meshgrid
+        mesh = np.meshgrid(*([grid_1d] * n), indexing="ij")
+
+        # Stack and reshape to (num_points**n, n)
+        u_sample = np.stack(mesh, axis=-1).reshape(-1, n)
+
+        return u_sample
+
+    prob_proxy_input = make_u_sample(n=len(vars), num_points=n_slices)
+
+    container = []
+    for i, row in enumerate(prob_proxy_input):
+        x_domain = [
+            v.alpha_cut(a) for v, a in zip(p_vars, row)
+        ]  # yield a list of intervals
+
+        response_y_itvl = b2b_f(x_domain)
+        container.append(response_y_itvl)
+
+    # masses = dependency.pdf(prob_proxy_input)
+
+    # return stacking(container, weights=masses)
+
     return stacking(container)
 
 
