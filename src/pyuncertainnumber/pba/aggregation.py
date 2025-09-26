@@ -7,84 +7,119 @@ from .ecdf import eCDF_bundle, get_ecdf
 from .intervals import Interval
 import functools
 from numbers import Number
-from ..decorator import UNtoUN
-from .pbox_abc import Staircase, convert_pbox
-from .utils import expose_functions_as_public
-from ..gutils import exist_un
-
+from .pbox_abc import Staircase
+from .operation import convert
 
 if TYPE_CHECKING:
     from .pbox_abc import Pbox
     from .dss import DempsterShafer
+    from .distributions import Distribution
     from ..characterisation.uncertainNumber import UncertainNumber
 
 
-def envelope(*mix_un, output_type="pbox") -> Pbox | UncertainNumber:
-    pass
-
-
-# * --------------- construct levels ----------------- * #
-def env(*l_constructs: Pbox | DempsterShafer | Number) -> Staircase:
+def envelope(
+    *l_uns: Pbox | DempsterShafer | Number | Interval | Distribution | UncertainNumber,
+    output_type="pbox",
+) -> Staircase | UncertainNumber:
     """calculates the envelope of constructs only
 
     args:
-        l_constructs (list): the components, constructs only, on which the envelope operation applied on.
+        l_uns (list): the components, constructs and uncertain numbers, on which the envelope operation applied on.
+
+        output_type (str): {'pbox' or 'uncertain_number' or 'un'}
+            - default is pbox
 
     returns:
         the envelope of the given arguments,  either a p-box or an interval.
+
+    example:
+        >>> from pyuncertainnumber import envelope
+        >>> a = pba.normal(3, 1)
+        >>> b = pba.uniform(5, 8)
+        >>> c = pba.normal(13, 2)
+        >>> t = envelope(a, b, c, output_type='pbox') # or output_type='uncertain_number'
     """
+
+    from ..characterisation.uncertainNumber import UncertainNumber
 
     def binary_env(p1, p2):
         return p1.env(p2)
 
-    xs = [convert_pbox(x) for x in l_constructs]
-    return functools.reduce(binary_env, xs)
+    xs = [convert(x) for x in l_uns]
+    e = functools.reduce(binary_env, xs)
+    if output_type == "pbox":
+        return e
+    elif output_type == "uncertain_number" | "un":
+        return UncertainNumber.fromConstruct(e)
+    else:
+        raise ValueError(
+            "output_type must be one of {'pbox', 'uncertain_number', 'un'}"
+        )
 
 
-# imposition
-def _imposition(*l_constructs: Staircase | DempsterShafer | Number) -> Staircase:
+def imposition(
+    *l_uns: Pbox | DempsterShafer | Number | Interval | Distribution | UncertainNumber,
+    output_type="pbox",
+) -> Staircase | UncertainNumber:
     """Returns the imposition/intersection of the list of p-boxes
 
     args:
-        - l_constructs (list): a list of UN objects to be mixed
+        l_uns (list): a list of constructs or UN objects to be mixed
+
+        output_type (str): {'pbox' or 'uncertain_number' or 'un'}
+            - default is pbox
 
     returns:
-        - Pbox
+        - Pbox or UncertainNumber
 
-    note:
-        - #TODO verfication needed for the base function `p1.imp(p2)`
+    example:
+        >>> import pyuncertainnumber as pun
+        >>> from pyuncertainnumber import pba
+        >>> a = pba.normal([3, 7], 1)
+        >>> b = pba.uniform([3,5], [6,9])
+        >>> i = pun.imposition(a, b)
+
     """
 
     def binary_imp(p1, p2):
         return p1.imp(p2)
 
-    xs = [convert_pbox(x) for x in l_constructs]
-    return functools.reduce(binary_imp, xs)
+    xs = [convert(x) for x in l_uns]
+    i = functools.reduce(binary_imp, xs)
+    if output_type == "pbox":
+        return i
+    elif output_type == "uncertain_number" | "un":
+        return UncertainNumber.fromConstruct(i)
+    else:
+        raise ValueError(
+            "output_type must be one of {'pbox', 'uncertain_number', 'un'}"
+        )
 
 
-# TODO: temp logic for  mixture for constructs only
-def _stochastic_mixture(*l_constructs, weights=None, display=False, **kwargs):
+def stochastic_mixture(*l_uns, weights=None, display=False, **kwargs):
     """it could work for either Pbox, distribution, DS structure or Intervals
 
     args:
-        - l_constructs (list): list of constructs of uncertain number
+        - l_uns (list): list of constructs or uncertain numbers
         - weights (list): list of weights
         - display (Boolean): boolean for plotting
-    # TODO mix types later
+
     note:
-        - currently only accepts same type objects
     """
 
     from .pbox_abc import Pbox
     from .dss import DempsterShafer
     from .intervals import Interval
 
-    if isinstance(l_constructs[0], Interval | list):
-        return stacking(l_constructs, weights=weights, display=display, **kwargs)
-    elif isinstance(l_constructs[0], Pbox):
-        return mixture_pbox(*l_constructs, weights, display=display)
-    elif isinstance(l_constructs[0], DempsterShafer):
-        return mixture_ds(*l_constructs, display=display)
+    if all(isinstance(x, Interval) for x in l_uns):
+        return stacking(l_uns, weights=weights, display=display, **kwargs)
+    elif all(isinstance(x, Pbox) for x in l_uns):
+        return mixture_pbox(*l_uns, weights, display=display)
+    elif all(isinstance(x, DempsterShafer) for x in l_uns):
+        return mixture_ds(*l_uns, display=display)
+    else:
+        converted_constructs = [convert(x) for x in l_uns]
+        return mixture_pbox(*converted_constructs, weights, display=display)
 
 
 def stacking(
@@ -99,7 +134,7 @@ def stacking(
     """stochastic mixture operation of Intervals with probability masses
 
     args:
-        - l_constructs (list): list of constructs of uncertain numbers
+        - vec_interval (list): list of Intervals or a vectorised Interval
         - weights (list): list of weights
         - display (Boolean): boolean for plotting
         - return_type (str): {'pbox' or 'ds' or 'bounds'}
@@ -109,6 +144,7 @@ def stacking(
         but can choose to return a p-box
 
     note:
+        - For intervals specifically.
         - it takes a list of intervals or a single vectorised interval, which is
         a different signature compared to the other aggregation functions.
         - together the interval and masses, it can be deemed that all the inputs
@@ -207,29 +243,3 @@ def env_ecdf_sep(*ecdfs, ret_type="pbox", ecdf_choice="canonical"):
 
     data = np.array(ecdfs)
     return env_ecdf(data, ret_type=ret_type, ecdf_choice=ecdf_choice)
-
-
-# exposed APIs
-
-
-# envelope = UNtoUN(_envelope)
-
-# Mapping: public API name -> private function
-api_map = {
-    "envelope": _envelope,
-    "imposition": _imposition,
-    "stochastic_mixture": _stochastic_mixture,
-}
-
-expose_functions_as_public(api_map, UNtoUN)
-
-__all__ = list(api_map.keys())
-__all__.extend(
-    [
-        "stacking",
-        "mixture_pbox",
-        "mixture_ds",
-        "env_ecdf",
-        "env_ecdf_sep",
-    ]
-)
