@@ -779,7 +779,7 @@ def is_un(sth):
         return 2
 
 
-def exist_un(a_list):
+def exist_un(a_list) -> bool:
     """check if there is any UN object in the list"""
     return any(is_un(x) == 1 for x in a_list)
 
