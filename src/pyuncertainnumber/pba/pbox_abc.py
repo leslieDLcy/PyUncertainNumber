@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 from .intervals.number import Interval as I
 from numbers import Number
 import operator
-import itertools
 from .utils import (
     condensation,
     find_nearest,
@@ -16,6 +15,7 @@ from .utils import (
     is_increasing,
     left_right_switch,
     variance_bounds_via_lp,
+    area_between_ecdfs,
 )
 import logging
 from .operation import vectorized_cartesian_op
@@ -259,9 +259,15 @@ class Pbox(NominalValueMixin, ABC):
         return I(np.median(self.left), np.median(self.right))
 
     @property
-    def area_metric(self):
-        return np.trapezoid(y=self._pvalues, x=self.left) - np.trapezoid(
-            y=self._pvalues, x=self.right
+    def area(self):
+        # return np.trapezoid(y=self._pvalues, x=self.left) - np.trapezoid(
+        #     y=self._pvalues, x=self.right
+        # )
+        return area_between_ecdfs(
+            x_upper=self.left,
+            p_upper=self._pvalues,
+            x_lower=self.right,
+            p_lower=self._pvalues,
         )
 
     # * --------------------- operators ---------------------*#
@@ -788,11 +794,6 @@ class Staircase(Pbox):
 
         itvls = self.outer_discretisation(n)
         return stacking(itvls)
-
-    def area_metric(self):
-        return np.trapezoid(y=self.left, x=self._pvalues) - np.trapezoid(
-            y=self.right, x=self._pvalues
-        )
 
     def truncate(self, a, b):
         """Truncate the Pbox to the range [a, b].

@@ -547,3 +547,37 @@ def sample_ecdf_in_pbox(q_a, p_a, q_b, p_b, x_grid=None, n=None, rng=None, eps=1
     q = np.repeat(x, k)  # length n, nondecreasing
     p = (np.arange(1, n + 1)) / n  # standard ECDF probabilities
     return q, p
+
+
+def area_between_ecdfs(x_upper, p_upper, x_lower, p_lower):
+    """Compute the area between two ECDFs defined by (x_upper, p_upper) and (x_lower, p_lower).
+
+    args:
+        x_upper, p_upper: arrays defining the upper ECDF
+        x_lower, p_lower: arrays defining the lower ECDF
+
+    """
+    # union grid of breakpoints
+    grid = np.unique(np.concatenate([x_upper, x_lower]))
+    if grid.size < 2:
+        return 0.0  # degenerate case
+
+    widths = np.diff(grid)  # interval widths [grid[k], grid[k+1])
+    lefts = grid[:-1]  # left endpoints of intervals
+
+    Fu = _ecdf_value_on_left_of_intervals(x_upper, p_upper, lefts)
+    Fl = _ecdf_value_on_left_of_intervals(x_lower, p_lower, lefts)
+
+    area = np.sum(widths * np.abs(Fu - Fl))
+    return float(area)
+
+
+def _ecdf_value_on_left_of_intervals(x, p, grid_left):
+    """
+    Right-continuous ECDF value used on [grid_left[k], grid_right[k]).
+    For values below the first x, value is 0. For above the last x, value stays at p[-1].
+    """
+    # index of last x <= each grid_left (right-continuous step)
+    idx = np.searchsorted(x, grid_left, side="right") - 1
+    vals = np.where(idx >= 0, p[idx], 0.0)
+    return vals
