@@ -10,17 +10,22 @@ from numbers import Number
 from ..decorator import UNtoUN
 from .pbox_abc import Staircase, convert_pbox
 from .utils import expose_functions_as_public
+from ..gutils import exist_un
 
 
 if TYPE_CHECKING:
     from .pbox_abc import Pbox
     from .dss import DempsterShafer
+    from ..characterisation.uncertainNumber import UncertainNumber
+
+
+def envelope(*mix_un, output_type="pbox") -> Pbox | UncertainNumber:
+    pass
 
 
 # * --------------- construct levels ----------------- * #
-# envelope
-def _envelope(*l_constructs: Pbox | DempsterShafer | Number) -> Staircase:
-    """calculates the envelope of uncertain number constructs
+def env(*l_constructs: Pbox | DempsterShafer | Number) -> Staircase:
+    """calculates the envelope of constructs only
 
     args:
         l_constructs (list): the components, constructs only, on which the envelope operation applied on.
