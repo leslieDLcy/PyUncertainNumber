@@ -22,7 +22,7 @@ dependencies = [
   "bayesian-optimization",
   "geneticalgorithm",
   "statsmodels >=0.14, <0.15", # Verified 0.14.4 compatibility
-  "jax",
+  "jax==0.4.35",
 ]
 description = "Rigorous computation with Uncertain Number in Python"
 license = {text = "MIT License"}

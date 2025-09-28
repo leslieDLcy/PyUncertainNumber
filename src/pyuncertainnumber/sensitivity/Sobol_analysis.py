@@ -6,11 +6,13 @@ from SALib.analyze import sobol as sobol_analyze
 from pyuncertainnumber import UncertainNumber as UN
 from matplotlib import pyplot as plt
 
-def sobol_analysis(x: list,
-                   f: Callable,
-                   output_names=None,
-                   plot_results: bool = True,
-                   **kwargs):
+
+# TODO: test needed for this function
+
+
+def sobol_analysis(
+    x: list, f: Callable, output_names=None, plot_results: bool = True, **kwargs
+):
     """
     Performs a Sobol sensitivity analysis using the SALibe library.
 
@@ -84,12 +86,12 @@ def sobol_analysis(x: list,
         >>>
         >>> # 4. Print results for the first output
         >>> results['Output_1']
-        >>> 
+        >>>
 
     """
     try:
         # === STAGE 1: Build the problem dictionary ===
-        dist_map = {'gaussian': 'norm', 'uniform': 'unif', 'triangular': 'triang'}
+        dist_map = {"gaussian": "norm", "uniform": "unif", "triangular": "triang"}
         names, bounds, dists = [], [], []
 
         for un in x:
@@ -100,42 +102,57 @@ def sobol_analysis(x: list,
             names.append(var_name)
             bounds.append(list(dist_params))
             dists.append(dist_map[dist_name])
-            
-        problem = {'num_vars': len(x), 'names': names, 'bounds': bounds, 'dists': dists}
+
+        problem = {"num_vars": len(x), "names": names, "bounds": bounds, "dists": dists}
 
         # === STAGE 2: Auto-Detect Vectorization ===
         is_vectorized = False
         try:
-            probe_input = np.zeros((2, problem['num_vars']))
+            probe_input = np.zeros((2, problem["num_vars"]))
             f(probe_input)
             print(f(probe_input))
             is_vectorized = True
             print("INFO: Auto-detected vectorized model.")
         except Exception:
-            print("INFO: Auto-detected non-vectorized model. Using sample-by-sample evaluation.")
+            print(
+                "INFO: Auto-detected non-vectorized model. Using sample-by-sample evaluation."
+            )
 
         # === STAGE 3: Sample and Evaluate Model ===
-        KNOWN_SAMPLING_ARGS = ['N', 'calc_second_order', 'scramble', 'skip_values', 'seed']
+        KNOWN_SAMPLING_ARGS = [
+            "N",
+            "calc_second_order",
+            "scramble",
+            "skip_values",
+            "seed",
+        ]
         sample_args, analyze_args = {}, {}
         for key, value in kwargs.items():
-            if key in KNOWN_SAMPLING_ARGS: sample_args[key] = value
-            else: analyze_args[key] = value
-            
-        sample_args.setdefault('N', 1024)
-        sample_args.setdefault('calc_second_order', True)
-        analyze_args.setdefault('print_to_console', True)
+            if key in KNOWN_SAMPLING_ARGS:
+                sample_args[key] = value
+            else:
+                analyze_args[key] = value
+
+        sample_args.setdefault("N", 1024)
+        sample_args.setdefault("calc_second_order", True)
+        analyze_args.setdefault("print_to_console", True)
 
         param_values = sobol_sample.sample(problem, **sample_args)
 
         if is_vectorized:
             Y = f(param_values)
         else:
-            Y = [f(row) for row in track(param_values, description="Processing samples...")]
-            print('Y', Y)
+            Y = [
+                f(row)
+                for row in track(param_values, description="Processing samples...")
+            ]
+            print("Y", Y)
 
         # === STAGE 4: Normalize Output and Analyze ===
         if isinstance(Y, (list, tuple)) and not np.isscalar(Y[0]):
-            Y_multi_output = np.array(Y) if isinstance(Y[0], (list, tuple)) else np.column_stack(Y)
+            Y_multi_output = (
+                np.array(Y) if isinstance(Y[0], (list, tuple)) else np.column_stack(Y)
+            )
         elif isinstance(Y, list):
             Y_multi_output = np.array(Y).reshape(-1, 1)
         elif Y.ndim == 1:
@@ -144,32 +161,34 @@ def sobol_analysis(x: list,
             Y_multi_output = Y
         else:
             raise ValueError(f"Model output has an unsupported shape: {Y.shape}")
-            
+
         num_outputs = Y_multi_output.shape[1]
         if output_names is None:
             output_names = [f"Output_{i+1}" for i in range(num_outputs)]
         elif len(output_names) != num_outputs:
-            raise ValueError(f"Provided {len(output_names)} names, but model has {num_outputs} outputs.")
-            
+            raise ValueError(
+                f"Provided {len(output_names)} names, but model has {num_outputs} outputs."
+            )
+
         all_results = {}
         for i, name in enumerate(output_names):
             print(f"\nResults for '{name}':")
             Si = sobol_analyze.analyze(problem, Y_multi_output[:, i], **analyze_args)
             all_results[name] = Si
-            
-           # all_results[name] 
+
+            # all_results[name]
             if plot_results:
 
-                all_results[name].plot() 
+                all_results[name].plot()
                 plt.title(f"Sobol Indices for: {name}")
                 plt.xlabel("Parameters")
                 plt.show()
-        
+
         return all_results
-                       
 
     except Exception as e:
         print(f"\n>>> SCRIPT FAILED <<<")
         import traceback
+
         traceback.print_exc()
         return None
