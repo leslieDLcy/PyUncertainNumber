@@ -8,6 +8,12 @@ if TYPE_CHECKING:
     from .pba.dss import DempsterShafer
 
 
+def inspect_un(x: any):
+    """Inspect the any type of uncertain number x."""
+    print(x.__repr__())
+    x.display()
+
+
 def env_helper(elements: list, env):
     """help visualise the envelope"""
 
