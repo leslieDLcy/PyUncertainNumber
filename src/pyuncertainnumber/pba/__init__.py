@@ -13,4 +13,4 @@ from .pbox_abc import inspect_pbox
 from .utils import inspect_un
 from pyuncertainnumber.pba.ecdf import get_ecdf
 from .operation import convert
-from .aggregation import stacking
+from .aggregation import *
