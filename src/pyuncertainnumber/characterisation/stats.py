@@ -44,7 +44,7 @@ def fit(method: str, family: str, data: np.ndarray) -> UncertainNumber:
 
 
     .. seealso::
-    :func:`pyuncertainnumber.pba.KS_bounds` : a non-parametric charactearisation method using Kolmogorov-Smirnov bounds
+        :func:`pyuncertainnumber.pba.KS_bounds` : a non-parametric charactearisation method using Kolmogorov-Smirnov bounds
     """
     match method:
         case "mle":
