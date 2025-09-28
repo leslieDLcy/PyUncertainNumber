@@ -96,30 +96,34 @@ def imposition(
         )
 
 
-def stochastic_mixture(*l_uns, weights=None, display=False, **kwargs):
+def stochastic_mixture(
+    *l_uns: Pbox | DempsterShafer | Number | Interval | Distribution | UncertainNumber,
+    weights=None,
+):
     """it could work for either Pbox, distribution, DS structure or Intervals
 
     args:
         - l_uns (list): list of constructs or uncertain numbers
         - weights (list): list of weights
-        - display (Boolean): boolean for plotting
 
-    note:
+    example:
+        >>> import pyuncertainnumber as pun
+        >>> p = pun.stochastic_mixture([[1,3], [2,4]])
     """
 
     from .pbox_abc import Pbox
     from .dss import DempsterShafer
     from .intervals import Interval
 
-    if all(isinstance(x, Interval) for x in l_uns):
-        return stacking(l_uns, weights=weights, display=display, **kwargs)
+    if all(isinstance(x, Interval | list) for x in l_uns):
+        return stacking(l_uns, weights=weights)
     elif all(isinstance(x, Pbox) for x in l_uns):
-        return mixture_pbox(*l_uns, weights, display=display)
+        return mixture_pbox(*l_uns, weights)
     elif all(isinstance(x, DempsterShafer) for x in l_uns):
-        return mixture_ds(*l_uns, display=display)
+        return mixture_ds(*l_uns)
     else:
         converted_constructs = [convert(x) for x in l_uns]
-        return mixture_pbox(*converted_constructs, weights, display=display)
+        return mixture_pbox(*converted_constructs, weights)
 
 
 def stacking(
@@ -140,8 +144,7 @@ def stacking(
         - return_type (str): {'pbox' or 'ds' or 'bounds'}
 
     return:
-        - the left and right bound F in `eCDF_bundlebounds` by default
-        but can choose to return a p-box
+        by default a p-box but can return the left and right bound F in `eCDF_bundlebounds`.
 
     note:
         - For intervals specifically.
@@ -149,6 +152,9 @@ def stacking(
         a different signature compared to the other aggregation functions.
         - together the interval and masses, it can be deemed that all the inputs
         required is jointly a DS structure
+
+    example:
+        >>> stacking([[1,3], [2,4]], weights=[0.5, 0.5], display=True)
     """
     from .pbox_abc import Staircase
     from .dss import DempsterShafer
@@ -204,12 +210,12 @@ def mixture_ds(*l_ds, display=False) -> DempsterShafer:
     return DempsterShafer(intervals, masses)
 
 
-def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
+def env_ecdf(data, output_type="pbox", ecdf_choice="canonical"):
     """nonparametric envelope function
 
     arrgs:
         data (array): Each row represents a distribution, on which the envelope operation applied.
-        ret_type (str): {'pbox' or 'cdf'}
+        output_type (str): {'pbox' or 'cdf'}
             - default is pbox
             - cdf is the CDF bundle
         ecdf_choice (str): {'canonical' or 'staircase'}
@@ -232,14 +238,14 @@ def env_ecdf(data, ret_type="pbox", ecdf_choice="canonical"):
     l_bound = np.min(q_arr, axis=0)
     u_bound = np.max(q_arr, axis=0)
 
-    if ret_type == "pbox":
+    if output_type == "pbox":
         return Staircase(left=l_bound, right=u_bound)
-    elif ret_type == "cdf":
+    elif output_type == "cdf":
         return eCDF_bundle(l_bound, pp), eCDF_bundle(u_bound, pp)
 
 
-def env_ecdf_sep(*ecdfs, ret_type="pbox", ecdf_choice="canonical"):
+def env_ecdf_sep(*ecdfs, output_type="pbox", ecdf_choice="canonical"):
     """nonparametric envelope function for separate empirical CDFs"""
 
     data = np.array(ecdfs)
-    return env_ecdf(data, ret_type=ret_type, ecdf_choice=ecdf_choice)
+    return env_ecdf(data, output_type=output_type, ecdf_choice=ecdf_choice)
