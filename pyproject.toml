@@ -5,7 +5,7 @@ requires = ["setuptools >= 61.0"]
 [project]
 authors = [
   {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
-  {name = "Roberto Rocchetta", email = "roberto.rocchetta88@gmail.com"}
+  {name = "Roberto Rocchetta", email = "roberto.rocchetta88@gmail.com"},
   {name = "Ioanna Ioannou", email = "Ioanna.Ioannou@liverpool.ac.uk"},
   {name = "Scott Ferson", email = "sandp8@gmail.com"},
 ]
