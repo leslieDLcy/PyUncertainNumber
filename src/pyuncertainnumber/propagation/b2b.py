@@ -183,7 +183,7 @@ def b2b(
             return y_bound
         case _:
             raise NotImplementedError(
-                f"Method {interval_strategy} is not supported yet. Supported methods are: {'endpoints', 'subinterval', 'ga', 'bo', 'direct'}"
+                f"Method {interval_strategy} is not supported yet. Supported methods are: {'endpoints', 'subinterval', 'ga', 'bo', 'direct', 'cauchy_deviate'}"
             )
 
 
