@@ -38,6 +38,10 @@ from pyuncertainnumber.pba.dss import dempstershafer_element, DempsterShafer
 # * --------------------- Dependency ---------------------*#
 from pyuncertainnumber.pba.dependency import Dependency
 
+# * --------------------- Characterisation ---------------------*#
+from pyuncertainnumber.pba.pbox_free import KS_bounds
+
+
 # * ---------------------  aggregation ---------------------*#
 from pyuncertainnumber.pba.aggregation import *
 

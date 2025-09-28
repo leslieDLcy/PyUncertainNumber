@@ -35,7 +35,16 @@ def fit(method: str, family: str, data: np.ndarray) -> UncertainNumber:
         - UncertainNumber object
 
     example:
+        >>> # precise data
         >>> pun.fit('mle', 'norm', np.random.normal(0, 1, 100))
+        >>>  # imprecise data
+        >>> precise_sample = sps.expon(scale=1/0.4).rvs(15)
+        >>> imprecise_data = pba.I(lo = precise_sample - 1.4, hi=precise_sample + 1.4)
+        >>> pun.fit('mom', family='exponential', data=imprecise_data)
+
+
+    .. seealso::
+    :func:`pyuncertainnumber.pba.KS_bounds` : a non-parametric charactearisation method using Kolmogorov-Smirnov bounds
     """
     match method:
         case "mle":
@@ -69,8 +78,7 @@ def makedist(shape: str):
 
 
 def MMbernoulli(x):
-    """a first attempt to Maximum likelihood estimation for Bernoulli distribution
-        which accepts both precise and imprecise data;
+    """a first attempt to Maximum likelihood estimation for Bernoulli distribution which accepts both precise and imprecise data;
 
     #! the example of `singleparam` pattern
     #! to change, add the 'interval_measurement' decorator
@@ -1083,6 +1091,9 @@ def parse_moments(
         mean (Number | Interval): mean value, which could be either precise value or an Interval object. Python list is not supported.
         std (Number): standard deviation
         var (Number): variance
+
+    example:
+        >>> parse_moments(family='normal', mean=3., std=1.)
 
     note:
         Only accept up to 2nd moment for now. Interval mean is supported due to single parameter construction.
