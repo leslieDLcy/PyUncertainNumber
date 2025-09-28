@@ -5,9 +5,11 @@ requires = ["setuptools >= 61.0"]
 [project]
 authors = [
   {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
+  {name = "Roberto Rocchetta", email = "roberto.rocchetta88@gmail.com"}
   {name = "Ioanna Ioannou", email = "Ioanna.Ioannou@liverpool.ac.uk"},
   {name = "Scott Ferson", email = "sandp8@gmail.com"},
 ]
+
 dependencies = [
   "matplotlib",
   "numpy",
@@ -23,6 +25,7 @@ dependencies = [
   "geneticalgorithm",
   "statsmodels >=0.14, <0.15", # Verified 0.14.4 compatibility
   "jax==0.4.35",
+  "SALib",
 ]
 description = "Rigorous computation with Uncertain Number in Python"
 license = {text = "MIT License"}
@@ -32,7 +35,7 @@ maintainers = [
 name = "pyuncertainnumber"
 readme = "README.md"
 requires-python = ">= 3.11"
-version = "0.0.19"
+version = "0.0.20"
 
 [tool.setuptools.packages.find]
 # All the following settings are optional:
