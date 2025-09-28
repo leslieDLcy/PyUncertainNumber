@@ -3,16 +3,16 @@ from typing import TYPE_CHECKING
 import numpy as np
 from functools import partial
 import itertools
-from ...pba.pbox_abc import convert_pbox
-from ...pba.aggregation import stacking
-from ..epistemic_uncertainty.b2b import b2b
-from ...pba.dependency import Dependency
-from ...pba.params import Params
+from ..pba.pbox_abc import convert_pbox
+from ..pba.aggregation import stacking
+from .b2b import b2b
+from ..pba.dependency import Dependency
+from ..pba.params import Params
 
 if TYPE_CHECKING:
-    from ...pba.intervals import Interval
-    from ...pba.distributions import Distribution, JointDistribution
-    from ...pba.pbox_abc import Pbox
+    from ..pba.intervals import Interval
+    from ..pba.distributions import Distribution, JointDistribution
+    from ..pba.pbox_abc import Pbox
 
 
 def interval_monte_carlo(
