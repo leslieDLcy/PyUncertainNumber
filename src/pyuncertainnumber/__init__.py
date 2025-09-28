@@ -52,4 +52,4 @@ from pyuncertainnumber.propagation.mixed_uncertainty.mixed_up import (
 )
 
 # * ---------------------  utils ---------------------*#
-from pyuncertainnumber.pba import inspect_un
+from pyuncertainnumber.gutils import inspect_un

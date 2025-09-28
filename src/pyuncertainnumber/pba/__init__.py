@@ -10,7 +10,6 @@ from .distributions import JointDistribution, ECDF
 from .dependency import Dependency
 from .context import dependency
 from .pbox_abc import inspect_pbox
-from .utils import inspect_un
 from pyuncertainnumber.pba.ecdf import get_ecdf
 from .operation import convert
 from .aggregation import *

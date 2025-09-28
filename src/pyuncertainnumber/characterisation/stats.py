@@ -14,24 +14,25 @@ from .core import makeUN
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
+    from pyuncertainnumber import UncertainNumber
 
 """ statistical inference functions from data for the UncertainNumber class. """
 
 
 @makeUN
-def fit(method: str, family: str, data: np.ndarray):
+def fit(method: str, family: str, data: np.ndarray) -> UncertainNumber:
     """parametric estimator to fit a distribution from data
 
     args:
-        - method (str): method of fitting, e.g., {'mle' or 'mom'} 'entropy', 'pert', 'fermi', 'bayesian'
-        - family (str): distribution family to be fitted
-        - data (np.ndarray): data to be fitted
+        method (str): method of fitting, e.g., {'mle' or 'mom'} 'entropy', 'pert', 'fermi', 'bayesian'
 
-    note:
-        - supported family list can be found in xx.
+        family (str): distribution family to be fitted
+
+        data (np.ndarray): data to be fitted
+
 
     return:
-        - the return from the constructors below are `scipy.stats.dist` objects or `UN` objects depending on the decorator
+        - UncertainNumber object
 
     example:
         >>> pun.fit('mle', 'norm', np.random.normal(0, 1, 100))
