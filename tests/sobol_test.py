@@ -1,32 +1,36 @@
 from pyuncertainnumber import UncertainNumber as UN
-from pyuncertainnumber.sensitivity.Sobol_analysis import sobol_analysis
+from pyuncertainnumber.sensitivity.sobol_analysis import sobol_analysis
 from matplotlib import pyplot as plt
 
-# 1. Define uncertain inputs
-inputs = [
-    UN(name="x1", essence="distribution", distribution_parameters=["uniform", (0, 1)]),
-    UN(
-        name="x2",
-        essence="distribution",
-        distribution_parameters=["gaussian", (0.5, 0.1)],
-    ),
-]
 
+def test_sobol_analysis():
+    # 1. Define uncertain inputs
+    inputs = [
+        UN(
+            name="x1",
+            essence="distribution",
+            distribution_parameters=["uniform", (0, 1)],
+        ),
+        UN(
+            name="x2",
+            essence="distribution",
+            distribution_parameters=["gaussian", (0.5, 0.1)],
+        ),
+    ]
 
-# 2. Define a model function (non-vectorized)
-def my_model(x):
-    out = x[:, 0] + x[:, 1]
+    # 2. Define a model function (non-vectorized)
+    def my_model(x):
+        out = x[:, 0] + x[:, 1]
 
-    return out
+        return out
 
+    # 3. Run the analysis
+    results = sobol_analysis(
+        inputs, my_model, calc_second_order=True, print_to_console=True, N=512
+    )
 
-# 3. Run the analysis
-results = sobol_analysis(
-    inputs, my_model, calc_second_order=True, print_to_console=True, N=512
-)
-
-# 4. Print results for the first output
-results
+    # 4. Print results for the first output
+    results
 
 
 # def myFunctionWithTwoOutputs(x):
