@@ -8,10 +8,8 @@ from ..pba.distributions import Distribution
 from ..pba.dependency import Dependency
 from ..propagation.epistemic_uncertainty.b2b import b2b
 from ..decorator import constructUN
-from .epistemic_uncertainty.extremepoints import extremepoints_method
 from .epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
 from .epistemic_uncertainty.local_optimisation import local_optimisation_method
-from .epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
 from .mixed_uncertainty.mixed_up import (
     interval_monte_carlo,
     slicing,
@@ -199,8 +197,6 @@ class EpistemicPropagation(P):
         match self.method:
             case "endpoint" | "endpoints" | "vertex":
                 handler = partial(b2b, interval_strategy="endpoints")
-            case "extremepoints":
-                handler = extremepoints_method
             case "subinterval" | "subintervals" | "subinterval_reconstitution":
                 handler = partial(b2b, interval_strategy="subinterval")
             case (
@@ -209,7 +205,7 @@ class EpistemicPropagation(P):
                 | "endpoint_cauchy"
                 | "endpoints_cauchy"
             ):
-                handler = cauchydeviates_method
+                handler = partial(b2b, interval_strategy="cauchy_deviate")
             case (
                 "local_optimization"
                 | "local_optimisation"
@@ -229,8 +225,6 @@ class EpistemicPropagation(P):
             case _:
                 raise ValueError("Unknown method")
 
-        # TODO: make the methods signature consistent
-        # TODO: ONLY an response interval needed to be returned
         results = handler(
             make_vec_interval(self._vars),  # pass down vec interval
             self.func,
