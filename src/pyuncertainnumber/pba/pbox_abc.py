@@ -289,6 +289,12 @@ class Pbox(NominalValueMixin, ABC):
         )
         return close
 
+    def __contains__(self, item):
+        if isinstance(item, Number):
+            return (self.lo <= item) and (item <= self.hi)
+        else:
+            return (self.lo <= item.lo) and (item.hi <= self.hi)
+
     # * --------------------- functions ---------------------*#
     def to_interval(self):
         """discretise pbox into a vec-interval of length of default steps
