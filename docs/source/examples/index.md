@@ -81,4 +81,41 @@ Interpret the uncertainty indicated by linguistic hedges (e.g. "about 7")
 Explore the uncertainty indicated by significant digits of numbers
 :::
 
+
+:::{card} Propagation of aleatory uncertainty
+:link: aleatory_propagation_demo
+:link-type: doc
+:img-top: ../_static/aleatory_propagation_demo.png
+:class-card: sd-text-center        # optional: center content
+:class-img-top: card-img-square    # <-- add a class you’ll style
+propagate random variables via a performance function
+:::
+
+
+:::{card} Interval propagation
+:link: interval_propagation_demo
+:link-type: doc
+:img-top: ../_static/interval_propagation_demo.png
+:class-card: sd-text-center        # optional: center content
+:class-img-top: card-img-square    # <-- add a class you’ll style
+Propagate intervals via a performance function, intrusively or nonintrusively
+:::
+
+
+
+:::{card} Mixed uncertainty
+:link: mix_uncertainty_propagation_demo
+:link-type: doc
+:img-top: ../_static/illustration_get_started.png
+:class-card: sd-text-center        # optional: center content
+:class-img-top: card-img-square    # <-- add a class you’ll style
+Propagation mixed uncertainty via a performance function
+:::
+
+
+
+
+
+
+
 ::::

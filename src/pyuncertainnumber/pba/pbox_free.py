@@ -79,7 +79,7 @@ def KS_bounds(
     .. figure:: /_static/ks_bounds_demo.png
         :alt: ks_bounds
         :align: center
-        :width: 80%
+        :width: 50%
 
         Kolmogorov-Smirnoff confidence bounds illustration with precise and imprecise data.
     """
