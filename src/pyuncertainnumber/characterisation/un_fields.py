@@ -54,6 +54,8 @@ class AncillaryUncertainty(enum.Enum):
 
 
 class Measurand(AncillaryUncertainty):
+    """What is being measured or described (e.g., count, probability, distribution)."""
+
     count = "count"
     tally = "tally"
     unobservable_parameter = "unobservable parameter"
@@ -64,6 +66,9 @@ class Measurand(AncillaryUncertainty):
 
 
 class Ensemble(AncillaryUncertainty):
+    """The collection or grouping over which variability or uncertainty is considered
+    (e.g., repeated measurements, flights, households)."""
+
     repeated_measurements = "repeated measurements"
     flights = "flights"
     pressurisations = "pressurisations"
@@ -77,11 +82,15 @@ class Ensemble(AncillaryUncertainty):
 
 
 class Variability(AncillaryUncertainty):
+    """The way uncertainty is expressed or summarized (e.g., point estimate, confidence)."""
+
     point_estimate = "point estimate"
     confidence = "confidence"
 
 
 class Uncertainty_types(AncillaryUncertainty):
+    """The type of uncertainty affecting the uncertain number."""
+
     Certain = "certain"
     Aleatory = "aleatory"
     Epistemic = "epistemic"

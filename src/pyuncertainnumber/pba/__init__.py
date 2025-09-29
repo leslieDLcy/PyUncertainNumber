@@ -9,8 +9,8 @@ from .distributions import Distribution
 from .distributions import JointDistribution, ECDF
 from .dependency import Dependency
 from .context import dependency
-from .pbox_abc import inspect_pbox
-from .utils import inspect_un
+from .pbox_abc import inspect_pbox, pbox_from_ecdf_bundle
 from pyuncertainnumber.pba.ecdf import get_ecdf
 from .operation import convert
 from .aggregation import *
+from .pbox_free import KS_bounds

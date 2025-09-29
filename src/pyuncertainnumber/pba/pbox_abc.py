@@ -25,6 +25,7 @@ from contextlib import suppress
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
+    from .ecdf import eCDF_bundle
 
 # Configure the logging system with a simple format
 logging.basicConfig(
@@ -69,6 +70,11 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
         right=bounds[1],
         shape=shape,
     )
+
+
+def pbox_from_ecdf_bundle(lower_bound: eCDF_bundle, upper_bound: eCDF_bundle) -> Pbox:
+    """Construct a p-box from two empirical CDF bundles as the extreme bounds"""
+    return Staircase.from_CDFbundle(lower_bound, upper_bound)
 
 
 def naive_frechet_pbox(x, y, op) -> Staircase:

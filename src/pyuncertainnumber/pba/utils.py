@@ -15,12 +15,6 @@ import numpy as np
 from scipy.optimize import linprog
 
 
-def inspect_un(x):
-    """Inspect the any type of uncertain number x."""
-    print(x.__repr__())
-    x.display()
-
-
 def extend_ecdf(cdf):
     """add zero and one to the ecdf
 

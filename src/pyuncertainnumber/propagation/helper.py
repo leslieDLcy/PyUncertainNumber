@@ -4,7 +4,7 @@ from scipy.stats import qmc
 import numpy as np
 
 if TYPE_CHECKING:
-    from ...pba.intervals import Interval
+    from ..pba.intervals import Interval
 
 """some helper funcs and classes for the epistemic space"""
 
@@ -40,7 +40,7 @@ class EpistemicDomain:
     """
 
     def __init__(self, *vars: Interval):
-        from ...pba.intervals.intervalOperators import make_vec_interval, parse_bounds
+        from ..pba.intervals.intervalOperators import make_vec_interval, parse_bounds
 
         try:
             self.vec_interval = make_vec_interval(vars)

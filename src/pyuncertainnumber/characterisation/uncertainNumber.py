@@ -57,13 +57,17 @@ class UncertainNumber:
     """Uncertain Number class
 
     args:
-        - `intervals`;
-        - `distribution_parameters`: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
-        - `pbox_initialisation`: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
-        -  nominal_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
+        - intervals (Interval): the interval specification for the UN object;
 
-    Example:
+        - distribution_parameters: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
+
+        - pbox_initialisation: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
+
+
+    example:
+
         Uncertain numbers can be constructed in multiple ways. For example, a canonical way allows users to fill in as many fields as possible:
+
         >>> from pyuncertainnumber import UncertainNumber
         >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", intervals=[1, 2])
         >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", distribution_parameters=['normal', (10, 2)])
@@ -72,6 +76,7 @@ class UncertainNumber:
 
 
         Alternatively, users can use shortcuts to quickly create UN objects and get on with calculations:
+
         >>> import pyuncertainnumber as pun
         >>> pun.I([1, 2])
         >>> pun.D('gaussian', (10, 2))
