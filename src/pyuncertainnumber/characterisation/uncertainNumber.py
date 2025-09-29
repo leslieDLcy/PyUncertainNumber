@@ -3,11 +3,7 @@ from typing import TYPE_CHECKING
 import functools
 
 from pyuncertainnumber.pba.operation import convert
-
-# from .measurand import Measurand
-# from .variability import Variability
-from .uncertainty_types import Uncertainty_types
-from .ensemble import Ensemble
+from .un_fields import *
 from .utils import *
 from .config import Config
 from pathlib import Path
@@ -20,6 +16,7 @@ from numbers import Number
 from ..pba.distributions import Distribution as pbaDistribution
 import operator
 from pint import Quantity
+
 
 """ Uncertain Number class """
 
@@ -60,13 +57,17 @@ class UncertainNumber:
     """Uncertain Number class
 
     args:
-        - `intervals`;
-        - `distribution_parameters`: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
-        - `pbox_initialisation`: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
-        -  nominal_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
+        - intervals (Interval): the interval specification for the UN object;
 
-    Example:
+        - distribution_parameters: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
+
+        - pbox_initialisation: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
+
+
+    example:
+
         Uncertain numbers can be constructed in multiple ways. For example, a canonical way allows users to fill in as many fields as possible:
+
         >>> from pyuncertainnumber import UncertainNumber
         >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", intervals=[1, 2])
         >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", distribution_parameters=['normal', (10, 2)])
@@ -75,6 +76,7 @@ class UncertainNumber:
 
 
         Alternatively, users can use shortcuts to quickly create UN objects and get on with calculations:
+
         >>> import pyuncertainnumber as pun
         >>> pun.I([1, 2])
         >>> pun.D('gaussian', (10, 2))
@@ -392,6 +394,10 @@ class UncertainNumber:
         if isinstance(construct, pbaDistribution):
             return cls.fromDistribution(construct)
         if isinstance(construct, cls):
+            return construct
+        if isinstance(
+            construct, np.ndarray
+        ):  # a fail-safe exit, which may be coerced into a Distribution UN later on
             return construct
         else:
             raise ValueError("The construct object is not recognised")
@@ -732,9 +738,6 @@ class ParamSpecification:
             self._true_type = "pbox"
 
 
-# * ---------------------helper functions  --------------------- *#
-
-
 def pass_down_units(a, b, ops, t):
     """pass down the unit of the uncertain number
 
@@ -764,8 +767,11 @@ def is_un(sth):
         - 1: if sth is an UncertainNumber object
         - 2: if sth is a construct in {Interval, Pbox, DempsterShafer, or Distribution}
     """
-    from pyuncertainnumber import Interval, Pbox, DempsterShafer
+
     from ..pba.distributions import Distribution
+    from ..pba.dss import DempsterShafer
+    from ..pba.pbox_abc import Pbox
+    from ..pba.intervals.number import Interval
 
     if isinstance(sth, Number):
         return 0
@@ -773,6 +779,11 @@ def is_un(sth):
         return 1
     elif isinstance(sth, Interval | Pbox | DempsterShafer | Distribution):
         return 2
+
+
+def exist_un(a_list) -> bool:
+    """check if there is any UN object in the list"""
+    return any(is_un(x) == 1 for x in a_list)
 
 
 # * ---------------------parametric shortcuts  --------------------- *#

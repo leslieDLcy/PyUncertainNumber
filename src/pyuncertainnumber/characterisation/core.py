@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import functools
 from .uncertainNumber import UncertainNumber
-from numbers import Number
 from .stats import *
 
 if TYPE_CHECKING:

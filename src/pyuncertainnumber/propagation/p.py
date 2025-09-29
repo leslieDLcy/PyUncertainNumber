@@ -1,32 +1,24 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
 from functools import partial
-from .epistemic_uncertainty.extremepoints import extremepoints_method
-from .epistemic_uncertainty.genetic_optimisation import genetic_optimisation_method
-from .epistemic_uncertainty.local_optimisation import local_optimisation_method
-from .epistemic_uncertainty.endpoints_cauchy import cauchydeviates_method
-from .mixed_uncertainty.mixed_up import (
+from abc import ABC, abstractmethod
+from pyuncertainnumber import pba
+from ..characterisation.uncertainNumber import UncertainNumber
+from ..pba.pbox_abc import Pbox
+from ..pba.intervals.number import Interval
+from ..pba.distributions import Distribution
+from ..pba.dependency import Dependency
+from .b2b import b2b
+from ..decorator import constructUN
+from .local_optimisation import local_optimisation_method
+from .mixed_up import (
     interval_monte_carlo,
     slicing,
     double_monte_carlo,
 )
 from ..pba.intervals.intervalOperators import make_vec_interval
 import numpy as np
-from scipy.stats import qmc
 
-from abc import ABC, abstractmethod
-from ..pba.pbox_abc import Pbox
-from ..pba.intervals.number import Interval
-from ..pba.distributions import Distribution
-from ..propagation.epistemic_uncertainty.b2b import b2b
-from ..decorator import constructUN
 
 """the new top-level module for the propagation of uncertain numbers"""
-
-
-if TYPE_CHECKING:
-    from ..characterisation.uncertainNumber import UncertainNumber
-
 
 import logging
 
@@ -37,11 +29,11 @@ logging.basicConfig(level=logging.INFO)
 class P(ABC):
     """Base class blueprint. Not for direct use"""
 
-    def __init__(self, vars, func, method, save_raw_data: bool = False):
+    def __init__(self, vars, func, method, dependency=None):
         self._vars = vars
         self.func = func
         self.method = method
-        self.save_raw_data = save_raw_data
+        self.dependency = dependency
 
     def post_init_check(self):
         """some checks"""
@@ -62,7 +54,7 @@ class P(ABC):
 
 
 class AleatoryPropagation(P):
-    """Aleatoric uncertainty propagation class for construct
+    """Aleatoric uncertainty propagation class for Distribution constructs only
 
     args:
         vars (Distribution): a list of uncertain numbers objects
@@ -71,9 +63,12 @@ class AleatoryPropagation(P):
 
         method (str): a string indicating the method to be used for propagation.
 
+        dependency (string or Dependency): a Dependency object(i.e. a copula function) to model the dependency structure among input variables.
+            Strings such as "independence" accepted for independence.
+
 
     note:
-        Supported methods include "monte_carlo", "latin_hypercube".
+        Supported methods include "monte_carlo". Note that "taylor_expansion" is not supported herein but implemented as a standalone function in the module `taylor_expansion.py`.
 
     caution:
         This function supports with low-level constructs NOT the high-level `UN` (uncertain number) objects.
@@ -95,10 +90,10 @@ class AleatoryPropagation(P):
         >>> result = aleatory(n_sam=1000)
     """
 
-    from .aleatory_uncertainty.sampling_aleatory import sampling_aleatory_method
+    from .taylor_expansion import taylor_expansion_method
 
-    def __init__(self, vars, func, method, save_raw_data: bool = False):
-        super().__init__(vars, func, method, save_raw_data)
+    def __init__(self, vars, func, method, dependency=None):
+        super().__init__(vars, func, method, dependency)
         self.post_init_check()
 
     def type_check(self):
@@ -120,38 +115,28 @@ class AleatoryPropagation(P):
         """doing the propagation"""
         match self.method:
             case "monte_carlo":
-                # regular sampling style
-                try:
+                if self.dependency is None or self.dependency == "independence":
                     # regular sampling style
-                    input_samples = [v.sample(n_sam) for v in self._vars]
-                    output_samples = self.func(input_samples)
-                except Exception as e:
-                    # vectorised sampling style
-                    input_samples = np.array(
-                        [v.sample(n_sam) for v in self._vars]
-                    ).T  # (n_sam, n_vars) == (n, d)
-                    output_samples = self.func(input_samples)
-            case "latin_hypercube" | "lhs":
-                sampler = qmc.LatinHypercube(d=len(self._vars))
-                lhs_samples = sampler.random(n=n_sam)  # u-space (n, d)
+                    try:
+                        # regular sampling style
+                        input_samples = [v.sample(n_sam) for v in self._vars]
+                        output_samples = self.func(input_samples)
+                    except Exception as e:
+                        # vectorised sampling style
+                        input_samples = np.array(
+                            [v.sample(n_sam) for v in self._vars]
+                        ).T  # (n_sam, n_vars) == (n, d)
+                        output_samples = self.func(input_samples)
+                        return output_samples
+                else:
+                    j = pba.JointDistribution(
+                        copula=self.dependency, marginals=self._vars
+                    )
 
-                try:
-                    # regular sampling style
-                    input_samples = [
-                        v.alpha_cut(lhs_samples[:, i]) for i, v in enumerate(self._vars)
-                    ]
-                    output_samples = self.func(input_samples)
-                except Exception as e:
-                    # vectorised sampling style
-                    input_samples = np.array(
-                        [
-                            v.alpha_cut(lhs_samples[:, i])
-                            for i, v in enumerate(self._vars)
-                        ]
-                    ).T
-                    output_samples = self.func(input_samples)
-            case "taylor_expansion":
-                pass
+                    s_inputs = j.sample(n_sam)  # (n_sam, n_vars)
+
+                    output_samples = self.func(s_inputs)
+                    return output_samples
             case _:
                 raise ValueError("method not yet supported")
         return output_samples
@@ -210,8 +195,6 @@ class EpistemicPropagation(P):
         match self.method:
             case "endpoint" | "endpoints" | "vertex":
                 handler = partial(b2b, interval_strategy="endpoints")
-            case "extremepoints":
-                handler = extremepoints_method
             case "subinterval" | "subintervals" | "subinterval_reconstitution":
                 handler = partial(b2b, interval_strategy="subinterval")
             case (
@@ -220,7 +203,7 @@ class EpistemicPropagation(P):
                 | "endpoint_cauchy"
                 | "endpoints_cauchy"
             ):
-                handler = cauchydeviates_method
+                handler = partial(b2b, interval_strategy="cauchy_deviate")
             case (
                 "local_optimization"
                 | "local_optimisation"
@@ -234,14 +217,12 @@ class EpistemicPropagation(P):
                 | "genetic optimization"
                 | "genetic optimisation"
             ):
-                handler = genetic_optimisation_method
+                handler = partial(b2b, interval_strategy="ga")
             case "bayesian_optimisation" | "bo":
                 handler = partial(b2b, interval_strategy="bo")
             case _:
                 raise ValueError("Unknown method")
 
-        # TODO: make the methods signature consistent
-        # TODO: ONLY an response interval needed to be returned
         results = handler(
             make_vec_interval(self._vars),  # pass down vec interval
             self.func,
@@ -260,6 +241,9 @@ class MixedPropagation(P):
 
         method (str): a string indicating the method to be used for pbox propagation, including {'interval_monte_carlo', 'slicing', 'double_monte_carlo'}.
 
+        dependency (string or Dependency): a Dependency object(i.e. a copula function) to model the dependency structure among input variables.
+            Strings such as "independence" accepted for independence.
+
         interval_strategy (str): a sub-level strategy selector for interval propagation, including {'direct', 'subinterval', 'endpoints'}.
 
     caution:
@@ -277,9 +261,11 @@ class MixedPropagation(P):
 
 
     note:
-        Discussion of the methods and strategies.
-        When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
-        whereas "subinterval" and "endpoints" require the function to take a vectorised signature.
+        Discussion of the methods and strategies. When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
+        whereas "subinterval" and "endpoints" require the function to take a vectorised signature. Currently, only "interval_monte_carlo" supports with dependency structures (e.g. copulas).
+
+        When calling the `run` function to do propagation, extra keyword arguments are needed to be passed down to the selected `method`.
+        For example, `n_sam` for "interval_monte_carlo"; `n_slices` for "slicing"; `n_outer`, `n_inner` for "double_monte_carlo".
 
     example:
         >>> from pyuncertainnumber import pba
@@ -289,12 +275,12 @@ class MixedPropagation(P):
         >>> b = pba.normal([10, 14], [1])
         >>> c = pba.normal([4, 5], [1])
         >>> mix = MixedPropagation(vars=[a,b,c], func=foo, method='slicing', interval_strategy='subinterval')
-        >>> result = mix(n_slices=20, n_sub=2, style='endpoints')
+        >>> result = mix.run(n_slices=20, n_sub=2, style='endpoints')
     """
 
-    def __init__(self, vars, func, method, interval_strategy=None):
+    def __init__(self, vars, func, method, dependency=None, interval_strategy=None):
 
-        super().__init__(vars, func, method)
+        super().__init__(vars, func, method, dependency)
         self.interval_strategy = interval_strategy
         self.post_init_check()
 
@@ -317,10 +303,14 @@ class MixedPropagation(P):
         ], f"Method {self.method} not supported for mixed uncertainty propagation"
 
     def run(self, **kwargs):
-        """doing the propagation"""
+        """doing the propagation. Extra keyword are needed to be passed down to the selected `method`"""
         match self.method:
             case "interval_monte_carlo":
-                handler = interval_monte_carlo
+                if self.dependency is None or self.dependency == "independence":
+                    handler = partial(interval_monte_carlo, dependency=None)
+                else:
+                    imc_w_d = partial(interval_monte_carlo, dependency=self.dependency)
+                    handler = imc_w_d
             case "slicing":
                 handler = slicing
             case "double_monte_carlo":
@@ -346,6 +336,9 @@ class Propagation:
         method (str):
             a string indicating the method to be used for propagation (e.g. "monte_carlo", "endpoint", etc.) which may depend on the constructs of the uncertain numbers.
             See notes about function signature.
+
+        dependency (string or Dependency): a Dependency object(i.e. a copula function) to model the dependency structure among input variables.
+            Strings such as "independence" accepted for independence.
 
         interval_strategy (str):
             a strategy for interval propagation, including {'direct', 'subinterval', 'endpoints'} which will
@@ -389,12 +382,14 @@ class Propagation:
         vars: list[UncertainNumber],
         func: callable,
         method: str,
+        dependency: str | Dependency = None,
         interval_strategy: str = None,
     ):
 
         self._vars = vars
         self._func = func
         self.method = method
+        self.dependency = dependency
         self.interval_strategy = interval_strategy
         self._post_init_check()
 
@@ -428,15 +423,18 @@ class Propagation:
         elif all_D:
             logging.info("distribution propagation")
             # all distributions
-            self.p = AleatoryPropagation(self._constructs, self._func, self.method)
+            self.p = AleatoryPropagation(
+                self._constructs, self._func, self.method, self.dependency
+            )
         elif (has_I and has_D) or has_P:
             # mixed uncertainty
             logging.info("mixed uncertainty propagation")
             self.p = MixedPropagation(
-                self._constructs,
-                self._func,
-                self.method,
-                self.interval_strategy,
+                vars=self._constructs,
+                func=self._func,
+                method=self.method,
+                dependency=self.dependency,
+                interval_strategy=self.interval_strategy,
                 # interval_strategy=self.kwargs.get("interval_strategy", None),
             )
         else:

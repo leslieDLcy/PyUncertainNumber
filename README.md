@@ -23,7 +23,7 @@ This package is underpined by a framework of **uncertain number** which allows f
 
 **Uncertain Number** refers to a class of mathematical objects useful for risk analysis that generalize real numbers, intervals, probability distributions, interval bounds on probability distributions (i.e. [probability boxes](https://en.wikipedia.org/wiki/Probability_box)), and [finite DempsterShafer structures](https://en.wikipedia.org/wiki/Dempster–Shafer_theory). Refer to the [documentation](https://pyuncertainnumber.readthedocs.io/en/latest/index.html) of this package for additional introduction.
 
-## quick start
+## Quick start
 
 `PyUncertainNumber` can be used to easily create an `UncertainNumber` object, which may embody a mathematical construct such as `PBox`, `Interval`, `Distribution`, or `DempsterShafer` structure.
 
@@ -59,7 +59,7 @@ response = p.run(n_slices=50)
 
 
 
-## installation
+## Installation
 
 **Requirement:** `Python >=3.11`
 

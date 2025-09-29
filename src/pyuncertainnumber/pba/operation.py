@@ -267,6 +267,8 @@ def convert(un):
         return un.to_pbox()
     elif isinstance(un, DempsterShafer):
         return un.to_pbox()
+    elif isinstance(un, Number):
+        return Interval(un, un).to_pbox()
     else:
         raise TypeError(f"Unable to convert {type(un)} object to Pbox")
 

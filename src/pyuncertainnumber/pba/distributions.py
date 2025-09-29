@@ -292,8 +292,6 @@ class Distribution(NominalValueMixin):
 class JointDistribution:
     """Joint distribution class
 
-    tip:
-        Bivariate implementation supported by now. Multivariate case is under development.
 
     example:
         >>> from pyuncertainnumber import pba
@@ -319,13 +317,13 @@ class JointDistribution:
     def from_sps(copula: Copula, marginals: list[sps.rv_continuous]):
         return CopulaDistribution(copula=copula, marginals=marginals)
 
-    def sample(self, size):
+    def sample(self, size, random_state=42):
         """generate orginal-space samples from the joint distribution"""
-        return self._joint_dist.rvs(size)
+        return self._joint_dist.rvs(size, random_state=random_state)
 
-    def u_sample(self, size):
+    def u_sample(self, size, random_state=42):
         """generate copula-space samples from the joint distribution"""
-        return self.copula.rvs(size)
+        return self.copula.rvs(size, random_state=random_state)
 
 
 # * --------------------- non-parametric ecdf cases --------------------- *#

@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING
 
 """leslie's general bound to bound implementation"""
 
-from ...pba.intervals.number import Interval
-from ...pba.intervals.intervalOperators import make_vec_interval
+from ..pba.intervals.number import Interval
+from ..pba.intervals.intervalOperators import make_vec_interval
 import numpy as np
 
 if TYPE_CHECKING:
-    from ...pba.intervals import Interval
+    from ..pba.intervals import Interval
 
 
 def b2b(
@@ -119,7 +119,7 @@ def b2b(
         >>> bar_individual(a, b)
         [38.0, 156.0]
     """
-    from ...pba.intervals.intervalOperators import wc_scalar_interval
+    from ..pba.intervals.intervalOperators import wc_scalar_interval
 
     try:
         vec_itvl = make_vec_interval(vars)
@@ -141,7 +141,7 @@ def b2b(
                 **kwargs,
             )
         case "ga":
-            from ...opt.get_range import get_range_GA
+            from ..opt.get_range import get_range_GA
             from pyuncertainnumber import EpistemicDomain
 
             ep = EpistemicDomain(vec_itvl)
@@ -154,7 +154,7 @@ def b2b(
             return opt_result[0]  # return the interval only
         case "bo":
             # assumes vectorised func signature
-            from ...opt.get_range import get_range_BO
+            from ..opt.get_range import get_range_BO
             from pyuncertainnumber import EpistemicDomain
 
             ep = EpistemicDomain(vec_itvl)
@@ -173,7 +173,7 @@ def b2b(
             | "Cauchy_deviate"
             | "Cauchy_deviate_method"
         ):
-            from ..cauchy_deviate import cauchy_deviate_method
+            from .cauchy_deviate import cauchy_deviate_method
 
             y_bound = cauchy_deviate_method(
                 input_vector_interval=vec_itvl,
@@ -183,7 +183,7 @@ def b2b(
             return y_bound
         case _:
             raise NotImplementedError(
-                f"Method {interval_strategy} is not supported yet. Supported methods are: {'endpoints', 'subinterval', 'ga', 'bo', 'direct'}"
+                f"Method {interval_strategy} is not supported yet. Supported methods are: {'endpoints', 'subinterval', 'ga', 'bo', 'direct', 'cauchy_deviate'}"
             )
 
 

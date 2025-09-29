@@ -3,28 +3,16 @@ from typing import TYPE_CHECKING
 import numpy as np
 from functools import partial
 import itertools
-from ...pba.pbox_abc import convert_pbox
-from ...pba.aggregation import stacking
-from ..epistemic_uncertainty.b2b import b2b
-from ...pba.dependency import Dependency
+from ..pba.pbox_abc import convert_pbox
+from ..pba.aggregation import stacking
+from .b2b import b2b
+from ..pba.dependency import Dependency
+from ..pba.params import Params
 
 if TYPE_CHECKING:
-    from ...pba.intervals import Interval
-    from ...pba.distributions import Distribution, JointDistribution
-    from ...pba.pbox_abc import Pbox
-
-"""leslie's implementation on mixed uncertainty propagation
-
-
-design signature hint:
-    - treat `vars` as the construct classes
-    - share the same interface with minimal arguments set (vars, func, interval_strategy)
-    - all these funcs will have the possibilities to return some verbose results
-    - where these verbose results can be saved to disk using a decorator
-
-note:
-    - a univariate func case is considered
-"""
+    from ..pba.intervals import Interval
+    from ..pba.distributions import Distribution, JointDistribution
+    from ..pba.pbox_abc import Pbox
 
 
 def interval_monte_carlo(
@@ -67,11 +55,16 @@ def interval_monte_carlo(
         >>> a = pba.normal([2, 3], [1])
         >>> b = pba.normal([10, 14], [1])
         >>> c = pba.normal([4, 5], [1])
+        >>> corre_matrix = np.array([[1, 0.5, 0.3], [0.5, 1, 0.4], [0.3, 0.4, 1]])
+        >>> de = pba.Dependency(family='gaussian', corr=corre_matrix)
         >>> mix = interval_monte_carlo(vars=[a,b,c],
         >>> ...       func=foo,
         >>> ...       n_sam=20,
+        >>> ...       dependency=de,
         >>> ...       interval_strategy='direct')
     """
+
+    vars = [convert_pbox(v) for v in vars]
 
     n_sam = int(n_sam) if isinstance(n_sam, float) else n_sam
 
@@ -81,17 +74,10 @@ def interval_monte_carlo(
         ndim = len(vars)
         dependency = Dependency(family="independence", k_dim=ndim)
         """old code for independent case only, which is driven by a cartesian product implementation"""
-        # from scipy.stats import qmc
-
-        # p_vars = [convert_pbox(v) for v in vars]
-
-        # # this change when there's specified dependency structure
-        # alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
-        # itvs = [v.alpha_cut(alpha) for v in p_vars]
-        # container = [b2b_f(_item) for _item in itertools.product(*itvs)]
 
     prob_proxy_input = dependency.u_sample(n_sam, random_state=random_state)
 
+    # TODO chanege alpha_cut to get outer_approximation
     container = []
     for i, row in enumerate(prob_proxy_input):
         x_domain = [
@@ -153,17 +139,48 @@ def slicing(
     """
     p_vars = [convert_pbox(v) for v in vars]
 
-    if outer_discretisation:
-        itvs = [p.outer_discretisation(n_slices) for p in p_vars]
-    else:
-        itvs = [v.discretise(n_slices) for v in p_vars]
+    # if outer_discretisation:
+    #     itvs = [p.outer_discretisation(n_slices) for p in p_vars]
+    # else:
+    #     itvs = [v.discretise(n_slices) for v in p_vars]
 
-    if len(itvs) == 1:
-        response_intvl = response_intvl = func(itvs[0])
-        response_pbox = stacking(response_intvl)
-        return response_pbox
+    # if len(itvs) == 1:
+    #     response_intvl = func(itvs[0])
+    #     response_pbox = stacking(response_intvl)
+    #     return response_pbox
+
     b2b_f = partial(b2b, func=func, interval_strategy=interval_strategy, **kwargs)
-    container = [b2b_f(_item) for _item in itertools.product(*itvs)]
+    # cartesian product of intervals -- original implementation but really slow and not efficient;
+    # container = [b2b_f(_item) for _item in itertools.product(*itvs)]
+
+    def make_u_sample(n, num_points):
+        # 200 equally spaced points between 0 and 1
+        grid_1d = np.linspace(0.01, 0.99, num_points)
+        # grid_1d = np.arange(Params.p_lboundary, Params.p_hboundary, 1 / num_points)
+
+        # Create n-dimensional meshgrid
+        mesh = np.meshgrid(*([grid_1d] * n), indexing="ij")
+
+        # Stack and reshape to (num_points**n, n)
+        u_sample = np.stack(mesh, axis=-1).reshape(-1, n)
+
+        return u_sample
+
+    prob_proxy_input = make_u_sample(n=len(vars), num_points=n_slices)
+
+    container = []
+    for i, row in enumerate(prob_proxy_input):
+        x_domain = [
+            v.alpha_cut(a) for v, a in zip(p_vars, row)
+        ]  # yield a list of intervals
+
+        response_y_itvl = b2b_f(x_domain)
+        container.append(response_y_itvl)
+
+    # masses = dependency.pdf(prob_proxy_input)
+
+    # return stacking(container, weights=masses)
+
     return stacking(container)
 
 
