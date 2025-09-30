@@ -55,5 +55,9 @@ from pyuncertainnumber.propagation.mixed_up import (
     double_monte_carlo,
 )
 
+
+# * --------------------- validation ---------------------*#
+from .pba.core import area_metric
+
 # * ---------------------  utils ---------------------*#
 from pyuncertainnumber.gutils import inspect_un
