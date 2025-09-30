@@ -265,10 +265,8 @@ class Pbox(NominalValueMixin, ABC):
         return I(np.median(self.left), np.median(self.right))
 
     @property
-    def area(self):
-        # return np.trapezoid(y=self._pvalues, x=self.left) - np.trapezoid(
-        #     y=self._pvalues, x=self.right
-        # )
+    def enclosed_area(self):
+        """the enclosed area between the two extreme cdfs"""
         return area_between_ecdfs(
             x_upper=self.left,
             p_upper=self._pvalues,
