@@ -19,6 +19,7 @@ from numpy.typing import ArrayLike
 
 __all__ = [
     "known_properties",
+    "known_constraints",
     "min_max",
     "min_max_mean",
     "min_mean",
@@ -299,6 +300,9 @@ def known_properties(
                 return c_pbox
             imp_pbox = base_pbox.imp(c_pbox)
         return imp_pbox
+
+
+known_constraints = known_properties
 
 
 def handle_default(**kwargs):
