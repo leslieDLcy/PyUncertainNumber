@@ -82,6 +82,16 @@ Explore the uncertainty indicated by significant digits of numbers
 :::
 
 
+:::{card} Characterise what you know
+:link: characterise_what_you_know
+:link-type: doc
+:img-top: ../_static/free_pbox_constraint_demo.png
+:class-card: sd-text-center        # optional: center content
+:class-img-top: card-img-square    # <-- add a class you’ll style
+Empirical knowledge serving as constraints when characterising what you know
+:::
+
+
 :::{card} Propagation of aleatory uncertainty
 :link: aleatory_propagation_demo
 :link-type: doc

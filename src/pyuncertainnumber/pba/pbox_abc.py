@@ -211,6 +211,8 @@ class Pbox(NominalValueMixin, ABC):
 
         self._init_range()
 
+        self.degenerate_flag()
+
     def steps_check(self):
 
         assert len(self.left) == len(
@@ -219,6 +221,14 @@ class Pbox(NominalValueMixin, ABC):
 
     def _compute_nominal_value(self):
         return np.round(self.mean.mid, 3)
+
+    def degenerate_flag(self) -> bool:
+        """check if the pbox is degenerate (i.e. left == right everywhere)"""
+        self._degenerate = np.array_equal(self.left, self.right)
+
+    @property
+    def degenerate(self) -> bool:
+        return self._degenerate
 
     @property
     def p_values(self):
@@ -265,10 +275,8 @@ class Pbox(NominalValueMixin, ABC):
         return I(np.median(self.left), np.median(self.right))
 
     @property
-    def area(self):
-        # return np.trapezoid(y=self._pvalues, x=self.left) - np.trapezoid(
-        #     y=self._pvalues, x=self.right
-        # )
+    def enclosed_area(self):
+        """the enclosed area between the two extreme cdfs"""
         return area_between_ecdfs(
             x_upper=self.left,
             p_upper=self._pvalues,
@@ -320,6 +328,10 @@ class Pbox(NominalValueMixin, ABC):
             self.to_interval(),
             np.repeat(a=(1 / discretisation), repeats=discretisation),
         )
+
+    def to_numpy(self):
+        """convert pbox to a 2D numpy array (n, 2) of left and right"""
+        return np.stack((self.left, self.right), axis=1)
 
 
 class Staircase(Pbox):
