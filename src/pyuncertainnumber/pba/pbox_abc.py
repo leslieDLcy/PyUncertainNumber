@@ -211,6 +211,8 @@ class Pbox(NominalValueMixin, ABC):
 
         self._init_range()
 
+        self.degenerate_flag()
+
     def steps_check(self):
 
         assert len(self.left) == len(
@@ -219,6 +221,14 @@ class Pbox(NominalValueMixin, ABC):
 
     def _compute_nominal_value(self):
         return np.round(self.mean.mid, 3)
+
+    def degenerate_flag(self) -> bool:
+        """check if the pbox is degenerate (i.e. left == right everywhere)"""
+        self._degenerate = np.array_equal(self.left, self.right)
+
+    @property
+    def degenerate(self) -> bool:
+        return self._degenerate
 
     @property
     def p_values(self):
@@ -318,6 +328,10 @@ class Pbox(NominalValueMixin, ABC):
             self.to_interval(),
             np.repeat(a=(1 / discretisation), repeats=discretisation),
         )
+
+    def to_numpy(self):
+        """convert pbox to a 2D numpy array (n, 2) of left and right"""
+        return np.stack((self.left, self.right), axis=1)
 
 
 class Staircase(Pbox):
