@@ -18,7 +18,10 @@ from pyuncertainnumber.pba.pbox_abc import Pbox
 
 # * --------------------- Interval ---------------------*#
 from pyuncertainnumber.pba.intervals.number import Interval
-from pyuncertainnumber.pba.intervals.intervalOperators import make_vec_interval
+from pyuncertainnumber.pba.intervals.intervalOperators import (
+    make_vec_interval,
+    parse_bounds,
+)
 from pyuncertainnumber.pba.intervals import intervalise
 from pyuncertainnumber.propagation.helper import EpistemicDomain
 
