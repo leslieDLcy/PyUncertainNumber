@@ -58,7 +58,9 @@ def b2b(
 
         n_sam (int): number of samples, only used for Cauchy deviate method
 
-        **kwargs: additional keyword arguments to be passed to the function
+        **kwargs: additional keyword arguments to be passed to the function, which provides extra control for the algorithm used.
+            For example, for GA, one can pass in 'algorithm_param' for BO, one can pass in 'acquisition_function', 'num_iterations' etc.
+            Typically, one would try the optimisation harder (e.g. more iterations) for a more accurate result.
 
 
     tip:
@@ -150,6 +152,7 @@ def b2b(
                 dimension=len(vec_itvl),
                 varbound=ep.to_GA_varBounds(),
                 verbose=False,
+                **kwargs,
             )
             return opt_result[0]  # return the interval only
         case "bo":
@@ -160,9 +163,7 @@ def b2b(
             ep = EpistemicDomain(vec_itvl)
 
             opt_result = get_range_BO(
-                f=func,
-                design_bounds=ep.to_BayesOptBounds(),
-                verbose=False,
+                f=func, design_bounds=ep.to_BayesOptBounds(), verbose=False, **kwargs
             )
             return opt_result[0]  # return the interval only
         case "direct":

@@ -191,7 +191,7 @@ def double_monte_carlo(
     n_e: int,
     func: callable,
     parallel=False,
-) -> Pbox:
+) -> tuple[Pbox, list, np.ndarray]:
     """Double-loop Monte Carlo or nested Monte Carlo for mixed uncertainty propagation
 
     args:
@@ -210,7 +210,10 @@ def double_monte_carlo(
         - resulting sample array: with `n_e=2`, the response :math:`y` : (n_ep+2, n_a) e.g. (4, 1000)
 
     return:
-        numpy array of shape ``(n_e+2, n_a)`` as a collection of CDFs for the response
+        a tuple containing the following items:
+            - a p-box enveloping all the CDFs from the epistemic samples
+            - a list of ECDFs for each epistemic sample
+            - numpy array of shape ``(n_e+2, n_a)`` as a collection of CDFs for the response
 
 
     note:
@@ -240,9 +243,11 @@ def double_monte_carlo(
         ... )
     """
     # from epistemic vars into vec interval object
-    from pyuncertainnumber import make_vec_interval
+    from pyuncertainnumber import make_vec_interval, parse_bounds
+    from pyuncertainnumber.pba.distributions import ECDF
+    from pyuncertainnumber import envelope
 
-    v = make_vec_interval(epistemic_vars)
+    v = parse_bounds(epistemic_vars)
     # lhs sample array on epistemic variables
     epistemic_points = v.endpoints_lhs_sample(n_e)
 
@@ -257,7 +262,7 @@ def double_monte_carlo(
         note:
             by default, aleatory variable are put in front of the epistemic ones
         """
-        xa_samples = joint_distribution.sample(n_a)
+        xa_samples = joint_distribution.sample(n_a).reshape(-1, 1)
 
         E = np.tile(e, (n_a, 1))
         X_input = np.concatenate((xa_samples, E), axis=1)
@@ -265,9 +270,12 @@ def double_monte_carlo(
 
     p_func = partial(evaluate_func_on_e, n_a=n_a, func=func)
     container = map(p_func, epistemic_points)
-    response = np.squeeze(np.stack(list(container), axis=0))
-    # TODO : envelope CDFs into a pbox
-    return response
+    response = np.squeeze(np.stack(list(container), axis=0))  # (n_e, n_a)
+
+    many_ecdfs = [ECDF(r) for r in response]
+    env_pbox = envelope(*many_ecdfs, output_type="pbox")
+
+    return env_pbox, many_ecdfs, response
 
 
 def bi_imc(x, y, func, dependency=None, n_sam=100):
