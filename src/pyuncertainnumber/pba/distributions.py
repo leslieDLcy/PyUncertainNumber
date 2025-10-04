@@ -345,6 +345,7 @@ class ECDF(Staircase):
 
     def __init__(self, empirical_data: np.ndarray):
         left, p_values = get_ecdf(empirical_data)
+        # TODO: quantile direct into Staircase. Hmm...
         super().__init__(left=left, right=left)
 
 
