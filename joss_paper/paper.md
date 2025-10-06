@@ -68,28 +68,80 @@ scientific explorations of forthcoming data releases from the *Gaia* mission
 [@gaia] by students and experts alike.
 
 
-Code accessibility is not guaranteed. `pyuncertainnumber` addresses that by enabling
-non-intrusive capability. How to work with black-box models?
+`pyuncertainnumber` enables rigorous uncertainty analysis for real-world situations 
+of mixed uncertainties and partial knowledge. Aleatoric and epistemic uncertainties are 
+recognised and treated appropriately in characterisation and propagation.
+
+Uncertainty arithmetic is underpinned by probability bounds analysis. While it has the potential 
+to automatically compile a non-deterministic subroutines via primitives such as intervals or uncertain numbers, 
+its usages face several challenges.
+
+Besides the issues of xx such as dependency problems, one notable challenge is that code accessibility is often not guaranteed. 
+Also, the lack of capability one the main reasons restricting the adoption of xxx in practice.
+
+
+`pyuncertainnumber` addresses that by enabling non-intrusive capability. How to work with black-box models? This capability significantly 
+boost its versatility for scientific computations by interfacing with many engineering softwares.
 
 
 
 # Interval propagation in a non-intrusive manner
 
 
-General gradient-free optimisation.
+Interval analysis has the advantages of rigorous, bla bla ...But naive interval arithmetic faces xxx problems, 
+though xxx provides mathematical re-arrangements. However, it is evident that a computational environment of intervals
+cannot be established except that being intrusive.
 
-```python
-b2b
-```
+\begin{equation}
+Y = g(I_{x1}, I_{x2}, ..., I_{xn})
+\end{equation}
+
+where $`I_{x1}, I_{x2}, ..., I_{xn}$ are intervals.
+
+In a general case, the function $g$ is not necessarily monotonic or linear and may well be a black-box model. Generally, the interval
+propagatin problem can be cast as an optimisation problem where the minimum and maximum are sought via a function mapping, and such 
+optimisation can only be solved via gradient-free optimisation techniques for black box models.
 
 
+<!-- tabulate the interval results from the example -->
+<!-- think twice. the middle row can be changed into a paragraph in the main text instead -->
+| Method     | Endpoints    | Subinterval reconstitution | Cauthy-Deviate method           | Bayesian optimisation | Genetic algorithm |
+|------------|--------------|----------------------------|---------------------------------|-----------------------|-------------------|
+| Assumption | monotonicity | heavy computation          | linearity and gradient required | No                    | No                |
+| Result     |              |                            |                                 |                       |                   |
+
+
+<!-- show the figure to indicate the ground-truth answer -->
 
 
 # Mixed uncertainty propagation for black-box models
 
 
+Most realistic situation bla bla. Imprecise world bla bla. After faithful characterisation, the ability 
+to propagate is the key in many critical engineering applications. 
+
+<!-- see the pbox propagation paper (iMC) and copy some texts herein -->
+
+Dependency structures bla bla. It has been echoed in the engineering applications and also the NASA challenge.
 
 
+Double Monte Carlo
+
+
+
+
+
+
+Interval Monte Carlo...
+
+
+
+
+# Propagation of p-boxes via surrogate models
+
+
+
+<!-- 
 # Mathematics
 
 Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
@@ -105,7 +157,7 @@ You can also use plain \LaTeX for equations
 \begin{equation}\label{eq:fourier}
 \hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
 \end{equation}
-and refer to \autoref{eq:fourier} from text.
+and refer to \autoref{eq:fourier} from text. -->
 
 # Citations
 
@@ -123,12 +175,12 @@ For a quick reference, the following citation commands can be used:
 
 # Figures
 
-Figures can be included like this:
+<!-- Figures can be included like this:
 ![Caption for example figure.\label{fig:example}](figure.png)
 and referenced from text using \autoref{fig:example}.
 
 Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
+![Caption for example figure.](figure.png){ width=20% } -->
 
 
 

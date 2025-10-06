@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns="http://www.crossref.org/schema/5.3.1"
+           xmlns:ai="http://www.crossref.org/AccessIndicators.xsd"
+           xmlns:rel="http://www.crossref.org/relations.xsd"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           version="5.3.1"
+           xsi:schemaLocation="http://www.crossref.org/schema/5.3.1 http://www.crossref.org/schemas/crossref5.3.1.xsd">
+  <head>
+    <doi_batch_id>20251004143514-2d8057dc7711411923662fffb8d2854f4503c1ea</doi_batch_id>
+    <timestamp>20251004143514</timestamp>
+    <depositor>
+      <depositor_name>JOSS Admin</depositor_name>
+      <email_address>admin@theoj.org</email_address>
+    </depositor>
+    <registrant>The Open Journal</registrant>
+  </head>
+  <body>
+    <journal>
+      <journal_metadata>
+        <full_title>Journal of Open Source Software</full_title>
+        <abbrev_title>JOSS</abbrev_title>
+        <issn media_type="electronic">2475-9066</issn>
+        <doi_data>
+          <doi>10.21105/joss</doi>
+          <resource>https://joss.theoj.org</resource>
+        </doi_data>
+      </journal_metadata>
+      <journal_issue>
+        <publication_date media_type="online">
+          <month>01</month>
+          <year>1970</year>
+        </publication_date>
+        <journal_volume>
+          <volume>¿VOL?</volume>
+        </journal_volume>
+        <issue>¿ISSUE?</issue>
+      </journal_issue>
+      <journal_article publication_type="full_text">
+        <titles>
+          <title>PyUncertainNumber: more than just probability arithmetic</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Yu</given_name>
+            <surname>Chen</surname>
+            <affiliations>
+              <institution><institution_name>Institute for Risk and Uncertainty, University of Liverpool, UK</institution_name><institution_id type="ror">https://ror.org/00hx57361</institution_id></institution>
+            </affiliations>
+            <ORCID>https://orcid.org/0000-0001-6617-2946</ORCID>
+          </person_name>
+          <person_name sequence="additional"
+                       contributor_role="author">
+            <given_name>Scott</given_name>
+            <surname>Ferson</surname>
+            <affiliations>
+              <institution><institution_name>Institute for Risk and Uncertainty, University of Liverpool, UK</institution_name><institution_id type="ror">https://ror.org/00hx57361</institution_id></institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional"
+                       contributor_role="author">
+            <given_name>Edoardo</given_name>
+            <surname>Patelli</surname>
+            <affiliations>
+              <institution><institution_name>Centre for Intelligent Infrastructure, University of Strathclyde</institution_name></institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <publication_date>
+          <month>01</month>
+          <day>01</day>
+          <year>1970</year>
+        </publication_date>
+        <pages>
+          <first_page>¿PAGE?</first_page>
+        </pages>
+        <publisher_item>
+          <identifier id_type="doi">N/A</identifier>
+        </publisher_item>
+        <ai:program name="AccessIndicators">
+          <ai:license_ref applies_to="vor">http://creativecommons.org/licenses/by/4.0/</ai:license_ref>
+          <ai:license_ref applies_to="am">http://creativecommons.org/licenses/by/4.0/</ai:license_ref>
+          <ai:license_ref applies_to="tdm">http://creativecommons.org/licenses/by/4.0/</ai:license_ref>
+        </ai:program>
+        <rel:program>
+          <rel:related_item>
+            <rel:description>Software archive</rel:description>
+            <rel:inter_work_relation relationship-type="references" identifier-type="doi">10.5281</rel:inter_work_relation>
+          </rel:related_item>
+          <rel:related_item>
+            <rel:description>GitHub review issue</rel:description>
+            <rel:inter_work_relation relationship-type="hasReview" identifier-type="uri">https://github.com/openjournals</rel:inter_work_relation>
+          </rel:related_item>
+        </rel:program>
+        <doi_data>
+          <doi>N/A</doi>
+          <resource>https://joss.theoj.org/papers/N/A</resource>
+          <collection property="text-mining">
+            <item>
+              <resource mime_type="application/pdf">https://joss.theoj.org/papers/N/A.pdf</resource>
+            </item>
+          </collection>
+        </doi_data>
+        <citation_list>
+          <citation key="Pearson:2017">
+            <article_title>Gaps in Globular Cluster Streams: Pal 5 and the Galactic Bar</article_title>
+            <author>Pearson</author>
+            <journal_title>ArXiv e-prints</journal_title>
+            <cYear>2017</cYear>
+            <unstructured_citation>Pearson, S., Price-Whelan, A. M., &amp; Johnston, K. V. (2017). Gaps in Globular Cluster Streams: Pal 5 and the Galactic Bar. ArXiv e-Prints. http://adsabs.harvard.edu/abs/2017arXiv170304627P</unstructured_citation>
+          </citation>
+          <citation key="Binney:2008">
+            <volume_title>Galactic Dynamics: Second Edition</volume_title>
+            <author>Binney</author>
+            <cYear>2008</cYear>
+            <unstructured_citation>Binney, J., &amp; Tremaine, S. (2008). Galactic Dynamics: Second Edition. Princeton University Press. http://adsabs.harvard.edu/abs/2008gady.book.....B</unstructured_citation>
+          </citation>
+          <citation key="gaia">
+            <article_title>The Gaia mission</article_title>
+            <author>Gaia Collaboration</author>
+            <journal_title>Astronomy and Astrophysics</journal_title>
+            <volume>595</volume>
+            <doi>10.1051/0004-6361/201629272</doi>
+            <cYear>2016</cYear>
+            <unstructured_citation>Gaia Collaboration. (2016). The Gaia mission. Astronomy and Astrophysics, 595. https://doi.org/10.1051/0004-6361/201629272</unstructured_citation>
+          </citation>
+          <citation key="astropy">
+            <article_title>Astropy: A community Python package for astronomy</article_title>
+            <author>Astropy Collaboration</author>
+            <journal_title>Astronomy and Astrophysics</journal_title>
+            <volume>558</volume>
+            <doi>10.1051/0004-6361/201322068</doi>
+            <cYear>2013</cYear>
+            <unstructured_citation>Astropy Collaboration. (2013). Astropy: A community Python package for astronomy. Astronomy and Astrophysics, 558. https://doi.org/10.1051/0004-6361/201322068</unstructured_citation>
+          </citation>
+          <citation key="fidgit">
+            <article_title>Fidgit: An ungodly union of GitHub and figshare</article_title>
+            <author>Smith</author>
+            <journal_title>GitHub repository</journal_title>
+            <cYear>2020</cYear>
+            <unstructured_citation>Smith, A. M., Thaney, K., &amp; Hahnel, M. (2020). Fidgit: An ungodly union of GitHub and figshare. In GitHub repository. GitHub. https://github.com/arfon/fidgit</unstructured_citation>
+          </citation>
+        </citation_list>
+      </journal_article>
+    </journal>
+  </body>
+</doi_batch>
