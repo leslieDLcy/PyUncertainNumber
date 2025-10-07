@@ -77,6 +77,22 @@ def endpoint_distance(A, B):
     return distances
 
 
+def am_distance_counter(A, B):
+    """Compute the distance between two sets of intervals as used in the area metric.
+
+    notes:
+
+    It is essentially doing:
+
+    def f(a, b, c, d):
+        return np.maximum.reduce([c - b, a - d, 0])
+
+    """
+    a, b = A[:, 0], A[:, 1]
+    c, d = B[:, 0], B[:, 1]
+    return np.maximum.reduce([c - b, a - d, np.zeros_like(a)])
+
+
 def function_succeeds(f, *args, **kwargs):
     try:
         f(*args, **kwargs)
@@ -87,7 +103,8 @@ def function_succeeds(f, *args, **kwargs):
 
 def area_metric_pbox(a: Pbox, b: Pbox):
     """when a and b are both Pboxes"""
-    diff = endpoint_distance(a.to_numpy(), b.to_numpy())
+    # diff = endpoint_distance(a.to_numpy(), b.to_numpy())  # old version busted by Scott
+    diff = am_distance_counter(a.to_numpy(), b.to_numpy())
     return np.trapz(y=diff, x=a.p_values)
 
 
@@ -128,5 +145,15 @@ def area_metric(a: Number | Pbox | ArrayLike, b: Number | Pbox | ArrayLike) -> f
             return area_metric_pbox(a, b)
     if isinstance(a, (np.ndarray, list)) and isinstance(b, (np.ndarray, list)):
         return area_metric_sample(a, b)
+    elif (isinstance(a, Pbox) and isinstance(b, np.ndarray)) or (
+        isinstance(a, np.ndarray) and isinstance(b, Pbox)
+    ):
+        # make a a Pbox and b a sample anyway
+        if not isinstance(a, Pbox):
+            a, b = b, a
+
+        # b has to be a scalar sample
+        b = np.squeeze(b).item()
+        return area_metric_number(a, b)
     else:
         raise NotImplementedError("Area metric not implemented for these types.")

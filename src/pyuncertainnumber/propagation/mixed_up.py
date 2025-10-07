@@ -155,7 +155,9 @@ def slicing(
 
     def make_u_sample(n, num_points):
         # 200 equally spaced points between 0 and 1
-        grid_1d = np.linspace(0.01, 0.99, num_points)
+        # grid_1d = np.linspace(0.01, 0.99, num_points)
+
+        grid_1d = np.linspace(Params.p_lboundary, Params.p_hboundary, num_points)
         # grid_1d = np.arange(Params.p_lboundary, Params.p_hboundary, 1 / num_points)
 
         # Create n-dimensional meshgrid
