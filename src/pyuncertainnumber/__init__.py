@@ -14,7 +14,7 @@ from pyuncertainnumber.characterisation.stats import fit
 
 
 # * --------------------- Pbox ---------------------*#
-from pyuncertainnumber.pba.pbox_abc import Pbox
+from pyuncertainnumber.pba.pbox_abc import Pbox, Staircase
 
 # * --------------------- Interval ---------------------*#
 from pyuncertainnumber.pba.intervals.number import Interval
