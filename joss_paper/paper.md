@@ -1,5 +1,5 @@
 ---
-title: 'PyUncertainNumber: more than just probability arithmetic'
+title: 'PyUncertainNumber for uncertainty propagation: more than just probability arithmetic'
 tags:
   - Python
   - uncertainty propagation
@@ -26,11 +26,6 @@ affiliations:
    index: 2
 date: 3 October 2025
 bibliography: paper.bib
-
-# Optional fields if submitting to a AAS journal too, see this blog post:
-# https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
-aas-doi: 10.3847/xxxxx <- update this with the DOI from AAS once you know it.
-aas-journal: Astrophysical Journal <- The name of the AAS journal.
 ---
 
 # Summary
@@ -88,29 +83,43 @@ boost its versatility for scientific computations by interfacing with many engin
 # Interval propagation in a non-intrusive manner
 
 
-Interval analysis has the advantages of rigorous, bla bla ...But naive interval arithmetic faces xxx problems, 
-though xxx provides mathematical re-arrangements. However, it is evident that a computational environment of intervals
-cannot be established except that being intrusive.
+Interval analysis has the advantages of providing rigorous enclosures of the solutions to problems, especially for engineering problems
+subject to epistemic uncertainty, such as modelling system paramters due to lack-of-knowledge or characterising measurement incertitude.
+It is evident that computational tasks requiring complex numerical solutions of intervals are non-intrusive (i.e. the source code is not accessiable).
+Besides, it shoule be noted even for cystal boxes (i.e. source code is accessible), naive interval arithmetic still faces challlenges such as the infamous interval dependency issue. 
+Though it may be mitigated through mathematical rearrangements in some cases, it will be challenging for most of the cases.
+<!-- But naive interval arithmetic faces xxx problems, though xxx provides mathematical re-arrangements.  -->
+
+Generally, the interval propagation problem can be cast as an optimisation problem where the minimum and maximum are sought via a function mapping.
+The functio, for example $g$ in Eq.(xx), is not necessarily monotonic or linear and may well be a black-box model. Hence, for black box models the optimisation can 
+only be solved via gradient-free optimisation techniques.
 
 \begin{equation}
 Y = g(I_{x1}, I_{x2}, ..., I_{xn})
 \end{equation}
 
-where $`I_{x1}, I_{x2}, ..., I_{xn}$ are intervals.
 
-In a general case, the function $g$ is not necessarily monotonic or linear and may well be a black-box model. Generally, the interval
-propagatin problem can be cast as an optimisation problem where the minimum and maximum are sought via a function mapping, and such 
-optimisation can only be solved via gradient-free optimisation techniques for black box models.
+\begin{equation}
+Y_min, Y_max
+\end{equation}
 
+where $I_{x1}, I_{x2}, ..., I_{xn}$ are intervals.
+
+`pyuncertainnumber` provides a series of non-intrusive methodologies of varying applicability. It should be noted that there is generally a trade-off between 
+applicability and efficiency. But with more knowledge about the characteristics of the underlying function, one can accordinly dispatch an efficient method.
+For example, whem monotonicity is known one can use vertex methods which $2_n$.
 
 <!-- tabulate the interval results from the example -->
 <!-- think twice. the middle row can be changed into a paragraph in the main text instead -->
+
+Table: Several methods for interval propagation []{label='ip_methods'}
+
 | Method     | Endpoints    | Subinterval reconstitution | Cauthy-Deviate method           | Bayesian optimisation | Genetic algorithm |
 |------------|--------------|----------------------------|---------------------------------|-----------------------|-------------------|
 | Assumption | monotonicity | heavy computation          | linearity and gradient required | No                    | No                |
 | Result     |              |                            |                                 |                       |                   |
 
-
+As shown in \autoref{ip_methods}, tabulation of xxx given a black box model.
 <!-- show the figure to indicate the ground-truth answer -->
 
 
@@ -124,12 +133,9 @@ to propagate is the key in many critical engineering applications.
 
 Dependency structures bla bla. It has been echoed in the engineering applications and also the NASA challenge.
 
+Sampling methods play a significant role in xxx
 
 Double Monte Carlo
-
-
-
-
 
 
 Interval Monte Carlo...
@@ -175,12 +181,12 @@ For a quick reference, the following citation commands can be used:
 
 # Figures
 
-<!-- Figures can be included like this:
+Figures can be included like this:
 ![Caption for example figure.\label{fig:example}](figure.png)
 and referenced from text using \autoref{fig:example}.
 
 Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% } -->
+![Caption for example figure.](figure.png){ width=20% }
 
 
 
