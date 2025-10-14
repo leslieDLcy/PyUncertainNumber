@@ -182,13 +182,17 @@ For a quick reference, the following citation commands can be used:
 # Figures
 
 Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
-
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
+![Double Monte Carlo.\label{fig:dmc}](dmc_flowchart.png)
+\autoref{fig:dmc} illustrates the *nested Monte Carlo* method.
 
 
+![Interval Monte Carlo.\label{fig:imc}](imc_flowchart.png)
+\autoref{fig:imc} illustrates the *interval Monte Carlo* method.
+
+
+
+<!-- Figure sizes can be customized by adding an optional second parameter:
+![Interval Monte Carlo.](imc_flowchart.png){ width=20% } -->
 
 # Conclusion
 
