@@ -216,6 +216,7 @@ def double_monte_carlo(
             - a p-box enveloping all the CDFs from the epistemic samples
             - a list of ECDFs for each epistemic sample
             - numpy array of shape ``(n_e+2, n_a)`` as a collection of CDFs for the response
+            - the epistemic samples used
 
 
     note:
@@ -277,7 +278,7 @@ def double_monte_carlo(
     many_ecdfs = [ECDF(r) for r in response]
     env_pbox = envelope(*many_ecdfs, output_type="pbox")
 
-    return env_pbox, many_ecdfs, response
+    return env_pbox, many_ecdfs, response, epistemic_points
 
 
 def bi_imc(x, y, func, dependency=None, n_sam=100):
