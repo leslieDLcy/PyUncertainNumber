@@ -22,6 +22,7 @@ def interval_monte_carlo(
     n_sam: int,
     dependency: Dependency = None,
     random_state=None,
+    side_effects=False,
     **kwargs,
 ) -> Pbox:
     """Interval Monte Carlo for propagation of pbox
@@ -38,6 +39,12 @@ def interval_monte_carlo(
             number of samples for each input
 
         dependency: dependency structure (e.g. vine copula or archimedean copula
+
+        random_state: random seed for reproducibility
+
+        side_effects (bool): whether return auxiliary outputs (side effects) during propagation
+            If true, the alpha-cut samples in the uniform space will be returned as well.
+            otherwise, the default is False and only the p-box is returned.
 
     tip:
         Independence assumption by now. Dependency structure is at beta developement now.
@@ -87,7 +94,10 @@ def interval_monte_carlo(
         response_y_itvl = b2b_f(x_domain)
         container.append(response_y_itvl)
 
-    return stacking(container)
+    if not side_effects:
+        return stacking(container)
+    else:
+        return stacking(container), prob_proxy_input
 
 
 def slicing(
@@ -192,6 +202,7 @@ def double_monte_carlo(
     n_a: int,
     n_e: int,
     func: callable,
+    side_effects=False,
     parallel=False,
 ) -> tuple[Pbox, list, np.ndarray]:
     """Double-loop Monte Carlo or nested Monte Carlo for mixed uncertainty propagation
@@ -211,12 +222,19 @@ def double_monte_carlo(
 
         - resulting sample array: with `n_e=2`, the response :math:`y` : (n_ep+2, n_a) e.g. (4, 1000)
 
+
+    side_effects (bool): whether return auxiliary outputs (side effects) during propagation
+            If true, the alpha-cut samples in the uniform space will be returned as well.
+            otherwise, the default is False and only the p-box is returned.
+
     return:
-        a tuple containing the following items:
+        If `side_effects` is True, a tuple containing the following items:
             - a p-box enveloping all the CDFs from the epistemic samples
             - a list of ECDFs for each epistemic sample
             - numpy array of shape ``(n_e+2, n_a)`` as a collection of CDFs for the response
             - the epistemic samples used
+
+        Otherwise, just the p-box.
 
 
     note:
@@ -278,7 +296,10 @@ def double_monte_carlo(
     many_ecdfs = [ECDF(r) for r in response]
     env_pbox = envelope(*many_ecdfs, output_type="pbox")
 
-    return env_pbox, many_ecdfs, response, epistemic_points
+    if not side_effects:
+        return env_pbox
+    else:
+        return env_pbox, many_ecdfs, response, epistemic_points
 
 
 def bi_imc(x, y, func, dependency=None, n_sam=100):
