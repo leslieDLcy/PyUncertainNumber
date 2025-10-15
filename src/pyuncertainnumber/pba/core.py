@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 import scipy.stats as sps
 from numbers import Number
-from pyuncertainnumber.pba.pbox_abc import Pbox
+from pyuncertainnumber.pba.pbox_abc import Pbox, Staircase
 
 
 class Joint(ABC):
@@ -157,3 +157,136 @@ def area_metric(a: Number | Pbox | ArrayLike, b: Number | Pbox | ArrayLike) -> f
         return area_metric_number(a, b)
     else:
         raise NotImplementedError("Area metric not implemented for these types.")
+
+
+from bisect import bisect_left
+
+
+# * --------------------------- the developments below are between scalar and P-box only
+
+
+def distance_to_ecdf_bound(x0, quantile):
+    """Min horizontal distance from x0 to the ECDF defined by quantile."""
+    xs = sorted(quantile)
+    i = bisect_left(xs, x0)
+    if i == 0:
+        return abs(xs[0] - x0)
+    if i == len(xs):
+        return abs(x0 - xs[-1])
+    # nearest of the two neighbors
+    return min(abs(x0 - xs[i - 1]), abs(xs[i] - x0))
+
+
+def closer_bound(x0, left_edge, right_edge):
+    """Decide which ECDF bound is closer to x0.
+
+    args:
+        x0: a scalar point
+        left_edge: samples from the left bound of the ECDF
+        x_right_samples: samples from the right bound of the ECDF
+    """
+    dl = distance_to_ecdf_bound(x0, left_edge)
+    dr = distance_to_ecdf_bound(x0, right_edge)
+    if dl < dr:
+        return "left", dl, dr
+    if dr < dl:
+        return "right", dl, dr
+    return "tie", dl, dr  # exactly equidistant
+
+
+def if_outside(x0, left_edge, right_edge):
+    """Check if x0 is outside the ECDF defined by left_edge and right_edge."""
+    return x0 < left_edge[0] or x0 > right_edge[-1]
+
+
+def if_right_in(x0, left_edge, right_edge):
+    """Check if x0 is inside the ECDF defined by left_edge and right_edge."""
+    return left_edge[-1] <= x0 <= right_edge[0]
+
+
+# high-level func
+def directional(x0, left_edge, right_edge):
+    """give instructions on which direction to move the Pbox towards the scalar
+
+    returns:
+        output a message variable
+    """
+    a = if_outside(x0, left_edge, right_edge)  # a is boolean
+    msg, _, _ = closer_bound(x0, left_edge, right_edge)
+
+    if a:  # outside
+        if msg == "left" or msg == "tie":
+            return "out_left"
+        elif msg == "right":
+            return "out_right"
+    else:  # inside
+        if msg == "left" or msg == "tie":
+            return "in_left"
+        elif msg == "right":
+            return "in_right"
+
+
+def calibration_distance(a: Pbox, b: Number) -> float:
+    """Estimate the calibration distance to compensate area metric between a P-box aand a scalar"""
+
+    if not isinstance(a, Pbox):
+        a, b = b, a  # swap so that a is always the Pbox
+
+    msg, _, _ = closer_bound(b, a.left, a.right)
+
+    if msg == "left" or msg == "tie":
+        return np.abs(a.left[-1] - b)
+    elif msg == "right":
+        return np.abs(a.right[0] - b)
+
+
+def slide_pbox_towards_scalar(a, b):
+    """Slide the Pbox a towards the scalar b by one step.
+
+    args:
+        a: a Pbox
+        b: a scalar
+
+    returns:
+        a new Pbox that is slid towards b by one step
+    """
+    # which direction to slide
+    msg = directional(b, a.left, a.right)
+
+    # how much to slide
+    proposal_dd = calibration_distance(a, b)
+
+    # worked and backup
+    # match msg:
+    #     case "out_right":
+    #         # expand on the right
+    #         return Staircase(a.left, a.right + proposal_dd)
+    #     case "out_left":
+    #         # expand on the left
+    #         return Staircase(a.left - proposal_dd, a.right)
+    #     case "in_left":
+    #         # slide to the left
+    #         return Staircase(a.left - proposal_dd, a.right - proposal_dd)
+    #     case "in_right":
+    #         # slide to the right
+    #         return Staircase(a.left + proposal_dd, a.right + proposal_dd)
+
+    match msg:
+        case "out_right":
+            # expand on the right
+            d1 = 0
+            d2 = proposal_dd
+        case "out_left":
+            # expand on the left
+            d1 = proposal_dd
+            d2 = 0
+        case "in_left":
+            # slide to the left
+            d1 = proposal_dd
+            d2 = -proposal_dd
+        case "in_right":
+            # slide to the right
+            d1 = -proposal_dd
+            d2 = proposal_dd
+
+    return Staircase(a.left - d1, a.right + d2)
