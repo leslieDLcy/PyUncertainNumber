@@ -1,5 +1,5 @@
 ---
-title: 'PyUncertainNumber for uncertainty propagation: more than just probability arithmetic'
+title: 'PyUncertainNumber for uncertainty propagation: beyond probability arithmetic'
 tags:
   - Python
   - uncertainty propagation
@@ -30,11 +30,7 @@ bibliography: paper.bib
 
 # Summary
 
-Scientific computations or simulations play a central role in quantifying the performance, reliability, and safety of complex engineered systems. However, these analyses are complicated by the various sources of uncertainties inherent in the computational pipeline. 
-Under-estimation could lead to xxx while over-estimation could lead to ...
-To ensure that complex engineered systems can be operated reliably and robustly, even during rare and extreme environment conditions, a comprehensive analysis is needed. Comprehensive in two senses: (i) all of the possible sources of uncertainty must be identified and represented using approaite mathematical construct; (ii) that rigorously account for mixed or mixture of various types of uncertainties. Challenges include xxx, code accessbility, tools to conduct the analysis.
-
-
+Scientific computations or simulations play a central role in quantifying the performance, reliability, and safety of complex engineered systems. However, these analyses are complicated by the various sources of uncertainties inherent in the computational pipeline. Underestimation may lead to suboptimal performance outside the most common scenarios while overestimation, on the other hand, may lead to over-engineered systems and significant waste of resources. To ensure that complex engineered systems can be operated reliably and robustly, even during rare and extreme environment conditions, a comprehensive analysis is required. The analysis should be comprehensive in two senses: (i) all of the possible sources of uncertainty must be identified and represented using approaite mathematical construct; (ii) that rigorously account for mixed or mixture of various types of uncertainties. Challenges include xxx, code accessbility, tools to conduct the analysis.
 By xxx, `pyuncertainnumber` bla bla.. non-intrusively.
 
 
@@ -46,22 +42,20 @@ account for uncertainty is vital in performance, relibiability, and safety of hi
 
 A comprehensive uncertainty framework for scientific computation involves a mathematical model,
 through which various input uncertainties are propagated to estimate the uncertainty of an unknown quantity of interest.
-In real-world applications, these input uncertainties are commonly manifested as mixed uncertainties, e.g. probability boxes (p-boxes) which effectively represents a set of distributionbs, combining both the aleatory and epistemic uncertainty in one structure, or a mixture of uncertainties suggesting, for instance, a vector of inputs parameters of aleatory (probability distributions), epistemic (intervals), and mixed nature (e.g. probability boxes).
+In real-world applications, these input uncertainties are commonly manifested as mixed uncertainties, e.g. probability boxes (p-boxes) which effectively represents a set of distributionbs, combining both the aleatory and epistemic uncertainty in one structure, or a mixture of uncertainties suggesting, for instance, a vector of inputs parameters of aleatory (e.g. probability distributions), epistemic (e.g. intervals), and mixed nature (e.g. probability boxes).
 
 Probability bounds analysis is one of the expressive frameworks proposed to manage uncertainties in an imprecise setting.
 Packages have been developed to facilitate the calculations of uncertain quantities, such as interval arithmetic [@marco_2022_6205624] and probability arithemetic [@gray:2021; @gray:2022]. Collectively, they can be referred to as *uncertainty arithmetic* which straightforwardly computes the response provided the performance function.
 
 
-While it has the potential to automatically compile a non-deterministic subroutines via uncertain primitives, its usages face several challenges.
-Besides the known issues such as [dependency problems](https://pyuncertainnumber.readthedocs.io/en/latest/examples/repeated_variable.html), one significant challenge is that code accessibility is often not guaranteed. 
-Importantly, the lack of this capability would largely restrict the adoption of xxx in practice.
+While it has the potential to automatically compile non-deterministic subroutines via uncertain primitives, its usages face several challenges.
+Besides the known issues such as [dependency problems](https://pyuncertainnumber.readthedocs.io/en/latest/examples/repeated_variable.html), one significant challenge is that code accessibility is often not guaranteed and hence unable to proceed. This would largely restrict the adoption of mixed uncertainty calculations in engineering practice.
 
-`pyuncertainnumber` enables rigorous uncertainty analysis for real-world situations 
-of mixed uncertainties and partial knowledge. Aleatoric and epistemic uncertainties are 
-recognised and treated appropriately in characterisation and propagation.
+`pyuncertainnumber` addresses that by enabling non-intrusive capability. That is, generic black-box models can be propagated with (that fancy word) various types of uncertainty.
+This capability significantly boost its versatility for scientific computations by interfacing with many engineering softwares.
 
-`pyuncertainnumber` addresses that by enabling non-intrusive capability. How to work with black-box models? This capability significantly 
-boost its versatility for scientific computations by interfacing with many engineering softwares.
+
+
 
 
 
@@ -111,12 +105,12 @@ As shown in \autoref{ip_methods}, tabulation of xxx given a black box model.
 # Mixed uncertainty propagation for black-box models
 
 
-Most realistic situation bla bla. Imprecise world bla bla. After faithful characterisation, the ability 
-to propagate is the key in many critical engineering applications. 
+Mixed uncertainty problem is the most realistic situation bla bla. It first requires faithful characterisation of uncertainty given the empirical information, and the approaach to rigorously progate them.
+Imprecise world bla bla. After faithful characterisation, the ability to propagate is the key in many critical engineering applications. 
 
 
 \begin{equation}
-Y = f(U_{x1}, U_{x2}, ..., U_{xn}; C)
+Y = f(\mathbf{u}; C)
 \end{equation}
 
 <!-- see the pbox propagation paper (iMC) and copy some texts herein -->
@@ -146,7 +140,8 @@ Figures can be included like this:
 # Conclusion
 
 <!-- reiterate the significance of our developments  !!! -->
-
+`pyuncertainnumber` enables rigorous uncertainty analysis for real-world situations 
+of mixed uncertainties and partial knowledge. 
 Significance: this provides compatability as interfacing with many engineering applications.
 boost its usage.
 
