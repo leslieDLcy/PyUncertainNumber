@@ -4,7 +4,7 @@ import numpy as np
 import scipy.stats as sps
 import matplotlib.pyplot as plt
 from warnings import *
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from ..characterisation.utils import pl_pcdf, pl_ecdf
 from .params import Params
 from .pbox_parametric import named_pbox
@@ -14,6 +14,7 @@ from statsmodels.distributions.copula.api import CopulaDistribution
 from .pbox_abc import Staircase
 from .ecdf import get_ecdf
 from numbers import Number
+from .mixins import NominalValueMixin
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
@@ -24,8 +25,9 @@ if TYPE_CHECKING:
 # * --------------------- parametric cases --------------------- *#
 
 
+#! question: is Distribution class necessary?
 @dataclass
-class Distribution:
+class Distribution(NominalValueMixin):
     """Two signature are currentlly supported, either a parametric specification or from a nonparametric empirical data set
 
     note:
@@ -39,17 +41,18 @@ class Distribution:
     dist_family: str = None
     dist_params: list[float] | tuple[float, ...] = None
     empirical_data: list[float] | np.ndarray = None
+    skip_post: bool = False
 
     def __post_init__(self):
-        if all(
+        if self.skip_post:
+            return
+        elif all(
             v is None for v in [self.dist_family, self.dist_params, self.empirical_data]
         ):
             raise ValueError(
                 "At least one of dist_family, dist_params or sample must be specified"
             )
-        self.flag()
-        self._dist = self.rep()
-        self.make_naked_value()
+        self.dist = self.rep()
 
     def __repr__(self):
         # if self.empirical_data is not None:
@@ -59,10 +62,10 @@ class Distribution:
         elif self.empirical_data is not None:
             return "dist ~ sample-approximated distribution object"
         else:
-            return "wrong initialisation"
+            return "blank object"
 
     def rep(self):
-        """the dist object either sps dist or sample approximated or pbox dist
+        """Create the underling dist object either sps dist or sample approximated or pbox dist
 
         note:
             underlying constructor to create the scipy.stats distribution object
@@ -70,6 +73,7 @@ class Distribution:
         if self.dist_family is not None:
             return self._match_distribution()
 
+    #! **kwargs from sps.dist will yield error
     def _match_distribution(self):
         """match the distribution object based on the family and parameters"""
         params = self.dist_params
@@ -77,6 +81,11 @@ class Distribution:
             params = (params,)
 
         return named_dists.get(self.dist_family)(*params)
+
+    def parse_params_from_dist(self):
+        self.dist_params = tuple(self._dist.args) + tuple(
+            v for k, v in sorted(self._dist.kwds.items())
+        )
 
     def flag(self):
         """boolean flag for if the distribution is a parameterised distribution or not
@@ -102,7 +111,7 @@ class Distribution:
         """alpha cut interface"""
         return self._dist.ppf(alpha)
 
-    def make_naked_value(self):
+    def make_nominal_value(self):
         """one value representation of the distribution
         note:
             - use mean for now;
@@ -155,22 +164,35 @@ class Distribution:
         """return the cumulative distribution function (cdf)"""
         return self._dist.cdf(Params.p_values)
 
+    def _compute_nominal_value(self):
+        return np.round(self._naked_value, 3)
+
     @property
     def dist(self):
         """the underlying sps.dist object"""
         return self._dist
 
-    @property
-    def naked_value(self):
-        return np.round(self._naked_value, 3)
+    @dist.setter
+    def dist(self, value):
+        self._dist = value
+        if self.dist_params is None:
+            self.parse_params_from_dist()
+        self.flag()
+        self.make_nominal_value()
 
     @property
-    def low(self):
+    def lo(self):
         return self._dist.ppf(Params.p_lboundary)
 
     @property
     def hi(self):
         return self._dist.ppf(Params.p_hboundary)
+
+    @property
+    def range(self):
+        from pyuncertainnumber import Interval
+
+        return Interval(self.lo, self.hi)
 
     @property
     def hint(self):
@@ -181,8 +203,30 @@ class Distribution:
     def dist_from_sps(
         cls, dist: sps.rv_continuous | sps.rv_discrete, shape: str = None
     ):
-        params = dist.args + tuple(dist.kwds.values())
-        return cls(dist_family=shape, dist_params=params)
+        # old version but does not work with 'scales'
+        # params = dist.args + tuple(dist.kwds.values())
+        # return cls(dist_family=shape, dist_params=params)
+        # params = {"args": dist.args, "kwds": dist.kwds}
+        # return named_dists.get(shape)(*params["args"], **params["kwds"])
+        obj = cls(
+            dist_family=shape, dist_params=None, empirical_data=None, skip_post=True
+        )
+        obj.dist = dist
+        return obj
+
+    # @classmethod
+    # def dist_from_sps(
+    #     cls, dist: sps.rv_continuous | sps.rv_discrete, shape: str = None
+    # ):
+    #     obj = cls.__new__(cls)  # bypass __init__ + __post_init__ logic
+    #     obj.__dict__.update(
+    #         dist_family=shape,
+    #         dist_params=None,
+    #         empirical_data=None,
+    #         _dist=dist,
+    #         _skip_post=True,
+    #     )
+    #     return obj
 
     # *  ---------------------conversion---------------------* #
 
@@ -248,8 +292,6 @@ class Distribution:
 class JointDistribution:
     """Joint distribution class
 
-    tip:
-        Bivariate implementation supported by now. Multivariate case is under development.
 
     example:
         >>> from pyuncertainnumber import pba
@@ -275,13 +317,13 @@ class JointDistribution:
     def from_sps(copula: Copula, marginals: list[sps.rv_continuous]):
         return CopulaDistribution(copula=copula, marginals=marginals)
 
-    def sample(self, size):
+    def sample(self, size, random_state=42):
         """generate orginal-space samples from the joint distribution"""
-        return self._joint_dist.rvs(size)
+        return self._joint_dist.rvs(size, random_state=random_state)
 
-    def u_sample(self, size):
+    def u_sample(self, size, random_state=42):
         """generate copula-space samples from the joint distribution"""
-        return self.copula.rvs(size)
+        return self.copula.rvs(size, random_state=random_state)
 
 
 # * --------------------- non-parametric ecdf cases --------------------- *#
@@ -303,6 +345,7 @@ class ECDF(Staircase):
 
     def __init__(self, empirical_data: np.ndarray):
         left, p_values = get_ecdf(empirical_data)
+        # TODO: quantile direct into Staircase. Hmm...
         super().__init__(left=left, right=left)
 
 
@@ -350,8 +393,9 @@ named_dists = {
     "dgamma": sps.dgamma,
     "dweibull": sps.dweibull,
     "erlang": sps.erlang,
-    "expon": expon_sane,
-    "exponential": expon_sane,  # re-engineered exponential distribution
+    "expon": sps.expon,
+    "exponential": sps.expon,  # re-engineered exponential distribution
+    "exponential_by_lambda": expon_sane,  # re-engineered exponential distribution
     "exponnorm": sps.exponnorm,
     "exponweib": sps.exponweib,
     "exponpow": sps.exponpow,

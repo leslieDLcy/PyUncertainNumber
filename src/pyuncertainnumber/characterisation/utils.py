@@ -116,6 +116,29 @@ def cd_root_dir(depth=0):
     print("current directory:", os.getcwd())
 
 
+def sgnumber(
+    user_input: str,
+) -> list:
+    """significant digits representation
+
+    number plus or minus its significant-digit imprecision
+    """
+    user_input = user_input.strip().lower()
+    tens = "0"
+    if "e" in user_input:
+        mantissa, tens = user_input.split("e", 1)
+    else:
+        mantissa = user_input
+    if "." in mantissa:
+        j = len(mantissa.split(".")[1])
+    # else: j = len(mantissa.split('0', 1)) - len(mantissa) + 1
+    else:
+        j = len(mantissa.rstrip("0")) - len(mantissa)
+    pm = 10 ** (-j) * 10 ** int(tens) / 2
+    # print('input:',user_input,', mantissa:',mantissa, ', j:',j, ', tens:',tens, ', pm:',pm)
+    return [float(user_input) - pm, float(user_input) + pm]
+
+
 def initial_list_checking(text):
     """detects if a string representation of a list"""
 
@@ -236,7 +259,7 @@ def get_concise_repr(a_dict):
             "pbox_parameters",
             "bounds",
             "masses",
-            "_unit",
+            "_units",
             "_physical_quantity",
             "_skip_construct_init",
             "_UnitsRep",

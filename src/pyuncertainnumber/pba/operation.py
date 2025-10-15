@@ -248,7 +248,7 @@ def isum(l_p):
 
 # there is an new `convert` func
 def convert(un):
-    """transform the input un into a Pbox object
+    """Convert any input un into a Pbox object
 
     note:
         - theorically 'un' can be {Interval, DempsterShafer, Distribution, float, int}
@@ -267,6 +267,8 @@ def convert(un):
         return un.to_pbox()
     elif isinstance(un, DempsterShafer):
         return un.to_pbox()
+    elif isinstance(un, Number):
+        return Interval(un, un).to_pbox()
     else:
         raise TypeError(f"Unable to convert {type(un)} object to Pbox")
 

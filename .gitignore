@@ -1,3 +1,7 @@
+# local env
+matplotlibrc.txt
+
+
 # Data
 /data/
 /visualisations/

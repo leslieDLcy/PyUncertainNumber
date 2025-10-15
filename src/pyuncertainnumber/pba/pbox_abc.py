@@ -8,50 +8,30 @@ import matplotlib.pyplot as plt
 from .intervals.number import Interval as I
 from numbers import Number
 import operator
-import itertools
 from .utils import (
     condensation,
-    smooth_condensation,
     find_nearest,
+    get_mean_var_from_ecdf,
     is_increasing,
     left_right_switch,
+    variance_bounds_via_lp,
+    area_between_ecdfs,
 )
 import logging
 from .operation import vectorized_cartesian_op
 from .context import get_current_dependency
+from .mixins import NominalValueMixin
+from contextlib import suppress
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
+    from .ecdf import eCDF_bundle
 
 # Configure the logging system with a simple format
 logging.basicConfig(
     level=logging.INFO,
     format="%(levelname)s: %(message)s",
 )
-
-
-def get_mean_var_from_ecdf(q, p):
-    """Numerically estimate the mean and var from ECDF data
-
-    args:
-        q (array-like): quantiles
-        p (array-like): probabilities
-
-    example:
-        >>> # Given ECDF data an example
-        >>> q = [1, 2, 3, 4]
-        >>> p = [0.25, 0.5, 0.75, 1.0]
-    """
-
-    # Step 1: Recover PMF
-    pmf = [p[0]] + [p[i] - p[i - 1] for i in range(1, len(p))]
-
-    # Step 2: Compute Mean
-    mean = sum(x * p for x, p in zip(q, pmf))
-
-    # Step 3: Compute Variance
-    variance = sum(p * (x - mean) ** 2 for x, p in zip(q, pmf))
-    return mean, variance
 
 
 def bound_steps_check(bound):
@@ -90,6 +70,11 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
         right=bounds[1],
         shape=shape,
     )
+
+
+def pbox_from_ecdf_bundle(lower_bound: eCDF_bundle, upper_bound: eCDF_bundle) -> Pbox:
+    """Construct a p-box from two empirical CDF bundles as the extreme bounds"""
+    return Staircase.from_CDFbundle(lower_bound, upper_bound)
 
 
 def naive_frechet_pbox(x, y, op) -> Staircase:
@@ -174,7 +159,7 @@ def frechet_pbox_mul(x, y):
         return classic_frechet_pbox(x, y, operator.mul)
 
 
-class Pbox(ABC):
+class Pbox(NominalValueMixin, ABC):
     """a base class for Pbox
 
     danger:
@@ -226,11 +211,24 @@ class Pbox(ABC):
 
         self._init_range()
 
+        self.degenerate_flag()
+
     def steps_check(self):
 
         assert len(self.left) == len(
             self.right
         ), "Length of lower and upper bounds is not consistent"
+
+    def _compute_nominal_value(self):
+        return np.round(self.mean.mid, 3)
+
+    def degenerate_flag(self) -> bool:
+        """check if the pbox is degenerate (i.e. left == right everywhere)"""
+        self._degenerate = np.array_equal(self.left, self.right)
+
+    @property
+    def degenerate(self) -> bool:
+        return self._degenerate
 
     @property
     def p_values(self):
@@ -277,13 +275,13 @@ class Pbox(ABC):
         return I(np.median(self.left), np.median(self.right))
 
     @property
-    def naked_value(self):
-        return np.round(self.mean.mid, 3)
-
-    @property
-    def area_metric(self):
-        return np.trapezoid(y=self._pvalues, x=self.left) - np.trapezoid(
-            y=self._pvalues, x=self.right
+    def enclosed_area(self):
+        """the enclosed area between the two extreme cdfs"""
+        return area_between_ecdfs(
+            x_upper=self.left,
+            p_upper=self._pvalues,
+            x_lower=self.right,
+            p_lower=self._pvalues,
         )
 
     # * --------------------- operators ---------------------*#
@@ -305,6 +303,12 @@ class Pbox(ABC):
         )
         return close
 
+    def __contains__(self, item):
+        if isinstance(item, Number):
+            return (self.lo <= item) and (item <= self.hi)
+        else:
+            return (self.lo <= item.lo) and (item.hi <= self.hi)
+
     # * --------------------- functions ---------------------*#
     def to_interval(self):
         """discretise pbox into a vec-interval of length of default steps
@@ -325,6 +329,10 @@ class Pbox(ABC):
             np.repeat(a=(1 / discretisation), repeats=discretisation),
         )
 
+    def to_numpy(self):
+        """convert pbox to a 2D numpy array (n, 2) of left and right"""
+        return np.stack((self.left, self.right), axis=1)
+
 
 class Staircase(Pbox):
     """distribution free p-box"""
@@ -341,21 +349,76 @@ class Staircase(Pbox):
         super().__init__(left, right, steps, mean, var, p_values)
 
     def _init_moments(self):
-        """initialised `mean`, `var` and `range` bounds"""
+        """
+        Initialize mean/var interval estimates.
+        Strategy:
+        1) Try LP-based bounds.
+        2) If that fails, try ECDF-based bounds.
+        3) If that also fails, set to NaN intervals so the program continues.
+        This function NEVER raises.
+        """
+        # Defaults
+        mean_I = None
+        var_I = None
+        method_used = None
+        errors = []
 
-        #! should we compute mean if it is a Cauchy, var if it's a t distribution?
-        #! we assume that two extreme bounds are valid CDFs
-        self.mean_lo, self.var_lo = get_mean_var_from_ecdf(self.left, self._pvalues)
-        self.mean_hi, self.var_hi = get_mean_var_from_ecdf(self.right, self._pvalues)
+        # --- Attempt 1: LP bounds ---
         try:
-            self.mean = I(self.mean_lo, self.mean_hi)
-        except:
-            self.mean = I(666, 666)
-        # TODO tmp solution for computing var for pbox
-        try:
-            self.var = I(self.var_lo, self.var_hi)
-        except:
-            self.var = I(666, 666)
+            dict_moments = variance_bounds_via_lp(
+                q_a=self.left,
+                p_a=self._pvalues,
+                q_b=self.right,
+                p_b=self._pvalues,
+                x_grid=np.linspace(self.lo, self.hi, 50),
+            )
+            self.mean_lo, self.mean_hi = dict_moments["mu_min"], dict_moments["mu_max"]
+            self.var_lo, self.var_hi = dict_moments["var_min"], dict_moments["var_max"]
+            mean_I = I(self.mean_lo, self.mean_hi)
+            var_I = I(self.var_lo, self.var_hi)
+            method_used = "lp_bounds"
+        except Exception as e:
+            errors.append(("lp_bounds", repr(e)))
+
+        # --- Attempt 2: ECDF fallback (only if needed) ---
+        if mean_I is None or var_I is None:
+            try:
+                mean_lo, var_lo = get_mean_var_from_ecdf(self.left, self._pvalues)
+                mean_hi, var_hi = get_mean_var_from_ecdf(self.right, self._pvalues)
+                self.mean_lo, self.mean_hi = mean_lo, mean_hi
+                self.var_lo, self.var_hi = var_lo, var_hi
+                mean_I = I(self.mean_lo, self.mean_hi)
+                var_I = I(self.var_lo, self.var_hi)
+                method_used = "ecdf_fallback"
+            except Exception as e:
+                errors.append(("ecdf_fallback", repr(e)))
+
+        # --- Last resort: make it unambiguous and safe ---
+        if mean_I is None or var_I is None:
+            # Use NaN to signal “unknown/unavailable” without risking real-number collisions.
+            mean_I = I(666, 666)
+            var_I = I(666, 666)
+            method_used = method_used or "unavailable"
+
+        # --- Assign + annotate; nothing in here may raise ---
+        self.mean = mean_I
+        self.var = var_I
+        # Optional: stash debug info for inspection; never let this crash.
+        with suppress(Exception):
+            self._moments_meta = {
+                "method": method_used,
+                "errors": errors,  # list of (stage, repr(error))
+                "lo_hi": {
+                    "mean": (
+                        getattr(self, "mean_lo", None),
+                        getattr(self, "mean_hi", None),
+                    ),
+                    "var": (
+                        getattr(self, "var_lo", None),
+                        getattr(self, "var_hi", None),
+                    ),
+                },
+            }
 
     def __repr__(self):
         def format_interval(interval):
@@ -634,6 +697,31 @@ class Staircase(Pbox):
         bar = partial(np.power, other)  # other as the base
         return self._unary_template(bar)
 
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        if method != "__call__":
+            return NotImplemented
+        if len(inputs) != 1 or inputs[0] is not self:
+            return NotImplemented
+        if "out" in kwargs and kwargs["out"] is not None:
+            return NotImplemented
+
+        if ufunc is np.sin:
+            return self.sin()
+        if ufunc is np.cos:
+            return self.cos()
+        if ufunc is np.tanh:
+            return self.tanh()
+        if ufunc is np.exp:
+            return self.exp()
+        if ufunc is np.sqrt:
+            return self.sqrt()
+        if ufunc is np.log:
+            return self.log()
+        if ufunc is np.reciprocal:
+            return self.reciprocal()
+
+        return NotImplemented
+
     # * --------------------- methods ---------------------*#
 
     def cdf(self, x: np.ndarray):
@@ -730,11 +818,6 @@ class Staircase(Pbox):
 
         itvls = self.outer_discretisation(n)
         return stacking(itvls)
-
-    def area_metric(self):
-        return np.trapezoid(y=self.left, x=self._pvalues) - np.trapezoid(
-            y=self.right, x=self._pvalues
-        )
 
     def truncate(self, a, b):
         """Truncate the Pbox to the range [a, b].
@@ -1148,7 +1231,7 @@ class Leaf(Staircase):
 
     def __repr__(self):
         base_repr = super().__repr__().rstrip(")")  # remove trailing ')'
-        return f"{base_repr}, shape={self.shape}"
+        return f"{base_repr}, shape={self.shape})"  # added back trailing ')'
 
     def sample(self, n_sam):
         """sample from a parametric pbox or distribution"""
