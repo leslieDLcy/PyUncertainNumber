@@ -30,50 +30,35 @@ bibliography: paper.bib
 
 # Summary
 
-The forces on stars, galaxies, and dark matter under external gravitational
-fields lead to the dynamical evolution of structures in the universe. The orbits
-of these bodies are therefore key to understanding the formation, history, and
-future state of galaxies. The field of "galactic dynamics," which aims to model
-the gravitating components of galaxies to study their structure and evolution,
-is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require
-efficient numerical tools, many of which require the same base code (e.g., for
-performing numerical orbit integration).
+Scientific computations or simulations play a central role in quantifying the performance, reliability, and safety of complex engineered systems. However, these analyses are complicated by the various sources of uncertainties inherent in the computational pipeline. 
+Under-estimation could lead to xxx while over-estimation could lead to ...
+To ensure that complex engineered systems can be operated reliably and robustly, even during rare and extreme environment conditions, a comprehensive analysis is needed. Comprehensive in two senses: (i) all of the possible sources of uncertainty must be identified and represented using approaite mathematical construct; (ii) that rigorously account for mixed or mixture of various types of uncertainties. Challenges include xxx, code accessbility, tools to conduct the analysis.
+
+
+By xxx, `pyuncertainnumber` bla bla.. non-intrusively.
+
+
+<!-- To quantitatively
+account for uncertainty is vital in performance, relibiability, and safety of high-consequence systems. However, the challenge xxx of . More expressive frameworks are proposed to manage uncertainties in an imprecise setting. It is desired to  -->
+
 
 # Statement of need
 
-`Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
-enables wrapping low-level languages (e.g., C) for speed without losing
-flexibility or ease-of-use in the user-interface. The API for `Gala` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package [@astropy] (`astropy.units` and
-`astropy.coordinates`).
+A comprehensive uncertainty framework for scientific computation involves a mathematical model,
+through which various input uncertainties are propagated to estimate the uncertainty of an unknown quantity of interest.
+In real-world applications, these input uncertainties are commonly manifested as mixed uncertainties, e.g. probability boxes (p-boxes) which effectively represents a set of distributionbs, combining both the aleatory and epistemic uncertainty in one structure, or a mixture of uncertainties suggesting, for instance, a vector of inputs parameters of aleatory (probability distributions), epistemic (intervals), and mixed nature (e.g. probability boxes).
 
-`Gala` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
-design, and support for Astropy functionality in `Gala` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike.
+Probability bounds analysis is one of the expressive frameworks proposed to manage uncertainties in an imprecise setting.
+Packages have been developed to facilitate the calculations of uncertain quantities, such as interval arithmetic [@marco_2022_6205624] and probability arithemetic [@gray:2021; @gray:2022]. Collectively, they can be referred to as *uncertainty arithmetic* which straightforwardly computes the response provided the performance function.
 
+
+While it has the potential to automatically compile a non-deterministic subroutines via uncertain primitives, its usages face several challenges.
+Besides the known issues such as [dependency problems](https://pyuncertainnumber.readthedocs.io/en/latest/examples/repeated_variable.html), one significant challenge is that code accessibility is often not guaranteed. 
+Importantly, the lack of this capability would largely restrict the adoption of xxx in practice.
 
 `pyuncertainnumber` enables rigorous uncertainty analysis for real-world situations 
 of mixed uncertainties and partial knowledge. Aleatoric and epistemic uncertainties are 
 recognised and treated appropriately in characterisation and propagation.
-
-Uncertainty arithmetic is underpinned by probability bounds analysis. While it has the potential 
-to automatically compile a non-deterministic subroutines via primitives such as intervals or uncertain numbers, 
-its usages face several challenges.
-
-Besides the issues of xx such as dependency problems, one notable challenge is that code accessibility is often not guaranteed. 
-Also, the lack of capability one the main reasons restricting the adoption of xxx in practice.
-
 
 `pyuncertainnumber` addresses that by enabling non-intrusive capability. How to work with black-box models? This capability significantly 
 boost its versatility for scientific computations by interfacing with many engineering softwares.
@@ -129,6 +114,11 @@ As shown in \autoref{ip_methods}, tabulation of xxx given a black box model.
 Most realistic situation bla bla. Imprecise world bla bla. After faithful characterisation, the ability 
 to propagate is the key in many critical engineering applications. 
 
+
+\begin{equation}
+Y = f(U_{x1}, U_{x2}, ..., U_{xn}; C)
+\end{equation}
+
 <!-- see the pbox propagation paper (iMC) and copy some texts herein -->
 
 Dependency structures bla bla. It has been echoed in the engineering applications and also the NASA challenge.
@@ -137,51 +127,10 @@ Sampling methods play a significant role in xxx
 
 Double Monte Carlo
 
-
 Interval Monte Carlo...
 
-
-
-
-# Propagation of p-boxes via surrogate models
-
-
-
-<!-- 
-# Mathematics
-
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
-
-Double dollars make self-standing equations:
-
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
-
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text. -->
-
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
-
-# Figures
-
 Figures can be included like this:
+
 ![Double Monte Carlo.\label{fig:dmc}](dmc_flowchart.png)
 \autoref{fig:dmc} illustrates the *nested Monte Carlo* method.
 
@@ -196,12 +145,18 @@ Figures can be included like this:
 
 # Conclusion
 
+<!-- reiterate the significance of our developments  !!! -->
+
 Significance: this provides compatability as interfacing with many engineering applications.
 boost its usage.
 
+
+<!-- # Propagation of p-boxes via surrogate models -->
+
+
+
 # Acknowledgements
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong
-Oh, and support from Kathryn Johnston during the genesis of this project.
+The work leading to these results received funding through the UK project Development of Advanced Wing Solutions 2 (DAWS2). The DAWS2 project is supported by the Aerospace Technology Institute (ATI) Programme, a joint government and industry investment to maintain and grow the UK’s competitive position in civil aerospace design and manufacture. The programme, delivered through a partnership between ATI, Department for Business and Trade (DBT) and Innovate UK, addresses technology, capability and supply chain challenges.
 
 # References
