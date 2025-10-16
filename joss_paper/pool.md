@@ -34,7 +34,7 @@ For a quick reference, the following citation commands can be used:
 - `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
 
 
-<!-- 
+
 # Mathematics
 
 Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
@@ -50,4 +50,9 @@ You can also use plain \LaTeX for equations
 \begin{equation}\label{eq:fourier}
 \hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
 \end{equation}
-and refer to \autoref{eq:fourier} from text. -->
+and refer to \autoref{eq:fourier} from text.
+
+
+
+Figure sizes can be customized by adding an optional second parameter:
+![Interval Monte Carlo.](imc_flowchart.png){ width=20% }

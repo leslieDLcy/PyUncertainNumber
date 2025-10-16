@@ -30,9 +30,12 @@ bibliography: paper.bib
 
 # Summary
 
-Scientific computations or simulations play a central role in quantifying the performance, reliability, and safety of complex engineered systems. However, these analyses are complicated by the various sources of uncertainties inherent in the computational pipeline. Underestimation may lead to suboptimal performance outside the most common scenarios while overestimation, on the other hand, may lead to over-engineered systems and significant waste of resources. To ensure that complex engineered systems can be operated reliably and robustly, even during rare and extreme environment conditions, a comprehensive analysis is required. The analysis should be comprehensive in two senses: (i) all of the possible sources of uncertainty must be identified and represented using approaite mathematical construct; (ii) that rigorously account for mixed or mixture of various types of uncertainties. Challenges include xxx, code accessbility, tools to conduct the analysis.
+Scientific computations or simulations play a central role in quantifying the performance, reliability, and safety of complex engineered systems. However, these analyses are complicated by the various sources of uncertainties inherent in the computational pipeline. Underestimation may lead to suboptimal performance outside the most common scenarios while overestimation, on the other hand, may lead to over-engineered systems and significant waste of resources. To ensure that complex engineered systems can be operated reliably and robustly, even during rare and extreme environment conditions, a comprehensive analysis is required. The analysis should be comprehensive in two senses: (i) all of the possible sources of uncertainty must be identified and represented using approaite mathematical construct; (ii) that rigorously account for mixed or mixture of various types of uncertainties. One of the biggesdt challenge include xxx, code accessbility, tools to conduct the analysis.
 By xxx, `pyuncertainnumber` bla bla.. non-intrusively.
+We interface with many softwares.
 
+
+<!-- Challenges include xxx, code accessbility, tools to conduct the analysis. -->
 
 <!-- To quantitatively
 account for uncertainty is vital in performance, relibiability, and safety of high-consequence systems. However, the challenge xxx of . More expressive frameworks are proposed to manage uncertainties in an imprecise setting. It is desired to  -->
@@ -41,15 +44,16 @@ account for uncertainty is vital in performance, relibiability, and safety of hi
 # Statement of need
 
 A comprehensive uncertainty framework for scientific computation involves a mathematical model,
-through which various input uncertainties are propagated to estimate the uncertainty of an unknown quantity of interest.
+through which various input uncertainties are propagated to estimate the uncertainty of an unknown quantity of interest (QoI).
 In real-world applications, these input uncertainties are commonly manifested as mixed uncertainties, e.g. probability boxes (p-boxes) which effectively represents a set of distributionbs, combining both the aleatory and epistemic uncertainty in one structure, or a mixture of uncertainties suggesting, for instance, a vector of inputs parameters of aleatory (e.g. probability distributions), epistemic (e.g. intervals), and mixed nature (e.g. probability boxes).
 
-Probability bounds analysis is one of the expressive frameworks proposed to manage uncertainties in an imprecise setting.
-Packages have been developed to facilitate the calculations of uncertain quantities, such as interval arithmetic [@marco_2022_6205624] and probability arithemetic [@gray:2021; @gray:2022]. Collectively, they can be referred to as *uncertainty arithmetic* which straightforwardly computes the response provided the performance function.
+Probability bounds analysis is one of the expressive frameworks proposed to manage uncertainties in an imprecise setting [@beer:2013].
+Software packages have been developed to facilitate the calculations of uncertain quantities, such as interval arithmetic [@marco_2022_6205624] and probability arithemetic [@gray:2021; @gray:2022]. Collectively, they can be referred to as *uncertainty arithmetic* [@chen:2025] which straightforwardly computes the response provided the performance function.
 
+While it has the potential to automatically compile non-deterministic subroutines via uncertain primitives, its usages face several challenges, one significant challenge is that code accessibility is often not guaranteed and hence unable to proceed. This would largely restrict the adoption of mixed uncertainty calculations in engineering practice.
+Such need has been echoed in the engineering applications and also the NASA challenge.
 
-While it has the potential to automatically compile non-deterministic subroutines via uncertain primitives, its usages face several challenges.
-Besides the known issues such as [dependency problems](https://pyuncertainnumber.readthedocs.io/en/latest/examples/repeated_variable.html), one significant challenge is that code accessibility is often not guaranteed and hence unable to proceed. This would largely restrict the adoption of mixed uncertainty calculations in engineering practice.
+<!-- besides known issues such as [dependency problems](https://pyuncertainnumber.readthedocs.io/en/latest/examples/repeated_variable.html) -->
 
 `pyuncertainnumber` addresses that by enabling non-intrusive capability. That is, generic black-box models can be propagated with (that fancy word) various types of uncertainty.
 This capability significantly boost its versatility for scientific computations by interfacing with many engineering softwares.
@@ -64,88 +68,90 @@ This capability significantly boost its versatility for scientific computations 
 
 Interval analysis has the advantages of providing rigorous enclosures of the solutions to problems, especially for engineering problems
 subject to epistemic uncertainty, such as modelling system paramters due to lack-of-knowledge or characterising measurement incertitude.
-It is evident that computational tasks requiring complex numerical solutions of intervals are non-intrusive (i.e. the source code is not accessiable).
-Besides, it shoule be noted even for cystal boxes (i.e. source code is accessible), naive interval arithmetic still faces challlenges such as the infamous interval dependency issue. 
-Though it may be mitigated through mathematical rearrangements in some cases, it will be challenging for most of the cases.
+Naive interval arithmetic typically faces difficulties such as the infamous [interval dependency](https://pyuncertainnumber.readthedocs.io/en/latest/examples/repeated_variable.html) issue. 
+Though it may be mitigated through mathematical rearrangements in some simple cases, it will be challenging for models of most complex systems. 
+The bigger issue remains the accessibility of code.
 <!-- But naive interval arithmetic faces xxx problems, though xxx provides mathematical re-arrangements.  -->
 
 Generally, the interval propagation problem can be cast as an optimisation problem where the minimum and maximum are sought via a function mapping.
-The functio, for example $g$ in Eq.(xx), is not necessarily monotonic or linear and may well be a black-box model. Hence, for black box models the optimisation can 
-only be solved via gradient-free optimisation techniques.
+The function, for example $f$ in \autoref{eq:intervalpropagation}, is not necessarily monotonic or linear and may well be a black-box deterministic model for a generic system. 
 
-\begin{equation}
-Y = g(I_{x1}, I_{x2}, ..., I_{xn})
+\begin{equation}\label{eq:intervalpropagation}
+Y = f(I_{x1}, I_{x2}, ..., I_{xn})
 \end{equation}
 
+where $\mathbf{I} = [\mathbf{\underline{I}}, \mathbf{\overline{I}}] = [I_{x1}, I_{x2}, ..., I_{xn}]^\text{T}$ represents the vector of interval-valued inputs.
+For black box models the optimisation can generally be solved via gradient-free optimisation techniques.
 
-\begin{equation}
-Y_min, Y_max
-\end{equation}
+$$\underline{Y} = \min_{\underline{\mathbf{I}} \leq \mathbf{I} \leq \overline{\mathbf{I}} } [f(\mathbf{I})]; \ \overline{Y} = \max_{\underline{\mathbf{I}} \leq \mathbf{I} \leq \overline{\mathbf{I}} } [f(\mathbf{I})]$$
 
-where $I_{x1}, I_{x2}, ..., I_{xn}$ are intervals.
 
 `pyuncertainnumber` provides a series of non-intrusive methodologies of varying applicability. It should be noted that there is generally a trade-off between 
-applicability and efficiency. But with more knowledge about the characteristics of the underlying function, one can accordinly dispatch an efficient method.
-For example, whem monotonicity is known one can use vertex methods which $2_n$.
+applicability and computational efficiency. With more knowledge pertaining the characteristics of the underlying function, one can accordinly dispatch an efficient method.
+For example, when monotonicity is known one can use the vertex method which requres $2^n$ model evaluations. Furthermore, the accuracy of these methods varies, and a common rule of thumb indicates that increasing the number of model evaluations generally leads to improved accuracy.
+A summary of applicability is tabulated in \autoref{tab:ipmethods}, readers can refer to [@chen:2025] for additional details.
 
 <!-- tabulate the interval results from the example -->
 <!-- think twice. the middle row can be changed into a paragraph in the main text instead -->
 
-Table: Several methods for interval propagation []{label='ip_methods'}
+Table: Several methods for interval propagation []{label="tab:ipmethods"}
 
 | Method     | Endpoints    | Subinterval reconstitution | Cauthy-Deviate method           | Bayesian optimisation | Genetic algorithm |
 |------------|--------------|----------------------------|---------------------------------|-----------------------|-------------------|
-| Assumption | monotonicity | heavy computation          | linearity and gradient required | No                    | No                |
-| Result     |              |                            |                                 |                       |                   |
+| Assumption | monotonicity | monotonicity in subinterlvas          | linearity and gradient required | No                    | No                |
+| Example result     |  [13.0,148.0]            |   [13.0,148.0]                         |     [-11.7,100.67]                            |     [13.0,148.0]                  |   [13.0,147.8]                |
 
-As shown in \autoref{ip_methods}, tabulation of xxx given a black box model.
-<!-- show the figure to indicate the ground-truth answer -->
+
+To better demonstrate the non-intrusive capability, two numberical examples, shown below, are provided where they are treated as black-box models. \autoref{tab:ipmethods} lists the response interval of $f_{b}([1,5], [7,13], [5,10])$ for respective methods.
+
+<!-- The functional forms are displayed in \autoref{fig:dmc} and \autoref{fig:imc} respectively. -->
+
+![Exampler functions as black-box models. (a) $f_{a}(x, y) = 100(x-y^2)^2 + (1 - x)^2$; (b) $f_{b}(x, y, z) = x^3 + y +z$\label{fig:dmc}](photo_appending.png)
+
 
 
 # Mixed uncertainty propagation for black-box models
 
+Real complex systems (physical or engineered) of industrial significance typically involves parameters subject to uncertainties of various nature. It requires faithful characterisation of these uncertainties given the empirical information, and the approaach to rigorously progate them. Due to the fact that empirical information is often sparse or scarce or conflicting, even the uncertainty characterisation for one parameter could be of mixed nature, for example one may be confident about the distributional family but uncertain about its shape parameters, or when there exists multiple expert opiontion of different credibility regarding its elicitation. 
+Commonly, real systems expect a high-dimensional input which effectively represents a mixture of aleatory, epistemic, and mixed uncertainties, as symbolfied below:
 
-Mixed uncertainty problem is the most realistic situation bla bla. It first requires faithful characterisation of uncertainty given the empirical information, and the approaach to rigorously progate them.
-Imprecise world bla bla. After faithful characterisation, the ability to propagate is the key in many critical engineering applications. 
+<!-- Imprecise world bla bla. After faithful characterisation, the ability to propagate is the key in many critical engineering applications.  -->
 
 
 \begin{equation}
 Y = f(\mathbf{u}; C)
 \end{equation}
 
-<!-- see the pbox propagation paper (iMC) and copy some texts herein -->
-
-Dependency structures bla bla. It has been echoed in the engineering applications and also the NASA challenge.
-
-Sampling methods play a significant role in xxx
-
-Double Monte Carlo
-
-Interval Monte Carlo...
-
-Figures can be included like this:
-
-![Double Monte Carlo.\label{fig:dmc}](dmc_flowchart.png)
-\autoref{fig:dmc} illustrates the *nested Monte Carlo* method.
+where $\mathbf{u} \in \mathbb{R}^{n}$ denotes the collection of $n$ uncertain inputs and $C$ denotes intervariable dependency structure.
 
 
-![Interval Monte Carlo.\label{fig:imc}](imc_flowchart.png)
-\autoref{fig:imc} illustrates the *interval Monte Carlo* method.
+When both aleatory and epistemic uncertainties are present in $\mathbf{u}$, a *nested (double) Monte Carlo* approach can be used for determininsitc models without confounding the two distinct types of uncertainty.
+As illustrated in \autoref{fig:dmc}, Latin-hypercube samples are first drawn from the epistemic interval, conditioned on which aleatory samples are drawn from the aleatoric probability distributions. 
+Propagate these samples, which are visually denoted as rug ticks alongside the abscissa, through the computational model results in an ensemble of CDF (cumulative distribution function) of the QoI whereby a final p-box is obtained as the envelope. 
+Each CDF (orange color) correponds to an epistemic sample. 
+
+![Workflow of the Double Monte Carlo.\label{fig:dmc}](dmc_flowchart.png)
+
+
+To scale to a more realistic setting, \autoref{fig:imc} illustrates the workflow of *interval Monte Carlo* method where a mixture of aleatory, epistemic, and mixed uncertainty parameters are present, and a certain copula is specified denoting the dependency structure. Correlated samples in the uniform space from the copula, visually denoted as rug ticks alongside the probability axis, are converted to physical space through alpha-cuts. Interval propagation (see [the last section](#interval-propagation-in-a-non-intrusive-manner)) then does the heavy lifting in which scalar values can be considered as degenerate intervals. As a result, the response QoI in \autoref{fig:imc} is then obtained as a p-box shown in gray. In contrast, a pinched response, obtained from propagating pinched input variables (e.g. a p-box is pinched into a distribution and an interval is pinched into a scalar), is also shown as a comparison.
+Importantly, rigorous bla bla.
+
+![Workflow of the Interval Monte Carlo.\label{fig:imc}](imc_flowchart.png)
 
 
 
-<!-- Figure sizes can be customized by adding an optional second parameter:
-![Interval Monte Carlo.](imc_flowchart.png){ width=20% } -->
 
 # Conclusion
 
 <!-- reiterate the significance of our developments  !!! -->
+
+It is evident that computational tasks requiring complex numerical solutions of intervals are non-intrusive (i.e. the source code is not accessiable).
 `pyuncertainnumber` enables rigorous uncertainty analysis for real-world situations 
 of mixed uncertainties and partial knowledge. 
 Significance: this provides compatability as interfacing with many engineering applications.
 boost its usage.
 
-
+Enriched sampling methods bla bla ...
 <!-- # Propagation of p-boxes via surrogate models -->
 
 
