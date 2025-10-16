@@ -6,8 +6,8 @@
            version="5.3.1"
            xsi:schemaLocation="http://www.crossref.org/schema/5.3.1 http://www.crossref.org/schemas/crossref5.3.1.xsd">
   <head>
-    <doi_batch_id>20251015162601-4f8f421d0288c7b99979c7b841cb67d401fa044d</doi_batch_id>
-    <timestamp>20251015162601</timestamp>
+    <doi_batch_id>20251016132513-73bfdc3982937fec6e33dc53a279aa05f693fc14</doi_batch_id>
+    <timestamp>20251016132513</timestamp>
     <depositor>
       <depositor_name>JOSS Admin</depositor_name>
       <email_address>admin@theoj.org</email_address>
@@ -37,7 +37,7 @@
       </journal_issue>
       <journal_article publication_type="full_text">
         <titles>
-          <title>PyUncertainNumber for uncertainty propagation: more than probability arithmetic</title>
+          <title>PyUncertainNumber for uncertainty propagation: beyond probability arithmetic</title>
         </titles>
         <contributors>
           <person_name sequence="first" contributor_role="author">
@@ -124,6 +124,22 @@
             <doi>10.5281/zenodo.6205624</doi>
             <cYear>2022</cYear>
             <unstructured_citation>Angelis, M. de. (2022). Intervals (Version v0.1). Zenodo. https://doi.org/10.5281/zenodo.6205624</unstructured_citation>
+          </citation>
+          <citation key="chen:2025">
+            <article_title>Imprecise uncertainty management with uncertain numbers to facilitate trustworthy computations</article_title>
+            <author>Chen</author>
+            <journal_title>SciPy proceedings</journal_title>
+            <cYear>2025</cYear>
+            <unstructured_citation>Chen, Y., &amp; Ferson, S. (2025). Imprecise uncertainty management with uncertain numbers to facilitate trustworthy computations. SciPy Proceedings.</unstructured_citation>
+          </citation>
+          <citation key="beer:2013">
+            <article_title>Imprecise probabilities in engineering analyses</article_title>
+            <author>Beer</author>
+            <journal_title>Mechanical systems and signal processing</journal_title>
+            <issue>1-2</issue>
+            <volume>37</volume>
+            <cYear>2013</cYear>
+            <unstructured_citation>Beer, M., Ferson, S., &amp; Kreinovich, V. (2013). Imprecise probabilities in engineering analyses. Mechanical Systems and Signal Processing, 37(1-2), 4–29.</unstructured_citation>
           </citation>
         </citation_list>
       </journal_article>
