@@ -1,5 +1,5 @@
 ---
-title: 'PyUncertainNumber for uncertainty propagation: beyond probability arithmetic'
+title: 'PyUncertainNumber for uncertainty propagation: beyond probabilistic arithmetic'
 tags:
   - Python
   - uncertainty propagation
@@ -32,6 +32,7 @@ bibliography: paper.bib
 
 Scientific computations or simulations play a central role in quantifying the performance, reliability, and safety of complex engineered systems. However, these analyses are complicated by the various sources of uncertainties inherent in the computational pipeline. Underestimation may lead to suboptimal performance outside the most common scenarios while overestimation, on the other hand, may lead to over-engineered systems and significant waste of resources. To ensure that complex engineered systems can be operated reliably and robustly, even during rare and extreme environment conditions, a comprehensive analysis is required. The analysis should be comprehensive in two senses: (i) all of the possible sources of uncertainty must be identified and represented using approaite mathematical construct; (ii) that rigorously account for mixed or mixture of various types of uncertainties. One of the biggesdt challenge include xxx, code accessbility, tools to conduct the analysis.
 By xxx, `pyuncertainnumber` bla bla.. non-intrusively.
+`pyuncertainnumber` computes guaranteed bounds on functions of uncertain variables, intrusively and non-intrusively, given only partial knowledge of the input probability distributions and their dependencies.
 We interface with many softwares.
 
 
@@ -146,6 +147,9 @@ Importantly, rigorous bla bla.
 <!-- reiterate the significance of our developments  !!! -->
 
 It is evident that computational tasks requiring complex numerical solutions of intervals are non-intrusive (i.e. the source code is not accessiable).
+
+
+
 `pyuncertainnumber` enables rigorous uncertainty analysis for real-world situations 
 of mixed uncertainties and partial knowledge. 
 Significance: this provides compatability as interfacing with many engineering applications.
