@@ -25,7 +25,9 @@ from contextlib import suppress
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
+    from .dss import DempsterShafer
     from .ecdf import eCDF_bundle
+    from typing import Self
 
 # Configure the logging system with a simple format
 logging.basicConfig(
@@ -799,7 +801,7 @@ class Staircase(Pbox):
 
         return interval_vec
 
-    def condensation(self, n):
+    def condensation(self, n) -> Self:
         """ourter condensation of the pbox to reduce the number of steps and get a sparser staircase pbox
 
         args:
@@ -807,17 +809,42 @@ class Staircase(Pbox):
 
         note:
             Have not thought about a better name so we call it `condensation` for now. Candidate names include 'approximation'.
+            It will ouput a p-box and keep steps as 200 for computational consistency.
 
         example:
             >>> p.condensation(n=5)
 
         return:
-            a staircase p-box with sparser steps
+            a staircase p-box that looks sparser but has the same number of steps
         """
         from .aggregation import stacking
 
         itvls = self.outer_discretisation(n)
         return stacking(itvls)
+
+    def condense(self, n) -> DempsterShafer:
+        """Another condensation function which has steps of n
+
+        Compared to the above `condensation` method that ouputs a p-box and  keeps steps as 200 for computational consistency.
+        This one condenses in a more literal manner, as in having n steps in the resulting Dempster-Shafer structure.
+        """
+        from .intervals.number import Interval as I
+        from .dss import DempsterShafer as DSS
+
+        condensed_x = self.condensation(n)
+
+        # condensed bounds
+        con_bd_l = np.unique(condensed_x.left)
+        con_bd_r = np.unique(condensed_x.right)
+
+        real_condensed_dss_x = DSS(
+            intervals=I(
+                lo=con_bd_l,
+                hi=con_bd_r,
+            ),
+            masses=[1 / len(con_bd_l)] * len(con_bd_l),
+        )
+        return real_condensed_dss_x
 
     def truncate(self, a, b):
         """Truncate the Pbox to the range [a, b].
