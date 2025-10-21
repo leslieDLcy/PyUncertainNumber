@@ -516,6 +516,130 @@ class Staircase(Pbox):
         ax.set_ylabel(r"$\Pr(X \leq x)$")
         return ax
 
+    #### put something below ####
+    def plot_reverse_axis(
+        self,
+        title=None,
+        ax=None,
+        style="box",
+        fill_color="lightgray",
+        bound_colors=None,
+        nuance="step",
+        alpha=0.3,
+        orientation="xy",  # NEW: "xy" (default) or "yx" (swap axes)
+        invert_xaxis=True,
+        **kwargs,
+    ):
+        """default plotting function
+
+        args:
+            style (str): 'box' or 'simple'
+            orientation (str): 'xy' keeps x on horizontal and Pr(X<=x) on vertical;
+                            'yx' swaps them.
+        """
+        from .utils import CustomEdgeRectHandler
+        import matplotlib.pyplot as plt
+
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        p_axis = self._pvalues if self._pvalues is not None else Params.p_values
+        plot_bound_colors = bound_colors if bound_colors is not None else ["g", "b"]
+
+        def display_box(nuance, label=None):
+            """display two F curves plus the top-bottom horizontal/vertical lines,
+            depending on orientation.
+            """
+            if orientation == "xy":
+                # x = left/right, y = p
+                if nuance == "step":
+                    step_kwargs = {"c": plot_bound_colors[0], "where": "post"}
+                    if label is not None:
+                        step_kwargs["label"] = label
+                    (line,) = ax.step(self.left, p_axis, **step_kwargs)
+                    ax.step(self.right, p_axis, c=plot_bound_colors[1], where="post")
+                elif nuance == "curve":
+                    curve_kwargs = {"c": plot_bound_colors[0]}
+                    if label is not None:
+                        curve_kwargs["label"] = label
+                    (line,) = ax.plot(self.left, p_axis, **curve_kwargs)
+                    ax.plot(self.right, p_axis, c=plot_bound_colors[1])
+                else:
+                    raise ValueError("nuance must be either 'step' or 'curve'")
+                ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
+                ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+
+            elif orientation == "yx":
+                # x = p, y = left/right  (axes swapped)
+                if nuance == "step":
+                    step_kwargs = {"c": plot_bound_colors[0], "where": "post"}
+                    if label is not None:
+                        step_kwargs["label"] = label
+                    (line,) = ax.step(p_axis, self.left, **step_kwargs)
+                    ax.step(p_axis, self.right, c=plot_bound_colors[1], where="post")
+                elif nuance == "curve":
+                    curve_kwargs = {"c": plot_bound_colors[0]}
+                    if label is not None:
+                        curve_kwargs["label"] = label
+                    (line,) = ax.plot(p_axis, self.left, **curve_kwargs)
+                    ax.plot(p_axis, self.right, c=plot_bound_colors[1])
+                else:
+                    raise ValueError("nuance must be either 'step' or 'curve'")
+                ax.plot([0, 0], [self.left[0], self.right[0]], c=plot_bound_colors[1])
+                ax.plot([1, 1], [self.left[-1], self.right[-1]], c=plot_bound_colors[0])
+            else:
+                raise ValueError("orientation must be 'xy' or 'yx'")
+
+            if label is not None:
+                ax.legend(handler_map={line: CustomEdgeRectHandler()})
+
+        if title is not None:
+            ax.set_title(title)
+
+        if style == "box":
+            if orientation == "xy":
+                ax.fill_betweenx(
+                    y=p_axis,
+                    x1=self.left,
+                    x2=self.right,
+                    interpolate=True,
+                    color=fill_color,
+                    alpha=alpha,
+                    **kwargs,
+                )
+            else:  # 'yx'
+                ax.fill_between(
+                    x=p_axis,
+                    y1=self.left,
+                    y2=self.right,
+                    interpolate=True,
+                    color=fill_color,
+                    alpha=alpha,
+                    **kwargs,
+                )
+            display_box(nuance, label=None)
+            if "label" in kwargs:
+                ax.legend(loc="best")
+        elif style == "simple":
+            display_box(nuance, label=kwargs["label"] if "label" in kwargs else None)
+        else:
+            raise ValueError("style must be either 'simple' or 'box'")
+
+        if orientation == "xy":
+            ax.set_xlabel(r"$x$")
+            ax.set_ylabel(r"$\Pr(X \leq x)$")
+        else:
+            ax.set_xlabel(r"$\Pr(X \leq x)$")
+            ax.set_ylabel(r"$x$")
+            if invert_xaxis:
+                ax.invert_xaxis()  # NEW LINE — reverses new x-axis (1 → 0)
+            ax.yaxis.tick_right()
+            ax.yaxis.set_label_position("right")
+
+        return ax
+
+    ### above ###
+
     def plot_outside_legend(
         self,
         title=None,

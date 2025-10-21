@@ -8,6 +8,8 @@ from collections import namedtuple
 import pyuncertainnumber.pba.aggregation as agg
 from .intervals import Interval
 from .mixins import NominalValueMixin, _PboxOpsMixin
+from matplotlib.patches import Rectangle
+
 
 dempstershafer_element = namedtuple("dempstershafer_element", ["interval", "mass"])
 """ Named tuple for Dempster-Shafer elements.
@@ -132,7 +134,6 @@ def plot_dss_raw(intervals, masses, ax=None):
         masses (array-like): masses of the intervals
         ax: matplotlib axis object
     """
-    from matplotlib.patches import Rectangle
 
     if ax is None:
         fig, ax = plt.subplots()
@@ -161,6 +162,82 @@ def plot_dss_raw(intervals, masses, ax=None):
     ax.margins(x=0.05, y=0.05)
 
     ax.set_xlabel("$X$")
+
+
+### below
+
+
+def plot_dss_raw_reverse_axis(
+    intervals, masses, ax=None, orientation="xy", invert_xaxis=True
+):
+    """
+    Plot Dempster–Shafer structures as boxes.
+
+    Args:
+        intervals: list of (a, b) intervals
+        masses: list or array of probability masses
+        ax: matplotlib axis object
+        orientation: "xy" (default) or "yx" (reversed; swaps X and Y axes)
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    # Bottoms (cumulative sum of masses)
+    bottoms = np.concatenate(([0], np.cumsum(masses)[:-1]))
+
+    if orientation == "xy":
+        # --- Standard orientation (original version) ---
+        for (a, b), bottom, h in zip(intervals, bottoms, masses):
+            rect = Rectangle(
+                (a, bottom),
+                b - a,
+                h,
+                facecolor="lightgray",
+                edgecolor="red",
+                linewidth=1,
+                alpha=0.5,
+            )
+            ax.add_patch(rect)
+
+        ax.set_xlabel(r"$X$")
+        ax.set_ylabel("Probability mass")
+
+    elif orientation == "yx":
+        # --- Reversed orientation (swap axes) ---
+        for (a, b), bottom, h in zip(intervals, bottoms, masses):
+            rect = Rectangle(
+                (bottom, a),
+                h,
+                b - a,
+                facecolor="lightgray",
+                edgecolor="red",
+                linewidth=1,
+                alpha=0.5,
+            )
+            ax.add_patch(rect)
+
+        # Reverse the new x-axis direction (1 → 0)
+        if invert_xaxis:
+            ax.invert_xaxis()
+
+        # Move y-axis ticks and label to the right for clarity
+        ax.yaxis.tick_right()
+        ax.yaxis.set_label_position("right")
+
+        ax.set_xlabel("Probability mass")
+        ax.set_ylabel(r"$X$")
+
+    else:
+        raise ValueError("orientation must be 'xy' or 'yx'")
+
+    # Autoscale and add margins
+    ax.autoscale_view()
+    ax.margins(x=0.05, y=0.05)
+
+    return ax
+
+
+### above
 
 
 def plot_DS_structure(
