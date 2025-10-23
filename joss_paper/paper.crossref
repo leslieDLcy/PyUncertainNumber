@@ -6,8 +6,8 @@
            version="5.3.1"
            xsi:schemaLocation="http://www.crossref.org/schema/5.3.1 http://www.crossref.org/schemas/crossref5.3.1.xsd">
   <head>
-    <doi_batch_id>20251016132513-73bfdc3982937fec6e33dc53a279aa05f693fc14</doi_batch_id>
-    <timestamp>20251016132513</timestamp>
+    <doi_batch_id>20251023102118-6ec5be2f6134b9d3f6661adbe830ec3d985780fd</doi_batch_id>
+    <timestamp>20251023102118</timestamp>
     <depositor>
       <depositor_name>JOSS Admin</depositor_name>
       <email_address>admin@theoj.org</email_address>
@@ -37,7 +37,7 @@
       </journal_issue>
       <journal_article publication_type="full_text">
         <titles>
-          <title>PyUncertainNumber for uncertainty propagation: beyond probability arithmetic</title>
+          <title>PyUncertainNumber for uncertainty propagation with black-box models: beyond probabilistic arithmetic</title>
         </titles>
         <contributors>
           <person_name sequence="first" contributor_role="author">
@@ -129,8 +129,9 @@
             <article_title>Imprecise uncertainty management with uncertain numbers to facilitate trustworthy computations</article_title>
             <author>Chen</author>
             <journal_title>SciPy proceedings</journal_title>
+            <doi>10.25080/ahrt5264</doi>
             <cYear>2025</cYear>
-            <unstructured_citation>Chen, Y., &amp; Ferson, S. (2025). Imprecise uncertainty management with uncertain numbers to facilitate trustworthy computations. SciPy Proceedings.</unstructured_citation>
+            <unstructured_citation>Chen, Y., &amp; Ferson, S. (2025). Imprecise uncertainty management with uncertain numbers to facilitate trustworthy computations. SciPy Proceedings. https://doi.org/10.25080/ahrt5264</unstructured_citation>
           </citation>
           <citation key="beer:2013">
             <article_title>Imprecise probabilities in engineering analyses</article_title>
@@ -140,6 +141,28 @@
             <volume>37</volume>
             <cYear>2013</cYear>
             <unstructured_citation>Beer, M., Ferson, S., &amp; Kreinovich, V. (2013). Imprecise probabilities in engineering analyses. Mechanical Systems and Signal Processing, 37(1-2), 4–29.</unstructured_citation>
+          </citation>
+          <citation key="ferson:2001">
+            <article_title>Probability bounds analysis solves the problem of incomplete specification in probabilistic risk and safety assessments</article_title>
+            <author>Ferson</author>
+            <journal_title>Risk-based decisionmaking in water resources IX</journal_title>
+            <cYear>2001</cYear>
+            <unstructured_citation>Ferson, S. (2001). Probability bounds analysis solves the problem of incomplete specification in probabilistic risk and safety assessments. In Risk-based decisionmaking in water resources IX (pp. 173–188).</unstructured_citation>
+          </citation>
+          <citation key="moore:2009">
+            <volume_title>Introduction to interval analysis</volume_title>
+            <author>Moore</author>
+            <cYear>2009</cYear>
+            <unstructured_citation>Moore, R. E., Kearfott, R. B., &amp; Cloud, M. J. (2009). Introduction to interval analysis. SIAM.</unstructured_citation>
+          </citation>
+          <citation key="oberkampf:2004">
+            <article_title>Verification, validation, and predictive capability in computational engineering and physics</article_title>
+            <author>Oberkampf</author>
+            <journal_title>Appl. Mech. Rev.</journal_title>
+            <issue>5</issue>
+            <volume>57</volume>
+            <cYear>2004</cYear>
+            <unstructured_citation>Oberkampf, W. L., Trucano, T. G., &amp; Hirsch, C. (2004). Verification, validation, and predictive capability in computational engineering and physics. Appl. Mech. Rev., 57(5), 345–384.</unstructured_citation>
           </citation>
         </citation_list>
       </journal_article>
