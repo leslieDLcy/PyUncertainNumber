@@ -1,6 +1,7 @@
 from __future__ import annotations
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.typing import ArrayLike
 
 """
 --------------------------
@@ -37,14 +38,12 @@ def plot_intervals(x, y_i, **kwargs):
     return ax
 
 
-def plot_lower_bound(x, y_i, **kwargs):
+def plot_lower_bound(x: ArrayLike, y_i: ArrayLike, **kwargs):
     """plot lower bound of intervals
 
     args:
-        x: array-like
-            x-axis coordinates
-        y_i: array-like
-            array of intervals
+        x (ArrayLike): x-axis coordinates
+        y_i (ArrayLike): array of intervals
     """
 
     fig, ax = plt.subplots()
@@ -52,22 +51,27 @@ def plot_lower_bound(x, y_i, **kwargs):
     ax.legend()
 
 
-def plot_mul_intervals(vec_interval, ax=None):
+# TODO: finsih the logic for when probability is given
+def plot_mul_intervals(vec_interval, probability=None, ax=None):
     """plot multiple intervals horizontally in the 0-1 probability range
 
     args:
-        vec_interval: Interval
-            a vector interval object
+        vec_interval (Interval): a vector interval object
     """
-    from ..utils import equi_selection
+    if (
+        probability is None
+    ):  # this will plot the intervals across the 0-1 probability axis
+        from ..utils import equi_selection
 
-    p_values = np.linspace(0, 1, 200)
-    pp = equi_selection(p_values, len(vec_interval))
+        p_values = np.linspace(0, 1, 200)
+        pp = equi_selection(p_values, len(vec_interval))
 
-    if ax is None:
-        fig, ax = plt.subplots()
+        if ax is None:
+            fig, ax = plt.subplots()
 
-    for i, intl in enumerate(vec_interval):  # horizontally plot the interval
-        ax.plot([intl.lo, intl.hi], [pp[i], pp[i]], label=f"Interval {i+1}")
-    ax.margins(x=0.1, y=0.1)
-    return ax
+        for i, intl in enumerate(vec_interval):  # horizontally plot the interval
+            ax.plot([intl.lo, intl.hi], [pp[i], pp[i]], label=f"Interval {i+1}")
+        ax.margins(x=0.1, y=0.1)
+        return ax
+    else:  # when probability is given
+        print('unfinished function "plot_mul_intervals" with given probability')

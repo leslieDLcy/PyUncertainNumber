@@ -86,13 +86,24 @@ class DempsterShafer(NominalValueMixin, _PboxOpsMixin):
     def masses(self):
         return self._masses
 
-    def plot(self, style="raw", ax=None, **kwargs):
-        """for box type transform dss into a pbox and plot"""
+    def plot(self, style="raw", ax=None, zorder=None, **kwargs):
+        """for box type transform dss into a pbox and plot
+
+        args:
+            style (str): "raw" (default), "box", "pbox", "interval"
+            edge_color (str): edge color for raw style. If None, use default red color.
+        """
         if ax is None:
             fig, ax = plt.subplots()
         match style:
             case "raw" | "box":
-                plot_dss_raw(self.intervals.to_numpy(), self.masses, ax=ax, **kwargs)
+                plot_dss_raw(
+                    self.intervals.to_numpy(),
+                    self.masses,
+                    ax=ax,
+                    zorder=zorder,
+                    **kwargs,
+                )
             case "pbox":
                 dss_pbox = self.to_pbox()
                 dss_pbox.plot(ax=ax, **kwargs)
@@ -126,7 +137,7 @@ class DempsterShafer(NominalValueMixin, _PboxOpsMixin):
         return cls(intervals, masses)
 
 
-def plot_dss_raw(intervals, masses, ax=None):
+def plot_dss_raw(intervals, masses, edge_color=None, ax=None, zorder=None, **kwargs):
     """plot the Dempster-Shafer structures in a raw (boxes)form
 
     args:
@@ -147,9 +158,11 @@ def plot_dss_raw(intervals, masses, ax=None):
             b - a,
             h,
             facecolor="lightgray",
-            edgecolor="red",
+            edgecolor=edge_color if edge_color is not None else "red",
             linewidth=1,
             alpha=0.5,
+            zorder=0 if zorder is None else zorder,
+            **kwargs,
         )
         ax.add_patch(rect)
 
