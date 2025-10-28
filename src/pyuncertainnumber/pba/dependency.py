@@ -11,38 +11,6 @@ from statsmodels.distributions.copula.api import (
 )
 
 
-# class Dependency:
-#     """Dependecy class to specify copula models
-
-#     args:
-#         family (str): name of the copula family, e.g. "gaussian",
-#             "t", "frank", "gumbel", "clayton", "independence"
-#         params (Number): parameter of the copula, e.g. correlation for gaussian copula
-#             or degrees of freedom for t copula
-
-#     example:
-#         >>> from pyuncertainnumber import pba
-#         >>> pba.Dependency('gaussian', params=0.8)
-
-#     """
-
-#     # parameterisation init
-#     def __init__(self, family: str, params: Number):
-#         self.family = family
-#         self.params = params
-#         self._post_init_check()
-#         self._copula = self.copulas_dict.get(self.family)(params)
-
-#     copulas_dict = {
-#         "gaussian": GaussianCopula,
-#         "t": StudentTCopula,
-#         "frank": FrankCopula,
-#         "gumbel": GumbelCopula,
-#         "clayton": ClaytonCopula,
-#         "independence": IndependenceCopula,
-#     }
-
-
 from numbers import Number
 from statsmodels.distributions.copula.api import (
     GaussianCopula,
@@ -149,8 +117,8 @@ class Dependency:
         rd = 42 if random_state is None else random_state
         return self._copula.rvs(n, random_state=rd)
 
-    def display(self, style="3d", ax=None):
-        """show the PDF in the u space"""
+    def display(self, style="3d_cdf", ax=None):
+        """show the PDF or CDF in the u space"""
         if style == "2d_pdf":
             self._copula.plot_pdf(ax=ax)
         elif style == "3d_cdf":

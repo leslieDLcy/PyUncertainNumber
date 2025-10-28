@@ -9,7 +9,7 @@ import pyuncertainnumber.pba.aggregation as agg
 from .intervals import Interval
 from .mixins import NominalValueMixin, _PboxOpsMixin
 from matplotlib.patches import Rectangle
-
+from numpy.typing import ArrayLike
 
 dempstershafer_element = namedtuple("dempstershafer_element", ["interval", "mass"])
 """ Named tuple for Dempster-Shafer elements.
@@ -26,7 +26,7 @@ class DempsterShafer(NominalValueMixin, _PboxOpsMixin):
 
         intervals: expect wildcard vector intervals, vec-Interval; list of scalar intervals; list of list pairs; or 2D array;
 
-        masses (array-like): probability masses
+        masses (ArrayLike): probability masses
 
     example:
         >>> from pyuncertainnumber import pba
@@ -51,7 +51,7 @@ class DempsterShafer(NominalValueMixin, _PboxOpsMixin):
     def __init__(
         self,
         intervals: Interval | list[list] | list[Interval] | np.ndarray,
-        masses: list[float],
+        masses: ArrayLike,
     ):
 
         self._intervals = make_vec_interval(intervals)
