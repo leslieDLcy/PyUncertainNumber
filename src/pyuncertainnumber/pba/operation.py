@@ -297,6 +297,72 @@ def copula_mass(C_func, u, v, eps=1e-12):
     return p
 
 
+def positiveconv_pbox(a, b, op=operator.add):
+    """positive dependence (PQD) convolution of two pboxes
+
+    example:
+        >>> X = pba.uniform(1, 24)
+        >>> Y = X
+        >>> p_ = positiveconv_pbox(X, Y)
+    """
+    from .intervals import Interval
+    from .pbox_abc import Staircase
+    from pyuncertainnumber import envelope as env
+    import math
+
+    # positive (PQD) dependence
+    assert a.steps == b.steps, "Pboxes must have the same number of steps"
+    n = a.steps
+    cu = np.zeros(n)
+    cd = np.zeros(n)
+
+    for i in range(n):
+        infimum = np.inf
+        for j in range(i, n):
+            if op == operator.add:
+                here = a.left[j] + b.left[int(n * i / (j + 1))]
+            elif op == operator.mul:
+                here = a.left[j] * b.left[int(n * i / (j + 1))]
+            elif op == operator.pow:
+                here = a.left[j] ** b.left[int(n * i / (j + 1))]
+            if here < infimum:
+                infimum = here
+        cd[i] = infimum
+
+        supremum = -np.inf
+        for j in range(i + 1):
+            kk = math.floor(1 + n * ((i) / n - j / n) / (1 - j / n)) - 1
+            if op == operator.add:
+                here = a.right[j] + b.right[kk]
+            elif op == operator.mul:
+                here = a.right[j] * b.right[kk]
+            elif op == operator.pow:
+                here = a.right[j] ** b.right[kk]
+            if here > supremum:
+                supremum = here
+        cu[i] = supremum
+
+    if op == "+":
+        v = env(
+            a.var + b.var,
+            a.var + b.var + 2 * np.sqrt(a.var * b.var),
+        ).to_interval()
+    else:
+        v = Interval(0, float("inf"))
+
+    if op == "^" and a.range.hi <= 1:
+        safe = cu
+        cu = sorted(cd)
+        cd = sorted(safe)
+
+    return Staircase(
+        cu,
+        cd,
+        mean=Interval(a.mean.lo + b.mean.lo, a.mean.hi + b.mean.hi),
+        var=Interval(v.left, v.right),
+    )
+
+
 def new_vectorised_naive_frechet_op(x: Pbox, y: Pbox, op):
     """independent operation on two pboxes
 
