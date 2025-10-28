@@ -18,7 +18,6 @@ from .utils import (
     area_between_ecdfs,
 )
 import logging
-from .operation import vectorized_cartesian_op
 from .context import get_current_dependency
 from .mixins import NominalValueMixin
 from contextlib import suppress
@@ -351,12 +350,13 @@ class Staircase(Pbox):
         super().__init__(left, right, steps, mean, var, p_values)
 
     def _init_moments(self):
-        """
-        Initialize mean/var interval estimates.
-        Strategy:
-        1) Try LP-based bounds.
-        2) If that fails, try ECDF-based bounds.
-        3) If that also fails, set to NaN intervals so the program continues.
+        """Initialize mean/var interval estimates.
+
+        strategy:
+            1) Try LP-based bounds.
+            2) If that fails, try ECDF-based bounds.
+            3) If that also fails, set to NaN intervals so the program continues.
+
         This function NEVER raises.
         """
         # Defaults
@@ -630,7 +630,7 @@ class Staircase(Pbox):
         invert_xaxis=True,
         **kwargs,
     ):
-        """default plotting function
+        """A testing plotting function that can swap quantile and probability axes.
 
         args:
             style (str): 'box' or 'simple'
@@ -1395,12 +1395,10 @@ class Staircase(Pbox):
     def mul(self, other, dependency="f"):
         """Multiplication of uncertain numbers with the defined dependency dependency"""
         from .operation import (
-            frechet_op,
             independent_op,
             perfect_op,
             opposite_op,
         )
-        from .aggregation import _imposition
 
         if isinstance(other, Number):
             return pbox_number_ops(self, other, operator.mul)
