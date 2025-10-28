@@ -121,7 +121,7 @@ def classic_frechet_pbox(x, y, op) -> Staircase:
 
 def straddle_frechet_pbox(x, y):
     """bespoke Frechet for multiplcation when anyone straddles 0"""
-    from .aggregation import _imposition
+    from .aggregation import imposition
 
     warnings.warn(
         "Multiplication of a pbox straddling zero needs attention",
@@ -129,7 +129,7 @@ def straddle_frechet_pbox(x, y):
     )
     naive_base_p = vectorised_naive_frechet_pbox(x, y, operator.mul)
     balch_p = x.balchprod(y)
-    imp_p = _imposition(naive_base_p, balch_p)
+    imp_p = imposition(naive_base_p, balch_p)
     return imp_p
 
 
