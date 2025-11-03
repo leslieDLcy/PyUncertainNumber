@@ -53,7 +53,7 @@ UQ is a big world (like Marvel multiverse) consisting of abundant theories and s
 `PyUncertainNumber` is rooted in Python and has close ties with the Python scientific computing ecosystem, it builds upon and greatly extends a few pioneering projects, such as [intervals](https://github.com/marcodeangelis/intervals), [scipy-stats](https://docs.scipy.org/doc/scipy/tutorial/stats.html) and [pba-for-python](https://github.com/Institute-for-Risk-and-Uncertainty/pba-for-python) to generalise probability and interval arithmetic. Beyond arithmetics, `PyUncertainNumber` has offered a wide spectrum of algorithms and methods for uncertainty characterisation, propagation, surrogate modelling, and optimisation under uncertainty, allowing imprecise uncertainty analysis in both intrusive and non-intrusive manner. `PyUncertainNumber` is under active development and will continue to be dedicated to support imprecise analysis in engineering using Python.
 
 
-### Citation
+## Citation
 
 > [Yu Chen, Scott Ferson (2025). Imprecise uncertainty management with uncertain numbers to facilitate trustworthy computations.](https://proceedings.scipy.org/articles/ahrt5264), SciPy proceedings 2025.
 
