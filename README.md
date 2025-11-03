@@ -17,44 +17,14 @@ Scientific computations of complex systems are surrounded by various forms of un
 This package is underpined by a framework of ***uncertain number*** which allows for a closed computation ecosystem whereby trustworthy computations can be conducted in a rigorous manner. <ins>It provides capabilities across the typical uncertainty analysis pipeline, encompassing characterisation, aggregation, propagation, and applications including reliability analysis and optimisation under uncertainty, especailly with a focus on imprecise probabilities.</ins>
 
 > ***Uncertain Number*** refers to a generalised representation that unifies several uncertainty constructs including real numbers, intervals, probability distributions, interval bounds on probability distributions (i.e. [probability boxes](https://en.wikipedia.org/wiki/Probability_box)), and [finite DempsterShafer structures](https://en.wikipedia.org/wiki/Dempster–Shafer_theory). It is mostly suitable for managing mixed types of uncertainties.
->
-> Refer to the [documentation](https://pyuncertainnumber.readthedocs.io/en/latest/index.html) of this package for additional introduction.
+
 
 
 ## Getting started
 
-`PyUncertainNumber` can be used to easily create an `UncertainNumber` object, which may embody a mathematical construct such as `PBox`, `Interval`, `Distribution`, or `DempsterShafer` structure.
+Explore the [documentation](https://pyuncertainnumber.readthedocs.io/en/latest/index.html) to get started, featuring hands-on [tutorials](https://pyuncertainnumber.readthedocs.io/en/latest/getting_started.html) and in-depth [examples](https://pyuncertainnumber.readthedocs.io/en/latest/examples/index.html) that showcase the power of the package.
 
-<!-- add some pbox plots herein -->
-<img src="./assets/myAnimation.gif" alt="drapbox dynamic visualisationwing" width="500"/>
-
-```python
-from pyuncertainnumber import UncertainNumber as UN
-import pyuncertainnumber as pun
-
-# a verbose to instantiate uncertain numbers with ancillary fields
-e = UN(
-    name='elas_modulus', 
-    symbol='E', 
-    unit='Pa', 
-    essence='pbox', 
-    distribution_parameters=['gaussian', ([0,12],[1,4])])
-
-# or simply use shortcut to create uncertain numbers
-a = pun.normal([2,3], [1])
-b = pun.normal([10,14], [1])
-
-# specify a response function
-def foo(x): return x[0] ** 3 + x[1] + 2
-
-# intrusive call signature which allows for drop-in replacements
-response = foo([a, b])
-
-# alternatively, one can use a more generic call signature for propagation
-p = pun.Propagation(vars=[a, b], func=foo, method='slicing', interval_strategy='direct')
-response = p.run(n_slices=50)
-```
-
+`pyuncertainnumber` exposes APIs at different levels. It features high-level APIs best suited for new users to quickly start with uncertainty computations with [*uncertain numbers*], and also low-level APIs allowing experts to have additional controls over mathematical constructs such as p-boxes, Dempster Shafer structures, probability distibutions, etc.
 
 
 ## Installation
@@ -66,6 +36,10 @@ pip install pyuncertainnumber
 ```
 
 ## Capabilities
+
+<p align="center">
+  <img src="./assets/up_flowchart.png" alt="Logo" width="1000"/>
+</p>
 
 - `PyUncertainNumber` is a Python package for generic computational tasks focussing on **rigourou uncertainty analysis**, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation.
 - `PyUncertainNumber` supports [probability bounds analysis](https://en.wikipedia.org/wiki/Probability_bounds_analysis) to rigorously bound the prediction for the quantity of interest with mixed uncertainty propagation.
@@ -81,11 +55,19 @@ UQ is a big world (like Marvel multiverse) consisting of abundant theories and s
 
 ### Citation
 
-> Paper in *SciPy Proceedings 2025*
->
-> [Yu Chen, Scott Ferson (2025). Imprecise uncertainty management with uncertain numbers to facilitate trustworthy computations.](https://proceedings.scipy.org/previews/01991ec4-7f40-7fd6-ad08-d258440c9963?preview=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2pvdXJuYWxzLmN1cnZlbm90ZS5jb20iLCJleHAiOjE3NTk2NzM3MDQsImF1ZCI6InNjaXB5Iiwic2NvcGUiOiJzdWJtaXNzaW9uIiwic2NvcGVJZCI6IjAxOTkxZWM0LTdmNDAtN2ZkNi1hZDA4LWQyNTkyNWU1YjE4YyIsImlhdCI6MTc1OTI0MTcwNH0.m1j4M51UZ2o213Uf7KQi8LlVB_Tj68N3vO3ONYkx6GA)
+> [Yu Chen, Scott Ferson (2025). Imprecise uncertainty management with uncertain numbers to facilitate trustworthy computations.](https://proceedings.scipy.org/articles/ahrt5264), SciPy proceedings 2025.
+
+A downloadable version can be accessed [here](https://www.researchgate.net/publication/396633010_Imprecise_uncertainty_management_with_uncertain_numbers_to_facilitate_trustworthy_computations).
 
 ``` bibtex
+@inproceedings{chen2025scipyproceed,
+  title = {Imprecise uncertainty management with uncertain numbers to facilitate trustworthy computations},
+  booktitle = {SciPy Proceedings},
+  year = {2025},
+  author = {Chen, Yu and Ferson, Scott},
+  doi = {10.25080/ahrt5264}
+}
+
 @software{chen_2025_17235456,
   author       = {Chen, (Leslie) Yu},
   title        = {PyUncertainNumber},
