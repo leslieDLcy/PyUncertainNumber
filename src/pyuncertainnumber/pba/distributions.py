@@ -15,6 +15,8 @@ from .pbox_abc import Staircase
 from .ecdf import get_ecdf
 from numbers import Number
 from .mixins import NominalValueMixin
+from numpy.typing import ArrayLike
+
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
@@ -160,7 +162,15 @@ class Distribution(NominalValueMixin):
         lo = self.alpha_cut(lo_cut_level)
         return Interval(lo, hi)
 
-    def get_cdf(self):
+    def pdf(self, x: ArrayLike):
+        """compute the probability density function (pdf) at x"""
+        return self._dist.pdf(x)
+
+    def cdf(self, x: ArrayLike):
+        """compute the cumulative distribution function (cdf) at x"""
+        return self._dist.cdf(x)
+
+    def get_whole_cdf(self):
         """return the cumulative distribution function (cdf)"""
         return self._dist.cdf(Params.p_values)
 
@@ -313,6 +323,9 @@ class JointDistribution:
         )
         self.ndim = len(self.marginals)
 
+    def __repr__(self):
+        return f"a {self.ndim}-dimensional JointDistribution with copula: {self.copula.family} and marginals: {[m.dist_family for m in self.marginals]}"
+
     @staticmethod
     def from_sps(copula: Copula, marginals: list[sps.rv_continuous]):
         return CopulaDistribution(copula=copula, marginals=marginals)
@@ -324,6 +337,60 @@ class JointDistribution:
     def u_sample(self, size, random_state=42):
         """generate copula-space samples from the joint distribution"""
         return self.copula.rvs(size, random_state=random_state)
+
+    def joint_density_of_bi_grid(self, x: ArrayLike, y: ArrayLike):
+        """compute the joint density on a grid given x and y arrays
+
+        Used for bivariate arithmetic calculations of X and Y with designated (known) dependency and marginals.
+
+
+        note:
+            discretisation step sizes dx and dy are set up by the input x and y arrays
+
+        example:
+            >>> x = np.linspace(0, 1, 50)
+            >>> y = np.linspace(0, 1, 50)
+            >>> dep = Dependency("gaussian", params=0.7)
+            >>> joint_density = dep.joint_density_of_grid(x, y)
+        """
+        XX, YY = np.meshgrid(x, y, indexing="ij")
+        UU, VV = self.marginals[0].cdf(XX), self.marginals[1].cdf(
+            YY
+        )  # transform to unit square
+        uv = np.column_stack([UU.ravel(), VV.ravel()])
+        c_uv = self.copula.pdf(uv).reshape(XX.shape)  # copula density
+        fX = self.marginals[0].pdf(XX)
+        fY = self.marginals[1].pdf(YY)
+        fXY = c_uv * fX * fY
+        dx = x[1] - x[0]
+        dy = y[1] - y[0]
+        return XX, YY, fXY, dx, dy
+
+    @staticmethod
+    def cdf_of_g(XX, YY, fXY, dx, dy, g_func, z_vals) -> ArrayLike:
+        """Numerically approximate F_Z(z) = P(g(X,Y) <= z) via discretisation on a grid
+
+        args:
+            z_vals (ArrayLike): discretisation of z values (array) at which to compute F_Z
+            XX, YY: the grid arrays from meshgrid
+            fXY: joint density on the grid
+            dx, dy: spacings in x and y directions
+            g_func (callable): a general callable applied elementwise to (XX, YY)
+
+        returns:
+            FZ (ArrayLike): cumulative distribution function values at z_vals
+
+        note:
+            given precomputed grid (XX,YY), joint density fXY, and spacings.
+        """
+        G = g_func(XX, YY)  # evaluate g on the grid once
+        FZ = np.empty_like(z_vals, dtype=float)
+        for k, z in enumerate(z_vals):
+            mask = G <= z
+            FZ[k] = np.sum(fXY * mask) * dx * dy
+        # Ensure numeric monotonicity (optional small fix)
+        FZ = np.clip(np.maximum.accumulate(FZ), 0.0, 1.0)
+        return FZ
 
 
 # * --------------------- non-parametric ecdf cases --------------------- *#

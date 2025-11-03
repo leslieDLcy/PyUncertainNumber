@@ -18,7 +18,6 @@ from .utils import (
     area_between_ecdfs,
 )
 import logging
-from .operation import vectorized_cartesian_op
 from .context import get_current_dependency
 from .mixins import NominalValueMixin
 from contextlib import suppress
@@ -122,7 +121,7 @@ def classic_frechet_pbox(x, y, op) -> Staircase:
 
 def straddle_frechet_pbox(x, y):
     """bespoke Frechet for multiplcation when anyone straddles 0"""
-    from .aggregation import _imposition
+    from .aggregation import imposition
 
     warnings.warn(
         "Multiplication of a pbox straddling zero needs attention",
@@ -130,7 +129,7 @@ def straddle_frechet_pbox(x, y):
     )
     naive_base_p = vectorised_naive_frechet_pbox(x, y, operator.mul)
     balch_p = x.balchprod(y)
-    imp_p = _imposition(naive_base_p, balch_p)
+    imp_p = imposition(naive_base_p, balch_p)
     return imp_p
 
 
@@ -351,12 +350,13 @@ class Staircase(Pbox):
         super().__init__(left, right, steps, mean, var, p_values)
 
     def _init_moments(self):
-        """
-        Initialize mean/var interval estimates.
-        Strategy:
-        1) Try LP-based bounds.
-        2) If that fails, try ECDF-based bounds.
-        3) If that also fails, set to NaN intervals so the program continues.
+        """Initialize mean/var interval estimates.
+
+        strategy:
+            1) Try LP-based bounds.
+            2) If that fails, try ECDF-based bounds.
+            3) If that also fails, set to NaN intervals so the program continues.
+
         This function NEVER raises.
         """
         # Defaults
@@ -454,6 +454,38 @@ class Staircase(Pbox):
 
         args:
             style (str): 'box' or 'simple'
+            fill_color (str): color to fill the box (only for 'box' style)
+            bound_colors (list): list of two colors for left and right bound lines
+            bound_styles (list): list of two linestyles for left and right bound lines
+            left_line_kwargs (dict): additional kwargs for left bound line
+            right_line_kwargs (dict): additional kwargs for right bound line
+            nuance (str): 'step' or 'curve' for bound line styles
+            alpha (float): transparency level for the box fill (only for 'box' style)
+            **kwargs: additional keyword arguments for the plot
+
+
+        note:
+            Two styles are supported: a 'box' with fill-in color and a 'simple' one without fill-in color.
+            Color and linestyle of the bound lines can be customized via the `bound_styles`, `left_line_kwargs`, and `right_line_kwargs` parameters.
+            The argument `nuance` controls whether the bound lines are plotted as step functions ('step') or smooth curves ('curve').
+
+
+        example:
+            >>> a = pba.normal([2, 6], [0.5, 1])
+            >>> fig, ax = plt.subplots()
+            >>> a.plot(ax=ax, style='simple')  # simple style without fill-in color
+            >>> # box style with fill-in color and also customized bound colors
+            >>> a.plot(ax=ax, style='box',
+            ... fill_color='lightblue',
+            ... bound_colors = ['lightblue', 'lightblue'],
+            ... bound_styles=("--", ":"),
+            ... alpha=0.5
+            ... )
+            >>> ax = pbox.plot(
+            ... left_line_kwargs={"linestyle": "--", "linewidth": 2},
+            ... right_line_kwargs={"linestyle": ":", "linewidth": 2, "alpha": 0.8},
+            )
+
         """
         import matplotlib.pyplot as plt
         import matplotlib.patheffects as pe  # optional; for "shaded/halo" line effects
@@ -630,7 +662,7 @@ class Staircase(Pbox):
         invert_xaxis=True,
         **kwargs,
     ):
-        """default plotting function
+        """A testing plotting function that can swap quantile and probability axes.
 
         args:
             style (str): 'box' or 'simple'
@@ -1395,12 +1427,10 @@ class Staircase(Pbox):
     def mul(self, other, dependency="f"):
         """Multiplication of uncertain numbers with the defined dependency dependency"""
         from .operation import (
-            frechet_op,
             independent_op,
             perfect_op,
             opposite_op,
         )
-        from .aggregation import _imposition
 
         if isinstance(other, Number):
             return pbox_number_ops(self, other, operator.mul)
