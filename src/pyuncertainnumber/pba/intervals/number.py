@@ -191,6 +191,19 @@ class Interval(NominalValueMixin):
     def _compute_nominal_value(self):
         return self.mid
 
+    def ravel(self):
+        """Return a flattened (1D) interval object for multi-dimensional intervals
+
+        example:
+            >>> A = np.random.rand(200, 200, 2)
+            >>> i = pba.intervalise(A)
+            >>> print(i.shape)
+            >>> i2 = i.ravel()
+            >>> print(i2.shape)
+        """
+        oned_cc = Interval(self.lo.ravel(), self.hi.ravel())
+        return oned_cc
+
     @property
     def lo(self) -> Union[ndarray, float]:
         return self._lo
