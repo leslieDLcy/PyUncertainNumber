@@ -253,28 +253,23 @@ import matplotlib.pyplot as plt
 def plot_intervals_from_res(
     res, p, *, show_points=False, title=None, include_ties=False, ax=None
 ):
-    """
-    Plot horizontal intervals from `res` at heights given by `p`.
+    """Plot horizontal intervals from `res` at heights given by `p`.
 
-    Parameters
-    ----------
-    res : np.ndarray
-        Structured array with fields ('distance', 'x1', 'x2').
-    p : array-like
-        1D array of same length as `res`, giving y-coordinate (height) of each interval.
-    show_points : bool, optional
-        If True, shows markers at interval endpoints.
-    title : str, optional
-        Plot title.
-    include_ties : bool, optional
-        If True, also include intervals where distance == 0 but argmax picked c-b or a-d.
-    ax : matplotlib.axes.Axes, optional
-        Axis to plot on. If None, a new figure and axis are created.
+    args
+        res (ArrayLike) : Structured array with fields ('distance', 'x1', 'x2').
 
-    Returns
-    -------
-    ax : matplotlib.axes.Axes
-        The matplotlib axis used for plotting.
+        p (ArrayLike) : 1D array of same length as `res`, giving y-coordinate (height) of each interval.
+
+        show_points (Boolean): If True, shows markers at interval endpoints.
+
+        title (str): Plot title. Optional
+
+        include_ties (bool): If True, also include intervals where distance == 0 but argmax picked c-b or a-d.
+
+        ax (matplotlib.axes.Axes) :  Axis to plot on. If None, a new figure and axis are created. Optional
+
+    returns
+        ax (matplotlib.axes.Axes): The matplotlib axis used for plotting.
     """
     res = np.asarray(res)
     p = np.asarray(p)
@@ -306,7 +301,7 @@ def plot_intervals_from_res(
 
     # Draw intervals
     for xi0, xi1, yi in zip(lo, hi, y):
-        ax.plot([xi0, xi1], [yi, yi], color="C0")
+        ax.plot([xi0, xi1], [yi, yi], color="lavender")  # horizontal segment
         if show_points:
             ax.plot([xi0, xi1], [yi, yi], "o", color="C0")
 
