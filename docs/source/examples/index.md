@@ -24,14 +24,14 @@ examples/significant_digits
 Getting started with `pyuncertainnumber`
 ::: -->
 
-:::{card} What is an uncertain number
+<!-- :::{card} What is an uncertain number
 :link: what_is_un
 :link-type: doc
 :img-top: ../_static/what_is_un.png
 :class-card: sd-text-center        # optional: center content
 :class-img-top: card-img-square    # <-- add a class you’ll style
 A closed computation environment of uncertain numbers for uncertainty quantification
-:::
+::: -->
 
 
 :::{card} Work with intervals

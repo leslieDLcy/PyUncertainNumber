@@ -27,7 +27,7 @@ def get_range_BO(
 
         verbose (Boolean): if True, prints the optimization progress
 
-        **kwargs: additional keyword arguments for the BayesOpt class
+        **kwargs: additional keyword arguments for the BayesOpt class. For example, one can pass 'num_explorations', 'num_iterations', etc.
 
     tip:
         for a less verbose output, use (convergence_curve=False, progress_bar=False)
@@ -160,7 +160,7 @@ def get_range_GA(
             - opt_hint: A dictionary with optimal input points for the minimum and maximum values.
 
     note:
-        It's suggested to use `EpistemicDomain` which facilitate the specification of varbound.
+        It's suggested to use `EpistemicDomain` which facilitates the specification of varbound.
     """
 
     from ..pba.intervals.number import Interval

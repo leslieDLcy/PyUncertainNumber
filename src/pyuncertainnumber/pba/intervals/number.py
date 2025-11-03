@@ -15,10 +15,10 @@ from typing import Optional, Any, Union
 import numpy as np
 import numpy
 from numpy import ndarray, asarray, stack, transpose, zeros
+from scipy.stats import qmc
 import matplotlib.pyplot as plt
 from .utils import safe_asarray
 from ..mixins import NominalValueMixin
-
 from .arithmetic import multiply, divide
 
 MACHINE_EPS = 7.0 / 3 - 4.0 / 3 - 1
@@ -151,9 +151,10 @@ class Interval(NominalValueMixin):
         args:
             n: number of samples
         """
-        from scipy.stats import qmc
-
-        sampler = qmc.LatinHypercube(d=self.__len__())
+        if self.is_scalar:
+            sampler = qmc.LatinHypercube(d=1)
+        else:
+            sampler = qmc.LatinHypercube(d=self.__len__())
         sample = sampler.random(n=n)
         sample = qmc.scale(sample, self.lo, self.hi)
         return sample
@@ -166,7 +167,10 @@ class Interval(NominalValueMixin):
         """
         lhs_sample = self.lhs_sample(n)
         endpoints = np.array([self.lo, self.hi])
-        return np.vstack((endpoints, lhs_sample))
+        if self.is_scalar:  # lhs_sample ~ (n, 1)
+            return np.concatenate((lhs_sample, endpoints[:, np.newaxis]))
+        else:
+            return np.vstack((endpoints, lhs_sample))
 
     def plot(self, ax=None, **kwargs):
         p = self.to_pbox()
@@ -186,6 +190,19 @@ class Interval(NominalValueMixin):
 
     def _compute_nominal_value(self):
         return self.mid
+
+    def ravel(self):
+        """Return a flattened (1D) interval object for multi-dimensional intervals
+
+        example:
+            >>> A = np.random.rand(200, 200, 2)
+            >>> i = pba.intervalise(A)
+            >>> print(i.shape)
+            >>> i2 = i.ravel()
+            >>> print(i2.shape)
+        """
+        oned_cc = Interval(self.lo.ravel(), self.hi.ravel())
+        return oned_cc
 
     @property
     def lo(self) -> Union[ndarray, float]:

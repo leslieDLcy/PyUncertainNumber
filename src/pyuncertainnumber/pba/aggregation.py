@@ -9,6 +9,10 @@ import functools
 from numbers import Number
 from .pbox_abc import Staircase
 from .operation import convert
+from numpy.typing import ArrayLike
+import scipy.stats as sps
+from .params import Params
+
 
 if TYPE_CHECKING:
     from .pbox_abc import Pbox
@@ -210,14 +214,17 @@ def mixture_ds(*l_ds, display=False) -> DempsterShafer:
     return DempsterShafer(intervals, masses)
 
 
-def env_ecdf(data, output_type="pbox", ecdf_choice="canonical"):
-    """nonparametric envelope function
+def env_samples(data: ArrayLike, output_type="pbox", ecdf_choice="canonical"):
+    """nonparametric envelope function directly from data samples
 
-    arrgs:
-        data (array): Each row represents a distribution, on which the envelope operation applied.
+    args:
+
+        data (ArrayLike): Each row represents a distribution, on which the envelope operation applied.
+
         output_type (str): {'pbox' or 'cdf'}
-            - default is pbox
-            - cdf is the CDF bundle
+            default is pbox
+            cdf is the CDF bundle
+
         ecdf_choice (str): {'canonical' or 'staircase'}
 
     note:
@@ -248,4 +255,39 @@ def env_ecdf_sep(*ecdfs, output_type="pbox", ecdf_choice="canonical"):
     """nonparametric envelope function for separate empirical CDFs"""
 
     data = np.array(ecdfs)
-    return env_ecdf(data, output_type=output_type, ecdf_choice=ecdf_choice)
+    return env_samples(data, output_type=output_type, ecdf_choice=ecdf_choice)
+
+
+"""hint:
+
+NN output: (n_sam, 2) of tuple (mu, sigma)
+--> (n_sam, quantile) via ppf function. (n_sam, 200)
+"""
+
+
+def env_am(n_pars: ArrayLike) -> np.ndarray:
+    """bespoke function used for am metric case
+
+    args:
+        n_pars (ArrayLike): (n_sam, 2) of tuple (mu, sigma) which may be a tensor
+    """
+    return sps.norm.ppf(q=Params.p_values, loc=n_pars[:, 0], scale=n_pars[:, 1])
+
+
+def env_pbox_am(n_mean: ArrayLike, n_std: ArrayLike) -> np.ndarray:
+    """bespoke function used for am metric case
+
+    args:
+        n_mean (ArrayLike): (n_sam,) of mean values which may be a tensor
+        n_std (ArrayLike): (n_sam,) of standard deviation values which may be a tensor
+    """
+
+    Q = Params.p_values[None, :]  # (1, m)
+    A = n_mean[:, None]  # (n, 1)
+    B = n_std[:, None]  # (n, 1)
+
+    #  Result: shape (n, m) — each row i uses (a[i], b[i]) across all q
+    quantile_array = sps.norm.ppf(q=Q, loc=A, scale=B)
+    l_bound = np.min(quantile_array, axis=0)
+    u_bound = np.max(quantile_array, axis=0)
+    return quantile_array, Staircase(left=l_bound, right=u_bound)
