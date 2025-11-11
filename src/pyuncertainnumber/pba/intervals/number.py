@@ -11,7 +11,9 @@
 # from intervals.methods import (lo,hi,width,rad,mag,straddlezero,isinterval)
 
 from __future__ import annotations
+from fileinput import filename
 from typing import Optional, Any, Union
+import json
 import numpy as np
 import numpy
 from numpy import ndarray, asarray, stack, transpose, zeros
@@ -512,10 +514,22 @@ class Interval(NominalValueMixin):
             half_width = np.asarray(half_width)
             return cls(lo=x - half_width, hi=x + half_width)
 
+    def save_json(self, filename: str) -> None:
+        """Save the interval object to a JSON file.
+
+        args:
+            filename: str, the name of the file to save the interval object to.
+
+        example:
+            >>> a.save_json("interval.json")
+        """
+        data = self.to_numpy().tolist()
+
+        with open(filename, "w") as f:
+            json.dump(data, f, indent=2)
+
 
 # * -------------- lightweight Interval
-
-import numpy as np
 
 
 """ for more compatability with possibility of newer additions """

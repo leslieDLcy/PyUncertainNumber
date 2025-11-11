@@ -29,8 +29,10 @@ from __future__ import annotations
 from typing import Sequence, Sized, Iterable, Optional, Any, Tuple, Union
 from itertools import product
 import numpy
+import numpy as np
 from numpy import ndarray, asarray, vstack, linspace, zeros, argmax
 from .number import Interval, MACHINE_EPS, lo, hi, width, mid
+import json
 
 numpy_min = numpy.min
 numpy_max = numpy.max
@@ -954,3 +956,17 @@ def unpack(x: Interval) -> list[Interval]:
 
     if len(x) >= 0:
         return [item for item in x]
+
+
+# * ----------------------------------- reload from json
+def load_interval_from_json(filename: str) -> Interval:
+    """Load a NumPy array from a JSON file saved by save_array_to_json().
+
+    example:
+        >>> interval = load_interval_from_json("interval_data.json")
+    """
+    with open(filename, "r") as f:
+        data = json.load(f)
+    array = np.array(data, dtype=float)
+    the_I = intervalise(array)
+    return the_I
