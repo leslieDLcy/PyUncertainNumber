@@ -514,19 +514,26 @@ class Interval(NominalValueMixin):
             half_width = np.asarray(half_width)
             return cls(lo=x - half_width, hi=x + half_width)
 
-    def save_json(self, filename: str) -> None:
+    def save_json(self, filename: str, comment: str = None) -> None:
         """Save the interval object to a JSON file.
 
         args:
-            filename: str, the name of the file to save the interval object to.
+            filename (str): the name of the file (without extension) to save the interval object to.
+
+        note:
+            By default, the file is saved with a .json5 extension.
 
         example:
-            >>> a.save_json("interval.json")
+            >>> a.save_json("interval_data", comment="This is interval data")
         """
+        import json5
+
         data = self.to_numpy().tolist()
 
-        with open(filename, "w") as f:
-            json.dump(data, f, indent=2)
+        with open(filename + ".json5", "w") as f:
+            if comment:
+                f.write(f"// {comment}\n")
+            json5.dump(data, f, indent=2)
 
 
 # * -------------- lightweight Interval

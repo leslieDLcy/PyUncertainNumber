@@ -962,11 +962,16 @@ def unpack(x: Interval) -> list[Interval]:
 def load_interval_from_json(filename: str) -> Interval:
     """Load a NumPy array from a JSON file saved by save_array_to_json().
 
+    note:
+        Both .json and .json5 files are supported.
+
     example:
-        >>> interval = load_interval_from_json("interval_data.json")
+        >>> interval = load_interval_from_json("interval_data.json5")
     """
+    import json5
+
     with open(filename, "r") as f:
-        data = json.load(f)
+        data = json5.load(f)
     array = np.array(data, dtype=float)
     the_I = intervalise(array)
     return the_I
