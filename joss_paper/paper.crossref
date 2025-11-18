@@ -6,8 +6,8 @@
            version="5.3.1"
            xsi:schemaLocation="http://www.crossref.org/schema/5.3.1 http://www.crossref.org/schemas/crossref5.3.1.xsd">
   <head>
-    <doi_batch_id>20251023102118-6ec5be2f6134b9d3f6661adbe830ec3d985780fd</doi_batch_id>
-    <timestamp>20251023102118</timestamp>
+    <doi_batch_id>20251118180326-6ec5be2f6134b9d3f6661adbe830ec3d985780fd</doi_batch_id>
+    <timestamp>20251118180326</timestamp>
     <depositor>
       <depositor_name>JOSS Admin</depositor_name>
       <email_address>admin@theoj.org</email_address>
@@ -55,6 +55,7 @@
             <affiliations>
               <institution><institution_name>Institute for Risk and Uncertainty, University of Liverpool, UK</institution_name><institution_id type="ror">https://ror.org/00hx57361</institution_id></institution>
             </affiliations>
+            <ORCID>https://orcid.org/0000-0002-2613-0650</ORCID>
           </person_name>
           <person_name sequence="additional"
                        contributor_role="author">
@@ -63,6 +64,7 @@
             <affiliations>
               <institution><institution_name>Centre for Intelligent Infrastructure, University of Strathclyde</institution_name></institution>
             </affiliations>
+            <ORCID>https://orcid.org/0000-0002-5007-7247</ORCID>
           </person_name>
         </contributors>
         <publication_date>
@@ -101,6 +103,36 @@
           </collection>
         </doi_data>
         <citation_list>
+          <citation key="dong1987vertex">
+            <article_title>Vertex method for computing functions of fuzzy variables</article_title>
+            <author>Dong</author>
+            <journal_title>Fuzzy sets and Systems</journal_title>
+            <issue>1</issue>
+            <volume>24</volume>
+            <cYear>1987</cYear>
+            <unstructured_citation>Dong, W., &amp; Shah, H. C. (1987). Vertex method for computing functions of fuzzy variables. Fuzzy Sets and Systems, 24(1), 65–78.</unstructured_citation>
+          </citation>
+          <citation key="williamson1990probabilistic">
+            <article_title>Probabilistic arithmetic. I. Numerical methods for calculating convolutions and dependency bounds</article_title>
+            <author>Williamson</author>
+            <journal_title>International journal of approximate reasoning</journal_title>
+            <issue>2</issue>
+            <volume>4</volume>
+            <cYear>1990</cYear>
+            <unstructured_citation>Williamson, R. C., &amp; Downs, T. (1990). Probabilistic arithmetic. I. Numerical methods for calculating convolutions and dependency bounds. International Journal of Approximate Reasoning, 4(2), 89–158.</unstructured_citation>
+          </citation>
+          <citation key="springer1979algebra">
+            <article_title>The algebra of random variables</article_title>
+            <author>Springer</author>
+            <cYear>1979</cYear>
+            <unstructured_citation>Springer, M. D. (1979). The algebra of random variables.</unstructured_citation>
+          </citation>
+          <citation key="smith:2004">
+            <volume_title>Uncertainty quantification: Theory, implementation, and applications</volume_title>
+            <author>Smith</author>
+            <cYear>2024</cYear>
+            <unstructured_citation>Smith, R. C. (2024). Uncertainty quantification: Theory, implementation, and applications. SIAM.</unstructured_citation>
+          </citation>
           <citation key="gray:2021">
             <article_title>ProbabilityBoundsAnalysis. Jl: Arithmetic with sets of distributions</article_title>
             <author>Gray</author>

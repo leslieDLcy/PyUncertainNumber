@@ -15,8 +15,10 @@ authors:
     equal-contrib: false # (This is how you can denote equal contributions between multiple authors)
     corresponding: false
     affiliation: 1
+    orcid: https://orcid.org/0000-0002-2613-0650
   - name: Edoardo Patelli
     corresponding: false # (This is how to denote the corresponding author)
+    orcid: https://orcid.org/0000-0002-5007-7247
     affiliation: 2
 affiliations:
  - name: Institute for Risk and Uncertainty, University of Liverpool, UK 
@@ -33,8 +35,7 @@ bibliography: paper.bib
 
 # Summary
 
-Scientific computations or simulations play a central role in quantifying the performance, reliability, and safety of complex engineered systems. However, these analyses are complicated by the various sources of uncertainties inherent in the computational pipeline. To ensure that complex engineered systems can be operated reliably and robustly even during rare and extreme environment conditions, a comprehensive uncertainty analysis is required. The analysis should be comprehensive in two senses: (i) all possible sources of uncertainty should be identified and represented using approaite mathematical constructs; (ii) The mixture of various types of uncertainties shuold be rigorously propagated through. 
-`pyuncertainnumber` enables such comprehensive analysis, by computing guaranteed bounds on functions of uncertain variables, intrusively and non-intrusively, given only partial empirical knowledge.
+Scientific calculations and simulations are complicated by various uncertainties inherent in the computational pipeline. Comprehensive analysis requires uncertainties be represented using mathematical constructs that distinguish variability from lack of knowledge and combine them rigorously in calculations. The new Python library `pyuncertainnumber` enables such analysis by computing guaranteed bounds on functions of uncertain variables given only partial empirical knowledge. It supports both intrusive methods that are efficient for projection through explicitly defined mathematical models and non-intrusive methods that can be used with black-box models that associate outputs with given inputs but whose internal workings are not known. 
 
 
 <!-- given only partial knowledge of the input probability distributions and their dependencies. -->
@@ -53,19 +54,22 @@ account for uncertainty is vital in performance, relibiability, and safety of hi
 
 A comprehensive uncertainty framework for scientific computation involves a mathematical model,
 through which various input uncertainties are propagated to estimate the uncertainty of an unknown quantity of interest (QoI).
-Real world complex systems (physical or engineered) of industrial significance typically involves input parameters subject to uncertainties of various nature [@oberkampf:2004]. These input uncertainties are commonly manifested as mixed uncertainties, e.g. probability boxes (p-boxes) which effectively represents a set of distributions, combining both the aleatory and epistemic uncertainty in one structure, or a mixture of uncertainties encompassing, for instance, a vector of inputs parameters of aleatory (e.g. probability distributions), epistemic (e.g. intervals), and mixed nature (e.g. probability boxes).
+Real world complex systems (physical or engineered) of industrial significance typically involves input parameters subject to uncertainties of various nature [@oberkampf:2004; @smith:2004]. These input uncertainties often appear as mixed uncertainties. A common example is probability boxes (p-boxes), which effectively represent a set of distributions and thereby capture both aleatory and epistemic uncertainty within a single structure. More generally, mixed uncertainties may involve a mixture of parameters subject to variability (aleatory uncertainty, typically represented by probability distributions), or lack of knowledge (epistemic uncertainty, often represented by intervals), or combinations of these forms, such as p-boxes.
 
-Probability bounds analysis [@ferson:2001] is one of the expressive frameworks proposed to manage uncertainties in an imprecise setting [@beer:2013].
-Software packages have been developed to facilitate the calculations of uncertain quantities, such as interval arithmetic [@marco_2022_6205624] and probability arithemetic [@gray:2021; @gray:2022]. Collectively, they can be referred to as *uncertainty arithmetic* [@chen:2025] which straightforwardly computes the response provided the performance function.
+Probability bounds analysis [@springer1979algebra; @williamson1990probabilistic; @ferson:2001] is one of the expressive frameworks proposed to manage uncertainties in an imprecise setting [@beer:2013].
+Software packages have been developed to facilitate the calculations of uncertain quantities, such as *interval arithmetic* [@marco_2022_6205624] and *probability arithmetic* [@gray:2021; @gray:2022]. Collectively, they can be referred to as uncertainty arithmetic [@chen:2025], which provides a straightforward way to compute outcomes from algebraic expressions involving uncertain variables.
 
-While it has the potential to automatically compile non-deterministic subroutines via uncertain primitives, its usages face several challenges, one significant challenge is that code accessibility of the simulation model (e.g. finite element or computational fluid dynamics models) of the system is often not guaranteed and hence unable to proceed. This would largely restrict the adoption of mixed uncertainty calculations in real-world applications of computational engineering and physics.
+While these uncertainty-representing objects have the potential to automatically compile non-deterministic subroutines via uncertain primitives, their use faces several challenges. A major one is that code accessibility[^1] of the simulation models or software (e.g. finite-element or computational-fluid-dynamics models) employed to describe the behavior of the system is often not guaranteed, rendering intrusive[^2] use of the above-mentioned uncertainty-representing frameworks infeasible. Often, these models are treated as black-box models in practice.
+Consequently, there is a critical need for software tools capable of performing mixed-uncertainty calculations on black-box models in real-world applications of computational engineering and physics.
+
+<!-- This would largely restrict the adoption of these tools  -->
 
 <!-- Such need has been echoed in the engineering applications and also the NASA challenge. -->
 
 <!-- besides known issues such as [dependency problems](https://pyuncertainnumber.readthedocs.io/en/latest/examples/repeated_variable.html) -->
 
-`pyuncertainnumber` addresses this challenge by providing the non-intrusive capability designed to allow generic black-box models to be rigorously propagated with polymorphic uncertainty.
-This capability significantly boosts versatility for scientific computations through interfacing with many engineering softwares.
+`pyuncertainnumber` addresses this need by providing the non-intrusive[^3] capability designed to allow generic black-box models to be rigorously propagated in the face of mixed uncertainties.
+This capability significantly boosts versatility for scientific computations through interfacing with many engineering software.
 
 
 
@@ -76,30 +80,30 @@ This capability significantly boosts versatility for scientific computations thr
 
 
 Interval analysis [@moore:2009] features the advantages of providing rigorous enclosures of the solutions to problems, especially for engineering problems
-subject to epistemic uncertainty, such as modelling system paramters due to lack-of-knowledge or characterising measurement incertitude.
+subject to epistemic uncertainty, such as modelling system parameters due to lack-of-knowledge or characterising measurement incertitude.
 Naive interval arithmetic typically faces difficulties such as the infamous [interval dependency](https://pyuncertainnumber.readthedocs.io/en/latest/examples/repeated_variable.html) issue. 
-Though it may be mitigated through arithmetic rearrangements in some simple cases, it still can challenging for models of most complex systems. 
+Though it may be mitigated through arithmetic rearrangements in some simple cases, it still can be challenging for models of most complex systems, and impossible for black-box models.
 The critical issue remains the accessibility of code.
 
 <!-- But naive interval arithmetic faces xxx problems, though xxx provides mathematical re-arrangements.  -->
 
-Generally, the interval propagation problem can be cast as an optimisation problem where the minimum and maximum are sought via a function mapping.
-The function, for example $f$ in \autoref{eq:intervalpropagation}, is not necessarily monotonic or linear and may well be a black-box deterministic model for a generic system. 
+Generally, the interval propagation problem can be cast as an optimisation problem where the minimum and maximum of the response are sought given a function mapping.
+Consider the function, for example $f$ in \autoref{eq:intervalpropagation}, which is not necessarily monotonic or linear and may well be a black-box deterministic model for a generic system. 
 
 \begin{equation}\label{eq:intervalpropagation}
 Y = f(I_{x1}, I_{x2}, ..., I_{xn})
 \end{equation}
 
 where $\mathbf{I} = [\mathbf{\underline{I}}, \mathbf{\overline{I}}] = [I_{x1}, I_{x2}, ..., I_{xn}]^\text{T}$ represents the vector of interval-valued inputs.
-For black box models the optimisation can generally be solved via gradient-free optimisation techniques.
+For black-box models the optimisation can generally be solved via gradient-free optimisation techniques, as shown below:
 
 $$\underline{Y} = \min_{\underline{\mathbf{I}} \leq \mathbf{I} \leq \overline{\mathbf{I}} } [f(\mathbf{I})]; \ \overline{Y} = \max_{\underline{\mathbf{I}} \leq \mathbf{I} \leq \overline{\mathbf{I}} } [f(\mathbf{I})]$$
 
 
 `pyuncertainnumber` provides a series of non-intrusive methodologies of varying applicability. It should be noted that there is generally a trade-off between 
 applicability and computational efficiency. With more knowledge pertaining the characteristics of the underlying function, one can accordinly dispatch an efficient method.
-For example, when monotonicity is known one can use the vertex method which requres $2^n$ model evaluations. Furthermore, the accuracy of these methods varies, and a common rule of thumb indicates that increasing the number of model evaluations generally leads to improved accuracy.
-A summary of applicability is tabulated in \autoref{tab:ipmethods}, readers can refer to [@chen:2025] for additional details.
+For example, when the function is known to be monotone one can use the vertex method [@dong1987vertex] which requres $2^n$ model evaluations. It should be noted that the accuracy of these methods varies, and a common guideline is that increasing the number of model evaluations generally leads to a better estimate of the bound.
+A summary of applicability is tabulated in \autoref{tab:ipmethods}, see [@chen:2025] for additional details.
 
 <!-- tabulate the interval results from the example -->
 <!-- think twice. the middle row can be changed into a paragraph in the main text instead -->
@@ -107,10 +111,13 @@ A summary of applicability is tabulated in \autoref{tab:ipmethods}, readers can 
 <!-- Table: Several methods for interval propagation []{label="tab:ipmethods"} -->
 Table: Supported methods for non-intrusive interval propagation.\label{tab:ipmethods}
 
-| Method     | Endpoints    | Subinterval reconstitution | Cauchy-Deviate method           | Bayesian optimisation | Genetic algorithm |
-|------------|--------------|----------------------------|---------------------------------|-----------------------|-------------------|
-| Assumption | monotonicity | monotonicity in subinterlvas          | linearity and gradient required | No                    | No                |
-| Example result     |  [13.0,148.0]            |   [13.0,148.0]                         |     [-11.7,100.67]                            |     [13.0,148.0]                  |   [13.0,147.8]                |
+| Category        | Assumption                         | Example result   |
+|-----------------|------------------------------------|------------------|
+| Vertex (Endpoints) | monotonicity                        | [13.0,148.0]     |
+| Subinterval reconstitution | monotonicity in subintervals     | [13.0,148.0]     |
+| Cauchy-deviate method | linearity and gradient required     | [-11.7,100.67]   |
+| Bayesian optimisation | No                                 | [13.0,148.0]     |
+| Genetic algorithm     | No                                 | [13.0,147.8]     |
 
 To better demonstrate the non-intrusive capability, two numerical examples, as displayed below in \autoref{fig:two_functions}, are provided where they are treated as black-box models. 
 \autoref{tab:ipmethods} lists the response interval of $f_{b}([1,5], [7,13], [5,10])$ for respective methods.
@@ -173,3 +180,9 @@ Enriched sampling methods bla bla ... -->
 The work leading to these results received funding through the UK project Development of Advanced Wing Solutions 2 (DAWS2). The DAWS2 project is supported by the Aerospace Technology Institute (ATI) Programme, a joint government and industry investment to maintain and grow the UK’s competitive position in civil aerospace design and manufacture. The programme, delivered through a partnership between ATI, Department for Business and Trade (DBT) and Innovate UK, addresses technology, capability and supply chain challenges.
 
 # References
+
+
+
+[^1]: access to the source code.
+[^2]: requiring access or modification of the source code of a computational model.
+[^3]: operating on the model as a black box, without accessing or modifying its internals.
