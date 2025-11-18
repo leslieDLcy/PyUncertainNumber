@@ -56,3 +56,10 @@ and refer to \autoref{eq:fourier} from text.
 
 Figure sizes can be customized by adding an optional second parameter:
 ![Interval Monte Carlo.](imc_flowchart.png){ width=20% }
+
+
+
+<!-- | Method     | Vertex    | Subinterval reconstitution | Cauchy-deviate method           | Bayesian optimisation | Genetic algorithm |
+|------------|--------------|----------------------------|---------------------------------|-----------------------|-------------------|
+| Assumption | monotonicity | monotonicity in subinterlvas          | linearity and gradient required | No                    | No                |
+| Example result     |  [13.0,148.0]            |   [13.0,148.0]                         |     [-11.7,100.67]                            |     [13.0,148.0]                  |   [13.0,147.8]                | -->
