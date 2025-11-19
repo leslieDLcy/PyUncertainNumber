@@ -132,6 +132,15 @@ def min(x: Interval, y: Interval):
     return Interval(a, b)
 
 
+def env(x: Interval, y: Interval):
+    """Return the envelope interval containing both x and y."""
+    if all([is_not_Interval(x), is_not_Interval(y)]):
+        return numpy.array([numpy.min((x, y)), numpy.max((x, y))])
+    a = numpy.min((lo(x), lo(y)), axis=0)
+    b = numpy.max((hi(x), hi(y)), axis=0)
+    return Interval(a, b)
+
+
 #####################################################################################
 # trig.py
 #####################################################################################
