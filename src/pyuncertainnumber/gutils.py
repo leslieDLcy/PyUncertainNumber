@@ -2,6 +2,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import matplotlib.pyplot as plt
+import os
 
 if TYPE_CHECKING:
     from .pba.pbox_abc import Pbox
@@ -23,3 +24,14 @@ def env_helper(elements: list, env):
 
     for p in elements:
         p.plot(ax=ax, zorder=100)
+
+
+def save_fig(figname, save_dir="."):
+    # Ensure directory exists
+    os.makedirs(save_dir, exist_ok=True)
+
+    # Build full file path
+    filepath = os.path.join(save_dir, f"{figname}.pdf")
+
+    # Save current figure
+    plt.savefig(filepath, format="pdf", dpi=300, bbox_inches="tight")
