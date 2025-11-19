@@ -101,30 +101,25 @@ $$\underline{Y} = \min_{\underline{\mathbf{I}} \leq \mathbf{I} \leq \overline{\m
 
 
 `pyuncertainnumber` provides a series of non-intrusive methodologies of varying applicability. It should be noted that there is generally a trade-off between 
-applicability and computational efficiency. With more knowledge pertaining the characteristics of the underlying function, one can accordinly dispatch an efficient method.
-For example, when the function is known to be monotone one can use the vertex method [@dong1987vertex] which requres $2^n$ model evaluations. It should be noted that the accuracy of these methods varies, and a common guideline is that increasing the number of model evaluations generally leads to a better estimate of the bound.
-A summary of applicability is tabulated in \autoref{tab:ipmethods}, see [@chen:2025] for additional details.
-
-<!-- tabulate the interval results from the example -->
-<!-- think twice. the middle row can be changed into a paragraph in the main text instead -->
+applicability and computational efficiency. With additional knowledge pertaining the characteristics of the underlying function, one can accordinly dispatch an efficient method.
+For example, if the function is known to be monotone,  one may employ the vertex method [@dong1987vertex] which requres only $2^n$ model evaluations and is therefore subtantially more efficient than a brute-force grid sampling scheme. It should be noted that the accuracy of these methods varies, and a common guideline is that increasing the number of model evaluations generally leads to a better estimate of the bound but at the cost of compututational burden.
+A summary of applicability is tabulated in \autoref{tab:ipmethods}; see @chen:2025 for additional details of their advantages and disadvantages.
 
 <!-- Table: Several methods for interval propagation []{label="tab:ipmethods"} -->
 Table: Supported methods for non-intrusive interval propagation.\label{tab:ipmethods}
 
-| Category        | Assumption                         | Example result   |
+| Category        | Assumption                         | Results of Example A   |
 |-----------------|------------------------------------|------------------|
 | Vertex (Endpoints) | monotonicity                        | [13.0,148.0]     |
 | Subinterval reconstitution | monotonicity in subintervals     | [13.0,148.0]     |
 | Cauchy-deviate method | linearity and gradient required     | [-11.7,100.67]   |
-| Bayesian optimisation | No                                 | [13.0,148.0]     |
-| Genetic algorithm     | No                                 | [13.0,147.8]     |
+| Bayesian optimisation | general applicability                                 | [13.0,148.0]     |
+| Genetic algorithm     | general applicability                                 | [13.0,147.8]     |
 
 To better demonstrate the non-intrusive capability, two numerical examples, as displayed below in \autoref{fig:two_functions}, are provided where they are treated as black-box models. 
-\autoref{tab:ipmethods} lists the response interval of $f_{b}([1,5], [7,13], [5,10])$ for respective methods.
+\autoref{tab:ipmethods} lists the response interval of $f_{a}([1,5], [7,13], [5,10])$ for respective methods. A reference ground truth is $[13.0, 148.0]$.
 
-<!-- The functional forms are displayed in \autoref{fig:dmc} and \autoref{fig:imc} respectively. -->
-
-![Exampler functions as black-box models. (a) $f_{a}(x, y) = 100(x-y^2)^2 + (1 - x)^2$; (b) $f_{b}(x, y, z) = x^3 + y +z$\label{fig:two_functions}](photo_appending.png)
+![Examplar functions as black-box models. (a) Example A: $f_{a}(x, y, z) = x^3 + y +z$, three level sets of $f_b=4$, $f_b=0$, $f_b=-4$ are shown; (b) Example B: $f_{b}(x, y) = 100(x-y^2)^2 + (1 - x)^2$.\label{fig:two_functions}](photo_appending.png)
 
 
 
@@ -162,10 +157,9 @@ To scale to a more realistic setting, \autoref{fig:imc} illustrates the workflow
 <!-- reiterate the significance of our developments  !!! -->
 
 It is evident that many computational tasks in engineering and physics rely on complex numerical methods in which the model functions are black boxes.
-This makes uncertainty arithmetic difficult to cope due to the code accessiability of models.
+This makes uncertainty arithmetic difficult to manage because the model code is inaccessible.
 By providing methods supporting generic black box models, `pyuncertainnumber` enables rigorous uncertainty analysis for real-world scenarios of mixed uncertainties and partial knowledge.
-This non-intrusive capability allows `pyuncertainnumber` to interface with multiple software environments to provide extensive compatibility with engineering applications, thereby its applicability across diverse computational workflows.
-
+This non-intrusive capability allows `pyuncertainnumber` to interface with multiple software environments, offering extensive compatibility with engineering applications and diverse computational workflows.
 <!-- We interface with many softwares.
 Significance: this provides compatability as interfacing with many engineering applications.
 boost its usage.
