@@ -46,8 +46,6 @@ def interval_monte_carlo(
             If true, the alpha-cut samples in the uniform space will be returned as well.
             otherwise, the default is False and only the p-box is returned.
 
-    tip:
-        Independence assumption by now. Dependency structure is at beta developement now.
 
     note:
         When choosing ``interval_strategy``, "direct" requires function signature to take a list of inputs,
