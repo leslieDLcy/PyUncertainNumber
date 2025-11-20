@@ -124,6 +124,18 @@ class Interval(NominalValueMixin):
                 break
         pass
 
+    def __contains__(self, item):
+        """Check if an item is enclosed within the interval.
+
+        example:
+            >>> i = Interval(1,3)
+            >>> 2 in i
+            True
+            >>> 4 in i
+            False
+        """
+        return np.all((item >= self.lo) & (item <= self.hi))
+
     def __next__(self):
         pass
 
