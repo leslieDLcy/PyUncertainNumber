@@ -1,5 +1,4 @@
-
-from calibration import *
+from .calibration import *
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -38,11 +37,9 @@ class KNNCalibrator(Calibrator):
         Seed for reproducibility (affects theta_sampler and resampling).
     """
 
-    def __init__(self,
-                 knn: int = 100,
-                 a_tol: float = 0.05,
-                 evaluate_model: bool = False
-                 ):
+    def __init__(
+        self, knn: int = 100, a_tol: float = 0.05, evaluate_model: bool = False
+    ):
 
         super().__init__()
         self.knn = int(knn)
@@ -51,9 +48,13 @@ class KNNCalibrator(Calibrator):
         self.random_state = 42
 
         # Internal state
-        self._theta_grid: Optional[np.ndarray] = None            # shared grid if evaluate_model=True, else unused
-        self._theta_by_xi: Dict[Tuple[float, ...], np.ndarray] = {}  # per-design θ (may be shared ref)
-        self._y_by_xi: Dict[Tuple[float, ...], np.ndarray] = {}      # per-design y
+        self._theta_grid: Optional[np.ndarray] = (
+            None  # shared grid if evaluate_model=True, else unused
+        )
+        self._theta_by_xi: Dict[Tuple[float, ...], np.ndarray] = (
+            {}
+        )  # per-design θ (may be shared ref)
+        self._y_by_xi: Dict[Tuple[float, ...], np.ndarray] = {}  # per-design y
         self._scaler_by_xi: Dict[Tuple[float, ...], StandardScaler] = {}
         self._neigh_by_xi: Dict[Tuple[float, ...], NearestNeighbors] = {}
         self._grid_idx_by_xi: Dict[Tuple[float, ...], np.ndarray] = {}
@@ -64,7 +65,6 @@ class KNNCalibrator(Calibrator):
         self._sim_theta: Optional[np.ndarray] = None
         self._sim_xi: Optional[np.ndarray] = None
 
-
     # ---------- utilities ----------
     @staticmethod
     def _key_from_xi(xi) -> Tuple[float, ...]:
@@ -72,12 +72,16 @@ class KNNCalibrator(Calibrator):
         return tuple(np.atleast_1d(np.asarray(xi, float)).ravel())
 
     # ---------- setup ----------
-    def setup(self,
-              model: Optional[Callable[[np.ndarray, Union[float, np.ndarray]], np.ndarray]] = None,
-              theta_sampler: Optional[Callable[[int], np.ndarray]] = None,
-              simulated_data: Optional[Dict[str, np.ndarray]] = None,
-              xi_list: Optional[List[Union[float, np.ndarray]]] = None,
-              n_samples: int = 10000):
+    def setup(
+        self,
+        model: Optional[
+            Callable[[np.ndarray, Union[float, np.ndarray]], np.ndarray]
+        ] = None,
+        theta_sampler: Optional[Callable[[int], np.ndarray]] = None,
+        simulated_data: Optional[Dict[str, np.ndarray]] = None,
+        xi_list: Optional[List[Union[float, np.ndarray]]] = None,
+        n_samples: int = 10000,
+    ):
         """
         Prepare per-design kNN structures by either reusing `simulated_data` or by simulating for each design.
 
@@ -107,21 +111,29 @@ class KNNCalibrator(Calibrator):
         if not self.evaluate_model:
             # ---- Reuse provided simulations; filter per design ----
             if simulated_data is None:
-                raise ValueError("evaluate_model=False requires `simulated_data` with keys 'y','theta','xi'.")
+                raise ValueError(
+                    "evaluate_model=False requires `simulated_data` with keys 'y','theta','xi'."
+                )
 
             self._sim_y = np.asarray(simulated_data["y"], float)
             self._sim_theta = np.asarray(simulated_data["theta"], float)
             self._sim_xi = np.asarray(simulated_data.get("xi", None), float)
             if self._sim_xi is None:
-                raise ValueError("`simulated_data` must include 'xi' to filter per design.")
+                raise ValueError(
+                    "`simulated_data` must include 'xi' to filter per design."
+                )
 
             for xi in xi_list:
                 key = self._key_from_xi(xi)
-                mask = np.all(np.abs(self._sim_xi - np.atleast_1d(xi)) < self.a_tol, axis=1)
+                mask = np.all(
+                    np.abs(self._sim_xi - np.atleast_1d(xi)) < self.a_tol, axis=1
+                )
                 y_xi = self._sim_y[mask]
                 theta_xi = self._sim_theta[mask]
                 if y_xi.size == 0:
-                    raise ValueError(f"No simulations matched design {xi} within tolerance a_tol={self.a_tol}.")
+                    raise ValueError(
+                        f"No simulations matched design {xi} within tolerance a_tol={self.a_tol}."
+                    )
                 # drop NaNs rows in y
                 ok = ~np.isnan(y_xi).any(axis=1)
                 y_xi, theta_xi = y_xi[ok], theta_xi[ok]
@@ -139,10 +151,14 @@ class KNNCalibrator(Calibrator):
         else:
             # ---- Evaluate model per design on a shared θ grid ----
             if model is None or theta_sampler is None:
-                raise ValueError("evaluate_model=True requires `model` and `theta_sampler`.")
+                raise ValueError(
+                    "evaluate_model=True requires `model` and `theta_sampler`."
+                )
             self._theta_grid = np.asarray(theta_sampler(int(n_samples)), float)
             if self._theta_grid.ndim != 2:
-                raise ValueError("theta_sampler must return a 2D array (n_samples, dθ).")
+                raise ValueError(
+                    "theta_sampler must return a 2D array (n_samples, dθ)."
+                )
 
             for xi in xi_list:
                 key = self._key_from_xi(xi)
@@ -157,7 +173,9 @@ class KNNCalibrator(Calibrator):
                 y_xi = y_xi[ok]
                 theta_xi = self._theta_grid[ok]
                 grid_idx = np.where(ok)[0]
-                self._grid_idx_by_xi[key] = grid_idx  # maps local row j -> global grid index grid_idx[j]
+                self._grid_idx_by_xi[key] = (
+                    grid_idx  # maps local row j -> global grid index grid_idx[j]
+                )
 
                 if y_xi.size == 0:
                     raise ValueError(f"All simulations at design {xi} had NaNs in y.")
@@ -173,11 +191,13 @@ class KNNCalibrator(Calibrator):
         self.is_ready = True
 
     # ---------- nearest ----------
-    def nearest(self,
-                y: Union[np.ndarray, List[float]],
-                xi: Union[float, np.ndarray],
-                k: Optional[int] = None,
-                return_dist: bool = False):
+    def nearest(
+        self,
+        y: Union[np.ndarray, List[float]],
+        xi: Union[float, np.ndarray],
+        k: Optional[int] = None,
+        return_dist: bool = False,
+    ):
         """
         Return k nearest neighbors for `y` at design `xi`.
 
@@ -201,7 +221,9 @@ class KNNCalibrator(Calibrator):
             raise RuntimeError("Call setup() before nearest().")
         key = self._key_from_xi(xi)
         if key not in self._neigh_by_xi:
-            raise KeyError(f"Design {xi} not in index. Known: {list(self._neigh_by_xi.keys())}")
+            raise KeyError(
+                f"Design {xi} not in index. Known: {list(self._neigh_by_xi.keys())}"
+            )
         y = np.atleast_2d(np.asarray(y, float))
         sc = self._scaler_by_xi[key]
         neigh = self._neigh_by_xi[key]
@@ -214,11 +236,13 @@ class KNNCalibrator(Calibrator):
         return theta_neighbors
 
     # ---------- calibration ----------
-    def calibrate(self,
-                  observations,
-                  resample_n: int | None = None,
-                  combine: str = "stack",
-                  combine_params: dict | None = None):
+    def calibrate(
+        self,
+        observations,
+        resample_n: int | None = None,
+        combine: str = "stack",
+        combine_params: dict | None = None,
+    ):
         """
         kNN calibration with two aggregation modes:
 
@@ -251,17 +275,23 @@ class KNNCalibrator(Calibrator):
         kde_bw = combine_params.get("kde_bandwidth", 0.1)
 
         # ---------------- Collect θ-neighbors for every (y, ξ) ----------------
-        theta_hits = []  # list of (n_i*k, dθ) blocks, one block per y-row (across all designs)
-        for (y_obs, xi) in observations:
+        theta_hits = (
+            []
+        )  # list of (n_i*k, dθ) blocks, one block per y-row (across all designs)
+        for y_obs, xi in observations:
             key = self._key_from_xi(xi)
             if key not in self._neigh_by_xi:
-                raise KeyError(f"Design {xi} not in index. Known: {list(self._neigh_by_xi.keys())}")
+                raise KeyError(
+                    f"Design {xi} not in index. Known: {list(self._neigh_by_xi.keys())}"
+                )
             yo = np.atleast_2d(np.asarray(y_obs, float))
             yo = yo[~np.isnan(yo).any(axis=1)]
             if yo.size == 0:
                 continue
             sc, neigh = self._scaler_by_xi[key], self._neigh_by_xi[key]
-            d, idx = neigh.kneighbors(sc.transform(yo), n_neighbors=self.knn, return_distance=True)
+            d, idx = neigh.kneighbors(
+                sc.transform(yo), n_neighbors=self.knn, return_distance=True
+            )
             # gather θ for this design
             th = self._theta_by_xi[key]
             # flatten all rows’ neighbors for this block
@@ -293,12 +323,24 @@ class KNNCalibrator(Calibrator):
             if resample_n and theta_out.shape[0] > 0:
                 rng = np.random.default_rng(self.random_state)
                 if weights is None:
-                    take = rng.choice(theta_out.shape[0], size=int(resample_n), replace=True)
+                    take = rng.choice(
+                        theta_out.shape[0], size=int(resample_n), replace=True
+                    )
                 else:
-                    take = rng.choice(theta_out.shape[0], size=int(resample_n), replace=True, p=weights)
+                    take = rng.choice(
+                        theta_out.shape[0],
+                        size=int(resample_n),
+                        replace=True,
+                        p=weights,
+                    )
                 theta_out = theta_out[take]
 
-            self._posterior = {"mode": "knn", "theta": theta_out, "weights": weights, "meta": meta}
+            self._posterior = {
+                "mode": "knn",
+                "theta": theta_out,
+                "weights": weights,
+                "meta": meta,
+            }
             return self._posterior
 
         elif combine == "intersect":
@@ -310,7 +352,9 @@ class KNNCalibrator(Calibrator):
             total_blocks = sum(b.shape[0] // self.knn for b in theta_hits)
 
             # Strictness knobs
-            min_frac = float(combine_params.get("min_frac", 0.8))  # keep θ seen in ≥80% of lists
+            min_frac = float(
+                combine_params.get("min_frac", 0.8)
+            )  # keep θ seen in ≥80% of lists
             min_count = combine_params.get("min_count", None)
             if min_count is None:
                 min_count = max(1, int(np.ceil(min_frac * total_blocks)))
@@ -322,36 +366,59 @@ class KNNCalibrator(Calibrator):
 
             # If nothing passed, fall back to TOP-FRACTION
             if theta_out.shape[0] == 0:
-                top_frac = float(combine_params.get("top_frac", 0.1))  # keep top 10% by frequency
+                top_frac = float(
+                    combine_params.get("top_frac", 0.1)
+                )  # keep top 10% by frequency
                 k = max(1, int(np.ceil(top_frac * len(counts))))
                 top_idx = np.argsort(counts)[::-1][:k]
                 theta_out = uniq[top_idx]
                 counts_sel = counts[top_idx].astype(float)
-                meta = {"combine": "intersect", "theta_match_tol": tol,
-                        "min_count": min_count, "min_frac": min_frac,
-                        "fallback": f"top-{top_frac:.2f}"}
+                meta = {
+                    "combine": "intersect",
+                    "theta_match_tol": tol,
+                    "min_count": min_count,
+                    "min_frac": min_frac,
+                    "fallback": f"top-{top_frac:.2f}",
+                }
             else:
-                meta = {"combine": "intersect", "theta_match_tol": tol,
-                        "min_count": min_count, "min_frac": min_frac}
+                meta = {
+                    "combine": "intersect",
+                    "theta_match_tol": tol,
+                    "min_count": min_count,
+                    "min_frac": min_frac,
+                }
 
             # Frequency-based weights (sharpen with gamma)
             weights = None
             if theta_out.shape[0] > 0:
-                gamma = float(combine_params.get("gamma", 1.0))  # 1.0=no sharpen, 2.0=stricter
+                gamma = float(
+                    combine_params.get("gamma", 1.0)
+                )  # 1.0=no sharpen, 2.0=stricter
                 w_counts = counts_sel ** max(gamma, 1e-12)
 
                 # Optional: KDE blending for smoother density
                 if bool(combine_params.get("use_kde", False)):
                     kde_bw = combine_params.get("kde_bandwidth", 0.1)
                     _, w_kde = self._kde_logweights(theta_out, bw=kde_bw)
-                    beta = float(combine_params.get("beta", 1.0))  # blend exponent for KDE
-                    w = w_counts * (w_kde ** beta)
+                    beta = float(
+                        combine_params.get("beta", 1.0)
+                    )  # blend exponent for KDE
+                    w = w_counts * (w_kde**beta)
                     w = np.asarray(w, float)
                     w = w / (w.sum() if w.sum() > 0 else len(w))
                     weights = w
-                    meta.update({"use_kde": True, "kde_bandwidth": kde_bw, "gamma": gamma, "beta": beta})
+                    meta.update(
+                        {
+                            "use_kde": True,
+                            "kde_bandwidth": kde_bw,
+                            "gamma": gamma,
+                            "beta": beta,
+                        }
+                    )
                 else:
-                    w = w_counts / (w_counts.sum() if w_counts.sum() > 0 else len(w_counts))
+                    w = w_counts / (
+                        w_counts.sum() if w_counts.sum() > 0 else len(w_counts)
+                    )
                     weights = w
                     meta.update({"gamma": gamma})
 
@@ -359,17 +426,28 @@ class KNNCalibrator(Calibrator):
             if resample_n and theta_out.shape[0] > 0:
                 rng = np.random.default_rng(self.random_state)
                 if weights is None:
-                    take = rng.choice(theta_out.shape[0], size=int(resample_n), replace=True)
+                    take = rng.choice(
+                        theta_out.shape[0], size=int(resample_n), replace=True
+                    )
                 else:
-                    take = rng.choice(theta_out.shape[0], size=int(resample_n), replace=True, p=weights)
+                    take = rng.choice(
+                        theta_out.shape[0],
+                        size=int(resample_n),
+                        replace=True,
+                        p=weights,
+                    )
                 theta_out = theta_out[take]
 
-            self._posterior = {"mode": "knn", "theta": theta_out, "weights": weights, "meta": meta}
+            self._posterior = {
+                "mode": "knn",
+                "theta": theta_out,
+                "weights": weights,
+                "meta": meta,
+            }
             return self._posterior
 
         else:
             raise ValueError("`combine` must be 'stack' or 'intersect'.")
-
 
     def _round_rows(self, A: np.ndarray, tol: float) -> tuple[np.ndarray, np.ndarray]:
         """
@@ -377,11 +455,14 @@ class KNNCalibrator(Calibrator):
         If tol <= 0, exact matching is used.
         """
         import numpy as _np
+
         A = _np.asarray(A, float)
         if A.size == 0:
             return A.copy(), _np.array([], dtype=int)
         if tol <= 0:
-            uniq, idx, counts = _np.unique(A, axis=0, return_index=True, return_counts=True)
+            uniq, idx, counts = _np.unique(
+                A, axis=0, return_index=True, return_counts=True
+            )
             order = _np.sort(idx)
             uniq = A[order]
             counts = counts[_np.argsort(idx)]
@@ -430,7 +511,6 @@ class KNNCalibrator(Calibrator):
 
         return logp, w
 
-
     # ---------- posterior ----------
     def get_posterior(self) -> Any:
         """Return the last computed posterior dict; raises if calibrate() hasn't been called."""
@@ -439,13 +519,9 @@ class KNNCalibrator(Calibrator):
         return self._posterior
 
 
-
-
-def estimate_p_theta_knn(observed_data,
-                         simulated_data,
-                         xi_star,
-                         knn: int = 20,
-                         a_tol: float =0.05):
+def estimate_p_theta_knn(
+    observed_data, simulated_data, xi_star, knn: int = 20, a_tol: float = 0.05
+):
     """
     Estimate the posterior distribution p(θ) of θ using a k-Nearest Neighbors (kNN)
     filter on a pre-computed simulation archive, conditioned on a design ξ*.
@@ -521,7 +597,9 @@ def estimate_p_theta_knn(observed_data,
     # Step 2: fit a kNN on the (filtered) space of y. Normalize observations
     scaler = StandardScaler()
     if np.any(np.isnan(simulated_data_xi[0])):
-        simulated_data_xi[0] = simulated_data_xi[0][~np.isnan(simulated_data_xi[0]).any(axis=1)]
+        simulated_data_xi[0] = simulated_data_xi[0][
+            ~np.isnan(simulated_data_xi[0]).any(axis=1)
+        ]
 
     scaler.fit(simulated_data_xi[0])
     neigh = NearestNeighbors(n_neighbors=knn)
@@ -533,10 +611,6 @@ def estimate_p_theta_knn(observed_data,
     dist, knn_idx = neigh.kneighbors(scaler.transform(observed_data))
     theta_set = np.vstack([simulated_data_xi[1][idx] for idx in knn_idx])
     return theta_set
-
-
-
-
 
 
 # ----------------------------
@@ -559,7 +633,7 @@ if __name__ == "__main__":
         elif xi.ndim == 2:  # if passed as (n,1)
             xi = xi.ravel()
         y = A * x1**2 + B * x1 * x2 * (1.0 + xi) + C * (x2 + xi) ** 2
-        y = y + 0.2 * np.random.randn(theta.shape[0])   # small noise
+        y = y + 0.2 * np.random.randn(theta.shape[0])  # small noise
         return y.reshape(-1, 1) if theta.shape[0] > 1 else np.array([y.item()])
 
     def theta_sampler(n, lb=-15, ub=15):
@@ -568,7 +642,7 @@ if __name__ == "__main__":
     # --------------- Build observations (unknown process) ---------------
     N_emp = 100
     rng = np.random.default_rng(7)
-    theta_target = rng.normal(3.1, 0.3, size=(N_emp, 2))   # this is unknown in practice
+    theta_target = rng.normal(3.1, 0.3, size=(N_emp, 2))  # this is unknown in practice
     experiment_designs = [-1.0, 0.0, 1.0, 3.0]
 
     observations = []
@@ -587,8 +661,10 @@ if __name__ == "__main__":
     )
 
     #  “intersect”
-    post_joint = calib_joint.calibrate(observations=observations, combine="intersect", resample_n=5000)
-    theta_post_joint = post_joint["theta"]        # (5000, 2) resampled
+    post_joint = calib_joint.calibrate(
+        observations=observations, combine="intersect", resample_n=5000
+    )
+    theta_post_joint = post_joint["theta"]  # (5000, 2) resampled
     # If you wanted grid + weights instead, call with resample_n=None and use post_joint["theta"], post_joint["weights"].
 
     # --------------- SINGLE-DESIGN calibration at xi=0.0 ---------------
@@ -602,7 +678,9 @@ if __name__ == "__main__":
         xi_list=[xi_star],
         n_samples=100_000,
     )
-    post_single = calib_single.calibrate([(y_obs_many, xi_star)], combine="stack")  # pooled kNN
+    post_single = calib_single.calibrate(
+        [(y_obs_many, xi_star)], combine="stack"
+    )  # pooled kNN
     theta_post_many = post_single["theta"]  # shape: (N_emp*knn, 2)
 
     # --------------- Quick nearest() demo ---------------
@@ -613,18 +691,50 @@ if __name__ == "__main__":
     # --------------- PLOTS ---------------
     # 1) Joint posterior (resampled) vs true cloud
     plt.figure(figsize=(6, 5))
-    plt.scatter(theta_post_joint[:, 0], theta_post_joint[:, 1],  s=6, alpha=0.25, label="Joint posterior (vote, resampled)")
-    plt.scatter(theta_target[:, 0], theta_target[:, 1],  c="r", marker="x", s=40, label=r"θ_true samples (unknown)")
+    plt.scatter(
+        theta_post_joint[:, 0],
+        theta_post_joint[:, 1],
+        s=6,
+        alpha=0.25,
+        label="Joint posterior (vote, resampled)",
+    )
+    plt.scatter(
+        theta_target[:, 0],
+        theta_target[:, 1],
+        c="r",
+        marker="x",
+        s=40,
+        label=r"θ_true samples (unknown)",
+    )
     plt.title("Unified kNN: joint combine='vote' over multiple designs")
-    plt.xlabel("θ1"); plt.ylabel("θ2"); plt.legend(); plt.grid(True)
+    plt.xlabel("θ1")
+    plt.ylabel("θ2")
+    plt.legend()
+    plt.grid(True)
     plt.show()
 
     # 2) Single-design posterior (kNN pooled) vs true cloud
     plt.figure(figsize=(6, 5))
-    plt.scatter(theta_post_many[:, 0], theta_post_many[:, 1], s=6, alpha=0.35, label="Single-design posterior (pooled kNN)")
-    plt.scatter(theta_target[:, 0], theta_target[:, 1],  c="r", marker="x", s=40, label=r"θ_true samples (unknown)")
+    plt.scatter(
+        theta_post_many[:, 0],
+        theta_post_many[:, 1],
+        s=6,
+        alpha=0.35,
+        label="Single-design posterior (pooled kNN)",
+    )
+    plt.scatter(
+        theta_target[:, 0],
+        theta_target[:, 1],
+        c="r",
+        marker="x",
+        s=40,
+        label=r"θ_true samples (unknown)",
+    )
     plt.title(f"Unified kNN: single-design at ξ*={xi_star}")
-    plt.xlabel("θ1"); plt.ylabel("θ2"); plt.legend(); plt.grid(True)
+    plt.xlabel("θ1")
+    plt.ylabel("θ2")
+    plt.legend()
+    plt.grid(True)
     plt.show()
 
     # 3) Show the 10 nearest θ for one observed y at xi=1.0 (sanity check)

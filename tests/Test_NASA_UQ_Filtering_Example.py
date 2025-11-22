@@ -5,17 +5,25 @@ import os
 from pathlib import Path
 import time
 
-from Iterative_Filtering import iterative_filter
+from pyuncertainnumber.calibration.iterative_filtering import iterative_filter
+
+""" hint:
+This testing script requires the simulation model executable 'local_model_windows.exe' to be present in the same directory as this script.
+Therefore, I will test it elsewhere since the executable is not going to ship with the repository.
+"""
+
 
 def NASA_UQ_Function(input_file_path, nsamples, nconditions):
     # This section needs to be written as a function that executes the function or model being used
-    exe_path = os.path.abspath(Path(__file__).parent / "local_model_windows.exe")  # Path to the executable in the current folder
+    exe_path = os.path.abspath(
+        Path(__file__).parent / "local_model_windows.exe"
+    )  # Path to the executable in the current folder
     command = [exe_path, input_file_path]
-    print('Simulation executable has been called.')
+    print("Simulation executable has been called.")
     result = subprocess.run(command, capture_output=True, text=True)
-    output_file_path = 'Y_out.csv'
+    output_file_path = "Y_out.csv"
     df = pd.read_csv(output_file_path, header=None)
-    print(f'Simulation output data loaded from {output_file_path}')
+    print(f"Simulation output data loaded from {output_file_path}")
 
     sample_indices = df[6].unique()  # Extract unique sample indices
     num_samples = len(sample_indices)
@@ -23,51 +31,100 @@ def NASA_UQ_Function(input_file_path, nsamples, nconditions):
     # df.to_csv(f'./{folder}/Y_out_Level{Iteration}_{repetitions}.csv',header=False,index=False) #stores the full output file (optional)
     Y_out = df.to_numpy().reshape(num_samples, 60, 6).transpose(1, 2, 0)
 
-    epsilon = 1e-14 #Small constant to avoid division by zero
-    y4y5 = (Y_out[10,3,:]/(Y_out[10,4,:]+epsilon)) #Get the simulation y ratios for all samples.
-    y4y6 = (Y_out[10,3,:]/(Y_out[10,5,:]+epsilon))
-    y5y6 = (Y_out[10,4,:]/(Y_out[10,5,:]+epsilon))
-    
-    y4y5 = np.reshape(y4y5,[nsamples,nconditions]) #Reshape each y threshold matrix into one where all conditions are in one line.
-    y4y6 = np.reshape(y4y6,[nsamples,nconditions])
-    y5y6 = np.reshape(y5y6,[nsamples,nconditions])
+    epsilon = 1e-14  # Small constant to avoid division by zero
+    y4y5 = Y_out[10, 3, :] / (
+        Y_out[10, 4, :] + epsilon
+    )  # Get the simulation y ratios for all samples.
+    y4y6 = Y_out[10, 3, :] / (Y_out[10, 5, :] + epsilon)
+    y5y6 = Y_out[10, 4, :] / (Y_out[10, 5, :] + epsilon)
 
-    y_out = np.empty([3,nsamples,nconditions])
+    y4y5 = np.reshape(
+        y4y5, [nsamples, nconditions]
+    )  # Reshape each y threshold matrix into one where all conditions are in one line.
+    y4y6 = np.reshape(y4y6, [nsamples, nconditions])
+    y5y6 = np.reshape(y5y6, [nsamples, nconditions])
+
+    y_out = np.empty([3, nsamples, nconditions])
     y_out[0] = y4y5
     y_out[1] = y4y6
     y_out[2] = y5y6
 
     return y_out
 
-'''Base and first query example'''
+
+"""Base and first query example"""
 
 variables = {
-    'names': ['a1','a2','e1','e2','e3','c1','c2','c3','s'],
-    'number_type': ['float','float','float','float','float','float','float','float','int'],
-    'b': [[0,1],[0,1],[0,1],[0,1],[0,1],[0.533,0.533],[0.666,0.666],[0.5,0.5],[0,1000000]],
-    's1': [[0,1],[0,1],[0,1],[0,1],[0,1],[0.052632,0.052632],[0.421053,0.421053],[0.631579,0.631579],[0,1000000]]
+    "names": ["a1", "a2", "e1", "e2", "e3", "c1", "c2", "c3", "s"],
+    "number_type": [
+        "float",
+        "float",
+        "float",
+        "float",
+        "float",
+        "float",
+        "float",
+        "float",
+        "int",
+    ],
+    "b": [
+        [0, 1],
+        [0, 1],
+        [0, 1],
+        [0, 1],
+        [0, 1],
+        [0.533, 0.533],
+        [0.666, 0.666],
+        [0.5, 0.5],
+        [0, 1000000],
+    ],
+    "s1": [
+        [0, 1],
+        [0, 1],
+        [0, 1],
+        [0, 1],
+        [0, 1],
+        [0.052632, 0.052632],
+        [0.421053, 0.421053],
+        [0.631579, 0.631579],
+        [0, 1000000],
+    ],
 }
 
 conditions = {
-    'names': ['b','s1'], #condition vector names (for saving files and getting how many conditions are used)
-    'values': [[2.031260556,1.746109960],  #y4y5 ratio values
-                 [2.408021879,3.429627891],  #y4y6 ratio values
-                 [1.185481534,1.964153444]]  #y5y6 ratio values
+    "names": [
+        "b",
+        "s1",
+    ],  # condition vector names (for saving files and getting how many conditions are used)
+    "values": [
+        [2.031260556, 1.746109960],  # y4y5 ratio values
+        [2.408021879, 3.429627891],  # y4y6 ratio values
+        [1.185481534, 1.964153444],
+    ],  # y5y6 ratio values
 }
 
-#True epistemic values to aim for: 0.335, 0.596, 0.375
+# True epistemic values to aim for: 0.335, 0.596, 0.375
 
-folder = './Samples_15_09_b' #Change as needed for new runs
+folder = "./Samples_15_09_b"  # Change as needed for new runs
 # os.mkdir(folder)
 
-thresholds = [0.5,0.5,0.3,0.2,0.1,0.05] #Arbitrary ratio list
+thresholds = [0.5, 0.5, 0.3, 0.2, 0.1, 0.05]  # Arbitrary ratio list
 
 tic = time.perf_counter()
-iterative_filter(NASA_UQ_Function,variables,500,thresholds,conditions,folder,index=[2,3,4],controls=[5,6,7])
+iterative_filter(
+    NASA_UQ_Function,
+    variables,
+    500,
+    thresholds,
+    conditions,
+    folder,
+    index=[2, 3, 4],
+    controls=[5, 6, 7],
+)
 toc = time.perf_counter()
-print(toc-tic)
+print(toc - tic)
 
-'''Base and all queries example'''
+"""Base and all queries example"""
 
 # conditions = {
 #     'names': ['b','s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'], #condition vector names (for saving files and getting how many conditions are used)
