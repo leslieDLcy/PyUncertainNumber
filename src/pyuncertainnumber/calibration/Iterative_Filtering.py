@@ -3,24 +3,37 @@ import random as rd
 
 
 def iterative_filter(
-    func,
-    variables,
-    nsamples,
-    thresholds,
-    conditions,
-    folder,
-    max_repetitions=3,
-    index=None,
-    controls=None,
+    func: callable,
+    variables: dict,
+    nsamples: int,
+    thresholds: list,
+    conditions: dict,
+    folder: str,
+    max_repetitions: int = 3,
+    index: list = None,
+    controls: list = None,
 ):
-    """func is the function being used to get the outputs.
-    variables is a dictionary that contains the names and bounds of all variables within the function.
-    nsamples is the number of samples taken for each variable.
-    thresholds are the set of filter values that the conditions will need to meet.
-    conditions are a set/dictionary of optimal/correct values that the outputs of interest will need to meet.
-    folder is where all outputs of this function will be stored in.
-    index is a list of indexes referring to the list of variables that are being filtered.
-    controls are the list of indexes referring to the variables whose values are unique to the condition being used.
+    """Performs the iterative filtering calibration method on a given function with uncertain inputs.
+
+    args:
+
+        func (callable): the function being analysed and used to get the outputs.
+
+        variables (dict): a dictionary that contains the names and bounds of all variables within the function.
+
+        nsamples (int): the number of samples taken for each variable.
+
+        thresholds (list): the set of threshold filter values that the conditions will need to meet.
+
+        conditions (dict): a dictionary of 'correct' values that the outputs of interest will need to meet.
+
+        folder (str): where all outputs of this function will be stored in.
+
+        max_repetitions (int): how many repetitions are allowed at a singular threshold value before stopping the process.
+
+        index (list): a list of indexes referring to the list of variables that are being filtered.
+
+        controls (list): a list of indexes referring to the variables whose values are unique to their condition and must be generated separately.
     """
 
     if (
