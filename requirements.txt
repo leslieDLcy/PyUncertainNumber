@@ -14,3 +14,4 @@ bayesian-optimization==2.0.4
 geneticalgorithm==1.0.2
 jax==0.4.35
 SALib
+json5
