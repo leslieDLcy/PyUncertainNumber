@@ -17,32 +17,29 @@ import time
 import numpy as np
 import pickle
 import logging
-
+import scipy.stats as sps
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
 
-# class prior_uniform:
-#     """uniform prior class"""
+class prior_uniform:
+    # TODO: add a new Half Cauchy prior
+    def __init__(self, lb, ub):
+        self.lb = lb
+        self.ub = ub
+        self.dist = sps.uniform(
+            loc=self.lb, scale=self.ub - self.lb
+        )  # Define the uniform distribution
 
-#     def __init__(self, lb, ub, name=None):
-#         self.lb = lb
-#         self.ub = ub
-#         self.name = name
-#         self.dist = uniform(
-#             loc=self.lb, scale=self.ub - self.lb
-#         )  # Define the uniform distribution
+    def generate_rns(self, N):
+        return np.random.uniform(self.lb, self.ub, N)
 
-#     def generate_rns(self, N):
-#         return np.random.uniform(self.lb, self.ub, N)
-
-#     def log_pdf_eval(self, x):
-#         if np.all(x >= self.lb) and np.all(
-#             x <= self.ub
-#         ):  # Check if x is within the bounds
-#             return self.dist.logpdf(x).sum()  # Sum log-PDF values for all dimensions
-#         else:
-#             return -np.inf  # Return negative infinity if x is out of bounds
+    def log_pdf_eval(self, x):
+        # Check if x is within the bounds
+        if np.all(x >= self.lb) and np.all(x <= self.ub):
+            return self.dist.logpdf(x).sum()  # Sum log-PDF values for all dimensions
+        else:
+            return -np.inf  # Return negative infinity if x is out of bounds
 
 
 def recover_trace_results(mytrace, names) -> pd.DataFrame:
@@ -412,41 +409,39 @@ def MCMC_MH(
 
 
 def run_tmcmc(
-    N,
-    all_pars,
-    log_likelihood,
-    parallel_processing,
-    status_file_name,
-    Nm_steps_max=5,
-    Nm_steps_maxmax=5,
+    N: int,
+    all_pars: list,
+    log_likelihood: callable,
+    status_file_name: str,
+    Nm_steps_max: int = 5,
+    Nm_steps_maxmax: int = 5,
+    parallel_processing: str = "multiprocessing",
 ):
-    """
-    main function to run transitional mcmc
+    """Main workflow of running Transitional MCMC
 
-    Parameters
-    ----------
-    N : int
-        number of particles to be sampled from posterior
-    all_pars : list of (size Np) prior distributions
-        Np is number of epistemic parameters
-        all_pars[i] is object of type pdfs
-        all parameters to be inferred
-    log_likelihood : function
-        log likelihood function to be defined in main.py as is problem specific
-    parallel_processing : string
-        should be either 'multiprocessing' or 'mpi'
-    status_file_name : string
-        name of the status file to store status of the tmcmc sampling
-    Nm_steps_max : int, optional
-        Numbers of MCMC steps for pertubation. The default is 5.
-    Nm_steps_maxmax : int, optional
-        Numbers of MCMC steps for pertubation. The default is 5.
+    args:
+        N  (int) : int
+            number of particles to be sampled from posterior
 
-    Returns
-    -------
-    mytrace: returns trace file of all samples of all tmcmc stages.
-        at stage m: it contains [Sm, Lm, Wm_n, ESS, beta, Smcap]
-        comm: if parallel_processing is mpi
+        all_pars (list) : list of (size Nop) prior distributions instances
+            Nop is number of epistemic parameters
+            all_pars[i] is object of type pdfs
+            all parameters to be inferred
+
+        log_likelihood (callable): log likelihood function to be defined in main.py as is problem specific
+
+        status_file_name (str): name of the status file to store status of the tmcmc sampling
+
+        Nm_steps_max (int, optional): Numbers of MCMC steps for perturbation. The default is 5.
+
+        Nm_steps_maxmax (int, optional): Numbers of MCMC steps for perturbation. The default is 5.
+
+        parallel_processing (str): should be either 'multiprocessing' or 'mpi'
+
+    returns:
+        mytrace: returns trace file of all samples of all tmcmc stages.
+            at stage m: it contains [Sm, Lm, Wm_n, ESS, beta, Smcap]
+            comm: if parallel_processing is mpi
 
     """
     # side note: make all_pars as ordered dict in the future
