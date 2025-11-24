@@ -68,6 +68,7 @@ def _parametric_bounds_array(dist_family, *args, **kwargs):
         new_args = itertools.product(*[i.to_numpy() for i in i_args])
 
     dist = named_dists[dist_family]
+    print(type(dist))
     g1, g2 = itertools.tee(new_args, 2)
     bounds = [dist.ppf(Params.p_values, *a) for a in g1]
     stats = [dist.stats(*a, moments="mv") for a in g2]
@@ -88,6 +89,11 @@ def _parametric_bounds_array(dist_family, *args, **kwargs):
 @makePbox
 def norm(*args):
     return "norm"
+
+
+@makePbox
+def lognormal(*args):
+    return "lognormal"
 
 
 @makePbox
@@ -900,7 +906,7 @@ def zipfian(*args):
 # *---------------------aliases---------------------*#
 normal = norm
 gaussian = norm
-lognormal = lognormal_weird
+# lognormal = lognormal_weird
 
 # *---------------------named pboxes for UN ---------------------*#
 named_pbox = {
@@ -967,7 +973,7 @@ named_pbox = {
     "logistic": logistic,
     "loggamma": loggamma,
     "loglaplace": loglaplace,
-    "lognormal": lognormal_weird,
+    "lognormal": lognormal,
     "loguniform": loguniform,
     "lomax": lomax,
     "maxwell": maxwell,
