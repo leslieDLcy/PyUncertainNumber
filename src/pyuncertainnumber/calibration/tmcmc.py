@@ -49,7 +49,11 @@ class TMCMC:
         self.status_file_name = status_file_name
 
     def run(self):
-        """Run the TMCMC algorithm"""
+        """Run the TMCMC algorithm
+
+        returns:
+            mytrace: returns trace file of all samples of all tmcmc stages.
+        """
 
         mytrace, _ = run_tmcmc(
             self.N,
