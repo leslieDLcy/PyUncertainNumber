@@ -48,6 +48,9 @@ class TMCMC:
         self.log_likelihood = log_likelihood
         self.status_file_name = status_file_name
 
+    def run(self):
+        """Run the TMCMC algorithm"""
+
         mytrace, _ = run_tmcmc(
             self.N,
             all_pars=self.parameters,
