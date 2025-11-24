@@ -161,7 +161,7 @@ def plot_updated_distribution(mytrace, names, save=False):
     # names = ["Xe_1", "Xe_2", "Xe_3", "Xa1_mu", "Xa2_mu", "Xa1_std", "Xa2_std"]
     df1 = pd.DataFrame(mytrace[0][0], columns=names)  # samples from prior
     df2 = pd.DataFrame(
-        mytrace[-1][-1], columns=names
+        mytrace[-1][0], columns=names
     )  # samples from last step posterior
 
     # Add a column to identify the source
