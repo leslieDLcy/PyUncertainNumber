@@ -1,16 +1,12 @@
 from numpy.typing import ArrayLike
 
 """
-main file to test transitional mcmc implementation
-example: 2D0F system
+Test file for `tmcmc` implementation on a simple example of 2D0F system
 
 To execute this file:
 
 - use following command on cmd promt if parallel_processing = 'multiprocessing'
     python main_2DOF.py
-
-- use following command on cmd promt if parallel_processing = 'mpi'
-    mpiexec -n 8 python -m mpi4py.futures main_2DOF.py
 """
 
 import numpy as np
@@ -30,7 +26,7 @@ data2 = np.array([2.3614, 2.5877, 2.7070, 2.3875, 2.7272])
 data3 = np.array([1.68245252, 1.71103903, 1.57876073, 1.58722342, 1.61878479])
 
 # number of particles (to approximate the posterior)
-Np = 500
+N = 500
 
 # prior distribution of parameters
 k1 = pdfs.Uniform(lower=0.8, upper=2.2)
@@ -76,11 +72,11 @@ if __name__ == "__main__":
     """main part to run tmcmc for the 2DOF example"""
 
     mytrace, comm = run_tmcmc(
-        Np, all_pars, log_likelihood, parallel_processing, "status_file_2DOF.txt"
+        N, all_pars, log_likelihood, parallel_processing, "status_file_2DOF.txt"
     )
 
     # save results
-    with open("mytrace.pickle", "wb") as handle1:
+    with open("mytrace.pkl", "wb") as handle1:
         pickle.dump(mytrace, handle1, protocol=pickle.HIGHEST_PROTOCOL)
 
     if parallel_processing == "mpi":
