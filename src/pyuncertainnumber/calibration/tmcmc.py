@@ -18,6 +18,7 @@ import numpy as np
 import pickle
 import logging
 import scipy.stats as sps
+from ..console import console
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
@@ -406,9 +407,9 @@ def MCMC_MH(
     all_PLP = []
 
     deltas = propose(np.zeros(len(current)), Em, Nm_steps)
-    logging.info(
-        f"MCMC_MH: running for particle_num = {particle_num}, .... N chains {Nm_steps}"
-    )
+    # logging.info(
+    #     f"MCMC_MH: running for particle_num = {particle_num}, .... N chains {Nm_steps}"
+    # )
 
     for j2 in range(Nm_steps):
         delta = deltas[j2]
@@ -548,15 +549,16 @@ def run_tmcmc(
 
         # adaptivly compute beta s.t. ESS = N/2 or ESS = 0.95*prev_ESS
         # plausible weights of Sm corresponding to new beta
-        logging.info(f"'Computing beta the weights ...")
+        # logging.info(f"'Computing beta the weights ...")
 
         beta, log_evidence, Wm_n, ESS = compute_beta_update_evidence(
             beta, Lm, log_evidence, ESS
         )
 
-        logging.info(
-            f"TMCMC Iteration stage {stage_num}: Tempering parameter updated to {beta:.6f}"
+        console.log(
+            f"[bold green]TMCMC Iteration stage {stage_num}: Tempering parameter updated to {beta:.6f}[/bold green]"
         )
+
         # Calculate covaraince matrix using Wm_n
         Cm = np.cov(Sm, aweights=Wm_n, rowvar=0)
 
