@@ -56,24 +56,24 @@ class TMCMC:
         return mytrace
 
 
-class prior_uniform:
-    # TODO: add a new Half Cauchy prior
-    def __init__(self, lb, ub):
-        self.lb = lb
-        self.ub = ub
-        self.dist = sps.uniform(
-            loc=self.lb, scale=self.ub - self.lb
-        )  # Define the uniform distribution
+# class prior_uniform:
+#     # TODO: add a new Half Cauchy prior
+#     def __init__(self, lb, ub):
+#         self.lb = lb
+#         self.ub = ub
+#         self.dist = sps.uniform(
+#             loc=self.lb, scale=self.ub - self.lb
+#         )  # Define the uniform distribution
 
-    def generate_rns(self, N):
-        return np.random.uniform(self.lb, self.ub, N)
+#     def generate_rns(self, N):
+#         return np.random.uniform(self.lb, self.ub, N)
 
-    def log_pdf_eval(self, x):
-        # Check if x is within the bounds
-        if np.all(x >= self.lb) and np.all(x <= self.ub):
-            return self.dist.logpdf(x).sum()  # Sum log-PDF values for all dimensions
-        else:
-            return -np.inf  # Return negative infinity if x is out of bounds
+#     def log_pdf_eval(self, x):
+#         # Check if x is within the bounds
+#         if np.all(x >= self.lb) and np.all(x <= self.ub):
+#             return self.dist.logpdf(x).sum()  # Sum log-PDF values for all dimensions
+#         else:
+#             return -np.inf  # Return negative infinity if x is out of bounds
 
 
 def recover_trace_results(mytrace, names) -> pd.DataFrame:
