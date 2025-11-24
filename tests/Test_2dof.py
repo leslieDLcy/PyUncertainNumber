@@ -72,7 +72,7 @@ if __name__ == "__main__":
     """main part to run tmcmc for the 2DOF example"""
 
     mytrace, comm = run_tmcmc(
-        N, all_pars, log_likelihood, parallel_processing, "status_file_2DOF.txt"
+        N, all_pars, log_likelihood, status_file_name="status_file_2DOF.txt"
     )
 
     # save results
