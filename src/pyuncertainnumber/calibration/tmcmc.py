@@ -22,6 +22,40 @@ import scipy.stats as sps
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
 
+class TMCMC:
+    """Class for TMCMC implementation
+
+    args:
+        N (int) : number of particles to be sampled from posterior
+
+        parameters (list) : list of (size Nop) prior distributions instances
+
+        log_likelihood (callable): log likelihood function to be defined in main.py as is problem specific
+
+        status_file_name (str): name of the status file to store status of the tmcmc sampling
+
+    return:
+        mytrace: returns trace file of all samples of all tmcmc stages.
+            At stage m: it contains [Sm, Lm, Wm_n, ESS, beta, Smcap]
+    """
+
+    def __init__(
+        self, N: int, parameters: list, log_likelihood: callable, status_file_name: str
+    ):
+        self.N = N
+        self.parameters = parameters
+        self.log_likelihood = log_likelihood
+        self.status_file_name = status_file_name
+
+        mytrace, _ = run_tmcmc(
+            self.N,
+            all_pars=self.parameters,
+            log_likelihood=self.log_likelihood,
+            status_file_name=self.status_file_name,
+        )
+        return mytrace
+
+
 class prior_uniform:
     # TODO: add a new Half Cauchy prior
     def __init__(self, lb, ub):
