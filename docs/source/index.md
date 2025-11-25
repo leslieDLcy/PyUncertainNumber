@@ -93,7 +93,7 @@ b = pun.normal([10,14], [1])
 a - b * a + b**2
 ```
 
-Besides, [many propagation methodologies](https://pyuncertainnumber.readthedocs.io/en/latest/guides/up.html) are provided to rigorously propgate the uncertainty through the computational pipeline, intrusively or non-intrusively.
+Besides, [many propagation methodologies](https://pyuncertainnumber.readthedocs.io/en/latest/guides/up.html) are provided to rigorously propagate the uncertainty through the computational pipeline, intrusively or non-intrusively.
 
 ```python
 # specify a response function
