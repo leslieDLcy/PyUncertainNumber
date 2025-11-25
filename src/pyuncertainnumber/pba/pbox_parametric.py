@@ -91,6 +91,11 @@ def norm(*args):
 
 
 @makePbox
+def lognormal(*args):
+    return "lognormal"
+
+
+@makePbox
 def alpha(*args):
     return "alpha"
 
@@ -900,7 +905,7 @@ def zipfian(*args):
 # *---------------------aliases---------------------*#
 normal = norm
 gaussian = norm
-lognormal = lognormal_weird
+# lognormal = lognormal_weird
 
 # *---------------------named pboxes for UN ---------------------*#
 named_pbox = {
@@ -967,7 +972,7 @@ named_pbox = {
     "logistic": logistic,
     "loggamma": loggamma,
     "loglaplace": loglaplace,
-    "lognormal": lognormal_weird,
+    "lognormal": lognormal,
     "loguniform": loguniform,
     "lomax": lomax,
     "maxwell": maxwell,

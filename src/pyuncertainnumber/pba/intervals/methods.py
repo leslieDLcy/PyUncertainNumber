@@ -29,8 +29,10 @@ from __future__ import annotations
 from typing import Sequence, Sized, Iterable, Optional, Any, Tuple, Union
 from itertools import product
 import numpy
+import numpy as np
 from numpy import ndarray, asarray, vstack, linspace, zeros, argmax
 from .number import Interval, MACHINE_EPS, lo, hi, width, mid
+import json
 
 numpy_min = numpy.min
 numpy_max = numpy.max
@@ -127,6 +129,15 @@ def min(x: Interval, y: Interval):
         return numpy.min((x, y), axis=0)
     a = numpy.min((lo(x), lo(y)), axis=0)
     b = numpy.min((hi(x), hi(y)), axis=0)
+    return Interval(a, b)
+
+
+def env(x: Interval, y: Interval):
+    """Return the envelope interval containing both x and y."""
+    if all([is_not_Interval(x), is_not_Interval(y)]):
+        return numpy.array([numpy.min((x, y)), numpy.max((x, y))])
+    a = numpy.min((lo(x), lo(y)), axis=0)
+    b = numpy.max((hi(x), hi(y)), axis=0)
     return Interval(a, b)
 
 
@@ -954,3 +965,22 @@ def unpack(x: Interval) -> list[Interval]:
 
     if len(x) >= 0:
         return [item for item in x]
+
+
+# * ----------------------------------- reload from json
+def load_interval_from_json(filename: str) -> Interval:
+    """Load a NumPy array from a JSON file saved by save_array_to_json().
+
+    note:
+        Both .json and .json5 files are supported.
+
+    example:
+        >>> interval = load_interval_from_json("interval_data.json5")
+    """
+    import json5
+
+    with open(filename, "r") as f:
+        data = json5.load(f)
+    array = np.array(data, dtype=float)
+    the_I = intervalise(array)
+    return the_I

@@ -11,7 +11,10 @@
 # from intervals.methods import (lo,hi,width,rad,mag,straddlezero,isinterval)
 
 from __future__ import annotations
+from fileinput import filename
 from typing import Optional, Any, Union
+from pathlib import Path
+import json5
 import numpy as np
 import numpy
 from numpy import ndarray, asarray, stack, transpose, zeros
@@ -20,6 +23,7 @@ import matplotlib.pyplot as plt
 from .utils import safe_asarray
 from ..mixins import NominalValueMixin
 from .arithmetic import multiply, divide
+
 
 MACHINE_EPS = 7.0 / 3 - 4.0 / 3 - 1
 
@@ -119,6 +123,18 @@ class Interval(NominalValueMixin):
             except StopIteration:
                 break
         pass
+
+    def __contains__(self, item):
+        """Check if an item is enclosed within the interval.
+
+        example:
+            >>> i = Interval(1,3)
+            >>> 2 in i
+            True
+            >>> 4 in i
+            False
+        """
+        return np.all((item >= self.lo) & (item <= self.hi))
 
     def __next__(self):
         pass
@@ -512,10 +528,39 @@ class Interval(NominalValueMixin):
             half_width = np.asarray(half_width)
             return cls(lo=x - half_width, hi=x + half_width)
 
+    def save_json(
+        self, filename: str, comment: str = None, save_dir: str | Path = "."
+    ) -> None:
+        """
+        Save the interval object to a JSON5 file.
+
+        Args:
+            filename (str): The name of the file (without extension) to save the interval object to.
+            comment (str, optional): A comment to include at the top of the file.
+            save_dir (str | Path, optional): Directory where the file should be saved. Defaults to current directory.
+
+        Note:
+            The file is saved with a `.json5` extension.
+
+        Example:
+            >>> a.save_json("interval_data", comment="This is interval data", save_dir="results/")
+        """
+        # Ensure save_dir is a Path object and create directory if missing
+        save_path = Path(save_dir)
+        save_path.mkdir(parents=True, exist_ok=True)
+
+        # Construct the full path with .json5 extension
+        file_path = save_path / f"{filename}.json5"
+
+        data = self.to_numpy().tolist()
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            if comment:
+                f.write(f"// {comment}\n")
+            json5.dump(data, f, indent=2)
+
 
 # * -------------- lightweight Interval
-
-import numpy as np
 
 
 """ for more compatability with possibility of newer additions """

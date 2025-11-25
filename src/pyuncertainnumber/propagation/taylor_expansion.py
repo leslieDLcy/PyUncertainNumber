@@ -28,12 +28,12 @@ def taylor_expansion_method(func, mean, *, var=None, cov=None) -> tuple:
 
 
     example:
-    >>> import jax.numpy as jnp
-    >>> from pyuncertainnumber import taylor_expansion_method
-    >>> MEAN= jnp.array([3., 2.5])
-    >>> COV = jnp.array([[4, 0.3], [0.3, 0.25]])
-    >>> def bar(x): return x[0]**2 + x[1] + 3
-    >>> mu_, var_ = taylor_expansion_method(func=bar, mean=MEAN, cov=COV)
+        >>> import jax.numpy as jnp
+        >>> from pyuncertainnumber import taylor_expansion_method
+        >>> MEAN= jnp.array([3., 2.5])
+        >>> COV = jnp.array([[4, 0.3], [0.3, 0.25]])
+        >>> def bar(x): return x[0]**2 + x[1] + 3
+        >>> mu_, var_ = taylor_expansion_method(func=bar, mean=MEAN, cov=COV)
 
     """
     if mean.ndim == 1:  # random vector

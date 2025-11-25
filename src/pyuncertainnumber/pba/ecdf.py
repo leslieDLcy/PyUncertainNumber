@@ -62,6 +62,7 @@ def pl_ecdf_bounding_bundles(
     alpha=None,
     linestyle=None,
     linewidth=None,
+    return_ax=False,
 ):
     if ax is None:
         fig, ax = plt.subplots()
@@ -113,6 +114,9 @@ def pl_ecdf_bounding_bundles(
         ax.set_title(title)
     if legend:
         ax.legend()
+
+    if return_ax:
+        return ax
 
 
 def ecdf(d):

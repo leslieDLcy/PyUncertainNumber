@@ -42,6 +42,16 @@ def test_env_pbox():
     assert b in t
 
 
+def test_env_intervals():
+    a = pba.I(2, 6)
+    b = pba.I(-2, 9)
+    t = pba.envelope(a, b)
+
+    assert isinstance(t, pba.Interval)
+    # assert a in t
+    # assert b in t
+
+
 # * ----------------------- imposition operation
 
 

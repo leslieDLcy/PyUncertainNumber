@@ -45,6 +45,11 @@ def envelope(
     """
 
     from ..characterisation.uncertainNumber import UncertainNumber
+    from .intervals.methods import is_Interval, env
+
+    if all([is_Interval(un) for un in l_uns]):
+        e = functools.reduce(env, l_uns)
+        return e
 
     def binary_env(p1, p2):
         return p1.env(p2)

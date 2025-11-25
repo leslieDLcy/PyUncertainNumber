@@ -14,7 +14,7 @@
 
 Scientific computations of complex systems are surrounded by various forms of uncertainty,  requiring appropriate treatment to maximise the credibility of computations. Empirical information for characterisation is often scarce, vague, conflicting and imprecise, requiring expressive uncertainty structures for trustful representation, aggregation and propagation.
 
-This package is underpined by a framework of ***uncertain number*** which allows for a closed computation ecosystem whereby trustworthy computations can be conducted in a rigorous manner. <ins>It provides capabilities across the typical uncertainty analysis pipeline, encompassing characterisation, aggregation, propagation, and applications including reliability analysis and optimisation under uncertainty, especailly with a focus on imprecise probabilities.</ins>
+This package is underpinned by a framework of ***uncertain number*** which allows for a closed computation ecosystem whereby trustworthy computations can be conducted in a rigorous manner. <ins>It provides capabilities across the typical uncertainty analysis pipeline, encompassing characterisation, aggregation, propagation, and applications including reliability analysis and optimisation under uncertainty, especially with a focus on imprecise probabilities.</ins>
 
 > ***Uncertain Number*** refers to a generalised representation that unifies several uncertainty constructs including real numbers, intervals, probability distributions, interval bounds on probability distributions (i.e. [probability boxes](https://en.wikipedia.org/wiki/Probability_box)), and [finite DempsterShafer structures](https://en.wikipedia.org/wiki/Dempster–Shafer_theory). It is mostly suitable for managing mixed types of uncertainties.
 
@@ -22,9 +22,10 @@ This package is underpined by a framework of ***uncertain number*** which allows
 
 ## Getting started
 
-Explore the [documentation](https://pyuncertainnumber.readthedocs.io/en/latest/index.html) to get started, featuring hands-on [tutorials](https://pyuncertainnumber.readthedocs.io/en/latest/getting_started.html) and in-depth [examples](https://pyuncertainnumber.readthedocs.io/en/latest/examples/index.html) that showcase the power of the package.
+Explore the [documentation](https://pyuncertainnumber.readthedocs.io/en/latest/index.html) to get started, featuring hands-on [tutorials](https://pyuncertainnumber.readthedocs.io/en/latest/tutorials/index.html) and in-depth [examples](https://pyuncertainnumber.readthedocs.io/en/latest/examples/index.html) that showcase the power of the package.
 
-`pyuncertainnumber` exposes APIs at different levels. It features high-level APIs best suited for new users to quickly start with uncertainty computations with [*uncertain numbers*], and also low-level APIs allowing experts to have additional controls over mathematical constructs such as p-boxes, Dempster Shafer structures, probability distibutions, etc.
+
+>`pyuncertainnumber` exposes APIs at different levels. It features high-level APIs best suited for new users to quickly start with uncertainty computations with [*uncertain numbers*](https://pyuncertainnumber.readthedocs.io/en/latest/tutorials/what_is_un.html), and also low-level APIs allowing experts to have additional controls over mathematical constructs such as p-boxes, Dempster Shafer structures, probability distributions, etc.
 
 
 ## Installation
@@ -41,7 +42,7 @@ pip install pyuncertainnumber
   <img src="./assets/up_flowchart.png" alt="Logo" width="1000"/>
 </p>
 
-- `PyUncertainNumber` is a Python package for generic computational tasks focussing on **rigourou uncertainty analysis**, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation.
+- `PyUncertainNumber` is a Python package for generic computational tasks focussing on **rigorous uncertainty analysis**, which provides a research-grade computing environment for uncertainty characterisation, propagation, validation and uncertainty extrapolation.
 - `PyUncertainNumber` supports [probability bounds analysis](https://en.wikipedia.org/wiki/Probability_bounds_analysis) to rigorously bound the prediction for the quantity of interest with mixed uncertainty propagation.
 - `PyUncertainNumber` also features great **natural language support** as such characterisatin of input uncertainty can be intuitively done by using natural language like `about 7` or simple expression like `[15 +- 10%]`, without worrying about the elicitation.
 - Interoperability via serialization: features the save and loading of Uncertain Number objects to work with downstream applications.
@@ -50,10 +51,10 @@ pip install pyuncertainnumber
 ## UQ multiverse
 
 UQ is a big world (like Marvel multiverse) consisting of abundant theories and software implementations on multiple platforms. We focus mainly on the imprecise probability frameworks. Some notable examples include [OpenCossan](https://github.com/cossan-working-group/OpenCossan), [UQlab](https://www.uqlab.com/) in Matlab and [UncertaintyQuantification.jl](https://github.com/FriesischScott/UncertaintyQuantification.jl), [ProbabilityBoundsAnalysis.jl](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl) in Julia, and many others of course. 
-`PyUncertainNumber` is rooted in Python and has close ties with the Python scientific computing ecosystem, it builds upon and greatly extends a few pioneering projects, such as [intervals](https://github.com/marcodeangelis/intervals), [scipy-stats](https://docs.scipy.org/doc/scipy/tutorial/stats.html) and [pba-for-python](https://github.com/Institute-for-Risk-and-Uncertainty/pba-for-python) to generalise probability and interval arithmetic. Beyond arithmetics, `PyUncertainNumber` has offered a wide spectrum of algorithms and methods for uncertainty characterisation, propagation, surrogate modelling, and optimisation under uncertainty, allowing imprecise uncertainty analysis in both intrusive and non-intrusive manner. `PyUncertainNumber` is under active development and will continue to be dedicated to support imprecise analysis in engineering using Python.
+`PyUncertainNumber` is rooted in Python and has close ties with the Python scientific computing ecosystem, it builds upon and greatly extends a few pioneering projects, such as [intervals](https://github.com/marcodeangelis/intervals), [scipy-stats](https://docs.scipy.org/doc/scipy/tutorial/stats.html) and [pba-for-python](https://github.com/Institute-for-Risk-and-Uncertainty/pba-for-python) to generalise probability and interval arithmetic. Beyond arithmetic, `PyUncertainNumber` has offered a wide spectrum of algorithms and methods for uncertainty characterisation, propagation, surrogate modelling, and optimisation under uncertainty, allowing imprecise uncertainty analysis in both intrusive and non-intrusive manner. `PyUncertainNumber` is under active development and will continue to be dedicated to support imprecise analysis in engineering using Python.
 
 
-### Citation
+## Citation
 
 > [Yu Chen, Scott Ferson (2025). Imprecise uncertainty management with uncertain numbers to facilitate trustworthy computations.](https://proceedings.scipy.org/articles/ahrt5264), SciPy proceedings 2025.
 

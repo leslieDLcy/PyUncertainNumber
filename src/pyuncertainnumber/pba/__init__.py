@@ -1,5 +1,6 @@
 from .intervals.number import Interval as I
-from .intervals.methods import intervalise
+from .intervals.methods import intervalise, load_interval_from_json
+
 from .pbox_parametric import *
 from .pbox_free import *
 from .dss import DempsterShafer
