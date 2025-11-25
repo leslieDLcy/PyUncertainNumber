@@ -1,7 +1,8 @@
 /* colors */
 
-h1, h2 {
-    color: #324d70;    
+h1,
+h2 {
+    color: #324d70;
 }
 
 /* buttons */
@@ -30,4 +31,16 @@ h1, h2 {
 .button>p>a:active {
     position: relative;
     top: 1px;
+}
+
+/* square, uniform card-top images */
+.sd-card .sd-card-img-top.card-img-square {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    /* keep aspect ratio, no crop */
+    margin-left: auto;
+    /* center horizontally */
+    margin-right: auto;
+    display: block;
 }

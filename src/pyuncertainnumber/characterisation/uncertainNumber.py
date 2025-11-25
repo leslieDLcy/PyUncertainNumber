@@ -2,10 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import functools
 
-# from .measurand import Measurand
-# from .variability import Variability
-from .uncertainty_types import Uncertainty_types
-from .ensemble import Ensemble
+from pyuncertainnumber.pba.operation import convert
+from .un_fields import *
 from .utils import *
 from .config import Config
 from pathlib import Path
@@ -18,6 +16,7 @@ from numbers import Number
 from ..pba.distributions import Distribution as pbaDistribution
 import operator
 from pint import Quantity
+
 
 """ Uncertain Number class """
 
@@ -58,13 +57,31 @@ class UncertainNumber:
     """Uncertain Number class
 
     args:
-        - `intervals`;
-        - `distribution_parameters`: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
-        - `pbox_initialisation`: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
-        -  naked_value: the deterministic numeric representation of the UN object, which shall be linked with the 'pba' or `Intervals` package
+        - intervals (Interval): the interval specification for the UN object;
 
-    Example:
+        - distribution_parameters: a list of the distribution family and its parameters; e.g. ['norm', [0, 1]];
+
+        - pbox_initialisation: a list of the distribution family and its parameters; e.g. ['norm', ([0,1], [3,4])];
+
+
+    example:
+
+        Uncertain numbers can be constructed in multiple ways. For example, a canonical way allows users to fill in as many fields as possible:
+
+        >>> from pyuncertainnumber import UncertainNumber
         >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", intervals=[1, 2])
+        >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", distribution_parameters=['normal', (10, 2)])
+        >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", pbox_parameters=['normal', ([8, 12], [0.5, 1.5])])
+        >>> UncertainNumber(name="velocity", symbol="v", unit="m/s", essence='dempster_shafer', intervals=[[1,5], [3,6]], masses=[0.5, 0.5])
+
+
+        Alternatively, users can use shortcuts to quickly create UN objects and get on with calculations:
+
+        >>> import pyuncertainnumber as pun
+        >>> pun.I([1, 2])
+        >>> pun.D('gaussian', (10, 2))
+        >>> pun.normal([8, 12], [0.5, 1.5])
+        >>> pun.DSS(intervals=[[1,5], [3,6]], masses=[0.5, 0.5])
     """
 
     Q_ = Quantity
@@ -83,7 +100,7 @@ class UncertainNumber:
         pbox_parameters=None,
         hedge=None,
         _construct=None,
-        naked_value=1.0,
+        nominal_value=1.0,
         p_flag=True,
         _skip_construct_init=False,
         measurand=None,
@@ -110,7 +127,7 @@ class UncertainNumber:
         self.pbox_parameters = pbox_parameters
         self.hedge = hedge
         self._construct = _construct
-        self.naked_value = naked_value
+        self.nominal_value = nominal_value
         self.p_flag = p_flag
         self._skip_construct_init = _skip_construct_init
         self.measurand = measurand
@@ -127,7 +144,7 @@ class UncertainNumber:
         self._samples = _samples
         self.__init_check()
         self.__init_construct()
-        self.naked_value = self._construct.naked_value
+        self.nominal_value = self._construct.nominal_value
         self.unit = unit
 
     # *  ---------------------more on initialisation---------------------*#
@@ -187,10 +204,10 @@ class UncertainNumber:
                 self.distribution_parameters[0],
                 self.distribution_parameters[1],
             )
-            self.naked_value = self._construct.mean().midpoint()
+            self.nominal_value = self._construct.mean().midpoint()
 
     def _update_physical_quantity(self):
-        self._physical_quantity = self.Q_(self.naked_value, self.unit)
+        self._physical_quantity = self.Q_(self.nominal_value, self.unit)
 
     @staticmethod
     def match_pbox(keyword, parameters):
@@ -239,14 +256,15 @@ class UncertainNumber:
 
         # fancy string formatting of unit
         u_str = f", physical_quantity={self._physical_quantity:~P}"
-        field_str += u_str
+        if not self._physical_quantity.dimensionless:
+            field_str += u_str
 
         return f"{self.__class__.__name__}({field_str})"
 
-    def describe(self, type="verbose"):
+    def describe(self, style="verbose"):
         """print out a verbose description of the uncertain number"""
 
-        match type:
+        match style:
             case "verbose":
                 match self.essence:
                     case "interval":
@@ -254,9 +272,13 @@ class UncertainNumber:
                     case "distribution":
                         return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}. Probability distributios are typically empolyed to model aleatoric uncertainty, which represents inherent randomness. The distribution is defined by the probability density function (pdf) or cumulative distribution function (cdf)."
                     case "pbox":
-                        return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}"
+                        try:
+                            return f"This is a {self.essence}-type Uncertain Number that follows a {self.pbox_parameters[0]} distribution with parameters {self.pbox_parameters[1]}"
+                        except:
+                            return f"This is a {self.essence}-type Uncertain Number that follows a {self.distribution_parameters[0]} distribution with parameters {self.distribution_parameters[1]}"
+
             case "one-number":
-                return f"This is an {self.essence}-type Uncertain Number whose naked value is {self.naked_value:.2f}"
+                return f"This is an {self.essence}-type Uncertain Number whose naked value is {self.nominal_value:.2f}"
             case "concise":
                 return self.__repr__()
             case "range":
@@ -359,11 +381,11 @@ class UncertainNumber:
     @classmethod
     def fromConstruct(cls, construct):
         """create an Uncertain Number from a construct object"""
-        from ..pba.pbox_abc import Leaf, Staircase
+        from ..pba.pbox_abc import Pbox
         from ..pba.dss import DempsterShafer
         from ..pba.distributions import Distribution as pbaDistribution
 
-        if isinstance(construct, Leaf | Staircase):
+        if isinstance(construct, Pbox):
             return cls.from_pbox(construct)
         if isinstance(construct, Interval):
             return cls.from_Interval(construct)
@@ -372,6 +394,10 @@ class UncertainNumber:
         if isinstance(construct, pbaDistribution):
             return cls.fromDistribution(construct)
         if isinstance(construct, cls):
+            return construct
+        if isinstance(
+            construct, np.ndarray
+        ):  # a fail-safe exit, which may be coerced into a Distribution UN later on
             return construct
         else:
             raise ValueError("The construct object is not recognised")
@@ -386,12 +412,12 @@ class UncertainNumber:
             dist_family (str): the distribution family
             dist_params (list, tuple or string): the distribution parameters
         """
-        distSpec = DistributionSpecification(D.dist_family, D.dist_params)
+        # distSpec = DistributionSpecification(D.dist_family, D.dist_params)
 
         if D.empirical_data is None:
             return cls(
                 essence="distribution",
-                distribution_parameters=distSpec.get_specification(),
+                distribution_parameters=[D.dist_family, D.dist_params],
                 **kwargs,
             )
         else:
@@ -431,49 +457,64 @@ class UncertainNumber:
 
     # * ---------------------arithmetic operations---------------------#
 
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        if method != "__call__":
+            return NotImplemented
+        if len(inputs) != 1 or inputs[0] is not self:
+            return NotImplemented
+        if "out" in kwargs and kwargs["out"] is not None:
+            return NotImplemented
+
+        if ufunc is np.sin:
+            return self.sin()
+        if ufunc is np.cos:
+            return self.cos()
+        if ufunc is np.tan:
+            return self.tan()
+        if ufunc is np.tanh:
+            return self.tanh()
+        if ufunc is np.exp:
+            return self.exp()
+        if ufunc is np.sqrt:
+            return self.sqrt()
+        if ufunc is np.log:
+            return self.log()
+        if ufunc is np.reciprocal:
+            return self.reciprocal()
+
+        return NotImplemented
+
     # * ---------------------unary operations---------------------#
+
+    def _apply(self, method):
+        from ..pba.operation import convert
+
+        target = convert(self.construct)
+        return UncertainNumber.fromConstruct(getattr(target, method)())
+
     def sqrt(self):
-        return UncertainNumber.fromConstruct(self._construct.sqrt())
+        return self._apply("sqrt")
 
     def exp(self):
-        from ..pba.operation import convert
-
-        try:
-            return self.construct.exp()
-        except:
-            return convert(self.construct).exp()
+        return self._apply("exp")
 
     def tanh(self):
-        from ..pba.operation import convert
+        return self._apply("tanh")
 
-        try:
-            return self.construct.tanh()
-        except:
-            return convert(self.construct).tanh()
+    def tan(self):
+        return self._apply("tan")
 
     def log(self):
-        from ..pba.operation import convert
-
-        try:
-            return self.construct.log()
-        except:
-            return convert(self.construct).log()
+        return self._apply("log")
 
     def sin(self):
-        from ..pba.operation import convert
-
-        try:
-            return self.construct.sin()
-        except:
-            return convert(self.construct).sin()
+        return self._apply("sin")
 
     def cos(self):
-        from ..pba.operation import convert
+        return self._apply("cos")
 
-        try:
-            return self.construct.cos()
-        except:
-            return convert(self.construct).cos()
+    def reciprocal(self):
+        return self._apply("reciprocal")
 
     # * ---------------------binary operations---------------------#
 
@@ -573,7 +614,7 @@ class UncertainNumber:
 
 # * ---------------------shortcuts --------------------- *#
 def makeUNPbox(func):
-
+    """Constructor decorator to create a UN from a parametric pbox"""
     from ..pba.pbox_parametric import _bound_pcdf
 
     @functools.wraps(func)
@@ -597,12 +638,12 @@ def constructUN(func):
 
 
 def I(*args: str | list[Number] | Interval) -> UncertainNumber:
-    """a shortcut for the interval-type UN object"""
+    """a shortcut to construct the interval-type UN object"""
     return UncertainNumber.fromConstruct(wc_scalar_interval_feature(*args))
 
 
 def D(*args, **kwargs) -> UncertainNumber:
-    """a shortcut for the distribution-type UN object"""
+    """a shortcut to construct the distribution-type UN object"""
     from ..pba.distributions import Distribution as pbaDistribution
 
     dist = pbaDistribution(*args, **kwargs)
@@ -634,17 +675,26 @@ def match_pbox(keyword, parameters):
 
 
 class Parameterisation:
-    def __init__(self, parm_specification, essence: str):
-        self.parm_specification = ParamSpecification(parm_specification)
+    """Parameterisation specification of the UN object
+
+    args:
+        - parm_specification (list): a combo of the distribution family and its parameters; e.g. ['norm', [0, 1]];
+        - essence (str): 'distribution' or 'pbox'
+    """
+
+    def __init__(self, parm_specification: list, essence: str):
+        self.parm_specification = ParamSpecification(
+            parm_specification
+        )  # combo e.g. ['norm', (0, 1)]
         self.essence = essence
 
     def yield_construct(self):
-        try:
+        if self.essence == "pbox":
             pbox = match_pbox(
                 self.parm_specification.family, self.parm_specification.parameters
             )
             return pbox
-        except Exception as e:
+        elif self.essence == "distribution":
             dist = pbaDistribution(
                 dist_family=self.parm_specification.family,
                 dist_params=self.parm_specification.parameters,
@@ -653,9 +703,10 @@ class Parameterisation:
 
 
 class ParamSpecification:
-    """only for the format of specification
+    """The combo specification of the distribution family and its parameters
 
     note:
+        Only used for the format of specification.
         a recommended specification: ['gaussian', (12,4)] or ['gaussian', ([0,12],[1,4])]
     """
 
@@ -687,9 +738,6 @@ class ParamSpecification:
             self._true_type = "pbox"
 
 
-# * ---------------------helper functions  --------------------- *#
-
-
 def pass_down_units(a, b, ops, t):
     """pass down the unit of the uncertain number
 
@@ -719,8 +767,11 @@ def is_un(sth):
         - 1: if sth is an UncertainNumber object
         - 2: if sth is a construct in {Interval, Pbox, DempsterShafer, or Distribution}
     """
-    from pyuncertainnumber import Interval, Pbox, DempsterShafer
+
     from ..pba.distributions import Distribution
+    from ..pba.dss import DempsterShafer
+    from ..pba.pbox_abc import Pbox
+    from ..pba.intervals.number import Interval
 
     if isinstance(sth, Number):
         return 0
@@ -728,6 +779,11 @@ def is_un(sth):
         return 1
     elif isinstance(sth, Interval | Pbox | DempsterShafer | Distribution):
         return 2
+
+
+def exist_un(a_list) -> bool:
+    """check if there is any UN object in the list"""
+    return any(is_un(x) == 1 for x in a_list)
 
 
 # * ---------------------parametric shortcuts  --------------------- *#

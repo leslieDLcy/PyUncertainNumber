@@ -1,5 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import functools
 from .uncertainNumber import UncertainNumber
+from .stats import *
+
+if TYPE_CHECKING:
+    from pyuncertainnumber import Interval
+
+""" to store core functions and decorators (underway)"""
 
 
 def makeUN(func):

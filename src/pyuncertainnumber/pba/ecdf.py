@@ -11,6 +11,9 @@ class eCDF_bundle:
     probabilities: np.ndarray
     # TODO plot ecdf not starting from 0
 
+    def __repr__(self):
+        return f"eCDF_bundle object with attribute 'quantiles'={self.quantiles.shape} and 'probabilities'={self.probabilities.shape})"
+
     @classmethod
     def from_sps_ecdf(cls, e):
         """utility to tranform sps.ecdf to eCDF_bundle"""
@@ -83,7 +86,7 @@ def pl_ecdf_bounding_bundles(
     ax.plot(
         b_l.quantiles,
         b_l.probabilities,
-        label=label if label is not None else f"KS condidence bands {sig_level}\% ",
+        label=label if label is not None else f"KS condidence bands",
         color=plot_bound_colors[0],
         **cdf_kwargs,
     )

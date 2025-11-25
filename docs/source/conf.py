@@ -24,13 +24,13 @@ extensions = [
     "myst_nb",
     "sphinx_prompt",
     "sphinx_design",
-    # "myst_parser",
     # 'sphinx.ext.autodoc',
     "autoapi.extension",
     "sphinx.ext.mathjax",
     "sphinx_inline_tabs",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
+    "sphinxcontrib.bibtex",
 ]
 
 nb_execution_mode = "off"  # or "auto", "force", "cache"
@@ -72,6 +72,7 @@ html_static_path = ["_static"]
 html_theme = "furo"
 html_title = " "
 html_logo = "_static/UNlogo3.png"
+html_css_files = ["custom.css"]  # make sure this is loaded
 
 myst_enable_extensions = [
     "dollarmath",
@@ -86,3 +87,5 @@ latex_elements = {
     "fncychap": "\\usepackage[Conny]{fncychap}",
     "extraclassoptions": "openany,oneside",
 }
+
+bibtex_bibfiles = ["refs.bib"]

@@ -33,11 +33,8 @@ $$
 
 where $X$ denotes an interval vector and $m$ is the midpoint vector while $D_{i}F$ be an interval extension of the first derivatives $\partial f / \partial x_{i}$.
 
-**Vertex method, interval substitution, etc.**
+Refer to {ref}`propagation_guide` page for additional methods (e.g. vertex method, interval substitution) for interval propagation.
 
-```{see also}
-Propagation
-```
 
 ### handling with measurement uncertainty
 

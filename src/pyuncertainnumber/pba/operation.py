@@ -9,6 +9,8 @@ import operator
 
 if TYPE_CHECKING:
     from .pbox_abc import Pbox
+    from .dss import DempsterShafer
+    from .dependency import Dependency
 
 
 # * ---------------  Frechet ops --------------- *#
@@ -180,6 +182,61 @@ def independent_op(x: Pbox, y: Pbox, op=operator.add):
     return nleft, nright
 
 
+def copula_op(x: Pbox, y: Pbox, dependency: Dependency, op=operator.add) -> Pbox:
+    """Bivariate operation on two pboxes with a given copula
+
+    return:
+        Pbox: resulting pbox after applying the operation with the copula
+    """
+    from .intervals import intervalise
+    from pyuncertainnumber.pba.aggregation import stacking
+
+    A = x.to_numpy()
+    B = y.to_numpy()
+
+    # Compute all pairwise interval sums
+    C = op(A[:, None, :], B[None, :, :])  # shape (200, 200, 2)
+    cc = intervalise(C)
+    cc_ = cc.ravel()  # shape: (40000,)
+
+    # Compute discrete copula mass matrix
+    C_ = functools.partial(C_func, copula=dependency.copula)
+    p = copula_mass(C_, x.p_values, y.p_values)  # shape (200, 200)
+    p = p.ravel()  # shape: (40000,)
+    return stacking(cc_, weights=p)
+
+
+def copula_dss_op(
+    x: DempsterShafer, y: DempsterShafer, dependency, op=operator.add
+) -> Pbox:
+    """Bivariate operation on two DSS with a given copula
+
+    note:
+        This is a temporary function until DSS is fully integrated with Pbox operations
+
+    return:
+        Pbox: resulting DSS after applying the operation with the copula
+    """
+    from .intervals import intervalise
+    from pyuncertainnumber.pba.aggregation import stacking
+
+    A = x.intervals.to_numpy()
+    B = y.intervals.to_numpy()
+
+    # Compute all pairwise interval sums
+    C = op(A[:, None, :], B[None, :, :])  # shape (200, 200, 2)
+    cc = intervalise(C)
+    cc_ = cc.ravel()  # shape: (40000,)
+
+    # Compute discrete copula mass matrix
+    u = np.cumsum(x.masses)
+    v = np.cumsum(y.masses)
+    C_ = functools.partial(C_func, copula=dependency.copula)
+    p = copula_mass(C_, u, v)  # shape (200, 200)
+    p = p.ravel()  # shape: (40000,)
+    return stacking(cc_, weights=p)
+
+
 # backup
 # def independent_op(x: Pbox, y: Pbox, op=operator.add):
 #     """independent operation on two pboxes
@@ -190,6 +247,120 @@ def independent_op(x: Pbox, y: Pbox, op=operator.add):
 #     nleft = vectorized_cartesian_op(x.left, y.left, op)
 #     nright = vectorized_cartesian_op(x.right, y.right, op)
 #     return nleft, nright
+
+
+def C_func(u, v, copula):
+    # statsmodels expects columns; reshape back
+    uv = np.column_stack((u.ravel(), v.ravel()))
+    out = copula.cdf(uv)
+    return out.reshape(u.shape)
+
+
+def copula_mass(C_func, u, v, eps=1e-12):
+    """
+    Compute the discrete copula mass matrix p_ij from grids u, v on [0,1].
+    C: callable taking arrays (same shape) and returning C(u,v)
+    u, v: 1D arrays (ascending) of points in [0,1]
+    eps: small value to avoid ±inf when calling C near 0 or 1
+    """
+    u = np.asarray(u, float)
+    v = np.asarray(v, float)
+
+    # extend with 0 for the finite-difference scheme
+    u_ext = np.concatenate(([0.0], u))
+    v_ext = np.concatenate(([0.0], v))
+
+    # build grid
+    U, V = np.meshgrid(u_ext, v_ext, indexing="ij")
+
+    # safe evaluate: clip to (eps, 1-eps) for the C call
+    Uc = np.clip(U, eps, 1.0 - eps)
+    Vc = np.clip(V, eps, 1.0 - eps)
+    Cgrid = C_func(Uc, Vc)
+
+    # enforce copula axioms on boundaries exactly
+    Cgrid[0, :] = 0.0  # C(0, v) = 0
+    Cgrid[:, 0] = 0.0  # C(u, 0) = 0
+
+    # rows/cols equal to 1.0, if present
+    i1 = np.where(np.isclose(u_ext, 1.0))[0]
+    j1 = np.where(np.isclose(v_ext, 1.0))[0]
+    if i1.size:
+        Cgrid[i1[0], :] = v_ext  # C(1, v) = v
+    if j1.size:
+        Cgrid[:, j1[0]] = u_ext  # C(u, 1) = u
+    if i1.size and j1.size:
+        Cgrid[i1[0], j1[0]] = 1.0  # C(1,1) = 1
+
+    # 2D finite differences → copula mass
+    p = Cgrid[1:, 1:] - Cgrid[:-1, 1:] - Cgrid[1:, :-1] + Cgrid[:-1, :-1]
+    return p
+
+
+def positiveconv_pbox(a, b, op=operator.add):
+    """positive dependence (PQD) convolution of two pboxes
+
+    example:
+        >>> X = pba.uniform(1, 24)
+        >>> Y = X
+        >>> p_ = positiveconv_pbox(X, Y)
+    """
+    from .intervals import Interval
+    from .pbox_abc import Staircase
+    from pyuncertainnumber import envelope as env
+    import math
+
+    # positive (PQD) dependence
+    assert a.steps == b.steps, "Pboxes must have the same number of steps"
+    n = a.steps
+    cu = np.zeros(n)
+    cd = np.zeros(n)
+
+    for i in range(n):
+        infimum = np.inf
+        for j in range(i, n):
+            if op == operator.add:
+                here = a.left[j] + b.left[int(n * i / (j + 1))]
+            elif op == operator.mul:
+                here = a.left[j] * b.left[int(n * i / (j + 1))]
+            elif op == operator.pow:
+                here = a.left[j] ** b.left[int(n * i / (j + 1))]
+            if here < infimum:
+                infimum = here
+        cd[i] = infimum
+
+        supremum = -np.inf
+        for j in range(i + 1):
+            kk = math.floor(1 + n * ((i) / n - j / n) / (1 - j / n)) - 1
+            if op == operator.add:
+                here = a.right[j] + b.right[kk]
+            elif op == operator.mul:
+                here = a.right[j] * b.right[kk]
+            elif op == operator.pow:
+                here = a.right[j] ** b.right[kk]
+            if here > supremum:
+                supremum = here
+        cu[i] = supremum
+
+    if op == "+":
+        v = env(
+            a.var + b.var,
+            a.var + b.var + 2 * np.sqrt(a.var * b.var),
+        ).to_interval()
+    else:
+        v = Interval(0, float("inf"))
+
+    if op == "^" and a.range.hi <= 1:
+        safe = cu
+        cu = sorted(cd)
+        cd = sorted(safe)
+
+    return Staircase(
+        cu,
+        cd,
+        mean=Interval(a.mean.lo + b.mean.lo, a.mean.hi + b.mean.hi),
+        var=Interval(v.left, v.right),
+    )
 
 
 def new_vectorised_naive_frechet_op(x: Pbox, y: Pbox, op):
@@ -248,7 +419,7 @@ def isum(l_p):
 
 # there is an new `convert` func
 def convert(un):
-    """transform the input un into a Pbox object
+    """Convert any input un into a Pbox object
 
     note:
         - theorically 'un' can be {Interval, DempsterShafer, Distribution, float, int}
@@ -267,6 +438,8 @@ def convert(un):
         return un.to_pbox()
     elif isinstance(un, DempsterShafer):
         return un.to_pbox()
+    elif isinstance(un, Number):
+        return Interval(un, un).to_pbox()
     else:
         raise TypeError(f"Unable to convert {type(un)} object to Pbox")
 

@@ -36,16 +36,37 @@ def hedge_interpret(hedge: str, return_type="interval") -> I | Pbox:
 
     example:
         >>> hedge_interpret("about 200", return_type="pbox")
+        >>> hedge_interpret("200.00")
     """
+    from ..pba.intervals import Interval as I
+    from ..characterisation.utils import sgnumber
 
     assert isinstance(hedge, str), "hedge must be a string"
+
+    # quick out if the hedge is just a number
+    kwd_list = [
+        "exactly",
+        "about",
+        "around",
+        "count",
+        "almost",
+        "over",
+        "below",
+        "above",
+        "at most",
+        "at least",
+        "order",
+        "between",
+    ]
+    if not any(kwd in hedge for kwd in kwd_list):
+        return I(*sgnumber(hedge))
+
     splitted_list = hedge.split()
 
     # parse the numeric value denoted as x
     x = [s for s in splitted_list if is_number(s)][0]
 
-    # decide if the number is a float or an integer
-    # we get the number at this step
+    # decipher the number is a float or an integer or sci-notation
     if "." in x:
         x = float(x)
     else:
@@ -62,14 +83,16 @@ def hedge_interpret(hedge: str, return_type="interval") -> I | Pbox:
         kwd = ""
 
     if return_type == "interval":
-        from ..pba.intervals import Interval as I
 
         # return the interval object
         match kwd:
             case "exactly":
                 return I.from_meanform(x, 10 ** (-(d + 1)))
-            case "":
-                return I.from_meanform(x, 0.5 * 10 ** (-d))
+            case "":  # to decipher a number
+                # old Leslie implementation due to different interpretation of the confused
+                # definition of "d" in the paper
+                # return I.from_meanform(x, 0.5 * 10 ** (-d))
+                return I(*sgnumber(hedge))
             case "about":
                 return I.from_meanform(x, 2 * 10 ** (-d))
             case "around":

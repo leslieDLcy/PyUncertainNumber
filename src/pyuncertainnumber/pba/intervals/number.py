@@ -15,10 +15,10 @@ from typing import Optional, Any, Union
 import numpy as np
 import numpy
 from numpy import ndarray, asarray, stack, transpose, zeros
+from scipy.stats import qmc
 import matplotlib.pyplot as plt
 from .utils import safe_asarray
-
-
+from ..mixins import NominalValueMixin
 from .arithmetic import multiply, divide
 
 MACHINE_EPS = 7.0 / 3 - 4.0 / 3 - 1
@@ -76,7 +76,7 @@ def show(x: Interval) -> str:
         return f"{x.val}"
 
 
-class Interval:
+class Interval(NominalValueMixin):
     """Interval is the main class"""
 
     def __init__(
@@ -151,9 +151,10 @@ class Interval:
         args:
             n: number of samples
         """
-        from scipy.stats import qmc
-
-        sampler = qmc.LatinHypercube(d=self.__len__())
+        if self.is_scalar:
+            sampler = qmc.LatinHypercube(d=1)
+        else:
+            sampler = qmc.LatinHypercube(d=self.__len__())
         sample = sampler.random(n=n)
         sample = qmc.scale(sample, self.lo, self.hi)
         return sample
@@ -166,7 +167,10 @@ class Interval:
         """
         lhs_sample = self.lhs_sample(n)
         endpoints = np.array([self.lo, self.hi])
-        return np.vstack((endpoints, lhs_sample))
+        if self.is_scalar:  # lhs_sample ~ (n, 1)
+            return np.concatenate((lhs_sample, endpoints[:, np.newaxis]))
+        else:
+            return np.vstack((endpoints, lhs_sample))
 
     def plot(self, ax=None, **kwargs):
         p = self.to_pbox()
@@ -183,6 +187,22 @@ class Interval:
         if np.all(self._lo == self._hi):
             return True
         return False
+
+    def _compute_nominal_value(self):
+        return self.mid
+
+    def ravel(self):
+        """Return a flattened (1D) interval object for multi-dimensional intervals
+
+        example:
+            >>> A = np.random.rand(200, 200, 2)
+            >>> i = pba.intervalise(A)
+            >>> print(i.shape)
+            >>> i2 = i.ravel()
+            >>> print(i2.shape)
+        """
+        oned_cc = Interval(self.lo.ravel(), self.hi.ravel())
+        return oned_cc
 
     @property
     def lo(self) -> Union[ndarray, float]:
@@ -209,6 +229,7 @@ class Interval:
 
     @property
     def rad(self):
+        """half width"""
         return rad(self)
 
     @property
@@ -255,10 +276,6 @@ class Interval:
     @property
     def ndim(self):
         return len(self.__shape)
-
-    @property
-    def naked_value(self):
-        return self.mid
 
     # * -------------- ARITHMETIC -------------- *#
     # unary operators #
@@ -428,6 +445,27 @@ class Interval:
     def __ne__(self, other):
         return not (self == other)
 
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        if method != "__call__":
+            return NotImplemented
+        if "out" in kwargs and kwargs["out"] is not None:
+            return NotImplemented
+
+        if ufunc is np.sin:
+            return self.sin()
+        if ufunc is np.cos:
+            return self.cos()
+        if ufunc is np.tan:
+            return self.tan()
+        if ufunc is np.exp:
+            return self.exp()
+        if ufunc is np.sqrt:
+            return self.sqrt()
+        if ufunc is np.log:
+            return self.log()
+
+        return NotImplemented
+
     # * -------------- unary functions -------------- *#
 
     def abs(self):
@@ -467,7 +505,12 @@ class Interval:
 
     @classmethod
     def from_meanform(cls, x, half_width):
-        return cls(x - half_width, x + half_width)
+        if np.isscalar(x):
+            return cls(x - half_width, x + half_width)
+        else:
+            x = np.asarray(x)
+            half_width = np.asarray(half_width)
+            return cls(lo=x - half_width, hi=x + half_width)
 
 
 # * -------------- lightweight Interval

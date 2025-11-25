@@ -1,6 +1,6 @@
 from __future__ import annotations
 from .intervals import Interval as I
-from .pbox_abc import Pbox, Staircase
+from .pbox_abc import Pbox, Staircase, pbox_from_ecdf_bundle
 from .utils import NotIncreasingError
 from typing import *
 from warnings import warn
@@ -11,11 +11,14 @@ from .ecdf import pl_ecdf_bounding_bundles, get_ecdf, eCDF_bundle
 from .imprecise import imprecise_ecdf
 from numbers import Number
 from ..decorator import exposeUN
+from numpy.typing import ArrayLike
+
 
 """ non-parametric pbox  """
 
 
 __all__ = [
+    "known_properties",
     "known_constraints",
     "min_max",
     "min_max_mean",
@@ -40,87 +43,118 @@ if TYPE_CHECKING:
     from .pbox_abc import Pbox
 
 
-def KS_bounds(s, alpha: float, display=True) -> tuple[eCDF_bundle]:
+def KS_bounds(
+    s: ArrayLike, alpha: float, display=True, output_type="bounds"
+) -> Union[tuple[eCDF_bundle], Pbox, UncertainNumber]:
     """construct free pbox from sample data by Kolmogorov-Smirnoff confidence bounds
 
     args:
-        - s (array-like): sample data, precise and imprecise
-        - dn (float): KS critical value at a significance level and sample size N;
+        s (ArrayLike): sample data, precise and imprecise
+
+        dn (float): KS critical value at a significance level and sample size N;
+
+        output_type (str): A choice between {'bounds', 'pbox', 'un'}, default='bounds'
+            which returns two eCDF bundles as bounds; 'pbox' to return a pbox object; 'un' to return an uncertain number object.
 
     return:
-        - two CDF bounds, i.e. upper and lower (eCDF_bundle objects)
+        a tuple of two CDF bounds, i.e. upper and lower (eCDF_bundle objects), or a Pbox object, or an UncertainNumber object
+        the return type is controlled by the `output_type` argument.
 
     note:
-        With the upper and lower bounds, a free pbox can be constructed.
+        By default the function returns two eCDF bundles as the extreme bounds. With the upper and lower bounds, a free pbox can be constructed.
 
     example:
         >>> # both precise data (e.g. numpy array) and imprecise data (e.g. a vector of interval) are supported
         >>> precise_data = np.random.normal(0, 1, 100)  # precise data case
-        >>> KS_bounds(precise_data, alpha=0.025, display=True)
-        >>>
-        >>> impre_data = pba.I(lo=[0, 1, 2], hi=[7, 8, 9])  # imprecise data case
-        >>> KS_bounds(impre_data, alpha=0.025, display=True)
+        >>> ub, lb = pba.KS_bounds(precise_data, alpha=0.025, display=True)
+
+        >>> # alternatively, an uncertain number or a p-box can be returned
+        >>> pba.KS_bounds(precise_data, alpha=0.025, display=False, output_type='pbox')  # return a pbox object
+        >>> pba.KS_bounds(precise_data, alpha=0.025, display=False, output_type='un')  # return an uncertain number object
+
+        >>> # imprecise data case
+        >>> impre_data = pba.I(lo = precise_data -0.5, hi = precise_data + 0.5)
+        >>> ub, lb = pba.KS_bounds(impre_data, alpha=0.025, display=True)
+
+
+    .. figure:: /_static/ks_bounds_demo.png
+        :alt: ks_bounds
+        :align: center
+        :width: 50%
+
+        Kolmogorov-Smirnoff confidence bounds illustration with precise and imprecise data.
     """
-    # TODO quantile of two bounds have different support ergo not a box yet
-    # * to make the output as a pbox
-    dn = d_alpha(len(s), alpha)
-    # precise data
-    if isinstance(s, list | np.ndarray):
-        # ecdf = sps.ecdf(s)
-        # b = transform_eeCDF_bundle(ecdf)
 
-        q, p = get_ecdf(s)
-        f_l, f_r = p + dn, p - dn
-        f_l, f_r = logical_bounding(f_l), logical_bounding(f_r)
-        # new ecdf bundles
-        b_l, b_r = eCDF_bundle(q, f_l), eCDF_bundle(q, f_r)
+    from pyuncertainnumber import UncertainNumber
 
-        if display:
-            fig, ax = plt.subplots()
-            ax.step(q, p, color="black", ls=":", where="post")
-            pl_ecdf_bounding_bundles(b_l, b_r, ax=ax)
+    def inner(s, alpha, display):
+        dn = d_alpha(len(s), alpha)
+        # precise data
+        if isinstance(s, list | np.ndarray):
+            # ecdf = sps.ecdf(s)
+            # b = transform_eeCDF_bundle(ecdf)
+
+            q, p = get_ecdf(s)
+            f_l, f_r = p + dn, p - dn
+            f_l, f_r = logical_bounding(f_l), logical_bounding(f_r)
+            # new ecdf bundles
+            b_l, b_r = eCDF_bundle(q, f_l), eCDF_bundle(q, f_r)
+
+            if display:
+                fig, ax = plt.subplots()
+                ax.step(q, p, color="black", ls=":", where="post")
+                pl_ecdf_bounding_bundles(b_l, b_r, ax=ax)
+            return b_l, b_r
+        # imprecise data
+        elif isinstance(s, I):
+            b_l, b_r = imprecise_ecdf(s)
+            b_lbp, b_rbp = imprecise_ecdf(s)
+
+            b_l.probabilities += dn
+            b_r.probabilities -= dn
+
+            b_l.probabilities, b_r.probabilities = logical_bounding(
+                b_l.probabilities
+            ), logical_bounding(b_r.probabilities)
+
+            if display:
+                fig, ax = plt.subplots()
+                # plot the epimirical ecdf
+                ax.plot(
+                    b_lbp.quantiles,
+                    b_lbp.probabilities,
+                    drawstyle="steps-post",
+                    ls=":",
+                    color="gray",
+                )
+                ax.plot(
+                    b_rbp.quantiles,
+                    b_rbp.probabilities,
+                    drawstyle="steps-post",
+                    ls=":",
+                    color="gray",
+                )
+
+                # plot the KS bounds
+                pl_ecdf_bounding_bundles(
+                    b_l,
+                    b_r,
+                    sig_level=(1 - 2 * alpha) * 100,
+                    ax=ax,
+                    title=f"Kolmogorov-Smirnoff confidence bounds at {(1 - 2 * alpha) * 100} % confidence level",
+                )
+        else:
+            raise ValueError("Invalid input data type")
         return b_l, b_r
-    # imprecise data
-    elif isinstance(s, I):
-        b_l, b_r = imprecise_ecdf(s)
-        b_lbp, b_rbp = imprecise_ecdf(s)
 
-        b_l.probabilities += dn
-        b_r.probabilities -= dn
-
-        b_l.probabilities, b_r.probabilities = logical_bounding(
-            b_l.probabilities
-        ), logical_bounding(b_r.probabilities)
-
-        if display:
-            fig, ax = plt.subplots()
-            # plot the epimirical ecdf
-            ax.plot(
-                b_lbp.quantiles,
-                b_lbp.probabilities,
-                drawstyle="steps-post",
-                ls=":",
-                color="gray",
-            )
-            ax.plot(
-                b_rbp.quantiles,
-                b_rbp.probabilities,
-                drawstyle="steps-post",
-                ls=":",
-                color="gray",
-            )
-
-            # plot the KS bounds
-            pl_ecdf_bounding_bundles(
-                b_l,
-                b_r,
-                sig_level=(1 - 2 * alpha) * 100,
-                ax=ax,
-                title=f"Kolmogorov-Smirnoff confidence bounds at {(1 - 2 * alpha) * 100} % confidence level",
-            )
-    else:
-        raise ValueError("Invalid input data type")
-    return b_l, b_r
+    b_l, b_r = inner(s, alpha, display)
+    if output_type == "bounds":
+        return b_l, b_r
+    elif output_type == "pbox":
+        return pbox_from_ecdf_bundle(b_l, b_r)
+    elif output_type == "un":
+        p = pbox_from_ecdf_bundle(b_l, b_r)
+        return UncertainNumber.from_pbox(p)
 
 
 def logical_bounding(a):
@@ -152,7 +186,8 @@ def d_alpha(n, alpha):
 # * ---------top level func for known statistical properties------*#
 
 
-def known_constraints(
+@exposeUN
+def known_properties(
     maximum=None,
     mean=None,
     median=None,
@@ -161,9 +196,10 @@ def known_constraints(
     percentiles=None,
     std=None,
     var=None,
+    family=None,
     **kwargs,
 ) -> UncertainNumber:
-    """Construct a uncertain number given known statistical properties specified as constraints.
+    """Construct a uncertain number given known statistical properties served as constraints.
 
     args:
         maximum (number): maximum value of the variable
@@ -174,6 +210,7 @@ def known_constraints(
         percentiles (dict): dictionary of percentiles and their values, e.g. {0: 0, 0.1: 1, 0.5: 2, 0.9: pun.I(3,4), 1:5}
         std (number): standard deviation of the variable
         var (number): variance of the variable
+        family (str): name of the distribution family, e.g. 'normal', 'lognormal', 'uniform', 'triangular', etc.
 
     returns:
         uncertain number
@@ -182,14 +219,17 @@ def known_constraints(
         It's also possible to directly call a function given the known information, such as ``pun.mean_std(mean=1, std=0.5)``.
 
     example:
-        >>> from pyuncertainnumber.pba import known_constraints
-        >>> known_constraints(
+        >>> from pyuncertainnumber.pba import known_properties
+        >>> known_properties(
         ...     maximum = 2,
         ...     mean = 1,
         ...     var = 0.25,
         ...     minimum=0,
         ...     )
     """
+
+    from ..characterisation.stats import parse_moments
+
     args = {
         "maximum": maximum,
         "mean": mean,
@@ -199,6 +239,7 @@ def known_constraints(
         "percentiles": percentiles,
         "std": std,
         "var": var,
+        "family": family,
     }
     shape_control = ["percentiles", "symmetric"]
     present_keys = tuple(
@@ -220,6 +261,25 @@ def known_constraints(
         ("maximum", "median", "minimum"): min_max_median,
         ("maximum", "mean", "minimum", "std"): min_max_mean_std,
         ("maximum", "mean", "minimum", "var"): min_max_mean_var,
+        ("family"): not_enough_info,
+        ("family", "mean"): parse_moments,
+        ("family", "mean", "std"): parse_moments,
+        ("family", "mean", "var"): parse_moments,
+        ("family", "mean", "std", "var"): parse_moments,
+        (
+            "family",
+            "maximum",
+            "minimum",
+        ): min_max,  # TODO: to implement trucate_parse_moments
+        (
+            "family",
+            "maximum",
+            "mean",
+            "minimum",
+        ): parse_moments,
+        ("family", "maximum", "mean", "minimum", "std"): truncate_parse_moments,
+        ("family", "maximum", "mean", "minimum", "var"): truncate_parse_moments,
+        ("family", "maximum", "mean", "minimum", "std", "var"): truncate_parse_moments,
     }
 
     handler1 = routes.get(present_keys, handle_default)
@@ -242,14 +302,36 @@ def known_constraints(
         return imp_pbox
 
 
+known_constraints = known_properties
+
+
 def handle_default(**kwargs):
-    return f"No match. Received: {kwargs}"
+    raise Exception(f"Combination not supported. Received: {kwargs}")
+
+
+def not_enough_info(**kwargs):
+    raise Exception(f"Not enough information provided. Received: {kwargs}")
+
+
+def truncate_parse_moments(**kwargs):
+    from ..characterisation.stats import parse_moments
+    from .operation import convert
+
+    if "maximum" in kwargs and "minimum" in kwargs:
+        base_pbox = convert(parse_moments(**kwargs))
+        box = min_max(**{k: kwargs[k] for k in ["minimum", "maximum"] if k in kwargs})
+        if base_pbox.hi <= box.hi and base_pbox.lo >= box.lo:
+            return base_pbox.imp(box)
+        else:
+            raise Exception("No intersection found")
+
+    else:
+        return parse_moments(**kwargs)
 
 
 # * --------------------- supporting functions---------------------*#
 
 
-@exposeUN
 def min_max(minimum: Number, maximum: Number) -> UncertainNumber | Pbox:
     """Equivalent to an interval object constructed as a nonparametric Pbox.
 
@@ -281,7 +363,6 @@ def min_max(minimum: Number, maximum: Number) -> UncertainNumber | Pbox:
     )
 
 
-@exposeUN
 def min_mean(minimum, mean, steps=Params.steps) -> UncertainNumber | Pbox:
     """Nonparametric pbox construction based on constraint of minimum and mean
 
@@ -314,7 +395,6 @@ def min_mean(minimum, mean, steps=Params.steps) -> UncertainNumber | Pbox:
     )
 
 
-@exposeUN
 def max_mean(
     maximum: Number,
     mean: Number,
@@ -343,7 +423,6 @@ def max_mean(
     return min_mean(-maximum, -mean).__neg__()
 
 
-@exposeUN
 def mean_std(mean: Number, std: Number, steps=Params.steps) -> UncertainNumber | Pbox:
     """Nonparametric pbox construction based on constraint of mean and std
 
@@ -374,7 +453,6 @@ def mean_std(mean: Number, std: Number, steps=Params.steps) -> UncertainNumber |
     return Staircase(left=left, right=right, mean=I(mean, mean), var=I(std**2, std**2))
 
 
-@exposeUN
 def mean_var(
     mean: Number,
     var: Number,
@@ -402,7 +480,6 @@ def mean_var(
     return mean_std(mean, np.sqrt(var))
 
 
-@exposeUN
 def min_max_mean(
     minimum: Number,
     maximum: Number,
@@ -443,7 +520,6 @@ def min_max_mean(
 
 
 # TODO: to verify if this is correct
-@exposeUN
 def pos_mean_std(
     mean: Number,
     std: Number,
@@ -481,7 +557,6 @@ def pos_mean_std(
     )
 
 
-@exposeUN
 def min_max_mode(
     minimum: Number,
     maximum: Number,
@@ -524,7 +599,6 @@ def min_max_mode(
     return Staircase(left=l, right=r, mean=I(mean_l, mean_r), var=I(var_l, var_r))
 
 
-@exposeUN
 def min_max_median(
     minimum: Number,
     maximum: Number,
@@ -572,7 +646,6 @@ def min_max_median(
     )
 
 
-@exposeUN
 def min_max_mean_std(
     minimum: Number,
     maximum: Number,
@@ -717,7 +790,6 @@ def min_max_mean_std(
     )
 
 
-@exposeUN
 def min_max_mean_var(
     minimum: Number,
     maximum: Number,
@@ -756,7 +828,6 @@ def min_max_mean_var(
     return min_max_mean_std(minimum, maximum, mean, np.sqrt(var), **kwargs)
 
 
-@exposeUN
 def from_percentiles(
     percentiles: dict, steps: int = Params.steps
 ) -> UncertainNumber | Pbox:

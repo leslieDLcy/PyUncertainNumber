@@ -8,50 +8,31 @@ import matplotlib.pyplot as plt
 from .intervals.number import Interval as I
 from numbers import Number
 import operator
-import itertools
 from .utils import (
     condensation,
-    smooth_condensation,
     find_nearest,
+    get_mean_var_from_ecdf,
     is_increasing,
     left_right_switch,
+    variance_bounds_via_lp,
+    area_between_ecdfs,
 )
 import logging
-from .operation import vectorized_cartesian_op
 from .context import get_current_dependency
+from .mixins import NominalValueMixin
+from contextlib import suppress
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Interval
+    from .dss import DempsterShafer
+    from .ecdf import eCDF_bundle
+    from typing import Self
 
 # Configure the logging system with a simple format
 logging.basicConfig(
     level=logging.INFO,
     format="%(levelname)s: %(message)s",
 )
-
-
-def get_mean_var_from_ecdf(q, p):
-    """Numerically estimate the mean and var from ECDF data
-
-    args:
-        q (array-like): quantiles
-        p (array-like): probabilities
-
-    example:
-        >>> # Given ECDF data an example
-        >>> q = [1, 2, 3, 4]
-        >>> p = [0.25, 0.5, 0.75, 1.0]
-    """
-
-    # Step 1: Recover PMF
-    pmf = [p[0]] + [p[i] - p[i - 1] for i in range(1, len(p))]
-
-    # Step 2: Compute Mean
-    mean = sum(x * p for x, p in zip(q, pmf))
-
-    # Step 3: Compute Variance
-    variance = sum(p * (x - mean) ** 2 for x, p in zip(q, pmf))
-    return mean, variance
 
 
 def bound_steps_check(bound):
@@ -90,6 +71,11 @@ def pbox_from_extredists(rvs, shape="beta", extre_bound_params=None):
         right=bounds[1],
         shape=shape,
     )
+
+
+def pbox_from_ecdf_bundle(lower_bound: eCDF_bundle, upper_bound: eCDF_bundle) -> Pbox:
+    """Construct a p-box from two empirical CDF bundles as the extreme bounds"""
+    return Staircase.from_CDFbundle(lower_bound, upper_bound)
 
 
 def naive_frechet_pbox(x, y, op) -> Staircase:
@@ -135,7 +121,7 @@ def classic_frechet_pbox(x, y, op) -> Staircase:
 
 def straddle_frechet_pbox(x, y):
     """bespoke Frechet for multiplcation when anyone straddles 0"""
-    from .aggregation import _imposition
+    from .aggregation import imposition
 
     warnings.warn(
         "Multiplication of a pbox straddling zero needs attention",
@@ -143,7 +129,7 @@ def straddle_frechet_pbox(x, y):
     )
     naive_base_p = vectorised_naive_frechet_pbox(x, y, operator.mul)
     balch_p = x.balchprod(y)
-    imp_p = _imposition(naive_base_p, balch_p)
+    imp_p = imposition(naive_base_p, balch_p)
     return imp_p
 
 
@@ -174,7 +160,7 @@ def frechet_pbox_mul(x, y):
         return classic_frechet_pbox(x, y, operator.mul)
 
 
-class Pbox(ABC):
+class Pbox(NominalValueMixin, ABC):
     """a base class for Pbox
 
     danger:
@@ -226,11 +212,24 @@ class Pbox(ABC):
 
         self._init_range()
 
+        self.degenerate_flag()
+
     def steps_check(self):
 
         assert len(self.left) == len(
             self.right
         ), "Length of lower and upper bounds is not consistent"
+
+    def _compute_nominal_value(self):
+        return np.round(self.mean.mid, 3)
+
+    def degenerate_flag(self) -> bool:
+        """check if the pbox is degenerate (i.e. left == right everywhere)"""
+        self._degenerate = np.array_equal(self.left, self.right)
+
+    @property
+    def degenerate(self) -> bool:
+        return self._degenerate
 
     @property
     def p_values(self):
@@ -277,13 +276,13 @@ class Pbox(ABC):
         return I(np.median(self.left), np.median(self.right))
 
     @property
-    def naked_value(self):
-        return np.round(self.mean.mid, 3)
-
-    @property
-    def area_metric(self):
-        return np.trapezoid(y=self._pvalues, x=self.left) - np.trapezoid(
-            y=self._pvalues, x=self.right
+    def enclosed_area(self):
+        """the enclosed area between the two extreme cdfs"""
+        return area_between_ecdfs(
+            x_upper=self.left,
+            p_upper=self._pvalues,
+            x_lower=self.right,
+            p_lower=self._pvalues,
         )
 
     # * --------------------- operators ---------------------*#
@@ -305,6 +304,12 @@ class Pbox(ABC):
         )
         return close
 
+    def __contains__(self, item):
+        if isinstance(item, Number):
+            return (self.lo <= item) and (item <= self.hi)
+        else:
+            return (self.lo <= item.lo) and (item.hi <= self.hi)
+
     # * --------------------- functions ---------------------*#
     def to_interval(self):
         """discretise pbox into a vec-interval of length of default steps
@@ -325,6 +330,10 @@ class Pbox(ABC):
             np.repeat(a=(1 / discretisation), repeats=discretisation),
         )
 
+    def to_numpy(self):
+        """convert pbox to a 2D numpy array (n, 2) of left and right"""
+        return np.stack((self.left, self.right), axis=1)
+
 
 class Staircase(Pbox):
     """distribution free p-box"""
@@ -341,21 +350,77 @@ class Staircase(Pbox):
         super().__init__(left, right, steps, mean, var, p_values)
 
     def _init_moments(self):
-        """initialised `mean`, `var` and `range` bounds"""
+        """Initialize mean/var interval estimates.
 
-        #! should we compute mean if it is a Cauchy, var if it's a t distribution?
-        #! we assume that two extreme bounds are valid CDFs
-        self.mean_lo, self.var_lo = get_mean_var_from_ecdf(self.left, self._pvalues)
-        self.mean_hi, self.var_hi = get_mean_var_from_ecdf(self.right, self._pvalues)
+        strategy:
+            1) Try LP-based bounds.
+            2) If that fails, try ECDF-based bounds.
+            3) If that also fails, set to NaN intervals so the program continues.
+
+        This function NEVER raises.
+        """
+        # Defaults
+        mean_I = None
+        var_I = None
+        method_used = None
+        errors = []
+
+        # --- Attempt 1: LP bounds ---
         try:
-            self.mean = I(self.mean_lo, self.mean_hi)
-        except:
-            self.mean = I(666, 666)
-        # TODO tmp solution for computing var for pbox
-        try:
-            self.var = I(self.var_lo, self.var_hi)
-        except:
-            self.var = I(666, 666)
+            dict_moments = variance_bounds_via_lp(
+                q_a=self.left,
+                p_a=self._pvalues,
+                q_b=self.right,
+                p_b=self._pvalues,
+                x_grid=np.linspace(self.lo, self.hi, 50),
+            )
+            self.mean_lo, self.mean_hi = dict_moments["mu_min"], dict_moments["mu_max"]
+            self.var_lo, self.var_hi = dict_moments["var_min"], dict_moments["var_max"]
+            mean_I = I(self.mean_lo, self.mean_hi)
+            var_I = I(self.var_lo, self.var_hi)
+            method_used = "lp_bounds"
+        except Exception as e:
+            errors.append(("lp_bounds", repr(e)))
+
+        # --- Attempt 2: ECDF fallback (only if needed) ---
+        if mean_I is None or var_I is None:
+            try:
+                mean_lo, var_lo = get_mean_var_from_ecdf(self.left, self._pvalues)
+                mean_hi, var_hi = get_mean_var_from_ecdf(self.right, self._pvalues)
+                self.mean_lo, self.mean_hi = mean_lo, mean_hi
+                self.var_lo, self.var_hi = var_lo, var_hi
+                mean_I = I(self.mean_lo, self.mean_hi)
+                var_I = I(self.var_lo, self.var_hi)
+                method_used = "ecdf_fallback"
+            except Exception as e:
+                errors.append(("ecdf_fallback", repr(e)))
+
+        # --- Last resort: make it unambiguous and safe ---
+        if mean_I is None or var_I is None:
+            # Use NaN to signal “unknown/unavailable” without risking real-number collisions.
+            mean_I = I(666, 666)
+            var_I = I(666, 666)
+            method_used = method_used or "unavailable"
+
+        # --- Assign + annotate; nothing in here may raise ---
+        self.mean = mean_I
+        self.var = var_I
+        # Optional: stash debug info for inspection; never let this crash.
+        with suppress(Exception):
+            self._moments_meta = {
+                "method": method_used,
+                "errors": errors,  # list of (stage, repr(error))
+                "lo_hi": {
+                    "mean": (
+                        getattr(self, "mean_lo", None),
+                        getattr(self, "mean_hi", None),
+                    ),
+                    "var": (
+                        getattr(self, "var_lo", None),
+                        getattr(self, "var_hi", None),
+                    ),
+                },
+            }
 
     def __repr__(self):
         def format_interval(interval):
@@ -377,6 +442,10 @@ class Staircase(Pbox):
         style="box",
         fill_color="lightgray",
         bound_colors=None,
+        # NEW
+        bound_styles=None,  # e.g. ("--", ":")
+        left_line_kwargs=None,  # e.g. {"linewidth": 2, "alpha": 0.9}
+        right_line_kwargs=None,  # e.g. {"linewidth": 2, "alpha": 0.9}
         nuance="step",
         alpha=0.3,
         **kwargs,
@@ -385,7 +454,41 @@ class Staircase(Pbox):
 
         args:
             style (str): 'box' or 'simple'
+            fill_color (str): color to fill the box (only for 'box' style)
+            bound_colors (list): list of two colors for left and right bound lines
+            bound_styles (list): list of two linestyles for left and right bound lines
+            left_line_kwargs (dict): additional kwargs for left bound line
+            right_line_kwargs (dict): additional kwargs for right bound line
+            nuance (str): 'step' or 'curve' for bound line styles
+            alpha (float): transparency level for the box fill (only for 'box' style)
+            **kwargs: additional keyword arguments for the plot
+
+
+        note:
+            Two styles are supported: a 'box' with fill-in color and a 'simple' one without fill-in color.
+            Color and linestyle of the bound lines can be customized via the `bound_styles`, `left_line_kwargs`, and `right_line_kwargs` parameters.
+            The argument `nuance` controls whether the bound lines are plotted as step functions ('step') or smooth curves ('curve').
+
+
+        example:
+            >>> a = pba.normal([2, 6], [0.5, 1])
+            >>> fig, ax = plt.subplots()
+            >>> a.plot(ax=ax, style='simple')  # simple style without fill-in color
+            >>> # box style with fill-in color and also customized bound colors
+            >>> a.plot(ax=ax, style='box',
+            ... fill_color='lightblue',
+            ... bound_colors = ['lightblue', 'lightblue'],
+            ... bound_styles=("--", ":"),
+            ... alpha=0.5
+            ... )
+            >>> ax = pbox.plot(
+            ... left_line_kwargs={"linestyle": "--", "linewidth": 2},
+            ... right_line_kwargs={"linestyle": ":", "linewidth": 2, "alpha": 0.8},
+            )
+
         """
+        import matplotlib.pyplot as plt
+        import matplotlib.patheffects as pe  # optional; for "shaded/halo" line effects
         from .utils import CustomEdgeRectHandler
 
         if ax is None:
@@ -394,42 +497,53 @@ class Staircase(Pbox):
         p_axis = self._pvalues if self._pvalues is not None else Params.p_values
         plot_bound_colors = bound_colors if bound_colors is not None else ["g", "b"]
 
+        # defaults
+        if bound_styles is None:
+            bound_styles = ("solid", "solid")
+        left_line_kwargs = {} if left_line_kwargs is None else dict(left_line_kwargs)
+        right_line_kwargs = {} if right_line_kwargs is None else dict(right_line_kwargs)
+
+        # ensure color + linestyle are set unless user overrode them
+        left_defaults = {"c": plot_bound_colors[0], "linestyle": bound_styles[0]}
+        right_defaults = {"c": plot_bound_colors[1], "linestyle": bound_styles[1]}
+        # user kwargs take precedence
+        left_kwargs = {**left_defaults, **left_line_kwargs}
+        right_kwargs = {**right_defaults, **right_line_kwargs}
+
         def display_box(nuance, label=None):
             """display two F curves plus the top-bottom horizontal lines"""
 
             if nuance == "step":
-                step_kwargs = {
-                    "c": plot_bound_colors[0],
-                    "where": "post",
-                }
-
+                step_kwargs_left = {"where": "post", **left_kwargs}
+                step_kwargs_right = {"where": "post", **right_kwargs}
                 if label is not None:
-                    step_kwargs["label"] = label
+                    step_kwargs_left["label"] = label
 
-                # Make the plot
-                (line,) = ax.step(self.left, p_axis, **step_kwargs)
-                ax.step(self.right, p_axis, c=plot_bound_colors[1], where="post")
-                ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
-                ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+                (line_left,) = ax.step(self.left, p_axis, **step_kwargs_left)
+                (line_right,) = ax.step(self.right, p_axis, **step_kwargs_right)
             elif nuance == "curve":
-                smooth_curve_kwargs = {
-                    "c": plot_bound_colors[0],
-                }
-
+                curve_kwargs_left = {**left_kwargs}
+                curve_kwargs_right = {**right_kwargs}
                 if label is not None:
-                    smooth_curve_kwargs["label"] = label
+                    curve_kwargs_left["label"] = label
 
-                (line,) = ax.plot(self.left, p_axis, **smooth_curve_kwargs)
-                ax.plot(self.right, p_axis, c=plot_bound_colors[1])
-                ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
-                ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+                (line_left,) = ax.plot(self.left, p_axis, **curve_kwargs_left)
+                (line_right,) = ax.plot(self.right, p_axis, **curve_kwargs_right)
             else:
                 raise ValueError("nuance must be either 'step' or 'curve'")
+
+            # horizontal caps (use right/left kwargs for consistent style/color)
+            ax.plot([self.left[0], self.right[0]], [0, 0], **right_kwargs)
+            ax.plot([self.left[-1], self.right[-1]], [1, 1], **left_kwargs)
+
             if label is not None:
-                ax.legend(handler_map={line: CustomEdgeRectHandler()})  # regular use
+                ax.legend(
+                    handler_map={line_left: CustomEdgeRectHandler()}
+                )  # regular use
 
         if title is not None:
             ax.set_title(title)
+
         if style == "box":
             ax.fill_betweenx(
                 y=p_axis,
@@ -444,12 +558,219 @@ class Staircase(Pbox):
             if "label" in kwargs:
                 ax.legend(loc="best")
         elif style == "simple":
-            display_box(nuance, label=kwargs["label"] if "label" in kwargs else None)
+            display_box(nuance, label=kwargs.get("label"))
         else:
             raise ValueError("style must be either 'simple' or 'box'")
+
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$\Pr(X \leq x)$")
         return ax
+
+    # backup old plot function
+    # def plot(
+    #     self,
+    #     title=None,
+    #     ax=None,
+    #     style="box",
+    #     fill_color="lightgray",
+    #     bound_colors=None,
+    #     nuance="step",
+    #     alpha=0.3,
+    #     **kwargs,
+    # ):
+    #     """default plotting function
+
+    #     args:
+    #         style (str): 'box' or 'simple'
+    #     """
+    #     from .utils import CustomEdgeRectHandler
+
+    #     if ax is None:
+    #         fig, ax = plt.subplots()
+
+    #     p_axis = self._pvalues if self._pvalues is not None else Params.p_values
+    #     plot_bound_colors = bound_colors if bound_colors is not None else ["g", "b"]
+
+    #     def display_box(nuance, label=None):
+    #         """display two F curves plus the top-bottom horizontal lines"""
+
+    #         if nuance == "step":
+    #             step_kwargs = {
+    #                 "c": plot_bound_colors[0],
+    #                 "where": "post",
+    #             }
+
+    #             if label is not None:
+    #                 step_kwargs["label"] = label
+
+    #             # Make the plot
+    #             (line,) = ax.step(self.left, p_axis, **step_kwargs)
+    #             ax.step(self.right, p_axis, c=plot_bound_colors[1], where="post")
+    #             ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
+    #             ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+    #         elif nuance == "curve":
+    #             smooth_curve_kwargs = {
+    #                 "c": plot_bound_colors[0],
+    #             }
+
+    #             if label is not None:
+    #                 smooth_curve_kwargs["label"] = label
+
+    #             (line,) = ax.plot(self.left, p_axis, **smooth_curve_kwargs)
+    #             ax.plot(self.right, p_axis, c=plot_bound_colors[1])
+    #             ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
+    #             ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+    #         else:
+    #             raise ValueError("nuance must be either 'step' or 'curve'")
+    #         if label is not None:
+    #             ax.legend(handler_map={line: CustomEdgeRectHandler()})  # regular use
+
+    #     if title is not None:
+    #         ax.set_title(title)
+    #     if style == "box":
+    #         ax.fill_betweenx(
+    #             y=p_axis,
+    #             x1=self.left,
+    #             x2=self.right,
+    #             interpolate=True,
+    #             color=fill_color,
+    #             alpha=alpha,
+    #             **kwargs,
+    #         )
+    #         display_box(nuance, label=None)
+    #         if "label" in kwargs:
+    #             ax.legend(loc="best")
+    #     elif style == "simple":
+    #         display_box(nuance, label=kwargs["label"] if "label" in kwargs else None)
+    #     else:
+    #         raise ValueError("style must be either 'simple' or 'box'")
+    #     ax.set_xlabel(r"$x$")
+    #     ax.set_ylabel(r"$\Pr(X \leq x)$")
+    #     return ax
+
+    #### put something below ####
+    def plot_reverse_axis(
+        self,
+        title=None,
+        ax=None,
+        style="box",
+        fill_color="lightgray",
+        bound_colors=None,
+        nuance="step",
+        alpha=0.3,
+        orientation="xy",  # NEW: "xy" (default) or "yx" (swap axes)
+        invert_xaxis=True,
+        **kwargs,
+    ):
+        """A testing plotting function that can swap quantile and probability axes.
+
+        args:
+            style (str): 'box' or 'simple'
+            orientation (str): 'xy' keeps x on horizontal and Pr(X<=x) on vertical;
+                            'yx' swaps them.
+        """
+        from .utils import CustomEdgeRectHandler
+        import matplotlib.pyplot as plt
+
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        p_axis = self._pvalues if self._pvalues is not None else Params.p_values
+        plot_bound_colors = bound_colors if bound_colors is not None else ["g", "b"]
+
+        def display_box(nuance, label=None):
+            """display two F curves plus the top-bottom horizontal/vertical lines,
+            depending on orientation.
+            """
+            if orientation == "xy":
+                # x = left/right, y = p
+                if nuance == "step":
+                    step_kwargs = {"c": plot_bound_colors[0], "where": "post"}
+                    if label is not None:
+                        step_kwargs["label"] = label
+                    (line,) = ax.step(self.left, p_axis, **step_kwargs)
+                    ax.step(self.right, p_axis, c=plot_bound_colors[1], where="post")
+                elif nuance == "curve":
+                    curve_kwargs = {"c": plot_bound_colors[0]}
+                    if label is not None:
+                        curve_kwargs["label"] = label
+                    (line,) = ax.plot(self.left, p_axis, **curve_kwargs)
+                    ax.plot(self.right, p_axis, c=plot_bound_colors[1])
+                else:
+                    raise ValueError("nuance must be either 'step' or 'curve'")
+                ax.plot([self.left[0], self.right[0]], [0, 0], c=plot_bound_colors[1])
+                ax.plot([self.left[-1], self.right[-1]], [1, 1], c=plot_bound_colors[0])
+
+            elif orientation == "yx":
+                # x = p, y = left/right  (axes swapped)
+                if nuance == "step":
+                    step_kwargs = {"c": plot_bound_colors[0], "where": "post"}
+                    if label is not None:
+                        step_kwargs["label"] = label
+                    (line,) = ax.step(p_axis, self.left, **step_kwargs)
+                    ax.step(p_axis, self.right, c=plot_bound_colors[1], where="post")
+                elif nuance == "curve":
+                    curve_kwargs = {"c": plot_bound_colors[0]}
+                    if label is not None:
+                        curve_kwargs["label"] = label
+                    (line,) = ax.plot(p_axis, self.left, **curve_kwargs)
+                    ax.plot(p_axis, self.right, c=plot_bound_colors[1])
+                else:
+                    raise ValueError("nuance must be either 'step' or 'curve'")
+                ax.plot([0, 0], [self.left[0], self.right[0]], c=plot_bound_colors[1])
+                ax.plot([1, 1], [self.left[-1], self.right[-1]], c=plot_bound_colors[0])
+            else:
+                raise ValueError("orientation must be 'xy' or 'yx'")
+
+            if label is not None:
+                ax.legend(handler_map={line: CustomEdgeRectHandler()})
+
+        if title is not None:
+            ax.set_title(title)
+
+        if style == "box":
+            if orientation == "xy":
+                ax.fill_betweenx(
+                    y=p_axis,
+                    x1=self.left,
+                    x2=self.right,
+                    interpolate=True,
+                    color=fill_color,
+                    alpha=alpha,
+                    **kwargs,
+                )
+            else:  # 'yx'
+                ax.fill_between(
+                    x=p_axis,
+                    y1=self.left,
+                    y2=self.right,
+                    interpolate=True,
+                    color=fill_color,
+                    alpha=alpha,
+                    **kwargs,
+                )
+            display_box(nuance, label=None)
+            if "label" in kwargs:
+                ax.legend(loc="best")
+        elif style == "simple":
+            display_box(nuance, label=kwargs["label"] if "label" in kwargs else None)
+        else:
+            raise ValueError("style must be either 'simple' or 'box'")
+
+        if orientation == "xy":
+            ax.set_xlabel(r"$x$")
+            ax.set_ylabel(r"$\Pr(X \leq x)$")
+        else:
+            ax.set_xlabel(r"$\Pr(X \leq x)$")
+            ax.set_ylabel(r"$x$")
+            if invert_xaxis:
+                ax.invert_xaxis()  # NEW LINE — reverses new x-axis (1 → 0)
+            ax.yaxis.tick_right()
+            ax.yaxis.set_label_position("right")
+
+        return ax
+
+    ### above ###
 
     def plot_outside_legend(
         self,
@@ -567,6 +888,30 @@ class Staircase(Pbox):
         ax.scatter(x, p_hi, c="r", marker="v", zorder=50)
         return ax
 
+    def plot_quantile_bound(self, p: float, ax=None, **kwargs):
+        """plot the quantile bound at a certain probability level p
+
+        note:
+            - a horizontal line
+        """
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        x_lo, x_hi = self.alpha_cut(p).lo, self.alpha_cut(p).hi
+
+        self.plot(ax=ax, **kwargs)
+
+        ax.plot(
+            [x_lo, x_hi],
+            [p, p],
+            c="r",
+            label="probability bound",
+            zorder=50,
+        )
+        ax.scatter(x_lo, p, c="r", marker=">", zorder=50)
+        ax.scatter(x_hi, p, c="r", marker="<", zorder=50)
+        return ax
+
     # * --------------------- constructors ---------------------*#
     @classmethod
     def from_CDFbundle(cls, a, b):
@@ -633,6 +978,31 @@ class Staircase(Pbox):
 
         bar = partial(np.power, other)  # other as the base
         return self._unary_template(bar)
+
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        if method != "__call__":
+            return NotImplemented
+        if len(inputs) != 1 or inputs[0] is not self:
+            return NotImplemented
+        if "out" in kwargs and kwargs["out"] is not None:
+            return NotImplemented
+
+        if ufunc is np.sin:
+            return self.sin()
+        if ufunc is np.cos:
+            return self.cos()
+        if ufunc is np.tanh:
+            return self.tanh()
+        if ufunc is np.exp:
+            return self.exp()
+        if ufunc is np.sqrt:
+            return self.sqrt()
+        if ufunc is np.log:
+            return self.log()
+        if ufunc is np.reciprocal:
+            return self.reciprocal()
+
+        return NotImplemented
 
     # * --------------------- methods ---------------------*#
 
@@ -711,7 +1081,7 @@ class Staircase(Pbox):
 
         return interval_vec
 
-    def condensation(self, n):
+    def condensation(self, n) -> Self:
         """ourter condensation of the pbox to reduce the number of steps and get a sparser staircase pbox
 
         args:
@@ -719,22 +1089,42 @@ class Staircase(Pbox):
 
         note:
             Have not thought about a better name so we call it `condensation` for now. Candidate names include 'approximation'.
+            It will ouput a p-box and keep steps as 200 for computational consistency.
 
         example:
             >>> p.condensation(n=5)
 
         return:
-            a staircase p-box with sparser steps
+            a staircase p-box that looks sparser but has the same number of steps
         """
         from .aggregation import stacking
 
         itvls = self.outer_discretisation(n)
         return stacking(itvls)
 
-    def area_metric(self):
-        return np.trapezoid(y=self.left, x=self._pvalues) - np.trapezoid(
-            y=self.right, x=self._pvalues
+    def condense(self, n) -> DempsterShafer:
+        """Another condensation function which has steps of n
+
+        Compared to the above `condensation` method that ouputs a p-box and  keeps steps as 200 for computational consistency.
+        This one condenses in a more literal manner, as in having n steps in the resulting Dempster-Shafer structure.
+        """
+        from .intervals.number import Interval as I
+        from .dss import DempsterShafer as DSS
+
+        condensed_x = self.condensation(n)
+
+        # condensed bounds
+        con_bd_l = np.unique(condensed_x.left)
+        con_bd_r = np.unique(condensed_x.right)
+
+        real_condensed_dss_x = DSS(
+            intervals=I(
+                lo=con_bd_l,
+                hi=con_bd_r,
+            ),
+            masses=[1 / len(con_bd_l)] * len(con_bd_l),
         )
+        return real_condensed_dss_x
 
     def truncate(self, a, b):
         """Truncate the Pbox to the range [a, b].
@@ -1037,12 +1427,10 @@ class Staircase(Pbox):
     def mul(self, other, dependency="f"):
         """Multiplication of uncertain numbers with the defined dependency dependency"""
         from .operation import (
-            frechet_op,
             independent_op,
             perfect_op,
             opposite_op,
         )
-        from .aggregation import _imposition
 
         if isinstance(other, Number):
             return pbox_number_ops(self, other, operator.mul)
@@ -1148,7 +1536,7 @@ class Leaf(Staircase):
 
     def __repr__(self):
         base_repr = super().__repr__().rstrip(")")  # remove trailing ')'
-        return f"{base_repr}, shape={self.shape}"
+        return f"{base_repr}, shape={self.shape})"  # added back trailing ')'
 
     def sample(self, n_sam):
         """sample from a parametric pbox or distribution"""
