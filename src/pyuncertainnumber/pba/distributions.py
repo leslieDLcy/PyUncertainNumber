@@ -82,6 +82,9 @@ class Distribution(NominalValueMixin):
         if not isinstance(params, (tuple, list)):
             params = (params,)
 
+        # TODO: special cases make it general
+        if self.dist_family == "lognormal":  # special case for lognormal distribution
+            return lognormal_sane(*params)
         return named_dists.get(self.dist_family)(*params)
 
     def parse_params_from_dist(self):

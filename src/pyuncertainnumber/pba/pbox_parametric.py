@@ -68,7 +68,6 @@ def _parametric_bounds_array(dist_family, *args, **kwargs):
         new_args = itertools.product(*[i.to_numpy() for i in i_args])
 
     dist = named_dists[dist_family]
-    print(type(dist))
     g1, g2 = itertools.tee(new_args, 2)
     bounds = [dist.ppf(Params.p_values, *a) for a in g1]
     stats = [dist.stats(*a, moments="mv") for a in g2]
