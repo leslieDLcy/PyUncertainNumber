@@ -18,18 +18,17 @@ interval_analysis
 
 ```{toctree}
 :caption: Tutorials
+:maxdepth: 1
+:titlesonly:
 :hidden:
 
-getting_started.ipynb
-what_is_un.ipynb
-uncertainty_characterisation.ipynb
-uncertainty_aggregation.ipynb
-uncertainty_propagation.ipynb
+tutorials/index
 ```
 
 ```{toctree}
 :caption: Examples
-:maxdepth: 2
+:maxdepth: 1
+:titlesonly:
 :hidden:
 
 examples/index
