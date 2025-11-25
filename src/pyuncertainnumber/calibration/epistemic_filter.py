@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import numpy as np
+import numpy as np
+from scipy.spatial import HalfspaceIntersection, ConvexHull
+from scipy.optimize import linprog
 
 
 class EpistemicFilter:
@@ -10,7 +13,7 @@ class EpistemicFilter:
     def __init__(
         self,
         xe_samples: NDArray,
-        discrepancy_scores: NDArray,
+        discrepancy_scores: NDArray = None,
         sets_of_discrepancy: list = None,
     ):
         """The EpistemicFilter method to reduce the epistemic uncertainty space based on discrepancy scores.
@@ -19,15 +22,22 @@ class EpistemicFilter:
             xe_samples (NDArray): Proposed Samples of epistemic parameters, shape (n_samples, n_dimensions).
                 Typically samples from a bounded set of some epistemic parameters.
 
-            discrepancy_scores (NDArray): Discrepancy scores between the model simulations and the observation.
-                Associated with each xe sample, shape (n_samples,).
+            discrepancy_scores (NDArray, optional): Discrepancy scores between the model simulations and the observation.
+                Associated with each xe sample, shape (n_samples,). Defaults to None.
 
             sets_of_discrepancy (list, optional): List of sets of discrepancy scores for multiple datasets.
                 Each element should be an NDArray of shape (n_samples,). Defaults to None.
 
         tip:
             For performance functions that output multiple responses, some aggregation of discrepancy scores may be used.
+            Depending on the number of observation, either a single set of discrepancy scores or multiple sets can be provided.
 
+        .. figure:: /_static/convex_hull.png
+            :alt: convex hull with bounds
+            :align: center
+            :width: 50%
+
+            Convex hull with bounds illustration.
         """
         self.xe_samples = xe_samples
         self.discrepancy_scores = discrepancy_scores
@@ -52,6 +62,58 @@ class EpistemicFilter:
         return filter_by_discrepancy(
             self.xe_samples, self.discrepancy_scores, threshold
         )
+
+    def iterative_filter(
+        self, thresholds: list, re_sample: bool = False, simulation_model=None
+    ):
+        """Iteratively filter the epistemic samples based on multiple discrepancy thresholds.
+
+        args:
+            thresholds (list): List of discrepancy thresholds for filtering data points.
+
+            re_sample (bool, optional): If True, re-evaluate discrepancy scores at each iteration using the simulation_model.
+                Defaults to False.
+
+            simulation_model (callable, optional): A function that takes xe_samples as input and returns discrepancy scores.
+                Required if re_sample is True. Defaults to None.
+        note:
+            if re_sample is True, the simulation_model should be provided to re-evaluate discrepancy scores.
+        """
+
+        # TODO start from the smallest threshold
+        pass
+
+    def filter_on_sets(self, plot_hulls: bool = True):
+        """Filter the epistemic samples based on multiple sets of discrepancy scores.
+
+        returns:
+            tuple:
+                - lower bounds;
+                - upper bounds of the intersected bounding box, or (None, None) if unsuccessful
+        """
+
+        xe_list = []
+        hull_list = []
+        boxes = []
+
+        for i in range(10):
+            ef = EpistemicFilter(
+                xe_samples=self.xe_samples,
+                discrepancy_scores=self.sets_of_discrepancy[i],
+            )
+            filtered_xe, hull, low_bound, upper_bound = ef.filter(threshold=10)
+            xe_list.append(filtered_xe)
+            hull_list.append(hull)
+            boxes.append((hull.min_bound, hull.max_bound))
+
+        if plot_hulls:
+            plot_multiple_convex_hulls(xe_list[:5], hull_list[:5])
+
+        # Compute intersection of bounding boxes
+        box_int_lower = np.maximum(boxes[0][0], boxes[1][0])
+        box_int_upper = np.minimum(boxes[0][1], boxes[1][1])
+
+        return box_int_lower, box_int_upper
 
     def plot_hull_with_bounds(
         self,
@@ -80,14 +142,6 @@ class EpistemicFilter:
 
         returns:
             ax (matplotlib Axes): The axes containing the plot.
-
-
-        .. figure:: /_static/convex_hull.png
-            :alt: convex hull with bounds
-            :align: center
-            :width: 50%
-
-            Convex hull with bounds illustration.
         """
         return plot_convex_hull_with_bounds(
             filtered_xe,
@@ -98,124 +152,6 @@ class EpistemicFilter:
             y_title=y_title,
             hull_alpha=hull_alpha,
         )
-
-
-##### NASA challenge 2025 #####
-# dummy query xc
-
-xc_query = [[0.533, 0.666, 0.5], [0.052631579, 0.421052632, 0.631578947]]
-
-n_steps_so_far = len(xc_query)
-
-
-# * this is probably problem specific
-def plot_convex_hulls(xe_samples, max_discrepancy, n_levels, min_level=0.005):
-    """Plot the convex hulls of the 2D projections of Xe
-    max_discrepancy: array with discrepancy scores of xe samples
-    xe: samples of the epistemic params
-    """
-    fig, axs = plt.subplots(1, 3, figsize=(15, 10))  # 3 rows, 1 column
-    MAX_delta, MIN_delta = np.nanmax(max_discrepancy), np.nanmin(max_discrepancy)
-
-    MIN_delta += min_level
-    Kid = 0  # for the legend
-    # Use a colormap for red scale
-    for ax, xe_idx_2plot in zip(
-        axs, [[0, 1], [0, 2], [1, 2]]
-    ):  # Loop through each pair of dimensions to plot
-        # Set up line styles, markers, and size
-        markers = ["x", "x", "x", "x", "x", "x", "x", "o"]
-
-        for i, threshold in enumerate(np.linspace(MAX_delta, MIN_delta, n_levels)):
-            filtered_points = xe_samples[max_discrepancy < threshold][:, xe_idx_2plot]
-            # Plot filtered points with corresponding color
-            ax.scatter(
-                filtered_points[:, 0],
-                filtered_points[:, 1],
-                s=5,
-                c="r",
-                label=f"Thresh < {threshold:.2f}",
-                alpha=0.02,
-                marker=markers[i % len(markers)],
-            )
-
-        for i, threshold in enumerate(np.linspace(MAX_delta, MIN_delta, n_levels)):
-            filtered_points = xe_samples[max_discrepancy < threshold][:, xe_idx_2plot]
-
-            if len(filtered_points) > 2:  # Fill the convex hull with a light color
-                hull = ConvexHull(filtered_points)
-                for simplex in hull.simplices:  # Outline the convex hull
-                    ax.plot(
-                        filtered_points[simplex, 0],
-                        filtered_points[simplex, 1],
-                        "b-",
-                        alpha=0.9,
-                        linewidth=4,
-                    )
-
-        ax.set_title(f"Convex Hulls 2D projection of Xe")
-        ax.set_xlabel(f"Xe {1+xe_idx_2plot[0]}")
-        ax.set_ylabel(f"Xe {1+xe_idx_2plot[1]}")
-        ax.grid()
-        if Kid == 0:
-            ax.legend(loc="upper right")
-            Kid += 1
-    plt.tight_layout()
-    plt.grid()
-    plt.show()
-
-
-# * this is probably problem specific
-def plot_convex_hull_3d(xe_samples, max_discrepancy, n_levels: int = 2):
-    """Plot 3d convex hull of Xe
-
-    max_discrepancy: array with discrepancy scores of xe samples
-    xe: samples of the epistemic params
-    """
-    # Create 3D plot
-    fig = plt.figure(figsize=(10, 10))
-    ax = fig.add_subplot(111, projection="3d")
-
-    # Plot all points
-    ax.scatter(
-        xe_samples[:, 0],
-        xe_samples[:, 1],
-        xe_samples[:, 2],
-        label="All points",
-        alpha=0.1,
-    )
-    MAX_delta, MIN_delta = np.nanmax(max_discrepancy), np.nanmin(max_discrepancy)
-
-    for threshold in np.linspace(MAX_delta, MIN_delta + 0.05, n_levels):
-        filtered_points = xe_samples[max_discrepancy < threshold]
-        ax.scatter(
-            filtered_points[:, 0],
-            filtered_points[:, 1],
-            filtered_points[:, 2],
-            label=f"Thresh < {threshold:.2f}",
-            alpha=0.1 * (1 - MAX_delta),
-        )
-        if len(filtered_points) > 3:  # ConvexHull in 3D requires at least 4 points
-            hull = ConvexHull(filtered_points)
-            for simplex in hull.simplices:
-                vertices = filtered_points[simplex]
-                poly = Poly3DCollection(
-                    [vertices], alpha=0.4, color="black", edgecolor="r"
-                )
-                ax.add_collection3d(poly)
-
-    # Set default view angle
-    ax.view_init(elev=25, azim=60)  # Elevation and azimuth
-    # Set plot labels and legend
-    ax.set_title("3D Convex Hulls for E={Xe: M(Xe,Xc*,:) <eps} Points")
-    ax.set_xlabel("Xe1")
-    ax.set_ylabel("Xe2")
-    ax.set_zlabel("Xe3")
-    ax.legend()
-    plt.show()
-
-
-##### for pun #####
 
 
 # problem agnostic
@@ -409,6 +345,154 @@ def plot_convex_hull_with_bounds(
 
     if n_dims == 3:
         ax.set_zlabel("z")
+
+    if show:
+        plt.show()
+
+    return ax
+
+
+def intersect_convex_hulls(hulls):
+    """
+    Compute intersection of several ConvexHull polytopes.
+    Works in 2D or 3D (and in principle higher).
+
+    Parameters
+    ----------
+    hulls : list of scipy.spatial.ConvexHull
+
+    Returns
+    -------
+    vertices : (m, d) ndarray
+        Vertices of the intersection polytope (may be empty).
+    hull_int : ConvexHull or None
+        ConvexHull of the intersection vertices, or None if empty.
+    """
+    if not hulls:
+        raise ValueError("Need at least one hull.")
+
+    dim = hulls[0].points.shape[1]
+
+    # 1. Collect all halfspaces: a^T x + c <= 0
+    halfspaces = np.vstack([h.equations for h in hulls])
+
+    # 2. Try to find a feasible interior point by linear programming
+    A = halfspaces[:, :-1]
+    c = halfspaces[:, -1]
+
+    # HalfspaceIntersection expects a^T x + c <= 0.
+    # We solve A x + c <= 0  <=>  A x <= -c
+    res = linprog(
+        np.zeros(dim),
+        A_ub=A,
+        b_ub=-c,
+        method="highs",
+    )
+
+    if not res.success:
+        # Intersection is empty (or numerical issues)
+        return np.empty((0, dim)), None
+
+    interior_point = res.x
+
+    # 3. Build the halfspace intersection
+    hs_int = HalfspaceIntersection(halfspaces, interior_point)
+    vertices = hs_int.intersections
+
+    if len(vertices) == 0:
+        return vertices, None
+
+    hull_int = ConvexHull(vertices)
+    return vertices, hull_int
+
+
+def plot_multiple_convex_hulls(
+    xe_list,
+    hulls=None,
+    show_bounds=True,
+    hull_alpha=0.25,
+    ax=None,
+    show=True,
+):
+    """
+    Plot multiple 2D point sets with their convex hulls.
+
+    Parameters
+    ----------
+    xe_list : list of ndarray
+        Each array must be shape (n_i, 2)
+    hulls : list of ConvexHull or None
+        If None, hulls are computed automatically.
+    show_bounds : bool
+        Whether to draw dashed bounding rectangles.
+    hull_alpha : float
+        Transparency of hull fill.
+    ax : matplotlib Axes
+        Optional existing axes.
+    show : bool
+        Whether to call plt.show()
+
+    Returns
+    -------
+    fig, ax, hulls
+    """
+
+    # Convert inputs and validate dimensions
+    xe_list = [np.asarray(xe) for xe in xe_list]
+    for xe in xe_list:
+        if xe.ndim != 2 or xe.shape[1] != 2:
+            raise ValueError("All point sets must be 2D with shape (n_i, 2).")
+
+    # Determine hulls if needed
+    if hulls is None:
+        hulls = []
+        for xe in xe_list:
+            if xe.shape[0] < 3:  # not enough points for a hull
+                hulls.append(None)
+            else:
+                hulls.append(ConvexHull(xe))
+
+    # Prepare figure
+    if ax is None:
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.figure
+
+    # Plot each convex hull
+    for idx, (xe, hull) in enumerate(zip(xe_list, hulls)):
+        color = f"C{idx % 10}"
+
+        # Plot points
+        ax.scatter(xe[:, 0], xe[:, 1], s=20, color=color)
+
+        # Draw the hull polygon
+        if hull is not None:
+            verts = xe[hull.vertices]
+            verts_closed = np.vstack([verts, verts[0]])
+
+            ax.fill(
+                verts_closed[:, 0],
+                verts_closed[:, 1],
+                facecolor=color,
+                edgecolor=color,
+                alpha=hull_alpha,
+                linewidth=2,
+            )
+
+            # Bounding rectangle
+            if show_bounds:
+                min_bound = getattr(hull, "min_bound", xe.min(axis=0))
+                max_bound = getattr(hull, "max_bound", xe.max(axis=0))
+                xmin, ymin = min_bound
+                xmax, ymax = max_bound
+
+                rect_x = [xmin, xmax, xmax, xmin, xmin]
+                rect_y = [ymin, ymin, ymax, ymax, ymin]
+                ax.plot(rect_x, rect_y, "--", linewidth=1.5, color=color)
+
+    # ax.set_aspect("equal", "box")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
 
     if show:
         plt.show()
