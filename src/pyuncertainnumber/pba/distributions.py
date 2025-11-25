@@ -82,6 +82,9 @@ class Distribution(NominalValueMixin):
         if not isinstance(params, (tuple, list)):
             params = (params,)
 
+        # TODO: special cases make it general
+        if self.dist_family == "lognormal":  # special case for lognormal distribution
+            return lognormal_sane(*params)
         return named_dists.get(self.dist_family)(*params)
 
     def parse_params_from_dist(self):
@@ -437,9 +440,27 @@ def lognormal_sane(mu, sigma):
     return sps.lognorm(s=shape, scale=scale)
 
 
+class LognormalSaneDist:
+    def ppf(self, p_values, *params):
+        dist = lognormal_sane(*params)
+        return dist.ppf(p_values)
+
+    def stats(self, *params, moments="mv"):
+        dist = lognormal_sane(*params)
+        return dist.stats(moments=moments)
+
+
 def expon_sane(lamb):
     """Sane exponential distribution constructor"""
     return sps.expon(scale=1 / lamb)
+
+
+class WrapperDist:
+    def __init__(self, ppf_func):
+        self._ppf = ppf_func
+
+    def ppf(self, *args, **kwargs):
+        return self._ppf(*args, **kwargs)
 
 
 named_dists = {
@@ -509,7 +530,7 @@ named_dists = {
     "loggamma": sps.loggamma,
     "loglaplace": sps.loglaplace,
     # "lognorm": sps.lognorm,
-    "lognormal": lognormal_sane,
+    "lognormal": LognormalSaneDist(),
     "loguniform": sps.loguniform,
     "lomax": sps.lomax,
     "maxwell": sps.maxwell,
