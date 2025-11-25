@@ -539,26 +539,6 @@ def estimate_p_theta_knn(observed_data,
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ----------------------------
 # Example usage
 if __name__ == "__main__":
