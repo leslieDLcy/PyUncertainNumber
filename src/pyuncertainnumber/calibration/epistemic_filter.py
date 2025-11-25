@@ -86,17 +86,23 @@ class EpistemicFilter:
     def filter_on_sets(self, plot_hulls: bool = True):
         """Filter the epistemic samples based on multiple sets of discrepancy scores.
 
+        args:
+            plot_hulls (bool, optional): If True, plots the convex hulls of the first five sets. Defaults to True.
+
         returns:
             tuple:
                 - lower bounds;
                 - upper bounds of the intersected bounding box, or (None, None) if unsuccessful
+
+        note:
+            `self.sets_of_discrepancy` must exist.
         """
 
         xe_list = []
         hull_list = []
         boxes = []
 
-        for i in range(10):
+        for i in range(len(self.sets_of_discrepancy)):
             ef = EpistemicFilter(
                 xe_samples=self.xe_samples,
                 discrepancy_scores=self.sets_of_discrepancy[i],
