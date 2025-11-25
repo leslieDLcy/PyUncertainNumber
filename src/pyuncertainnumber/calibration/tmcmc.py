@@ -1,13 +1,15 @@
 from numpy.typing import NDArray
+import pickle
+from scipy.stats import wasserstein_distance, entropy
+from sklearn.metrics import mean_squared_error
 
 """
-@author: Mukesh K. Ramancha
-@revised: Roberto Rocchetta (NASA UQ challenge 2025)
-@revised: Leslie for pyuncertainnumber package
-@date: Nov 2025
+This is the implementation for Transitional Markov Chain Monte Carlo (TMCMC) algorithm
 
-transitional Markov chain Monte Carlo
-a.k.a. sequential Monte Carlo
+Leslie refactored and revised for `pyuncertainnumber` package, based on the version from 
+Roberto Rocchetta (NASA UQ challenge 2025). The original code is from Mukesh K. Ramancha.
+@license: MIT License
+@date: Nov 2025
 """
 
 import matplotlib.pyplot as plt
@@ -29,7 +31,7 @@ class TMCMC:
 
         parameters (list) : list of (size Nop) prior distributions instances
 
-        log_likelihood (callable): log likelihood function to be defined in main.py as is problem specific
+        log_likelihood (callable): log likelihood function on $\theta$ to be defined which is problem specific
 
         status_file_name (str): name of the status file to store status of the tmcmc sampling
 
@@ -68,6 +70,20 @@ class TMCMC:
             status_file_name=self.status_file_name,
         )
         return mytrace
+
+    def save_trace(self, mytrace, file_name: str, save_dir=None):
+        """Save the trace to a file
+
+        args:
+            mytrace: trace file of all samples of all tmcmc stages.
+            file_name (str): name of the file to save the trace
+        """
+        # save results
+        if save_dir is not None:
+            file_name = f"{save_dir}/{file_name}"
+        with open(f"{file_name}.pkl", "wb") as f:
+            pickle.dump(mytrace, f, protocol=pickle.HIGHEST_PROTOCOL)
+            np.save(file_name, mytrace)
 
 
 # class prior_uniform:
@@ -164,7 +180,7 @@ def plot_distribution(combined_df, round_index, save=False, save_dir=None):
     plt.show()
 
 
-""" keep the orignal as backup"""
+# * ----------------------------------- tmcmc
 
 
 def plot_updated_distribution(mytrace, names, save=False):
@@ -692,3 +708,94 @@ def run_tmcmc(
 
     if parallel_processing == "multiprocessing":
         return mytrace, None
+
+
+# * ----------------------------------- likelihood
+
+
+def log_likelihood(
+    sam_id: int,
+    param_vec: NDArray,
+    data_empirical,
+    n_xa_samples,
+    simulator: callable,
+    which_likelihood_calculator="gaussian",
+) -> np.ndarray:
+    """Picklable function at module level.
+
+    args:
+        sam_id: (int) a dummy sample index  which is required in the main `run_tmcmc` workflow
+
+        param_vec (array-like): indeed a 1d epistemic_param_vec, the parameter vector, i.e. epistemic_domain
+
+    Note:
+        Gaussian approximate likelihood function is implemented here. Other likelihood functions such as
+        "pseudo" and "vae" are underway.
+    """
+
+    if which_likelihood_calculator == "gaussian":
+        llhd_calculator = gaussian_likelihood_fun
+    elif which_likelihood_calculator == "pseudo":
+        llhd_calculator = "pseudo"
+    elif which_likelihood_calculator == "vae":
+        llhd_calculator = "vae"
+    else:
+        raise ValueError(f"Unknown likelihood function: {which_likelihood_calculator}")
+
+    pseudo_log_likelihoods = llhd_calculator(
+        params=param_vec,
+        data=data_empirical,
+        simulator=simulator,
+        n_xa_samples=n_xa_samples,
+    )
+    return np.sum(pseudo_log_likelihoods, axis=-1)
+
+
+def gaussian_likelihood_fun(
+    params, data, simulator, n_xa_samples, dissimilarity_metric="wasserstein"
+):
+    """Computes the Gaussian log-likelihood of the data given the model and parameters.
+
+    args:
+        params: Parameters for the black-box model.
+
+        data: Empirical data (numpy array of shape (time_steps, features, samples)).
+
+        simulator: A function that generates model response samples given parameters.
+            Here response may be time series data of shape (time_steps, features, n_xa_samples), or
+            maybe some performance metrics extracted from the time series data.
+
+        n_xa_samples: Number of samples to generate from the simulator.
+
+    returns:
+        log_likelihood: The Gaussian log-likelihood of the data given the model.
+    """
+
+    # Generate samples from the black box model using params
+    mod_sam = simulator(params, n_xa_samples)
+
+    # Compute global dissimilarity
+    if dissimilarity_metric == "mse":
+        # Mean Squared Error
+        dissimilarity = mean_squared_error(data.flatten(), mod_sam.flatten())
+
+        # time series case
+        # data_expanded = np.expand_dims(data, axis=-1)  # Shape: (60, 6, 100, 1)
+        # mod_sam_expanded = np.expand_dims(mod_sam, axis=-2)  # Shape: (60, 6, 1, 10)
+        # dissimilarity = np.mean((data_expanded - mod_sam_expanded) ** 2)
+
+    elif dissimilarity_metric == "wasserstein":
+        dissimilarity = wasserstein_distance(data.flatten(), mod_sam.flatten())
+
+    elif dissimilarity_metric == "correlation":
+        corr = np.corrcoef(data.flatten(), mod_sam.flatten())[0, 1]
+        dissimilarity = 1 - corr  # Correlation-based distance
+
+    else:
+        raise ValueError(f"Unknown dissimilarity metric: {dissimilarity_metric}")
+
+    # Convert dissimilarity to likelihood
+    eps_scale = 1e-4  # arbitrary scale factor....can be done better
+    log_likelihood = -((eps_scale * dissimilarity) ** 2)  # np.exp(-dissimilarity)
+
+    return log_likelihood
