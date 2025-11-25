@@ -25,7 +25,7 @@ This package is underpinned by a framework of ***uncertain number*** which allow
 Explore the [documentation](https://pyuncertainnumber.readthedocs.io/en/latest/index.html) to get started, featuring hands-on [tutorials](docs/source/tutorials/index.md) and in-depth [examples](docs/source/examples/index.md) that showcase the power of the package.
 
 
-> `pyuncertainnumber` exposes APIs at different levels. It features high-level APIs best suited for new users to quickly start with uncertainty computations with [*uncertain numbers*](docs/source/tutorials/what_is_un.ipynb), and also low-level APIs allowing experts to have additional controls over mathematical constructs such as p-boxes, Dempster Shafer structures, probability distributions, etc.
+>`pyuncertainnumber` exposes APIs at different levels. It features high-level APIs best suited for new users to quickly start with uncertainty computations with [*uncertain numbers*](docs/source/tutorials/what_is_un.ipynb), and also low-level APIs allowing experts to have additional controls over mathematical constructs such as p-boxes, Dempster Shafer structures, probability distributions, etc.
 
 
 ## Installation
