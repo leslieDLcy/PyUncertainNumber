@@ -15,9 +15,7 @@ import seaborn as sb
 import pandas as pd
 import time
 import numpy as np
-import pickle
 import logging
-import scipy.stats as sps
 from ..console import console
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
@@ -38,6 +36,14 @@ class TMCMC:
     return:
         mytrace: returns trace file of all samples of all tmcmc stages.
             At stage m: it contains [Sm, Lm, Wm_n, ESS, beta, Smcap]
+
+
+    .. figure:: /_static/tmcmc_2dof.png
+        :alt: 2DOF TMCMC example
+        :align: center
+        :width: 50%
+
+        Example of TMCMC calibration of a 2-DOF system
     """
 
     def __init__(
@@ -106,7 +112,7 @@ def recover_trace_results(mytrace, names) -> pd.DataFrame:
 
     df1 = pd.DataFrame(mytrace[0][0], columns=names)  # samples from prior
     df2 = pd.DataFrame(
-        mytrace[-1][-1], columns=names
+        mytrace[-1][0], columns=names
     )  # samples from last step posterior
 
     # Add a column to identify the source
@@ -521,17 +527,7 @@ def run_tmcmc(
 
             pool = Pool(processes=mp.cpu_count() - 2)
             Lmt = pool.starmap(log_likelihood, iterables)
-        # TODO: remove `mpi` for now
-        # elif parallel_processing == "mpi":
-        #     status_file.write("using mpi \n")
-        #     # import mpi4py
-        #     # mpi4py.rc.recv_mprobe = False
-        #     from mpi4py import MPI
-        #     from mpi4py.futures import MPIPoolExecutor
 
-        #     comm = MPI.COMM_WORLD
-        #     executor = MPIPoolExecutor(max_workers=comm.Get_size())
-        #     Lmt = list(executor.starmap(log_likelihood, iterables))
         else:
             raise (
                 AssertionError(
@@ -580,9 +576,6 @@ def run_tmcmc(
         # save to trace
         # stage m: samples, likelihood, weights, next stage ESS, next stage beta, resampled samples
         mytrace.append([Sm, Lm, Wm_n, ESS, beta, Smcap])
-
-        with open(f"tmcmc_trace_N{N}_inside.pkl", "wb") as f:
-            pickle.dump(mytrace, f)
 
         # TODO: plot updated distribution to fix later on
         # if stage_num in [2, 4, 6]:
