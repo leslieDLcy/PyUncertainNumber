@@ -3,12 +3,18 @@
 <!-- Register the notebooks with Sphinx -->
 ```{toctree}
 :maxdepth: 1
+:titlesonly:
+:hidden:
 
-examples/getting_started
-examples/example_dependency_dev_purpose
-examples/repeated_variable
-examples/linguistic_approximation
-examples/significant_digits
+work_with_interval
+example_dependency_dev_purpose
+repeated_variable
+linguistic_approximation
+significant_digits
+characterise_what_you_know
+aleatory_propagation_demo
+interval_propagation_demo
+mix_uncertainty_propagation_demo
 ```
 
 <!-- Show a grid of nice cards that link to each notebook -->
