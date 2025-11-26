@@ -795,7 +795,7 @@ def gaussian_likelihood_fun(
         raise ValueError(f"Unknown dissimilarity metric: {dissimilarity_metric}")
 
     # Convert dissimilarity to likelihood
-    eps_scale = 1e-4  # arbitrary scale factor....can be done better
-    log_likelihood = -((eps_scale * dissimilarity) ** 2)  # np.exp(-dissimilarity)
+    eps_scale = 1e-3  # scaling factor for likelihood
+    log_likelihood = -((dissimilarity / eps_scale) ** 2)  # np.exp(-dissimilarity)
 
     return log_likelihood
