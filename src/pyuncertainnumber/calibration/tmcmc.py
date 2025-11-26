@@ -81,9 +81,9 @@ class TMCMC:
         # save results
         if save_dir is not None:
             file_name = f"{save_dir}/{file_name}"
+
         with open(f"{file_name}.pkl", "wb") as f:
             pickle.dump(mytrace, f, protocol=pickle.HIGHEST_PROTOCOL)
-            np.save(file_name, mytrace)
 
 
 # class prior_uniform:

@@ -1,23 +1,15 @@
+"""
+Test file for `tmcmc` implementation on a simple example of 2DOF system
+"""
+
 from numpy.typing import ArrayLike
 
-"""
-Test file for `tmcmc` implementation on a simple example of 2D0F system
-
-To execute this file:
-
-- use following command on cmd promt if parallel_processing = 'multiprocessing'
-    python main_2DOF.py
-"""
-
 import numpy as np
-import pickle
+import pytest
 from pyuncertainnumber.calibration import pdfs
-from pyuncertainnumber.calibration.tmcmc import run_tmcmc, TMCMC
+from pyuncertainnumber.calibration.tmcmc import TMCMC
 
-# choose 'multiprocessing' for local workstation or 'mpi' for supercomputer
-parallel_processing = "multiprocessing"
-
-# measurment data:
+# measurement data:
 # eigen values of first mode
 data1 = np.array([0.3860, 0.3922, 0.4157, 0.3592, 0.3615])
 # eigen values of second mode
@@ -123,26 +115,20 @@ def log_likelihood_case2(particle_num, s):
     return LL
 
 
-# run main
-if __name__ == "__main__":
-    """main part to run tmcmc for the 2DOF example"""
-
-    # * ------------------------- the original call signature
-    # mytrace, comm = run_tmcmc(
-    #     N, all_pars, log_likelihood_case2, status_file_name="status_file_2DOF.txt"
-    # )
-
-    # * -------------------------- Leslie's alternative TMCMC class usage
-
+def test_2dof_tmcmc(tmp_path):
+    """Test TMCMC on 2DOF example"""
+    # Use temporary directory for status file
+    status_file = tmp_path / "status_file_2DOF_class.txt"
+    
     t = TMCMC(
         N,
         all_pars,
         log_likelihood=log_likelihood_case2,
-        status_file_name="status_file_2DOF_class.txt",
+        status_file_name=str(status_file),
     )
 
     mytrace = t.run()
+    
+    assert mytrace is not None
 
-    # save results
-    with open("mytrace.pkl", "wb") as handle1:
-        pickle.dump(mytrace, handle1, protocol=pickle.HIGHEST_PROTOCOL)
+
