@@ -6,35 +6,48 @@ from sklearn.neighbors import NearestNeighbors, KernelDensity
 
 
 class KNNCalibrator(Calibrator):
-    r"""
-    Unified kNN-based calibrator for black-box models or precomputed simulations.
+    """Unified kNN-based calibrator for black-box models or precomputed simulations.
 
-    Setup (unified)
-    ---------------
-    - If `evaluate_model=False` and `simulated_data` is provided, we **reuse** simulations and
-      build a per-design kNN index by **filtering** rows with |xi - xi*| < a_tol for each ξ* in `xi_list`.
-    - If `evaluate_model=True`, we **simulate** `y = model(theta, xi)` **for each** ξ in `xi_list`, using
-      a **shared θ grid** drawn once from `theta_sampler(n_samples)`. Then we build per-design kNN indices.
+    Args:
+        knn (int): Number of neighbors per observed row. Default: 100.
+        a_tol (float): Tolerance for matching simulated :math:`\\xi` to a requested :math:`\\xi^*`
+            (when reusing). A simulation is kept if :math:`\\|\\xi_{\\text{sim}} - \\xi^*\\|_\\infty < a_{\\text{tol}}`.
+            Default: 0.05.
+        evaluate_model (bool): If True, call the black-box model for each :math:`\\xi` in ``xi_list``
+            on a shared :math:`\\theta` grid. If False, reuse ``simulated_data`` (requires y/theta/xi arrays).
+            Default: False.
+        random_state (int): Seed for reproducibility (affects theta_sampler and resampling). Default: 42.
 
-    Calibration (single logic for single/multi-design)
-    --------------------------------------------------
-    For each `(y_obs, xi)`:
-      1) standardize `y_obs` with the per-design scaler,
-      2) get k nearest neighbors in y-space,
-      3) map indices → θ for that design.
-    Finally we **stack** θ across all observations/designs (or optionally tally/vote).
+    Note:
+        **Setup (unified approach)**:
 
-    Args
-    ----
-    knn : int
-        Number of neighbors per observed row.
-    a_tol : float
-        Tolerance for matching `simulated_data['xi']` to a requested ξ* (when reusing).
-    evaluate_model : bool
-        If True, call the black-box `model` for each ξ in `xi_list` on a shared θ grid.
-        If False, reuse `simulated_data` (requires y/theta/xi).
-    random_state : Optional[int]
-        Seed for reproducibility (affects theta_sampler and resampling).
+        - If ``evaluate_model=False`` and ``simulated_data`` is provided:
+
+          * Reuse pre-computed simulations
+          * Build a per-design kNN index by filtering rows with :math:`\\|\\xi - \\xi^*\\|_\\infty < a_{\\text{tol}}`
+            for each :math:`\\xi^*` in ``xi_list``
+
+        - If ``evaluate_model=True``:
+
+          * Simulate :math:`y = \\text{model}(\\theta, \\xi)` for each :math:`\\xi` in ``xi_list``
+          * Use a shared :math:`\\theta` grid drawn once from ``theta_sampler(n_samples)``
+          * Build per-design kNN indices on this shared grid
+
+        **Calibration workflow (single/multi-design)**:
+
+        For each observation pair :math:`(y_{\\text{obs}}, \\xi)`:
+
+        1. Standardize :math:`y_{\\text{obs}}` using the per-design scaler
+        2. Find k nearest neighbors in y-space
+        3. Map neighbor indices to :math:`\\theta` values for that design
+        4. Stack :math:`\\theta` samples across all observations/designs (or apply voting/intersection)
+
+    .. figure:: /_static/knn_illustration.png
+        :alt: knn_illustration
+        :align: center
+        :width: 50%
+
+        KNN calibration illustration.
     """
 
     def __init__(
@@ -82,21 +95,17 @@ class KNNCalibrator(Calibrator):
         xi_list: Optional[List[Union[float, np.ndarray]]] = None,
         n_samples: int = 10000,
     ):
-        """
-        Prepare per-design kNN structures by either reusing `simulated_data` or by simulating for each design.
+        """Prepare per-design kNN structures by either reusing simulated_data or simulating for each design.
 
-        Parameters
-        ----------
-        model : callable
-            Black-box simulator with signature `model(theta, xi) -> y` (vectorized over theta).
-        theta_sampler : callable
-            Sampler for θ; required when `evaluate_model=True`.
-        simulated_data : dict
-            Dict with keys {"y": (n, dy), "theta": (n, dθ), "xi": (n, dξ)} when reusing sims.
-        xi_list : list
-            List of designs; each item can be scalar or array-like. If None → [0.0].
-        n_samples : int
-            Number of θ samples to draw when `evaluate_model=True`.
+        Args:
+            model (callable, optional): Black-box simulator with signature ``model(theta, xi) -> y``
+                (vectorized over theta).
+            theta_sampler (callable, optional): Sampler for :math:`\\theta`; required when ``evaluate_model=True``.
+            simulated_data (dict, optional): Dict with keys {"y": (n, dy), "theta": (n, dθ), "xi": (n, dξ)}
+                when reusing sims.
+            xi_list (list, optional): List of designs; each item can be scalar or array-like.
+                If None, defaults to [0.0].
+            n_samples (int): Number of :math:`\\theta` samples to draw when ``evaluate_model=True``. Default: 10000.
         """
         xi_list = [0.0] if not xi_list else xi_list
 
@@ -198,24 +207,18 @@ class KNNCalibrator(Calibrator):
         k: Optional[int] = None,
         return_dist: bool = False,
     ):
-        """
-        Return k nearest neighbors for `y` at design `xi`.
+        """Return k nearest neighbors for y at design xi.
 
-        Parameters
-        ----------
-        y : array-like, shape (m, d_y) or (d_y,)
-            Query outputs.
-        xi : scalar or array-like
-            Design key to select the per-design index.
-        k : Optional[int]
-            Number of neighbors; defaults to self.knn.
-        return_dist : bool
-            If True, also return distances and raw indices.
+        Args:
+            y (array-like): Query outputs, shape (m, d_y) or (d_y,).
+            xi (scalar or array-like): Design key to select the per-design index.
+            k (int, optional): Number of neighbors; defaults to ``self.knn``.
+            return_dist (bool): If True, also return distances and raw indices. Default: False.
 
-        Returns
-        -------
-        theta_neighbors : (m*k, dθ) stacked θ for all query rows
-        distances, indices : optional
+        Returns:
+            theta_neighbors (ndarray): Shape (m*k, dθ) stacked :math:`\\theta` for all query rows.
+            distances (ndarray, optional): Returned if ``return_dist=True``.
+            indices (ndarray, optional): Returned if ``return_dist=True``.
         """
         if not self.is_ready:
             raise RuntimeError("Call setup() before nearest().")
@@ -243,28 +246,55 @@ class KNNCalibrator(Calibrator):
         combine: str = "stack",
         combine_params: dict | None = None,
     ):
-        """
-        kNN calibration with two aggregation modes:
+        """Run kNN calibration and aggregate posterior θ across neighbor-hit blocks.
 
-        combine:
-          - 'stack'     : concatenate all kNN θ; optional de-duplication
-          - 'intersect' : keep θ that occur at least 'min_count' times across all neighbor hits
+        Args:
+            observations: Observed simulator or model outputs to calibrate against.
 
-        combine_params:
-          - dedup: bool (default False) — only for 'stack'
-          - theta_match_tol: float (default 1e-9) — rounding quantum for row matching/dup
-          - min_count: int | None — minimum occurrences for 'intersect'
-                       default: max(1, ceil(0.5 * total_blocks))   # “appear in about half of the lists”
-          - use_kde: bool (default False) — if True, compute KDE log-scores and normalized weights
-          - kde_bandwidth: float | None — optional bandwidth for KDE (Scott’s rule if None)
+            resample_n (int | None): If set, resample posterior θ samples to this size.
+                If `None`, return all aggregated θ without resampling.
+
+            combine (str): Aggregation mode. One of:
+
+                - **'stack'**: concatenate all kNN θ; optional de-duplication.
+
+                - **'intersect'**: retain θ hit at least `min_count` times across neighbor blocks.
+
+            combine_params (dict | None): Optional parameters controlling aggregation and KDE weighting.
+
+                Supported keys:
+
+                - **dedup** (bool): Default `False`. Remove duplicate θ (only for 'stack').
+
+                - **theta_match_tol** (float): Default `1e-9`. Tolerance or rounding quantum for comparing/merging θ values.
+
+                - **min_count** (int | None): Minimum occurrences for 'intersect'. Default is `max(1, ceil(0.5 * total_blocks))`, meaning θ must appear in about half of neighbor lists.
+
+                - **use_kde** (bool): Default `False`. If `True`, fit KDE on aggregated θ to compute log-scores and normalized weights.
+
+                - **kde_bandwidth** (float | None): Bandwidth for KDE. If `None` (default), use Scott's rule.
+
+        tip:
+            Two aggregation modes are supported:
+
+            - **stack**: Concatenate all kNN θ into a single array. Supports optional de-duplication of nearly identical θ values.
+
+            - **intersect**: Keep θ values that occur in at least `min_count` neighbor blocks across all observations/design points (default ≈ half of all blocks).
+
+            Optional density weighting via KDE can be applied after aggregation to compute normalized posterior weights.
+
 
         Returns:
-          dict with keys:
-            'mode'    : 'knn'
-            'theta'   : (n,dθ) posterior samples (resampled if requested)
-            'weights' : None (stack/intersect) or KDE weights if use_kde=True
-            'meta'    : dict with aggregation info (and KDE bandwidth if used)
+            dict: A dictionary with keys:
+                - **'mode'** (str): Always `'knn'`.
+                - **'theta'** (ndarray): Posterior samples of shape `(N, dθ)`;
+                  resampled if `resample_n` is provided.
+                - **'weights'** (ndarray | None): `None` for stack/intersect,
+                  or a length-`N` array of KDE weights if `use_kde=True`.
+                - **'meta'** (dict): Aggregation info; may include KDE bandwidth
+                  if density weighting is used.
         """
+
         if not self.is_ready:
             raise RuntimeError("Call setup() before calibrate().")
 
@@ -450,9 +480,15 @@ class KNNCalibrator(Calibrator):
             raise ValueError("`combine` must be 'stack' or 'intersect'.")
 
     def _round_rows(self, A: np.ndarray, tol: float) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Round rows of A to multiples of `tol` and return (unique_rows, counts).
-        If tol <= 0, exact matching is used.
+        """Round rows of A to multiples of tol and return (unique_rows, counts).
+
+        Args:
+            A (ndarray): Input array to process.
+            tol (float): Tolerance for rounding. If tol <= 0, exact matching is used.
+
+        Returns:
+            tuple: (unique_rows, counts) where unique_rows are the deduplicated rows
+                and counts are the occurrence counts.
         """
         import numpy as _np
 
@@ -475,22 +511,18 @@ class KNNCalibrator(Calibrator):
         return uniq, counts
 
     def _kde_logweights(self, X, bw=0.5, n_max_exact=5000):
-        """
-        Compute KDE-based log-weights for posterior samples X.
+        """Compute KDE-based log-weights for posterior samples X.
 
         Args:
-            X : ndarray (n, d)
-                Posterior samples.
-            bw : float
-                Bandwidth for Gaussian kernel.
-            n_max_exact : int
-                Max n for exact pairwise KDE. Above this, fall back to sklearn.KernelDensity.
+            X (ndarray): Posterior samples, shape (n, d).
+            bw (float): Bandwidth for Gaussian kernel. Default: 0.5.
+            n_max_exact (int): Max n for exact pairwise KDE. Above this, fall back to
+                sklearn.KernelDensity. Default: 5000.
 
         Returns:
-            logp : ndarray (n,)
-                Log-density values at X.
-            w : ndarray (n,)
-                Normalized weights.
+            tuple:
+                - **logp** (ndarray): Log-density values at X, shape (n,).
+                - **w** (ndarray): Normalized weights, shape (n,).
         """
         n, d = X.shape
         if n <= n_max_exact:
@@ -522,47 +554,42 @@ class KNNCalibrator(Calibrator):
 def estimate_p_theta_knn(
     observed_data, simulated_data, xi_star, knn: int = 20, a_tol: float = 0.05
 ):
-    """
-    Estimate the posterior distribution p(θ) of θ using a k-Nearest Neighbors (kNN)
-    filter on a pre-computed simulation archive, conditioned on a design ξ*.
+    """Estimate the posterior distribution p(θ) using k-Nearest Neighbors (kNN) on a simulation archive.
 
-    This method restricts the simulation archive to runs at (or near) the
-    target design ξ*, then fits a kNN model in output (y) space. For each
-    observed output y_obs, it retrieves the k-nearest simulated outputs and
-    returns the corresponding θ values as approximate posterior samples.
+    This method restricts the simulation archive to runs at (or near) the target design :math:`\\xi^*`, 
+    then fits a kNN model in output (y) space. For each observed output y_obs, it retrieves the 
+    k-nearest simulated outputs and returns the corresponding :math:`\\theta` values as approximate 
+    posterior samples.
+
     Args:
-        observed_data (np.ndarray):
-            Array of observed outputs y_obs (shape: n_obs × d_y).
+        observed_data (ndarray): Array of observed outputs y_obs, shape (n_obs, d_y).
             Must match the dimensionality of simulated outputs.
-        simulated_data (list):
-            A list of arrays [y, θ, ξ], containing
-                - y (n × d_y): simulation output, e.g. a transformed y with only KPIs
-                - θ (n × d_theta): parameters and variables to be calibrated
-                - ξ (n × d_xi):  conditioning controllable factors, e.g., design,  parameters
-        knn (int):
-            Number of nearest neighbors to query per observed sample.
-        xi_star
-            Target design ξ* at which the posterior is estimated.
-        a_tol (float, optional):
-            Tolerance for matching simulations to ξ*. Defaults to 0.1.
-            A simulation is kept if ||xi_sim - xi_star||∞ < a_tol.
+        simulated_data (list): List of arrays [y, θ, ξ], containing:
+            
+            - **y** (ndarray): Simulation output, shape (n, d_y), e.g., transformed y with only KPIs
+            - **θ** (ndarray): Parameters and variables to be calibrated, shape (n, d_theta)
+            - **ξ** (ndarray): Conditioning controllable factors, shape (n, d_xi), e.g., design parameters
+            
+        knn (int): Number of nearest neighbors to query per observed sample. Default: 20.
+        xi_star (scalar or array-like): Target design :math:`\\xi^*` at which the posterior is estimated.
+        a_tol (float): Tolerance for matching simulations to :math:`\\xi^*`. Default: 0.05.
+            A simulation is kept if :math:`\\|\\xi_{\\text{sim}} - \\xi^*\\|_\\infty < a_{\\text{tol}}`.
 
     Returns:
-        np.ndarray:
-            θ samples from the posterior, stacked across all observed y.
+        ndarray: :math:`\\theta` samples from the posterior, stacked across all observed y.
             Shape: (n_obs × knn, d_theta).
 
     Raises:
-        ValueError: If filtering leaves no simulations at ξ*.
+        ValueError: If filtering leaves no simulations at :math:`\\xi^*`.
         RuntimeError: If kNN search fails due to inconsistent dimensions.
 
-    Notes:
-        - Scaling of outputs y is performed internally via StandardScaler
-          for robustness against different KPI magnitudes.
-        - The parameter `knn` acts as a smoothing parameter: higher values
-          broaden the posterior but reduce sharpness.
-        - The choice of `a_tol` trades off strict design conditioning vs.
-          sample size. Too small → few matches; too large → weaker conditioning.
+    Note:
+        - Scaling of outputs y is performed internally via StandardScaler for robustness 
+          against different KPI magnitudes.
+        - The parameter ``knn`` acts as a smoothing parameter: higher values broaden the 
+          posterior but reduce sharpness.
+        - The choice of ``a_tol`` trades off strict design conditioning vs. sample size. 
+          Too small → few matches; too large → weaker conditioning.
 
     Example:
         >>> import numpy as np
@@ -611,3 +638,131 @@ def estimate_p_theta_knn(
     dist, knn_idx = neigh.kneighbors(scaler.transform(observed_data))
     theta_set = np.vstack([simulated_data_xi[1][idx] for idx in knn_idx])
     return theta_set
+
+
+# ----------------------------
+# Example usage
+if __name__ == "__main__":
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    # --- import your unified calibrator ---
+    # from knn import KNNCalibrator
+    # (Assuming KNNCalibrator is defined in the current file for this snippet.)
+
+    def paraboloid_model(theta, xi=0.0, A=1.0, B=0.5, C=1.5):
+        """Vectorized paraboloid, mild noise; supports scalar or vector xi."""
+        theta = np.atleast_2d(theta).astype(float)
+        x1, x2 = theta[:, 0], theta[:, 1]
+        xi = np.asarray(xi, float)
+        if xi.ndim == 0:
+            xi = np.full(theta.shape[0], xi)
+        elif xi.ndim == 2:  # if passed as (n,1)
+            xi = xi.ravel()
+        y = A * x1**2 + B * x1 * x2 * (1.0 + xi) + C * (x2 + xi) ** 2
+        y = y + 0.2 * np.random.randn(theta.shape[0])  # small noise
+        return y.reshape(-1, 1) if theta.shape[0] > 1 else np.array([y.item()])
+
+    def theta_sampler(n, lb=-15, ub=15):
+        return np.random.uniform(lb, ub, size=(n, 2))
+
+    # --------------- Build observations (unknown process) ---------------
+    N_emp = 100
+    rng = np.random.default_rng(7)
+    theta_target = rng.normal(3.1, 0.3, size=(N_emp, 2))  # this is unknown in practice
+    experiment_designs = [-1.0, 0.0, 1.0, 3.0]
+
+    observations = []
+    for xi in experiment_designs:
+        y_emp = paraboloid_model(theta=theta_target, xi=xi)  # shape (100,1) per design
+        observations.append((y_emp, xi))
+
+    # --------------- kNN calibration multiple designs ---------------
+    # Use model+sampler so each design gets its own per-design kNN built on the SAME theta grid
+    calib_joint = KNNCalibrator(knn=100, evaluate_model=True)
+    calib_joint.setup(
+        model=paraboloid_model,
+        theta_sampler=theta_sampler,
+        xi_list=experiment_designs,
+        n_samples=100_000,
+    )
+
+    #  “intersect”
+    post_joint = calib_joint.calibrate(
+        observations=observations, combine="intersect", resample_n=5000
+    )
+    theta_post_joint = post_joint["theta"]  # (5000, 2) resampled
+    # If you wanted grid + weights instead, call with resample_n=None and use post_joint["theta"], post_joint["weights"].
+
+    # --------------- SINGLE-DESIGN calibration at xi=0.0 ---------------
+    xi_star = 0.0
+    y_obs_many = next(y for (y, xi) in observations if np.isclose(xi, xi_star))
+
+    calib_single = KNNCalibrator(knn=100, evaluate_model=True)
+    calib_single.setup(
+        model=paraboloid_model,
+        theta_sampler=lambda n: theta_sampler(n, -15, 15),
+        xi_list=[xi_star],
+        n_samples=100_000,
+    )
+    post_single = calib_single.calibrate(
+        [(y_obs_many, xi_star)], combine="stack"
+    )  # pooled kNN
+    theta_post_many = post_single["theta"]  # shape: (N_emp*knn, 2)
+
+    # --------------- Quick nearest() demo ---------------
+    # Take a single observed y at xi=1.0 and fetch its 10 nearest θ:
+    y_one = observations[2][0][0]  # first row at design 1.0
+    theta_knn_10 = calib_joint.nearest(y_one, xi=1.0, k=10)  # (10,2) θ neighbors
+
+    # --------------- PLOTS ---------------
+    # 1) Joint posterior (resampled) vs true cloud
+    plt.figure(figsize=(6, 5))
+    plt.scatter(
+        theta_post_joint[:, 0],
+        theta_post_joint[:, 1],
+        s=6,
+        alpha=0.25,
+        label="Joint posterior (vote, resampled)",
+    )
+    plt.scatter(
+        theta_target[:, 0],
+        theta_target[:, 1],
+        c="r",
+        marker="x",
+        s=40,
+        label=r"θ_true samples (unknown)",
+    )
+    plt.title("Unified kNN: joint combine='vote' over multiple designs")
+    plt.xlabel("θ1")
+    plt.ylabel("θ2")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    # 2) Single-design posterior (kNN pooled) vs true cloud
+    plt.figure(figsize=(6, 5))
+    plt.scatter(
+        theta_post_many[:, 0],
+        theta_post_many[:, 1],
+        s=6,
+        alpha=0.35,
+        label="Single-design posterior (pooled kNN)",
+    )
+    plt.scatter(
+        theta_target[:, 0],
+        theta_target[:, 1],
+        c="r",
+        marker="x",
+        s=40,
+        label=r"θ_true samples (unknown)",
+    )
+    plt.title(f"Unified kNN: single-design at ξ*={xi_star}")
+    plt.xlabel("θ1")
+    plt.ylabel("θ2")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    # 3) Show the 10 nearest θ for one observed y at xi=1.0 (sanity check)
+    print("Ten nearest θ for one observed y at ξ=1.0:\n", theta_knn_10)

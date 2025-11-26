@@ -3,38 +3,34 @@ from rich.progress import track
 import numpy as np
 from SALib.sample import sobol as sobol_sample
 from SALib.analyze import sobol as sobol_analyze
-from pyuncertainnumber import UncertainNumber as UN
 from matplotlib import pyplot as plt
-
-
-# TODO: test needed for this function
 
 
 def sobol_analysis(
     x: list, f: Callable, output_names=None, plot_results: bool = True, **kwargs
 ):
-    """
-    Performs a Sobol sensitivity analysis using the SALibe library.
+    """Performs a Sobol sensitivity analysis using the SALibe library.
 
-    args:
-        x (list): A list of `UncertainNumber` objects defining the input variables.
+    Args:
+        x (list): A list of ``UncertainNumber`` objects defining the input variables.
         f (Callable): The model function to be analyzed.
         output_names (list, optional): A list of strings to name the model outputs.
                                        Defaults to None.
         plot_results (bool, optional): If True, generates and displays plots of the
                                        results. Defaults to True.
-        **kwargs: Additional keyword arguments to pass to SALib's `sample` and
-                  `analyze` functions. For example, `N` (the number of samples)
+        **kwargs: Additional keyword arguments to pass to SALib's ``sample`` and
+                  ``analyze`` functions. For example, ``N`` (the number of samples)
                   must be a power of 2 (e.g., 1024, 2048) and defaults to 1024.
 
-    returns:
+    Returns:
         dict: A dictionary where keys are the output names and values are the
               corresponding SALib analysis result objects.
 
-    Notes:
-        This function is designed to work with a list of `UncertainNumber` objects
+    .. tip::
+        This function is designed to work with a list of ``UncertainNumber`` objects
         that are defined as distributions. It evaluates the sensitivity of a model
-        function `f`, which can have single or multiple outputs, to these inputs.
+        function ``f``, which can have single or multiple outputs, to these inputs.
+
         The code performs the following steps:
             1.  **Problem Definition**: A SALib `problem` dictionary is constructed from the
                 input list `X` of UncertainNumber objects. This dictionary defines the
@@ -68,6 +64,7 @@ def sobol_analysis(
 
             7.  **Plotting**: If `plot_results` is True, bar charts of the S1 and ST
                 indices are generated for each output.
+
     Example:
         >>> from pyuncertain import UncertainNumber as UN
         >>>

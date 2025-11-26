@@ -1,13 +1,8 @@
-# ----------------------------
-# Example usage
 import numpy as np
 import matplotlib.pyplot as plt
 from pyuncertainnumber.calibration.knn import KNNCalibrator
 
-
-# --- import your unified calibrator ---
-# from knn import KNNCalibrator
-# (Assuming KNNCalibrator is defined in the current file for this snippet.)
+rng = np.random.default_rng(12)
 
 
 def paraboloid_model(theta, xi=0.0, A=1.0, B=0.5, C=1.5):
@@ -17,7 +12,7 @@ def paraboloid_model(theta, xi=0.0, A=1.0, B=0.5, C=1.5):
     xi = np.asarray(xi, float)
     if xi.ndim == 0:
         xi = np.full(theta.shape[0], xi)
-    elif xi.ndim == 2:  # if passed as (n,1)
+    elif xi.ndim == 2:
         xi = xi.ravel()
     y = A * x1**2 + B * x1 * x2 * (1.0 + xi) + C * (x2 + xi) ** 2
     y = y + 0.2 * np.random.randn(theta.shape[0])  # small noise
@@ -28,103 +23,55 @@ def theta_sampler(n, lb=-15, ub=15):
     return np.random.uniform(lb, ub, size=(n, 2))
 
 
-# --------------- Build observations (unknown process) ---------------
-N_emp = 100
-rng = np.random.default_rng(7)
-theta_target = rng.normal(3.1, 0.3, size=(N_emp, 2))  # this is unknown in practice
-experiment_designs = [-1.0, 0.0, 1.0, 3.0]
+def scatter_post(ax, theta, truth=None, title="", alpha=0.30, s=6, label="Posterior"):
+    ax.scatter(theta[:, 0], theta[:, 1], s=s, alpha=alpha, label=label)
+    if truth is not None:
+        ax.scatter(
+            truth[:, 0], truth[:, 1], c="r", marker="x", s=60, label="θ true cloud"
+        )
+    ax.set_title(title)
+    ax.set_xlabel("θ1")
+    ax.set_ylabel("θ2")
+    ax.grid(True)
+    ax.legend()
 
-observations = []
-for xi in experiment_designs:
-    y_emp = paraboloid_model(theta=theta_target, xi=xi)  # shape (100,1) per design
-    observations.append((y_emp, xi))
 
-# --------------- kNN calibration multiple designs ---------------
-# Use model+sampler so each design gets its own per-design kNN built on the SAME theta grid
-calib_joint = KNNCalibrator(knn=100, evaluate_model=True)
-calib_joint.setup(
-    model=paraboloid_model,
-    theta_sampler=theta_sampler,
-    xi_list=experiment_designs,
-    n_samples=100_000,
-)
+def test_knn_single_design():
+    """Test KNN calibration with single design point and generate visualization."""
+    # Case 1 - 1 sample (y), 1 target (θ point-valued), 1 experiment (ξ)
+    theta_true_c1 = rng.normal(0, 4, size=(1, 2))  # unknown
+    xi_list_c1 = [0.0]  # selected (experiment)
+    y_emp = paraboloid_model(theta_true_c1, xi_list_c1)
+    observations_c1 = [(y_emp, xi_list_c1)]
+    print(
+        f"CASE 1 - designs: {len(observations_c1)} samples: {observations_c1[0][0].shape[0]}"
+    )
 
-#  “intersect”
-post_joint = calib_joint.calibrate(
-    observations=observations, combine="intersect", resample_n=5000
-)
-theta_post_joint = post_joint["theta"]  # (5000, 2) resampled
-# If you wanted grid + weights instead, call with resample_n=None and use post_joint["theta"], post_joint["weights"].
+    # set up knn calibrator
+    calib_single = KNNCalibrator(knn=500, evaluate_model=True)
+    calib_single.setup(
+        model=paraboloid_model,
+        theta_sampler=theta_sampler,
+        xi_list=xi_list_c1,
+        n_samples=500_000,
+    )
+    # run calibration
+    post_single = calib_single.calibrate(
+        observations=observations_c1, combine="stack"
+    )  # pooled kNN
+    theta_post_single = post_single["theta"]
 
-# --------------- SINGLE-DESIGN calibration at xi=0.0 ---------------
-xi_star = 0.0
-y_obs_many = next(y for (y, xi) in observations if np.isclose(xi, xi_star))
+    # Basic assertions
+    assert theta_post_single is not None
+    assert theta_post_single.shape[1] == 2  # 2D parameter space
+    assert len(theta_post_single) > 0
 
-calib_single = KNNCalibrator(knn=100, evaluate_model=True)
-calib_single.setup(
-    model=paraboloid_model,
-    theta_sampler=lambda n: theta_sampler(n, -15, 15),
-    xi_list=[xi_star],
-    n_samples=100_000,
-)
-post_single = calib_single.calibrate(
-    [(y_obs_many, xi_star)], combine="stack"
-)  # pooled kNN
-theta_post_many = post_single["theta"]  # shape: (N_emp*knn, 2)
-
-# --------------- Quick nearest() demo ---------------
-# Take a single observed y at xi=1.0 and fetch its 10 nearest θ:
-y_one = observations[2][0][0]  # first row at design 1.0
-theta_knn_10 = calib_joint.nearest(y_one, xi=1.0, k=10)  # (10,2) θ neighbors
-
-# --------------- PLOTS ---------------
-# 1) Joint posterior (resampled) vs true cloud
-plt.figure(figsize=(6, 5))
-plt.scatter(
-    theta_post_joint[:, 0],
-    theta_post_joint[:, 1],
-    s=6,
-    alpha=0.25,
-    label="Joint posterior (vote, resampled)",
-)
-plt.scatter(
-    theta_target[:, 0],
-    theta_target[:, 1],
-    c="r",
-    marker="x",
-    s=40,
-    label=r"θ_true samples (unknown)",
-)
-plt.title("Unified kNN: joint combine='vote' over multiple designs")
-plt.xlabel("θ1")
-plt.ylabel("θ2")
-plt.legend()
-plt.grid(True)
-plt.show()
-
-# 2) Single-design posterior (kNN pooled) vs true cloud
-plt.figure(figsize=(6, 5))
-plt.scatter(
-    theta_post_many[:, 0],
-    theta_post_many[:, 1],
-    s=6,
-    alpha=0.35,
-    label="Single-design posterior (pooled kNN)",
-)
-plt.scatter(
-    theta_target[:, 0],
-    theta_target[:, 1],
-    c="r",
-    marker="x",
-    s=40,
-    label=r"θ_true samples (unknown)",
-)
-plt.title(f"Unified kNN: single-design at ξ*={xi_star}")
-plt.xlabel("θ1")
-plt.ylabel("θ2")
-plt.legend()
-plt.grid(True)
-plt.show()
-
-# 3) Show the 10 nearest θ for one observed y at xi=1.0 (sanity check)
-print("Ten nearest θ for one observed y at ξ=1.0:\n", theta_knn_10)
+    # visualize
+    fig, ax = plt.subplots(figsize=(6, 5))
+    scatter_post(
+        ax,
+        theta_post_single,
+        truth=np.atleast_2d(theta_true_c1),
+        title=f"Unified kNN — single design (ξ*={xi_list_c1}, pooled neighbors)",
+    )
+    # plt.show()

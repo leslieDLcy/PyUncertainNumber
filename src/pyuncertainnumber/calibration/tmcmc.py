@@ -31,7 +31,7 @@ class TMCMC:
 
         parameters (list) : list of (size Nop) prior distributions instances
 
-        log_likelihood (callable): log likelihood function on $\theta$ to be defined which is problem specific
+        log_likelihood (callable): log likelihood function on :math:`\\theta` to be defined which is problem specific
 
         status_file_name (str): name of the status file to store status of the tmcmc sampling
 
@@ -39,6 +39,15 @@ class TMCMC:
         mytrace: returns trace file of all samples of all tmcmc stages.
             At stage m: it contains [Sm, Lm, Wm_n, ESS, beta, Smcap]
 
+
+    example:
+        >>>    t = TMCMC(
+        >>>        N,
+        >>>        all_pars,
+        >>>        log_likelihood=log_likelihood_function,
+        >>>        status_file_name='tmcmc_running_status.txt',
+        >>>    )
+        >>>    mytrace = t.run()
 
     .. figure:: /_static/tmcmc_2dof.png
         :alt: 2DOF TMCMC example
@@ -81,9 +90,9 @@ class TMCMC:
         # save results
         if save_dir is not None:
             file_name = f"{save_dir}/{file_name}"
+
         with open(f"{file_name}.pkl", "wb") as f:
             pickle.dump(mytrace, f, protocol=pickle.HIGHEST_PROTOCOL)
-            np.save(file_name, mytrace)
 
 
 # class prior_uniform:
@@ -795,7 +804,7 @@ def gaussian_likelihood_fun(
         raise ValueError(f"Unknown dissimilarity metric: {dissimilarity_metric}")
 
     # Convert dissimilarity to likelihood
-    eps_scale = 1e-4  # arbitrary scale factor....can be done better
-    log_likelihood = -((eps_scale * dissimilarity) ** 2)  # np.exp(-dissimilarity)
+    eps_scale = 1e-3  # scaling factor for likelihood
+    log_likelihood = -((dissimilarity / eps_scale) ** 2)  # np.exp(-dissimilarity)
 
     return log_likelihood
