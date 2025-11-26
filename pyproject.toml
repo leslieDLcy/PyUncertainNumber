@@ -4,10 +4,10 @@ requires = ["setuptools >= 61.0"]
 
 [project]
 authors = [
-  { name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com" },
-  { name = "Roberto Rocchetta", email = "roberto.rocchetta88@gmail.com" },
-  { name = "Ioanna Ioannou", email = "Ioanna.Ioannou@liverpool.ac.uk" },
-  { name = "Scott Ferson", email = "sandp8@gmail.com" },
+  {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
+  {name = "Roberto Rocchetta", email = "roberto.rocchetta88@gmail.com"},
+  {name = "Ioanna Ioannou", email = "Ioanna.Ioannou@liverpool.ac.uk"},
+  {name = "Scott Ferson", email = "sandp8@gmail.com"},
 ]
 
 dependencies = [
@@ -29,14 +29,14 @@ dependencies = [
   "json5",
 ]
 description = "Rigorous computation with Uncertain Number in Python"
-license = { text = "MIT License" }
+license = {text = "MIT License"}
 maintainers = [
-  { name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com" },
+  {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
 ]
 name = "pyuncertainnumber"
 readme = "README.md"
 requires-python = ">= 3.11"
-version = "0.1.1"
+version = "0.1.2"
 
 [tool.setuptools.packages.find]
 # All the following settings are optional:
