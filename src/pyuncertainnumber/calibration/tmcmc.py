@@ -31,7 +31,7 @@ class TMCMC:
 
         parameters (list) : list of (size Nop) prior distributions instances
 
-        log_likelihood (callable): log likelihood function on $\theta$ to be defined which is problem specific
+        log_likelihood (callable): log likelihood function on :math:`\\theta` to be defined which is problem specific
 
         status_file_name (str): name of the status file to store status of the tmcmc sampling
 
@@ -39,6 +39,15 @@ class TMCMC:
         mytrace: returns trace file of all samples of all tmcmc stages.
             At stage m: it contains [Sm, Lm, Wm_n, ESS, beta, Smcap]
 
+
+    example:
+        >>>    t = TMCMC(
+        >>>        N,
+        >>>        all_pars,
+        >>>        log_likelihood=log_likelihood_function,
+        >>>        status_file_name='tmcmc_running_status.txt',
+        >>>    )
+        >>>    mytrace = t.run()
 
     .. figure:: /_static/tmcmc_2dof.png
         :alt: 2DOF TMCMC example
