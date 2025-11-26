@@ -1,6 +1,5 @@
 from pyuncertainnumber import UncertainNumber as UN
 from pyuncertainnumber.sensitivity.sobol_analysis import sobol_analysis
-from matplotlib import pyplot as plt
 
 
 def test_sobol_analysis():
@@ -21,7 +20,6 @@ def test_sobol_analysis():
     # 2. Define a model function (non-vectorized)
     def my_model(x):
         out = x[:, 0] + x[:, 1]
-
         return out
 
     # 3. Run the analysis
@@ -30,7 +28,7 @@ def test_sobol_analysis():
     )
 
     # 4. Print results for the first output
-    results
+    print(results)
 
 
 # def myFunctionWithTwoOutputs(x):
