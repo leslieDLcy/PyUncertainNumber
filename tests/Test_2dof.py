@@ -119,7 +119,7 @@ def test_2dof_tmcmc(tmp_path):
     """Test TMCMC on 2DOF example"""
     # Use temporary directory for status file
     status_file = tmp_path / "status_file_2DOF_class.txt"
-    
+
     t = TMCMC(
         N,
         all_pars,
@@ -128,7 +128,5 @@ def test_2dof_tmcmc(tmp_path):
     )
 
     mytrace = t.run()
-    
+
     assert mytrace is not None
-
-
