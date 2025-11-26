@@ -9,10 +9,7 @@
 ![license](https://img.shields.io/github/license/leslieDLcy/PyUncertainNumber)
 ![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
 
-
-# PyUncertainNumber
-
-Scientific computations of complex systems are surrounded by various forms of uncertainty,  requiring appropriate treatment to maximise the credibility of computations. Empirical information for characterisation is often scarce, vague, conflicting and imprecise, requiring expressive uncertainty structures for trustful representation, aggregation and propagation.
+Scientific computations are surrounded by various forms of uncertainty, requiring appropriate treatment to maximise the credibility of computations. Empirical information is often scarce, vague, conflicting and imprecise, requiring expressive uncertainty structures for trustful representation, aggregation and propagation.
 
 This package is underpinned by a framework of ***uncertain number*** which allows for a closed computation ecosystem whereby trustworthy computations can be conducted in a rigorous manner. <ins>It provides capabilities across the typical uncertainty analysis pipeline, encompassing characterisation, aggregation, propagation, and applications including reliability analysis and optimisation under uncertainty, especially with a focus on imprecise probabilities.</ins>
 

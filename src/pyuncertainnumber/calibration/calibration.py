@@ -34,43 +34,6 @@ class Calibrator(ABC):
         pass
 
 
-class KNNCalibrator(Calibrator):
-    """  Calibration via k-Nearest Neighbors. Supports single-design (kNN search) and multi-design (joint kernel fusion).
-    """
-
-    def __init__(self, knn: int = 100, a_tol: float = 1e-3, kernel_bandwidth: Optional[float] = None):
-        super().__init__()
-        self.knn = knn
-        self.a_tol = a_tol
-        self.kernel_bandwidth = kernel_bandwidth
-
-        # internal state placeholders
-        self._mode = None
-        self._theta_sim = None
-        self._y_sim = None
-        self._posterior = None
-
-    def setup(self, model=None, theta_sampler=None, xi_sampler=None,
-              simulated_data: Optional[Dict[str, np.ndarray]] = None,
-              xi_list: Optional[List] = None, n_samples: int = 2000):
-        """  Provide priors/simulations, set up internal structures.  """
-        self.is_ready = True
-        self._mode = "single" if xi_list and len(xi_list) == 1 else "joint"
-        # TODO: implement actual logic
-
-    def calibrate(self, observations: Any, resample_n: Optional[int] = None) -> Any:
-        """  Condition on observed data, return posterior samples or weights.  """
-        if not self.is_ready:
-            raise RuntimeError("Call setup() before calibrate().")
-        # TODO: implement calibration logic
-        self._posterior = None
-        return self._posterior
-
-    def get_posterior(self) -> Any:
-        """Return last posterior representation."""
-        return self._posterior
-
-
 class MCMCCalibrator(Calibrator):
     """  Calibration via Bayesian MCMC (e.g. Metropolis-Hastings, HMC, NUTS). """
     def __init__(self, n_chains: int = 4,
