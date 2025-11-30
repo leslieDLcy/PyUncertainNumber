@@ -130,6 +130,7 @@ class EpistemicFilter:
         x_title=None,
         y_title=None,
         hull_alpha=0.25,
+        show_samples=True,
     ):
         """Plot the convex hull and bounding box of the epistemic samples.
 
@@ -157,6 +158,7 @@ class EpistemicFilter:
             x_title=x_title,
             y_title=y_title,
             hull_alpha=hull_alpha,
+            show_samples=show_samples,
         )
 
 
@@ -208,6 +210,7 @@ def plot_convex_hull_with_bounds(
     x_title=None,
     y_title=None,
     hull_alpha=0.25,
+    show_samples=True,
 ):
     """
     Plot points, their convex hull, and the axis-aligned bounding box.
@@ -262,7 +265,8 @@ def plot_convex_hull_with_bounds(
     # -------------------- 2D CASE --------------------
     if n_dims == 2:
         # Scatter points
-        ax.scatter(xe[:, 0], xe[:, 1], s=20, color="blue")
+        if show_samples:
+            ax.scatter(xe[:, 0], xe[:, 1], s=20, color="blue")
 
         # Convex hull polygon
         verts = xe[hull.vertices]
