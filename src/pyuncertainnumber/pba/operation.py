@@ -534,6 +534,83 @@ def adec(a, c):
     return Staircase(left=b, right=r)
 
 
+def mdec(a, c):
+    """
+    Multiplicative deconvolution: returns b such that a * b ≈ c
+    Assumes a, b, c are Pbox-like with .left/.right bounds.
+    """
+
+    from .params import Params
+    from .intervals.number import Interval as I
+    from .pbox_abc import convert_pbox, Staircase
+
+    def _is_nothing(x):
+        return x is None or (isinstance(x, float) and np.isnan(x))
+
+    n = Params.steps
+    b = np.zeros(n)  # left (upper) bound array in this notation
+    r = np.zeros(n)
+    m = n - 1
+
+    # left side (c.u / a.u in the C code)
+    if _is_nothing(c.left[0]) and _is_nothing(a.left[0]):
+        b[0] = 0.0
+    else:
+        b[0] = c.left[0] / a.left[0]
+
+    for i in range(1, m + 1):
+        if _is_nothing(c.left[i]):
+            b[i] = 0.0
+        else:
+            done = False
+            sofar = c.left[i]
+            for j in range(i):
+                if sofar <= a.left[i - j] * b[j]:
+                    done = True
+            if done:
+                b[i] = b[i - 1]
+            else:
+                b[i] = 0.0 if _is_nothing(a.left[0]) else c.left[i] / a.left[0]
+
+    # right side (c.d / a.d in the C code)
+    if _is_nothing(c.right[m]) and _is_nothing(a.right[m]):
+        r[m] = 0.0
+    else:
+        r[m] = c.right[m] / a.right[m]
+
+    for i in range(m - 1, -1, -1):
+        if _is_nothing(c.right[i]):
+            r[i] = 0.0
+        else:
+            done = False
+            sofar = c.right[i]
+            for j in range(m, i, -1):
+                if sofar >= a.right[i - j + m] * r[j]:
+                    done = True
+            if done:
+                r[i] = r[i + 1]
+            else:
+                r[i] = 0.0 if _is_nothing(a.right[m]) else c.right[i] / a.right[m]
+
+    # crossing check
+    bad = any(b[i] > r[i] for i in range(n))
+    if bad:
+        y = float("-inf")
+        x = float("inf")
+        for i in range(n):
+            if not (_is_nothing(c.left[i]) or _is_nothing(a.left[i])):
+                y = max(y, c.left[i] / a.left[i])
+            if not (_is_nothing(c.right[i]) or _is_nothing(a.right[i])):
+                x = min(x, c.right[i] / a.right[i])
+        return convert_pbox(I(y, x))
+
+    # final check
+    for i in range(n):
+        if b[i] > r[i]:
+            raise ValueError("Math Problem: couldn't factor")
+    return Staircase(left=b, right=r)
+
+
 # * --------------- independent ops --------------- *#
 
 
