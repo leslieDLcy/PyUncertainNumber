@@ -6,6 +6,7 @@
 
 2dof_tmcmc_demo
 KNN_calibrator_demo
+Data_peeling_demo
 ```
 
 ::::{grid} 1 1 2 2
@@ -25,6 +26,11 @@ Posterior inference of stiffness parameters with TMCMC.
 Data-driven likelihood-free calibration technique.
 :::
 
-
+:::{card} Data peeling algorithm
+:link: Data_peeling_demo
+:link-type: doc
+:img-top: ../../_static/nested_ds.png
+Data peeling algorithm on a banana-shaped data generating process.
+:::
 
 ::::

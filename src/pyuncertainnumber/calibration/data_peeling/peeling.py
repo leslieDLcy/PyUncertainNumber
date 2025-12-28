@@ -41,7 +41,7 @@ fy: array (lxdx2) of projections of enclosing sets output space.
 
 def data_peeling_algorithm(
     X: NDArray, tol: float = 1e-4
-):  # should also input the shape, rectangle, circle, etc.
+) -> tuple[list, list]:  # should also input the shape, rectangle, circle, etc.
     """Data peeling algorithm for constructing a sequence of nested enclosing sets.
 
     args:
@@ -49,10 +49,11 @@ def data_peeling_algorithm(
         tol (float): a tolerance parameter determining the minimal size of an allowed enclosing box
 
     returns:
-        sequence_of_indices (list):
-            a list (number of levels long) of sets (or list) of indices of heterogeneous size
-        sequence_of_boxes (list):
-            a list (number of levels long) of (dx2) boxes
+        tuple[list, list]: a tuple containing:
+            - sequence_of_indices (list):
+                a list (number of levels long) of sets (or list) of indices of heterogeneous size
+            - sequence_of_boxes (list):
+                a list (number of levels long) of (dx2) boxes
 
 
     .. figure:: /_static/peeling_illus.png
@@ -61,8 +62,6 @@ def data_peeling_algorithm(
         :width: 90%
 
         Illustration of the data peeling algorithm.
-
-
     """
     H = make_hashtable(X)  # turns dataset in to hashtable
     n, d = X.shape
@@ -104,9 +103,15 @@ def data_peeling_algorithm(
     return a, b
 
 
-def index_to_mask(x, n=100):
-    """
-    Converts the list of indices x into a (nx1) boolean mask, true at those particular indices
+def index_to_mask(x: list, n=100) -> numpy.ndarray:
+    """Converts the list of indices x into a (nx1) boolean mask, true at those particular indices
+
+    Args:
+        x (list): list of indices
+        n (int, optional): size of the mask. Defaults to 100.
+
+    Returns:
+        numpy.ndarray: boolean mask
     """
     nrange = numpy.arange(n)
     boole = numpy.zeros(nrange.shape, dtype=bool)
@@ -133,21 +138,22 @@ def sanity_check(
 
 
 def data_peeling_backward(
-    uy: numpy.ndarray, y: numpy.ndarray = None, boxes: list = None, tol=1e-4
-):
+    uy: NDArray, y: NDArray = None, boxes: list = None, tol=1e-4
+) -> tuple[list, list, list]:
     """
-    IN
-    uy: (mxd) array of coverage samples output space.
-    boxes: sequence of boxes, each box is a (dx2) array. Also iterable of interval objects.
+    Args:
+        uy (NDArray): (mxd) array of coverage samples output space.
+        boxes (list): sequence of boxes, each box is a (dx2) array. Also iterable of interval objects.
 
-    OUT
-    a: list (number of levels long) of sets (or list) of indices (heterogeneous size).
-    b: list (number of levels long) of (dx2) boxes (array-like).
-    c: list (number of levels long) of indices (input space) conatained in each level.
-
-    There are two cases where the peeling algorithm must raise an exception, and they are both linked to the termination of the algorithm.
-    (1) When the last enclosing set has less samples than the minimum number of support scenarios to determine that set.
-    (2) When there are enough samples to determine the set but some of them are too close to eachother (even for just one dimension).
+    Returns:
+        tuple[list, list, list]: a tuple containing:
+            - a: list (number of levels long) of sets (or list) of indices (heterogeneous size).
+            - b: list (number of levels long) of (dx2) boxes (array-like).
+            - c: list (number of levels long) of indices (input space) conatained in each level.
+    Note:
+        There are two cases where the peeling algorithm must raise an exception, and they are both linked to the termination of the algorithm.
+            - When the last enclosing set has less samples than the minimum number of support scenarios to determine that set.
+            - When there are enough samples to determine the set but some of them are too close to eachother (even for just one dimension).
 
     While two may be linked to the problem of degeneracy, in this context, it may be best suited to refer to this case as a coverage problem.
     """
@@ -174,18 +180,23 @@ def extract_kn(a):
 
 
 def peeling_to_structure(
-    a, b, kind="scenario", beta=0.01
-):  # keep b for piping: peeling_to_structure(data_peeling_algorithm(x))
-    """
-    Note b may not be boxes, but spheres, ellipses, etc.
+    a: list, b: list, kind: str = "scenario", beta: float = 0.01
+) -> tuple[NDArray, list]:
+    """Peeling to structure.
 
-    IN:
-    a: list (number of levels long) of sets (or list) of indices of heterogeneous size
-    b: list (number of levels long) of (dx2) boxes (array-like)
+    Args:
+        a (list):  (number of levels long) of sets (or list) of indices of heterogeneous size
+        b (list):  (number of levels long) of (dx2) boxes (array-like)
 
-    OUT:
-    f: (lxdx2) array containing the projections of a joint fuzzy number.
-    p: list[float] of length l
+    Returns:
+        f: (lxdx2) array containing the projections of a joint fuzzy number.
+        p: list[float] of length l
+
+    Note:
+        Note b may not be boxes, but spheres, ellipses, etc.
+
+    .. tip::
+        keep b for piping: peeling_to_structure(data_peeling_algorithm(x))
     """
     k_cum, n = extract_kn(a)
     ALPHA = []
@@ -216,25 +227,26 @@ def uniform(lo, hi, N=100):
     return stats.uniform(loc=lo, scale=hi - lo).rvs((N, d))
 
 
-def samples_to_structure(ux, c):
-    """IN:
-    ux: (mxd_) array.
-    c: list (number of levels long) subset of indices (input space) conatained in each level.
+def samples_to_structure(ux: NDArray, c: list):
+    """
+    Args:
+        ux (NDArray): (mxd_) array.
+        c (list): (number of levels long) subset of indices (input space) conatained in each level.
 
-    OUT:
-    fx: (lxd_x2) array containing the projections of a joint fuzzy number in the input space.
+    Returns:
+        fx: (lxd_x2) array containing the projections of a joint fuzzy number in the input space.
     """
 
     pass
 
 
-def width(x: numpy.ndarray):
+def width(x: NDArray):
     """
-    IN
-    x: An interval or interval iterable, i.e. an (dx2) array
+    Args:
+        x: An interval or interval iterable, i.e. an (dx2) array
 
-    OUT
-    w: the width of the intervals
+    Returns:
+        w: the width of the intervals
     """
     x = numpy.asarray(x, dtype=float)
     if len(x.shape) == 1:

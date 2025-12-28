@@ -456,7 +456,7 @@ def plot_scattermatrix(
                 ax.hist(x[:, i], bins=bins, density=True, color=color)
                 # ax.yaxis.tick_right()
                 ax.set_xlabel(labels[i], fontsize=FONTSIZE)
-                ax.set_ylabel("#i/N", fontsize=FONTSIZE)
+                ax.set_ylabel(f"{i+1}/N", fontsize=FONTSIZE)
             else:
                 ax.scatter(
                     x[:, j],
@@ -472,7 +472,7 @@ def plot_scattermatrix(
             SUBAX.append(ax)
     for ax in SUBAX:
         if grid:
-            ax.grid(b=True)
+            ax.grid(True)
         ax.tick_params(
             direction="out",
             length=6,
