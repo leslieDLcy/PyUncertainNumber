@@ -1463,10 +1463,22 @@ class Staircase(Pbox):
         return self.mul(1 / other, dependency)
 
     def pow(self, other, dependency="f"):
+        """Exponentiation of uncertain numbers with the defined dependency dependency
+
+        This suggests that the exponent (i.e. `other`) can also be an uncertain number.
+        """
         from .operation import frechet_op, vectorized_cartesian_op
 
         if isinstance(other, Number):
-            return pbox_number_ops(self, other, operator.pow)
+            if self.straddles_zero():
+                from pyuncertainnumber import pba
+
+                itvls = self.to_interval()
+                response = itvls**other
+                return pba.stacking(response)
+            else:
+                return pbox_number_ops(self, other, operator.pow)
+
         if is_un(other):
             other = convert_pbox(other)
 
