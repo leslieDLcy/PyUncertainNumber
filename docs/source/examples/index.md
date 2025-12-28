@@ -51,6 +51,14 @@ Hybrid aleatory–epistemic propagation examples.
 Posterior inference of stiffness parameters with TMCMC.
 :::
 
+:::{card} KNN calibration
+:link: calibration/KNN_calibrator_demo
+:link-type: doc
+:img-top: ../_static/KNN_calibration_demo.png
+Data-driven likelihood-free calibration technique.
+:::
+
+
 ::::
 
 ## Characterisation

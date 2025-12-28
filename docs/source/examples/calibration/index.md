@@ -5,6 +5,7 @@
 :titlesonly:
 
 2dof_tmcmc_demo
+KNN_calibrator_demo
 ```
 
 ::::{grid} 1 1 2 2
@@ -16,5 +17,14 @@
 :img-top: ../../_static/tmcmc_2dof.png
 Posterior inference of stiffness parameters with TMCMC.
 :::
+
+:::{card} KNN calibration
+:link: KNN_calibrator_demo
+:link-type: doc
+:img-top: ../../_static/KNN_calibration_demo.png
+Data-driven likelihood-free calibration technique.
+:::
+
+
 
 ::::
