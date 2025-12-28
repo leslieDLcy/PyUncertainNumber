@@ -442,7 +442,6 @@ class Staircase(Pbox):
         style="box",
         fill_color="lightgray",
         bound_colors=None,
-        # NEW
         bound_styles=None,  # e.g. ("--", ":")
         left_line_kwargs=None,  # e.g. {"linewidth": 2, "alpha": 0.9}
         right_line_kwargs=None,  # e.g. {"linewidth": 2, "alpha": 0.9}
@@ -476,14 +475,15 @@ class Staircase(Pbox):
             >>> a.plot(ax=ax, style='simple')  # simple style without fill-in color
             >>> # box style with fill-in color and also customized bound colors
             >>> a.plot(ax=ax, style='box',
-            ... fill_color='lightblue',
-            ... bound_colors = ['lightblue', 'lightblue'],
-            ... bound_styles=("--", ":"),
-            ... alpha=0.5
+            ...     fill_color='lightblue',
+            ...     bound_colors = ['lightblue', 'lightblue'],
+            ...     bound_styles=("--", ":"),
+            ...     alpha=0.5
             ... )
+            >>> # customized left and right bound line styles
             >>> ax = pbox.plot(
-            ... left_line_kwargs={"linestyle": "--", "linewidth": 2},
-            ... right_line_kwargs={"linestyle": ":", "linewidth": 2, "alpha": 0.8},
+            ...     left_line_kwargs={"linestyle": "--", "linewidth": 2},
+            ...     right_line_kwargs={"linestyle": ":", "linewidth": 2, "alpha": 0.8},
             )
 
         """
