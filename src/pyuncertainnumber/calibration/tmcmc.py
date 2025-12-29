@@ -79,10 +79,10 @@ class TMCMC:
 
     def __init__(
         self,
-        N: int,
-        parameters: list,
-        names: list[str],
-        log_likelihood: callable,
+        N: int = None,
+        parameters: list = None,
+        names: list[str] = None,
+        log_likelihood: callable = None,
         mutation_steps: int = 5,
         status_file_name: str = None,
         trace=None,
@@ -94,6 +94,11 @@ class TMCMC:
         self.mutation_steps = mutation_steps
         self.status_file_name = status_file_name
         self.trace = trace
+        self.check_names()
+
+    def check_names(self):
+        if self.names is None:
+            raise ValueError("Parameter names must be  provided.")
 
     def run(self):
         """Run the TMCMC algorithm
@@ -131,15 +136,19 @@ class TMCMC:
         with open(f"{file_name}.pkl", "wb") as f:
             pickle.dump(mytrace, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-    def load_prior_samples(self, trace):
+    def load_prior_samples(self, trace=None) -> pd.DataFrame:
+        if trace is None:
+            trace = self.trace
         prior = pd.DataFrame(trace[0].samples, columns=self.names)  # samples from prior
         return prior
 
-    def load_posterior_samples(self, trace) -> pd.DataFrame:
+    def load_posterior_samples(self, trace=None) -> pd.DataFrame:
+        if trace is None:
+            trace = self.trace
         posterior = pd.DataFrame(trace[-1].samples, columns=self.names)
         return posterior
 
-    def plot_updated_distribution(self, trace, save=False):
+    def plot_updated_distribution(self, trace=None, save=False):
         """Plot the prior and posterior distribution of the parameters
 
         args:
@@ -208,26 +217,6 @@ class Stage:
     def resampled_samples(self) -> Optional[NDArray]:
         """Samples after importance resampling (before MH mutation)."""
         return self.Smcap
-
-
-# class prior_uniform:
-#     # TODO: add a new Half Cauchy prior
-#     def __init__(self, lb, ub):
-#         self.lb = lb
-#         self.ub = ub
-#         self.dist = sps.uniform(
-#             loc=self.lb, scale=self.ub - self.lb
-#         )  # Define the uniform distribution
-
-#     def generate_rns(self, N):
-#         return np.random.uniform(self.lb, self.ub, N)
-
-#     def log_pdf_eval(self, x):
-#         # Check if x is within the bounds
-#         if np.all(x >= self.lb) and np.all(x <= self.ub):
-#             return self.dist.logpdf(x).sum()  # Sum log-PDF values for all dimensions
-#         else:
-#             return -np.inf  # Return negative infinity if x is out of bounds
 
 
 def recover_trace_samples(mytrace: list[Stage], names: list[str]) -> pd.DataFrame:
