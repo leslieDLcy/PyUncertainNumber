@@ -44,9 +44,11 @@ class TMCMC:
         >>> # create an instance of TMCMC class and run tmcmc
         >>> t = TMCMC(
         >>>     N,
-        >>>     all_pars,
+        >>>     parameters,
+        >>>     names,
         >>>     log_likelihood=log_likelihood_function,
-        >>>     status_file_name='tmcmc_running_status.txt', # status log file
+        >>>     mutation_steps=1,                                   # number of MCMC steps for perturbation
+        >>>     status_file_name='tmcmc_running_status.txt',        # status log file
         >>> )
         >>> mytrace = t.run()
 
@@ -59,11 +61,19 @@ class TMCMC:
     """
 
     def __init__(
-        self, N: int, parameters: list, log_likelihood: callable, status_file_name: str
+        self,
+        N: int,
+        parameters: list,
+        names: list[str],
+        log_likelihood: callable,
+        mutation_steps: int = 5,
+        status_file_name: str = None,
     ):
         self.N = N
         self.parameters = parameters
+        self.names = names
         self.log_likelihood = log_likelihood
+        self.mutation_steps = mutation_steps
         self.status_file_name = status_file_name
 
     def run(self):
@@ -77,6 +87,7 @@ class TMCMC:
             self.N,
             all_pars=self.parameters,
             log_likelihood=self.log_likelihood,
+            Nm_steps_max=self.mutation_steps,
             status_file_name=self.status_file_name,
         )
         return mytrace
@@ -154,50 +165,17 @@ def recover_trace_results(mytrace, names) -> pd.DataFrame:
     return combined_df
 
 
-# TODO
-def plot_distribution(combined_df, round_index, save=False, save_dir=None):
-    """Plot OR save the updated distribution of the parameters
-
-    args:
-        combined_df: DataFrame from the trace
-        round_index: int, the i-th model updating for E space
-        save: bool, default=False, if True save the figure
-    """
-
-    # Create the pairplot with density plots on the lower triangle
-    g = sb.pairplot(
-        combined_df,
-        hue="source",
-        palette="Set2",
-        diag_kind="kde",  # Add KDE plots to the diagonal
-    )
-
-    # Add density plots on the lower triangle
-    for i, j in zip(
-        *np.tril_indices_from(g.axes, -1)
-    ):  # Iterate over the lower triangle
-        sb.kdeplot(
-            data=combined_df,
-            x=combined_df.columns[j],
-            y=combined_df.columns[i],
-            hue="source",
-            fill=True,
-            alpha=0.5,
-            ax=g.axes[i, j],
-        )
-
-    if save == True:
-        print("Note: figure saved")
-        plt.savefig(f"{save_dir}/updated_distribution_{round_index}.png")
-    plt.show()
-
-
 # * ----------------------------------- tmcmc
 
 
-# TODO
-def plot_updated_distribution(mytrace, names, save=False):
-    """Plot the prior and posterior distribution of the parameters"""
+def plot_updated_distribution(mytrace, names: list[str], save=False):
+    """Plot the prior and posterior distribution of the parameters
+
+    args:
+        mytrace: trace file of all samples of all tmcmc stages.
+        names (list[str]): list of parameter names
+        save (bool): if True, save the figure
+    """
 
     # Example DataFrames from mytrace
     # names = list(Config.epistemic_domain.keys())
@@ -462,6 +440,12 @@ def MCMC_MH(
     return current, likelihood_current, posterior_current, numAccepts
 
 
+# TODO
+def run_tmcmc_vec():
+    """vectorised version of run_tmcmc to be implemented later"""
+    pass
+
+
 def run_tmcmc(
     N: int,
     all_pars: list,
@@ -469,7 +453,6 @@ def run_tmcmc(
     status_file_name: str,
     Nm_steps_max: int = 5,
     Nm_steps_maxmax: int = 5,
-    parallel_processing: str = "multiprocessing",
 ):
     """Main workflow of running Transitional MCMC
 
@@ -477,10 +460,7 @@ def run_tmcmc(
         N  (int) : int
             number of particles to be sampled from posterior
 
-        all_pars (list) : list of (size Nop) prior distributions instances
-            Nop is number of epistemic parameters
-            all_pars[i] is object of type pdfs
-            all parameters to be inferred
+        all_pars (list) : All the parameters, of size Nop, to be updated. `all_pars[i]` is object of type `pdfs`.
 
         log_likelihood (callable): log likelihood function to be defined in main.py as is problem specific
 
@@ -496,10 +476,9 @@ def run_tmcmc(
         a tuple containing:
             mytrace: returns trace file of all samples of all tmcmc stages.
                 at stage m: it contains [Sm, Lm, Wm_n, ESS, beta, Smcap]
-
-            comm: if parallel_processing is mpi
-
     """
+    parallel_processing = "multiprocessing"
+
     # side note: make all_pars as ordered dict in the future
     # Initialize (beta, effective sample size)
     beta = 0
@@ -573,7 +552,7 @@ def run_tmcmc(
         # Calculate covaraince matrix using Wm_n
         Cm = np.cov(Sm, aweights=Wm_n, rowvar=0)
 
-        # Resample ###################################################
+        # * --------------------------------------------------------- Resample
         # Resampling using plausible weights
         SmcapIDs = np.random.choice(range(N), N, p=Wm_n)
         # SmcapIDs = resampling.stratified_resample(Wm_n)
@@ -581,7 +560,7 @@ def run_tmcmc(
         Lmcap = Lm[SmcapIDs]
         Postmcap = Postm[SmcapIDs]
 
-        # save to trace
+        #  save to trace
         # stage m: samples, likelihood, weights, next stage ESS, next stage beta, resampled samples
         mytrace.append([Sm, Lm, Wm_n, ESS, beta, Smcap])
 
@@ -596,7 +575,7 @@ def run_tmcmc(
         status_file.write("ESS = %d \n" % ESS)
         status_file.write("scalem = %.2f \n" % scalem)
 
-        # Perturb ###################################################
+        # * --------------------------------------------------------- MH Perturb
         # perform MCMC starting at each Smcap (total: N) for Nm_steps
         Em = ((scalem) ** 2) * Cm  # Proposal dist covariance matrix
 
@@ -681,7 +660,7 @@ def run_tmcmc(
         # for next beta
         Sm, Postm, Lm = Sm1, Postm1, Lm1
 
-    # save to trace
+    # save to trace, which is the last stopping stage
     mytrace.append([Sm, Lm, np.ones(len(Wm_n)) / len(Wm_n), "notValid", 1, "notValid"])
 
     status_file = open(status_file_name, "a+")
@@ -699,7 +678,7 @@ def run_tmcmc(
     status_file.close()
 
     if parallel_processing == "multiprocessing":
-        return mytrace, None
+        return mytrace
 
 
 # * ----------------------------------- likelihood
