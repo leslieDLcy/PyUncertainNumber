@@ -2,6 +2,8 @@ from numpy.typing import NDArray
 import pickle
 from scipy.stats import wasserstein_distance, entropy
 from sklearn.metrics import mean_squared_error
+from dataclasses import dataclass
+from typing import Optional
 
 """
 This is the implementation for Transitional Markov Chain Monte Carlo (TMCMC) algorithm
@@ -52,6 +54,14 @@ class TMCMC:
         >>> )
         >>> mytrace = t.run()
 
+        >>> # for loading trace file
+        >>> import pickle
+        >>> with open('tmcmc_trace.pkl', 'rb') as f:
+        >>>     mytrace = pickle.load(f)
+        >>> re = TMCMC(trace=mytrace, names=names) # create TMCMC instance with loaded trace and names
+        >>> re.plot_updated_distribution(mytrace, save=False)
+
+
     .. figure:: /_static/tmcmc_2dof.png
         :alt: 2DOF TMCMC example
         :align: center
@@ -68,6 +78,7 @@ class TMCMC:
         log_likelihood: callable,
         mutation_steps: int = 5,
         status_file_name: str = None,
+        trace=None,
     ):
         self.N = N
         self.parameters = parameters
@@ -75,6 +86,7 @@ class TMCMC:
         self.log_likelihood = log_likelihood
         self.mutation_steps = mutation_steps
         self.status_file_name = status_file_name
+        self.trace = trace
 
     def run(self):
         """Run the TMCMC algorithm
@@ -83,14 +95,20 @@ class TMCMC:
             mytrace: returns trace file of all samples of all tmcmc stages.
         """
 
-        mytrace, _ = run_tmcmc(
+        mytrace = run_tmcmc_updated(
             self.N,
             all_pars=self.parameters,
             log_likelihood=self.log_likelihood,
             Nm_steps_max=self.mutation_steps,
             status_file_name=self.status_file_name,
         )
+        self.trace = mytrace
+        self.check_trace()
         return mytrace
+
+    def check_trace(self):
+        if hasattr(self, "trace") and self.trace is not None:
+            print("Trace is loaded.")
 
     def save_trace(self, mytrace, file_name: str, save_dir=None):
         """Save the trace to a file
@@ -105,6 +123,84 @@ class TMCMC:
 
         with open(f"{file_name}.pkl", "wb") as f:
             pickle.dump(mytrace, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+    def load_prior_samples(self, trace):
+        prior = pd.DataFrame(trace[0].samples, columns=self.names)  # samples from prior
+        return prior
+
+    def load_posterior_samples(self, trace) -> pd.DataFrame:
+        posterior = pd.DataFrame(trace[-1].samples, columns=self.names)
+        return posterior
+
+    def plot_updated_distribution(self, trace, save=False):
+        """Plot the prior and posterior distribution of the parameters
+
+        args:
+            trace: trace file of all samples of all tmcmc stages.
+            save (bool): if True, save the figure
+        """
+        if trace is None:
+            trace = self.trace
+
+        if not hasattr(self, "names") or self.names is None:
+            raise ValueError("Parameter names are not provided.")
+
+        plot_updated_distribution(trace, self.names, save=save)
+
+
+@dataclass
+class Stage:
+    """Container for one TMCMC stage.
+
+    Args:
+        Sm (NDArray): samples before resampling (N x Np)
+        Lm (NDArray): log-likelihoods at Sm (N,)
+        Wm_n (NDArray): normalized incremental weights (N,)
+        ESS (Optional[float]): effective sample size the next stage (can be None in terminal stage)
+        beta (float): tempering parameter next stage beta
+        Smcap (Optional[NDArray]): resampled samples (N x Np), None in terminal stage
+    """
+
+    Sm: NDArray  # samples before resampling (N x Np)
+    Lm: NDArray  # log-likelihoods at Sm (N,)
+    Wm_n: NDArray  # normalized incremental weights (N,)
+    ESS: Optional[
+        float
+    ]  # effective sample size next stage ESS (can be None in terminal stage)
+    beta: float  # tempering parameter next stage beta
+    Smcap: Optional[NDArray]  # resampled samples (N x Np), None in terminal stage
+
+    # * ---- Hints ----
+
+    @property
+    def samples(self) -> NDArray:
+        """Samples before resampling (from previous stage)."""
+        return self.Sm
+
+    @property
+    def log_likelihoods(self) -> NDArray:
+        """Log-likelihood evaluated at `samples`."""
+        return self.Lm
+
+    @property
+    def weights(self) -> NDArray:
+        """Normalized incremental importance weights."""
+        return self.Wm_n
+
+    @property
+    def effective_sample_size(self) -> Optional[float]:
+        """Effective sample size after reweighting the next stage."""
+        return self.ESS
+
+    @property
+    def tempering_parameter(self) -> float:
+        """Tempering parameter beta next stage beta."""
+        return self.beta
+
+    @property
+    def resampled_samples(self) -> Optional[NDArray]:
+        """Samples after importance resampling (before MH mutation)."""
+        return self.Smcap
 
 
 # class prior_uniform:
@@ -127,30 +223,20 @@ class TMCMC:
 #             return -np.inf  # Return negative infinity if x is out of bounds
 
 
-# TODO
-def recover_trace_results(mytrace, names) -> pd.DataFrame:
-    """Load back the trace results and return a DataFrame
+def recover_trace_samples(mytrace: list[Stage], names: list[str]) -> pd.DataFrame:
+    """Load back the Prior and Posterior samples in the form of a DataFrame
 
-    return:
-        trace results in a DataFrame
+    args:
+        mytrace (list[Stage]): trace file of all samples of all tmcmc stages.
+        names (list[str]): list of parameter names
+
+    returns:
+        (pd.DataFrame) : Prior and Posterior in the trace as a DataFrame
     """
 
-    # names = ["Xe_1", "Xe_2", "Xe_3", "Xa1_mu", "Xa2_mu", "Xa1_std", "Xa2_std"]
-    # names = [
-    #     "Xe_1",
-    #     "Xe_2",
-    #     "Xe_3",
-    #     "Xa1_alpha",
-    #     "Xa1_beta",
-    #     "Xa2_alpha",
-    #     "Xa2_beta",
-    #     "Xa_12_corr",
-    # ]
-    # names = list(Config.epistemic_domain.keys())
-
-    df1 = pd.DataFrame(mytrace[0][0], columns=names)  # samples from prior
+    df1 = pd.DataFrame(mytrace[0].samples, columns=names)  # samples from prior
     df2 = pd.DataFrame(
-        mytrace[-1][0], columns=names
+        mytrace[-1].samples, columns=names
     )  # samples from last step posterior
 
     # Add a column to identify the source
@@ -181,9 +267,9 @@ def plot_updated_distribution(mytrace, names: list[str], save=False):
     # names = list(Config.epistemic_domain.keys())
 
     # names = ["Xe_1", "Xe_2", "Xe_3", "Xa1_mu", "Xa2_mu", "Xa1_std", "Xa2_std"]
-    df1 = pd.DataFrame(mytrace[0][0], columns=names)  # samples from prior
+    df1 = pd.DataFrame(mytrace[0].samples, columns=names)  # samples from prior
     df2 = pd.DataFrame(
-        mytrace[-1][0], columns=names
+        mytrace[-1].samples, columns=names
     )  # samples from last step posterior
 
     # Add a column to identify the source
@@ -446,6 +532,253 @@ def run_tmcmc_vec():
     pass
 
 
+def run_tmcmc_updated(
+    N: int,
+    all_pars: list,
+    log_likelihood: callable,
+    status_file_name: str,
+    Nm_steps_max: int = 5,
+    Nm_steps_maxmax: int = 5,
+) -> list[Stage]:
+    """Updated main workflow of running Transitional MCMC
+
+    Solves the "At this point, beta has been updated to the new value, but Postm is still the log-target from the previous beta (except at the very first stage).
+    So Postmcap is inconsistent with the beta you pass into MCMC_MH."
+
+    args:
+        N  (int) : int
+            number of particles to be sampled from posterior
+
+        all_pars (list) : All the parameters, of size Nop, to be updated. `all_pars[i]` is object of type `pdfs`.
+
+        log_likelihood (callable): log likelihood function to be defined in main.py as is problem specific
+
+        status_file_name (str): name of the status file to store status of the tmcmc sampling
+
+        Nm_steps_max (int, optional): Numbers of MCMC steps for perturbation. The default is 5.
+
+        Nm_steps_maxmax (int, optional): Numbers of MCMC steps for perturbation. The default is 5.
+
+    returns:
+        list[Stage]: the trace that contains all iterations of the Stage instances.
+    """
+    parallel_processing = "multiprocessing"
+
+    # side note: make all_pars as ordered dict in the future
+    # Initialize (beta, effective sample size)
+    beta = 0
+    ESS = N
+    mytrace = []
+    stage_num = 0
+    start_time_global = time.time()
+
+    # Initialize other TMCMC variables
+    Nm_steps = Nm_steps_max
+    parallelize_MCMC = True
+    Adap_calc_Nsteps, Adap_scale_cov = "yes", "yes"  # yes or no
+    scalem = 1  # cov scale factor
+    log_evidence = 0  # model evidence
+
+    # initial samples -> array (N, Np)
+    Sm = initial_population(N, all_pars)
+
+    # Evaluate posterior at Sm
+    Priorm = np.array([log_prior(s, all_pars) for s in Sm]).squeeze()
+    Postm = Priorm  # prior = post for beta = 0
+
+    status_file = open(status_file_name, "a+")
+
+    # Evaluate log-likelihood at current samples Sm
+    if parallelize_MCMC:
+        iterables = [(ind, Sm[ind]) for ind in range(N)]
+        status_file.write("======================== \n")
+        if parallel_processing == "multiprocessing":
+            status_file.write("using multiprocessing \n")
+            import multiprocessing as mp
+            from multiprocessing import Pool
+
+            pool = Pool(processes=mp.cpu_count() - 2)
+            Lmt = pool.starmap(log_likelihood, iterables)
+
+        else:
+            raise (
+                AssertionError(
+                    "parallel_processing invalid, should be either multiprocessing or mpi"
+                )
+            )
+        status_file.write("======================== \n")
+        Lm = np.array(Lmt).squeeze()
+    else:
+        Lm = []
+        for ind in range(N):
+            Lm.append(log_likelihood(ind, Sm[ind]))
+            logging.info(
+                f"Computing likelihood stage {stage_num}: particle:{ind + 1}/{N}"
+            )
+        Lm = np.array(Lm).squeeze()
+    status_file.close()
+
+    while beta < 1:
+        stage_num += 1
+        start_time_stage = time.time()
+
+        # adaptivly compute beta s.t. ESS = N/2 or ESS = 0.95*prev_ESS
+        # plausible weights of Sm corresponding to new beta
+        # logging.info(f"'Computing beta the weights ...")
+
+        beta_old = beta
+        beta, log_evidence, Wm_n, ESS = compute_beta_update_evidence(
+            beta, Lm, log_evidence, ESS
+        )
+
+        # NEW: update Postm to match the NEW beta, before resampling / MH
+        Postm = Postm + (beta - beta_old) * Lm
+
+        console.log(
+            f"[bold green]TMCMC Iteration stage {stage_num}: Tempering parameter updated to {beta:.6f}[/bold green]"
+        )
+
+        # Calculate covaraince matrix using Wm_n
+        Cm = np.cov(Sm, aweights=Wm_n, rowvar=0)
+
+        # * --------------------------------------------------------- Resample
+        # Resampling using plausible weights
+        SmcapIDs = np.random.choice(range(N), N, p=Wm_n)
+        # SmcapIDs = resampling.stratified_resample(Wm_n)
+        Smcap = Sm[SmcapIDs]  # Resampled particles
+        Lmcap = Lm[SmcapIDs]
+        Postmcap = Postm[SmcapIDs]
+
+        #  save to trace
+        # stage m: samples, likelihood, weights, next stage ESS, next stage beta, resampled samples
+        mytrace.append(Stage(Sm=Sm, Lm=Lm, Wm_n=Wm_n, ESS=ESS, beta=beta, Smcap=Smcap))
+
+        # TODO: plot updated distribution to fix later on
+        # if stage_num in [2, 4, 6]:
+        #     plot_updated_distribution(mytrace)
+
+        # print to status_file
+        status_file = open(status_file_name, "a+")
+        status_file.write("stage number = %d \n" % stage_num)
+        status_file.write("beta = %.5f \n" % beta)
+        status_file.write("ESS = %d \n" % ESS)
+        status_file.write("scalem = %.2f \n" % scalem)
+
+        # * --------------------------------------------------------- MH Perturb
+        # perform MCMC starting at each Smcap (total: N) for Nm_steps
+        Em = ((scalem) ** 2) * Cm  # Proposal dist covariance matrix
+
+        numProposals = N * Nm_steps
+        numAccepts = 0
+
+        if parallelize_MCMC:
+            iterables = [
+                (
+                    j1,
+                    Em,
+                    Nm_steps,
+                    Smcap[j1],
+                    Lmcap[j1],
+                    Postmcap[j1],
+                    beta,
+                    numAccepts,
+                    all_pars,
+                    log_likelihood,
+                )
+                for j1 in range(N)
+            ]
+
+            if parallel_processing == "multiprocessing":
+                results = pool.starmap(MCMC_MH, iterables)
+
+            # elif parallel_processing == "mpi":
+            #     results = list(executor.starmap(MCMC_MH, iterables))
+        else:
+            """Here we are running Markov-Chain Monte Carlo for each particle"""
+            results = [
+                MCMC_MH(
+                    j1,
+                    Em,
+                    Nm_steps,
+                    Smcap[j1],
+                    Lmcap[j1],
+                    Postmcap[j1],
+                    beta,
+                    numAccepts,
+                    all_pars,
+                    log_likelihood,
+                )
+                for j1 in range(N)
+            ]
+
+        Sm1, Lm1, Postm1, numAcceptsS = zip(*results)
+        Sm1 = np.asarray(Sm1)
+        Lm1 = np.asarray(Lm1)
+        Postm1 = np.asarray(Postm1)
+        numAcceptsS = np.asarray(numAcceptsS)
+        numAccepts = sum(numAcceptsS)
+
+        # total observed acceptance rate
+        R = numAccepts / numProposals
+        status_file.write("acceptance rate = %.2f \n" % R)
+
+        # Calculate Nm_steps based on observed acceptance rate
+        if Adap_calc_Nsteps == "yes":
+            # increase max Nmcmc with stage number
+            Nm_steps_max = min(Nm_steps_max + 1, Nm_steps_maxmax)
+            status_file.write("adapted max MCMC steps = %d \n" % Nm_steps_max)
+
+            acc_rate = max(1.0 / numProposals, R)
+            Nm_steps = min(
+                Nm_steps_max, 1 + int(np.log(1 - 0.99) / np.log(1 - acc_rate))
+            )
+            status_file.write("next MCMC Nsteps = %d \n" % Nm_steps)
+
+        status_file.write("log_evidence till now = %.20f \n" % log_evidence)
+        status_file.write(
+            "--- Execution time: %.2f mins --- \n"
+            % ((time.time() - start_time_stage) / 60)
+        )
+        status_file.write("======================== \n")
+        status_file.close()
+
+        # scale factor based on observed acceptance ratio
+        if Adap_scale_cov == "yes":
+            scalem = (1 / 9) + ((8 / 9) * R)
+
+        # for next beta
+        Sm, Postm, Lm = Sm1, Postm1, Lm1
+
+    # save to trace, which is the last stopping stage
+    mytrace.append(
+        Stage(
+            Sm=Sm,
+            Lm=Lm,
+            Wm_n=np.ones(len(Wm_n)) / len(Wm_n),
+            ESS=None,
+            beta=1.0,
+            Smcap=None,
+        )
+    )
+
+    status_file = open(status_file_name, "a+")
+    status_file.write(
+        "--- Execution time: %.2f mins --- \n"
+        % ((time.time() - start_time_global) / 60)
+    )
+    status_file.write("log_evidence = %.20f \n" % log_evidence)
+
+    if parallelize_MCMC:
+        if parallel_processing == "multiprocessing":
+            status_file.write("closing multiprocessing \n")
+            pool.close()
+
+    status_file.close()
+
+    if parallel_processing == "multiprocessing":
+        return mytrace
+
+
 def run_tmcmc(
     N: int,
     all_pars: list,
@@ -556,7 +889,7 @@ def run_tmcmc(
         # Resampling using plausible weights
         SmcapIDs = np.random.choice(range(N), N, p=Wm_n)
         # SmcapIDs = resampling.stratified_resample(Wm_n)
-        Smcap = Sm[SmcapIDs]
+        Smcap = Sm[SmcapIDs]  # Resampled particles
         Lmcap = Lm[SmcapIDs]
         Postmcap = Postm[SmcapIDs]
 
