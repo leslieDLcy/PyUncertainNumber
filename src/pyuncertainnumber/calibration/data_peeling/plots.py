@@ -2,9 +2,10 @@ import numpy as numpy
 import matplotlib as matplotlib
 import matplotlib.pyplot as pyplot
 from matplotlib import gridspec
-
 from .peeling import peeling_to_structure
 from .fuzzy import samples_to_fuzzy_projection
+from numpy.typing import NDArray
+
 
 FONTSIZE = 22
 
@@ -100,12 +101,16 @@ def breakout(n):  # use this to determine the grid size of subplots
     return a, b
 
 
-def plot_peeling(x, a, b, p=None, axes3d=False, figsize="medium", grid=True, label="X"):
-    """
-    x: (nxd) data set of iid observations
-    a: sequence of subindices for each level
-    b: sequence of boxes or enclosing sets
-    p: upper violation probability (membership value)
+def plot_peeling(
+    x: NDArray, a, b, p=None, axes3d=False, figsize="medium", grid=True, label="X"
+):
+    """Plotting function for data peeling results.
+
+    Args:
+        x (NDArray): data set of iid observations
+        a: sequence of subindices for each level
+        b: sequence of boxes or enclosing sets
+        p: upper violation probability (membership value)
     """
     x = numpy.asarray(x, dtype=float)
     n, d = x.shape

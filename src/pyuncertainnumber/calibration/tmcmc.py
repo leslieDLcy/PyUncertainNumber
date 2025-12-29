@@ -41,18 +41,19 @@ class TMCMC:
 
 
     example:
-        >>>    t = TMCMC(
-        >>>        N,
-        >>>        all_pars,
-        >>>        log_likelihood=log_likelihood_function,
-        >>>        status_file_name='tmcmc_running_status.txt',
-        >>>    )
-        >>>    mytrace = t.run()
+        >>> # create an instance of TMCMC class and run tmcmc
+        >>> t = TMCMC(
+        >>>     N,
+        >>>     all_pars,
+        >>>     log_likelihood=log_likelihood_function,
+        >>>     status_file_name='tmcmc_running_status.txt', # status log file
+        >>> )
+        >>> mytrace = t.run()
 
     .. figure:: /_static/tmcmc_2dof.png
         :alt: 2DOF TMCMC example
         :align: center
-        :width: 50%
+        :width: 70%
 
         Example of TMCMC calibration of a 2-DOF system
     """
@@ -115,8 +116,9 @@ class TMCMC:
 #             return -np.inf  # Return negative infinity if x is out of bounds
 
 
+# TODO
 def recover_trace_results(mytrace, names) -> pd.DataFrame:
-    """load back the trace results and return a DataFrame
+    """Load back the trace results and return a DataFrame
 
     return:
         trace results in a DataFrame
@@ -152,6 +154,7 @@ def recover_trace_results(mytrace, names) -> pd.DataFrame:
     return combined_df
 
 
+# TODO
 def plot_distribution(combined_df, round_index, save=False, save_dir=None):
     """Plot OR save the updated distribution of the parameters
 
@@ -192,7 +195,9 @@ def plot_distribution(combined_df, round_index, save=False, save_dir=None):
 # * ----------------------------------- tmcmc
 
 
+# TODO
 def plot_updated_distribution(mytrace, names, save=False):
+    """Plot the prior and posterior distribution of the parameters"""
 
     # Example DataFrames from mytrace
     # names = list(Config.epistemic_domain.keys())
@@ -240,22 +245,19 @@ def plot_updated_distribution(mytrace, names, save=False):
     plt.show()
 
 
-def initial_population(N, all_pars) -> np.ndarray:
+def initial_population(N: float, all_pars: list) -> NDArray:
     """Generates initial population from prior distribution
 
-    Parameters
-    ----------
-    N : float
-        number of particles.
-    all_pars : list of size Np
-        Np is number of parameters
-        all_pars[i] is object of type pdfs
-        all parameters to be inferred.
+    Args:
+        N (float): number of particles.
+
+        all_pars (list) : All the parameters, of size Np, to be updated. `all_pars[i]` is object of type `pdfs`.
 
     Returns
-    -------
-    ini_pop : numpy array of size N x Np
-        initial population.
+        ini_pop (NDArray): the initial population which is a numpy array of size `N x Np`.
+
+    note:
+        `Np` is number of parameters
     """
     ini_pop = np.zeros((N, len(all_pars)))
     for i in range(len(all_pars)):
@@ -263,23 +265,19 @@ def initial_population(N, all_pars) -> np.ndarray:
     return ini_pop
 
 
-def log_prior(s, all_pars):
-    """
-    computes log_prior value at all particles
-    Parameters
-    ----------
-    s : numpy array of size N x Np
-        all particles.
-    all_pars : list of size Np
-        Np is number of parameters
-        all_pars[i] is object of type pdfs
-        all parameters to be inferred.
+def log_prior(s: NDArray, all_pars: list) -> float:
+    """Computes log_prior value at all particles
+
+    Args:
+        s (NDArray): numpy array of size (N x Np) of all particles.
+
+        all_pars (list) : All the parameters, of size Np, to be updated. `all_pars[i]` is object of type `pdfs`.
 
     Returns
-    -------
-    log_p : numpy array of size N
-        log prior at all N particles .
+        log_p (NDArray): log prior at all N particles which is a numpy array of size N
 
+    Note:
+        `Np` denotes number of parameters
     """
     log_p = 0
     for i in range(len(s)):
@@ -287,31 +285,23 @@ def log_prior(s, all_pars):
     return log_p
 
 
-def compute_beta_update_evidence(beta, log_likelihoods, log_evidence, prev_ESS):
-    """
-    Computes beta for the next stage and updated model evidence
+def compute_beta_update_evidence(
+    beta: float, log_likelihoods: NDArray, log_evidence: float, prev_ESS: int
+):
+    """Computes beta for the next stage and updated model evidence
 
-    Parameters
-    ----------
-    beta : float
-        stage parameter.
-    log_likelihoods : numpy array of size N
-        log likelihood values at all particles
-    log_evidence : float
-        log of evidence.
-    prev_ESS : int
-        effective sample size of previous stage
+    Args:
+        beta (float): stage parameter.
+        log_likelihoods (NDArray): log likelihood values at all particles which is numpy array of size N
+        log_evidence (float): log of evidence.
+        prev_ESS (int): effective sample size of previous stage
 
-    Returns
-    -------
-    new_beta : float
-        stage parameter for next stage.
-    log_evidence : float
-        updated log evidence.
-    Wm_n : numpy array of size N
-        weights of particles for the next stage
-    ESS : float
-        effective sample size of new stage
+    :returns: A 4-tuple ``(new_beta, log_evidence, Wm_n, ESS)`` where:
+        - **new_beta** (*float*): stage parameter for next stage.
+        - **log_evidence** (*float*): updated log evidence.
+        - **Wm_n** (*NDArray*): weights of particles for the next stage.
+        - **ESS** (*float*): effective sample size of new stage.
+    :rtype: tuple[float, float, NDArray, float]
 
     """
     old_beta = beta
@@ -367,24 +357,18 @@ def compute_beta_update_evidence(beta, log_likelihoods, log_evidence, prev_ESS):
     return new_beta, log_evidence, Wm_n, ESS
 
 
-def propose(current, covariance, n):
-    """
-    proposal distribution for MCMC in pertubation stage
+def propose(current: NDArray, covariance: NDArray, n: int) -> NDArray:
+    """Proposal distribution for MCMC in pertubation stage
 
-    Parameters
-    ----------
-    current : numpy array of size Np
-        current particle location
-    covariance : numpy array of size Np x Np
-        proposal covariance matrix
-    n : int
-        number of proposals.
+    Args:
+        current (NDArray): numpy array of size Np
+            current particle location
+        covariance (NDArray): numpy array of size Np x Np
+            proposal covariance matrix
+        n (int): number of proposals.
 
-    Returns
-    -------
-    numpy array of size n x Np
-        n proposals.
-
+    Returns:
+        NDArray: n proposals
     """
     return np.random.multivariate_normal(current, covariance, n)
 
@@ -400,13 +384,12 @@ def MCMC_MH(
     numAccepts: int,
     all_pars: list,
     log_likelihood: callable,
-):
-    """
-    Markov chain Monte Carlo using Metropolis-Hastings which "perturbs" each particle using MCMC-MH
+) -> tuple[NDArray, float, float, int]:
+    """Markov chain Monte Carlo using Metropolis-Hastings which "perturbs" each particle using MCMC-MH
 
     Conduct `Nm_steps` steps of MH for each particle.
 
-    args:
+    Args:
         particle_num (int) : The index of the current particle/parameter vector being evaluated.
 
         Em (NDArray) : proposal covarince matrix which is numpy array of size Nop x Nop
@@ -430,15 +413,13 @@ def MCMC_MH(
 
         log_likelihood (callable): log likelihood function to be defined in main.py.
 
+    :returns: A 4-tuple ``(current, likelihood_current, posterior_current, numAccepts)`` where:
 
-    returns:
-        current (NDArray): perturbed particle location which is numpy array of size Nop;
-
-        likelihood_current (float): log likelihood value at perturbed particle
-
-        posterior_current (float): log posterior value at perturbed particle
-
-        numAccepts (int): total number of accepts during perturbation (MCMC - MH)
+        - **current** (*NDArray*): Perturbed particle location of shape (Nop,).
+        - **likelihood_current** (*float*): Log-likelihood at the perturbed particle.
+        - **posterior_current** (*float*): Log-posterior at the perturbed particle.
+        - **numAccepts** (*int*): Updated total number of accepts.
+    :rtype: tuple[NDArray, float, float, int]
 
     """
     all_proposals = []
@@ -512,8 +493,10 @@ def run_tmcmc(
         parallel_processing (str): should be either 'multiprocessing' or 'mpi'
 
     returns:
-        mytrace: returns trace file of all samples of all tmcmc stages.
-            at stage m: it contains [Sm, Lm, Wm_n, ESS, beta, Smcap]
+        a tuple containing:
+            mytrace: returns trace file of all samples of all tmcmc stages.
+                at stage m: it contains [Sm, Lm, Wm_n, ESS, beta, Smcap]
+
             comm: if parallel_processing is mpi
 
     """
@@ -737,9 +720,10 @@ def log_likelihood(
 
         param_vec (array-like): indeed a 1d epistemic_param_vec, the parameter vector, i.e. epistemic_domain
 
-    Note:
+
+    note:
         Gaussian approximate likelihood function is implemented here. Other likelihood functions such as
-        "pseudo" and "vae" are underway.
+        "pseudo" and "vae" are underway. `sam_id` is not used here, but it is required in the main `run_tmcmc` workflow
     """
 
     if which_likelihood_calculator == "gaussian":
