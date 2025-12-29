@@ -1,9 +1,16 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING, Optional
+
 from numpy.typing import NDArray
 import pickle
 from scipy.stats import wasserstein_distance, entropy
 from sklearn.metrics import mean_squared_error
 from dataclasses import dataclass
-from typing import Optional
+
+
+if TYPE_CHECKING:
+    from pyuncertainnumber import Distribution
+    from .pdfs import ProbabilityDensityFun
 
 """
 This is the implementation for Transitional Markov Chain Monte Carlo (TMCMC) algorithm
@@ -329,13 +336,15 @@ def initial_population(N: float, all_pars: list) -> NDArray:
     return ini_pop
 
 
-def log_prior(s: NDArray, all_pars: list) -> float:
+def log_prior(
+    s: NDArray, all_pars: list[ProbabilityDensityFun | Distribution]
+) -> float:
     """Computes log_prior value at all particles
 
     Args:
         s (NDArray): numpy array of size (N x Np) of all particles.
 
-        all_pars (list) : All the parameters, of size Np, to be updated. `all_pars[i]` is object of type `pdfs`.
+        all_pars (list[ProbabilityDensityFun | Distribution]) : All the parameters, of size Np, to be updated. `all_pars[i]` is object of type `pdfs`.
 
     Returns
         log_p (NDArray): log prior at all N particles which is a numpy array of size N
