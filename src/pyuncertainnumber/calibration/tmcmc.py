@@ -1119,8 +1119,8 @@ def gaussian_likelihood_fun(
 
 def get_top_samples(trace, top_num=20):
     """Get the top posterior samples based on likelihood values."""
-    posterior_samples = trace[-1][0]  # shape (N, 8)
-    likelihoods = trace[-1][1]  # shape (N,)
+    posterior_samples = trace[-1].samples  # shape (N, 8)
+    likelihoods = trace[-1].likelihoods  # shape (N,)
 
     # Select top 20% samples by likelihood
     top_indices = np.argsort(likelihoods)[-top_num:]
@@ -1129,7 +1129,7 @@ def get_top_samples(trace, top_num=20):
 
 
 def get_posterior_samples(trace):
-    posterior_samples = trace[-1][0]  # shape (N, 8)
+    posterior_samples = trace[-1].samples  # shape (N, 8)
     return posterior_samples
 
 
@@ -1153,7 +1153,9 @@ def hdi_1d(x, cred_mass=0.95):
     return (low[j], high[j])
 
 
-def get_hdi_bounds(data: pd.DataFrame | NDArray, levels=(0.99, 0.95, 0.20, 0.10, 0.05)):
+def get_hdi_bounds(
+    data: pd.DataFrame | NDArray, levels=(0.99, 0.95, 0.20, 0.10, 0.05)
+) -> pd.DataFrame:
     """Compute HDI bounds for each column in `data`
 
     args:
@@ -1186,6 +1188,14 @@ def get_hdi_bounds(data: pd.DataFrame | NDArray, levels=(0.99, 0.95, 0.20, 0.10,
     return pd.DataFrame(out).rename_axis("column").reset_index()
 
 
-def transform_old_trace_to_new(trace):
-    """Transform old trace format to new Stage class format."""
+def transform_old_trace_to_new(trace: list[list]) -> list[Stage]:
+    """Transform old trace format to new Stage class format.
+
+    args:
+        trace (list[list]): Old trace instance which is list of lists, where each inner list contains:
+            [Sm, Lm, Wm_n, ESS, beta, Smcap]
+
+    returns:
+        list[Stage]: New trace instance which is list of Stage class instances.
+    """
     return [Stage(*i) for i in trace]
