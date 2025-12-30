@@ -1112,3 +1112,75 @@ def gaussian_likelihood_fun(
     log_likelihood = -((dissimilarity / eps_scale) ** 2)  # np.exp(-dissimilarity)
 
     return log_likelihood
+
+
+# * ----------------------------------- helper functions
+
+
+def get_top_samples(trace, top_num=20):
+    """Get the top posterior samples based on likelihood values."""
+    posterior_samples = trace[-1][0]  # shape (N, 8)
+    likelihoods = trace[-1][1]  # shape (N,)
+
+    # Select top 20% samples by likelihood
+    top_indices = np.argsort(likelihoods)[-top_num:]
+    top_samples = posterior_samples[top_indices]
+    return top_samples
+
+
+def get_posterior_samples(trace):
+    posterior_samples = trace[-1][0]  # shape (N, 8)
+    return posterior_samples
+
+
+def hdi_1d(x, cred_mass=0.95):
+    x = np.asarray(x, dtype=float)
+    x = x[np.isfinite(x)]
+    if x.size == 0:
+        return (np.nan, np.nan)
+
+    x = np.sort(x)
+    n = x.size
+    m = int(np.floor(cred_mass * n))
+    if m < 1:
+        return (np.nan, np.nan)
+
+    low = x[: n - m]
+    high = x[m:]
+    widths = high - low
+    j = np.argmin(widths)
+
+    return (low[j], high[j])
+
+
+def get_hdi_bounds(data: pd.DataFrame | NDArray, levels=(0.99, 0.95, 0.20, 0.10, 0.05)):
+    """Compute HDI bounds for each column in `data`
+
+    args:
+        data (pd.DataFrame | NDArray): posterior samples (shape: n_samples x n_vars).
+        levels (tuple): A tuple of high density intervalc levels.
+
+    returns:
+        pd.DataFrame: DataFrame with HDI bounds for each column and level.
+    """
+    # Normalize input
+    if isinstance(data, pd.DataFrame):
+        values = data.to_numpy()
+        columns = data.columns
+    else:
+        values = np.asarray(data)
+        if values.ndim != 2:
+            raise ValueError("Input array must be 2D (n_samples, n_columns)")
+        columns = [f"col_{i}" for i in range(values.shape[1])]
+
+    out = {}
+
+    for j, col in enumerate(columns):
+        col_vals = values[:, j]
+        for lvl in levels:
+            lo, hi = hdi_1d(col_vals, cred_mass=lvl)
+            p = int(round(lvl * 100))
+            out.setdefault(f"hdi_{p}_low", {})[col] = lo
+            out.setdefault(f"hdi_{p}_high", {})[col] = hi
+
+    return pd.DataFrame(out).rename_axis("column").reset_index()
