@@ -1120,7 +1120,7 @@ def gaussian_likelihood_fun(
 def get_top_samples(trace, top_num=20):
     """Get the top posterior samples based on likelihood values."""
     posterior_samples = trace[-1].samples  # shape (N, 8)
-    likelihoods = trace[-1].likelihoods  # shape (N,)
+    likelihoods = trace[-1].log_likelihoods  # shape (N,)
 
     # Select top 20% samples by likelihood
     top_indices = np.argsort(likelihoods)[-top_num:]
