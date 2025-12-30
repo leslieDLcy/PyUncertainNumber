@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 """
 This is the implementation for Transitional Markov Chain Monte Carlo (TMCMC) algorithm
 
-Leslie refactored and revised for `pyuncertainnumber` package, based on the version from 
+Leslie refactored, revised and integrated for `pyuncertainnumber` package, based on the version from 
 Roberto Rocchetta (NASA UQ challenge 2025). The original code is from Mukesh K. Ramancha.
 @license: MIT License
 @date: Nov 2025
@@ -50,14 +50,17 @@ class TMCMC:
 
 
     example:
+        >>> from pyuncertainnumber.calibration.tmcmc import TMCMC
+        >>> from pyuncertainnumber import pba
         >>> # create an instance of TMCMC class and run tmcmc
+        >>> parameters = [pba.D("uniform", (0.8, 2.2)), pba.D("uniform", (0.4, 1.2))] # dummy prior distributions
         >>> t = TMCMC(
-        >>>     N,
-        >>>     parameters,
-        >>>     names,
-        >>>     log_likelihood=log_likelihood_function,
+        >>>     N=1000,                                             # number of particles
+        >>>     parameters=parameters,                              # prior distributions
+        >>>     names =['k1', 'k2'],                                # parameter names
+        >>>     log_likelihood=log_likelihood_function,             # user defined log likelihood function
         >>>     mutation_steps=1,                                   # number of MCMC steps for perturbation
-        >>>     status_file_name='tmcmc_running_status.txt',        # status log file
+        >>>     status_file_name='tmcmc_progressing_status.txt',    # status log file
         >>> )
         >>> mytrace = t.run()
 
@@ -65,8 +68,10 @@ class TMCMC:
         >>> import pickle
         >>> with open('tmcmc_trace.pkl', 'rb') as f:
         >>>     mytrace = pickle.load(f)
-        >>> re = TMCMC(trace=mytrace, names=names) # create TMCMC instance with loaded trace and names
-        >>> re.plot_updated_distribution(mytrace, save=False)
+        >>> re = TMCMC(trace=mytrace, names=names)                  # create TMCMC instance with loaded trace and names
+        >>> re.plot_updated_distribution(save=False)                # plot prior and posterior distribution
+        >>> prior_samples = re.load_prior_samples()                 # load prior samples as DataFrame
+        >>> posterior_samples = re.load_posterior_samples()         # load posterior samples as DataFrame
 
 
     .. figure:: /_static/tmcmc_2dof.png
@@ -100,7 +105,7 @@ class TMCMC:
         if self.names is None:
             raise ValueError("Parameter names must be  provided.")
 
-    def run(self):
+    def run(self) -> list[Stage]:
         """Run the TMCMC algorithm
 
         returns:
@@ -185,6 +190,11 @@ class Stage:
     ]  # effective sample size next stage ESS (can be None in terminal stage)
     beta: float  # tempering parameter next stage beta
     Smcap: Optional[NDArray]  # resampled samples (N x Np), None in terminal stage
+
+    def __repr__(self) -> str:
+        return (
+            f"Stage(beta={self.beta:.4f}, " f"ESS={self.ESS}, " f"N={self.Sm.shape[0]})"
+        )
 
     # * ---- Hints ----
 
