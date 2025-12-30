@@ -1184,3 +1184,8 @@ def get_hdi_bounds(data: pd.DataFrame | NDArray, levels=(0.99, 0.95, 0.20, 0.10,
             out.setdefault(f"hdi_{p}_high", {})[col] = hi
 
     return pd.DataFrame(out).rename_axis("column").reset_index()
+
+
+def transform_old_trace_to_new(trace):
+    """Transform old trace format to new Stage class format."""
+    return [Stage(i) for i in trace]
