@@ -6,7 +6,13 @@ import pickle
 from scipy.stats import wasserstein_distance, entropy
 from sklearn.metrics import mean_squared_error
 from dataclasses import dataclass
-
+import matplotlib.pyplot as plt
+import seaborn as sb
+import pandas as pd
+import time
+import numpy as np
+import logging
+from ..console import console
 
 if TYPE_CHECKING:
     from pyuncertainnumber import Distribution
@@ -21,13 +27,6 @@ Roberto Rocchetta (NASA UQ challenge 2025). The original code is from Mukesh K. 
 @date: Nov 2025
 """
 
-import matplotlib.pyplot as plt
-import seaborn as sb
-import pandas as pd
-import time
-import numpy as np
-import logging
-from ..console import console
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
@@ -1128,12 +1127,26 @@ def get_top_samples(trace, top_num=20):
     return top_samples
 
 
-def get_posterior_samples(trace):
+def get_posterior_samples(trace: list[Stage]) -> NDArray:
+    """Get the posterior particles of the last stage from the trace.
+
+    args:
+        trace (list[Stage]): trace object.
+    """
     posterior_samples = trace[-1].samples  # shape (N, 8)
     return posterior_samples
 
 
-def hdi_1d(x, cred_mass=0.95):
+def hdi_1d(x: NDArray, cred_mass=0.95) -> tuple[float, float]:
+    """Obtain the highest density interval (HDI) from particles
+
+    args:
+        x (NDArray): 1D array of samples.
+        cred_mass (float): Credible mass for the HDI.
+
+    returns:
+        tuple: Lower and upper bounds of the HDI.
+    """
     x = np.asarray(x, dtype=float)
     x = x[np.isfinite(x)]
     if x.size == 0:
