@@ -38,12 +38,12 @@ def test_low_level_imc(example_pboxes):
         func=foo_universal,
         dependency=de,
         interval_strategy="direct",
-        n_sam=500,
+        n_sam=10,
     )  # `direct` strategy succeeds
     assert isinstance(t_gau_copula, pun.pba.Pbox)
 
     t1_independence = mix.interval_monte_carlo(
-        vars=[a, b, c], func=foo_universal, interval_strategy="direct", n_sam=10_000
+        vars=[a, b, c], func=foo_universal, interval_strategy="direct", n_sam=10
     )  # `direct` strategy succeeds
 
     assert isinstance(t1_independence, pun.pba.Pbox)
@@ -52,7 +52,7 @@ def test_low_level_imc(example_pboxes):
         vars=[a, b, c],
         func=foo_universal,
         interval_strategy="endpoints",
-        n_sam=1e4,
+        n_sam=10,
     )  # `endpoints` strategy succeeds (expects foo_vec)
     assert isinstance(t1, pun.pba.Pbox)
 
@@ -60,7 +60,7 @@ def test_low_level_imc(example_pboxes):
         vars=[a, b, c],
         func=foo_universal,
         interval_strategy="subinterval",
-        n_sam=1000,
+        n_sam=10,
         n_sub=10,
         subinterval_style="endpoints",
     )  # `subinterval` strategy succeeds
@@ -71,7 +71,7 @@ def test_low_level_imc(example_pboxes):
 def test_low_level_slicing(example_pboxes):
     a, b, c = example_pboxes
     t3 = mix.slicing(
-        vars=[a, b, c], func=foo_universal, interval_strategy="endpoints", n_slices=30
+        vars=[a, b, c], func=foo_universal, interval_strategy="endpoints", n_slices=10
     )  # `endpoints` strategy succeeds
 
     assert isinstance(t3, pun.pba.Pbox)

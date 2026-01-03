@@ -611,6 +611,15 @@ class UncertainNumber:
         with open(filepath, "w") as fp:
             json.dump(self, fp, cls=UNEncoder, indent=4)
 
+    # * ---------------------other functions---------------------*#
+    def to_pbox(self):
+        """convert the UN object to a pbox object"""
+
+        from ..pba.operation import convert
+
+        pbox = convert(self._construct)
+        return pbox
+
 
 # * ---------------------shortcuts --------------------- *#
 def makeUNPbox(func):
