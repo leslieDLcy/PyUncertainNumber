@@ -19,6 +19,7 @@ dependencies = [
   "Pint",
   "pymongo",
   "pymoo",
+  "rich",
   "scipy >=1.15, <1.15.2",
   "tqdm",
   "bayesian-optimization",
