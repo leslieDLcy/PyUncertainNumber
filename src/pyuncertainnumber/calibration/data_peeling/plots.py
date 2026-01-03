@@ -5,7 +5,7 @@ from matplotlib import gridspec
 from .peeling import peeling_to_structure
 from .fuzzy import samples_to_fuzzy_projection
 from numpy.typing import NDArray
-
+import matplotlib.pyplot as plt
 
 FONTSIZE = 22
 
@@ -428,7 +428,7 @@ def plot_peeling_nxd(
                 labelsize="x-large",
             )
     pyplot.tight_layout()
-    pass
+    return ax
 
 
 def plot_scattermatrix(
@@ -488,7 +488,6 @@ def plot_scattermatrix(
             labelsize="x-large",
         )
     pyplot.tight_layout()
-    pass
 
 
 def plot_fuzzy(
@@ -633,3 +632,172 @@ def plot_peeling_nxd_back(
             )
     pyplot.tight_layout()
     pass
+
+
+# * --------- refactor
+
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib import gridspec
+
+
+def _draw_peeling_cell(
+    ax,
+    x,
+    b,
+    fx,
+    p,
+    i,
+    j,
+    labels,
+    aspect="auto",
+    marker="s",
+    markercolor="grey",
+    boxcolor="blue2",
+    grid=True,
+    baseline_alpha=0.075,
+):
+    # match your styling
+    boxcolor_rgba = c_(boxcolor, alpha=baseline_alpha)
+    markercolor_rgba = c_(markercolor, alpha=0.5)
+
+    if i == j:  # diagonal
+        _ = plot_one_fuzzy_grad(
+            fx[:, i, :],
+            data=x[:, i],
+            p=p,
+            ax=ax,
+            color=boxcolor_rgba,
+            baseline_alpha=baseline_alpha,
+        )
+        ax.set_xlabel(labels[i], fontsize=FONTSIZE)
+        ax.set_ylabel(r"$1-\delta$", fontsize=FONTSIZE)
+    else:  # off-diagonal
+        ax.scatter(
+            x[:, i],
+            x[:, j],
+            color=markercolor_rgba,
+            marker=marker,
+            edgecolors="face",
+        )
+        for box in b:
+            _ = plot_box([box[i, :], box[j, :]], ax=ax, facecolor=boxcolor_rgba)
+
+        ax.set_aspect(aspect)
+        ax.set_xlabel(labels[i], fontsize=FONTSIZE)
+        ax.set_ylabel(labels[j], fontsize=FONTSIZE)
+
+    if grid:
+        ax.grid()
+
+    ax.tick_params(
+        direction="out",
+        length=6,
+        width=2,
+        colors="#5a5a64",
+        grid_color="gray",
+        grid_alpha=0.5,
+        labelsize="x-large",
+    )
+
+    return ax
+
+
+def plot_peeling_nxd_all(
+    x,
+    a,
+    b,
+    fx=None,
+    p: list = None,
+    figsize=None,
+    aspect="auto",
+    label="X",
+    marker="s",
+    markercolor="grey",
+    boxcolor="blue2",
+    grid=True,
+    baseline_alpha=0.075,
+    return_axes=False,  # <-- new
+):
+    n, d = x.shape
+    if (p is None) or (fx is None):
+        fx, p = peeling_to_structure(a, b, kind="scenario", beta=0.01)
+
+    labels = [r"$" + label + "_" + str(i + 1) + "$" for i in range(d)]
+    if figsize is None:
+        figsize = FIGSIZE["medium"]
+    elif isinstance(figsize, str):
+        figsize = FIGSIZE[figsize]
+
+    fig = plt.figure(figsize=figsize)
+    gs = gridspec.GridSpec(d, d, figure=fig)
+
+    axes = np.empty((d, d), dtype=object)
+
+    for i in range(d):
+        for j in range(d):
+            ax = plt.subplot(gs[j, i])
+            axes[j, i] = ax  # row=j, col=i (matches your gs[j,i])
+            _draw_peeling_cell(
+                ax=ax,
+                x=x,
+                b=b,
+                fx=fx,
+                p=p,
+                i=i,
+                j=j,
+                labels=labels,
+                aspect=aspect,
+                marker=marker,
+                markercolor=markercolor,
+                boxcolor=boxcolor,
+                grid=grid,
+                baseline_alpha=baseline_alpha,
+            )
+
+    plt.tight_layout()
+    return (fig, axes) if return_axes else ax  # keep backward compatible
+
+
+def plot_peeling_one(
+    x,
+    a,
+    b,
+    i,
+    j,
+    fx=None,
+    p: list = None,
+    figsize=(4, 4),
+    aspect="auto",
+    label="X",
+    marker="s",
+    markercolor="grey",
+    boxcolor="blue2",
+    grid=True,
+    baseline_alpha=0.075,
+):
+    n, d = x.shape
+    if (p is None) or (fx is None):
+        fx, p = peeling_to_structure(a, b, kind="scenario", beta=0.01)
+
+    labels = [r"$" + label + "_" + str(k + 1) + "$" for k in range(d)]
+
+    fig, ax = plt.subplots(figsize=figsize)
+    _draw_peeling_cell(
+        ax=ax,
+        x=x,
+        b=b,
+        fx=fx,
+        p=p,
+        i=i,
+        j=j,
+        labels=labels,
+        aspect=aspect,
+        marker=marker,
+        markercolor=markercolor,
+        boxcolor=boxcolor,
+        grid=grid,
+        baseline_alpha=baseline_alpha,
+    )
+    fig.tight_layout()
+    return fig, ax
