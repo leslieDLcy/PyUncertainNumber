@@ -1,5 +1,6 @@
 # local env
 matplotlibrc.txt
+*.egg-info/
 
 
 # Data
