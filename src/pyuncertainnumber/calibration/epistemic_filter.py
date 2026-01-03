@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import numpy as np
-import numpy as np
 from scipy.spatial import HalfspaceIntersection, ConvexHull
 from scipy.optimize import linprog
+from functools import partial
 
 
 class EpistemicFilter:
@@ -19,14 +19,14 @@ class EpistemicFilter:
         """The EpistemicFilter method to reduce the epistemic uncertainty space based on discrepancy scores.
 
         args:
-            xe_samples (NDArray): Proposed Samples of epistemic parameters, shape (n_samples, n_dimensions).
+            xe_samples (NDArray): Proposed Samples of epistemic parameters, shape (ne, n_dimensions).
                 Typically samples from a bounded set of some epistemic parameters.
 
             discrepancy_scores (NDArray, optional): Discrepancy scores between the model simulations and the observation.
-                Associated with each xe sample, shape (n_samples,). Defaults to None.
+                Associated with each xe sample, shape (ne,). Defaults to None.
 
             sets_of_discrepancy (list, optional): List of sets of discrepancy scores for multiple datasets.
-                Each element should be an NDArray of shape (n_samples,). Defaults to None.
+                Each element should be an NDArray of shape (ne,). Defaults to None.
 
         tip:
             For performance functions that output multiple responses, some aggregation of discrepancy scores may be used.
@@ -45,11 +45,11 @@ class EpistemicFilter:
             sets_of_discrepancy if sets_of_discrepancy is not None else None
         )
 
-    def filter(self, threshold: float = 0.1):
+    def filter(self, threshold: float | list):
         """Filter the epistemic samples based on a discrepancy threshold.
 
         args:
-            threshold (float): The discrepancy threshold for filtering data points.
+            threshold (float | list): The discrepancy threshold(s) for filtering data points.
 
         returns:
             tuple:
@@ -57,16 +57,42 @@ class EpistemicFilter:
                 - hull;
                 - lower bounds;
                 - upper bounds of the bounding box, or (None, None) if unsuccessful.
-
         """
-        return filter_by_discrepancy(
-            self.xe_samples, self.discrepancy_scores, threshold
-        )
+        if isinstance(threshold, list):
+            return self.iterative_filter(thresholds=threshold)
+        else:
+            return filter_by_discrepancy(
+                self.xe_samples, self.discrepancy_scores, threshold
+            )
 
     def iterative_filter(
+        self,
+        thresholds: list,
+    ) -> list:
+        """Iteratively filter the epistemic samples based on multiple thresholds.
+
+        args:
+            thresholds (list): List of discrepancy thresholds for filtering data points.
+
+            simulation_model (callable, optional): A function that takes xe_samples as input and returns discrepancy scores.
+                Required if re_sample is True. Defaults to None.
+
+        note:
+            thresholds are assumed to be sorted in ascending order.
+        """
+
+        f = partial(
+            filter_by_discrepancy,
+            xe_samples=self.xe_samples,
+            discrepancy_scores=self.discrepancy_scores,
+        )
+        return [f(t) for t in thresholds.sort()]
+
+    # TODO develope this function which natively intergrates the simulation model and resampling
+    def iterative_filter_w_simulation_model(
         self, thresholds: list, re_sample: bool = False, simulation_model=None
     ):
-        """Iteratively filter the epistemic samples based on multiple discrepancy thresholds.
+        """Iteratively filter the epistemic samples based on multiple thresholds.
 
         args:
             thresholds (list): List of discrepancy thresholds for filtering data points.
@@ -80,7 +106,6 @@ class EpistemicFilter:
             if re_sample is True, the simulation_model should be provided to re-evaluate discrepancy scores.
         """
 
-        # TODO start from the smallest threshold
         pass
 
     def filter_on_sets(self, plot_hulls: bool = True):
@@ -161,23 +186,27 @@ class EpistemicFilter:
 
 
 # problem agnostic
-def filter_by_discrepancy(xe, discrepancy_scores, threshold=0.1):
+def filter_by_discrepancy(xe_samples, discrepancy_scores, threshold=0.1) -> tuple:
     """Computes the intersection of convex hull bounding boxes based on a discrepancy threshold.
 
     args:
-        threshold (float): The discrepancy threshold for filtering data points.
+        threshold (float): The scalar discrepancy threshold for filtering data points.
 
     returns:
         tuple: the hull, and Lower and upper bounds of the intersected bounding box, or (None, None) if unsuccessful.
+
+    note:
+        Assume the threshold is a scalar value.
     """
     # Get the absolute path of the directory containing this script
 
-    filtered_xe = xe[discrepancy_scores < threshold]
+    filtered_xe = xe_samples[discrepancy_scores < threshold]
 
     if filtered_xe.size == 0:
         raise ValueError(f"No data points remain after filtering.")
 
     hull = ConvexHull(filtered_xe)
+
     # return hull, hull.min_bound, hull.max_bound
 
     # for multiple thresholds/datasets
@@ -201,7 +230,7 @@ def filter_by_discrepancy(xe, discrepancy_scores, threshold=0.1):
 
 
 def plot_convex_hull_with_bounds(
-    filtered_xe,
+    filtered_xe: NDArray,
     hull=None,
     ax=None,
     show=True,
@@ -209,29 +238,30 @@ def plot_convex_hull_with_bounds(
     y_title=None,
     hull_alpha=0.25,
 ):
-    """
-    Plot points, their convex hull, and the axis-aligned bounding box.
+    """Plot points, their convex hull, and the axis-aligned bounding box.
 
-    Parameters
-    ----------
-    filtered_xe : array-like, shape (n_samples, n_dims)
+    args:
+    filtered_xe (NDArray): array-like, shape (n_samples, n_dims)
         Input points. Supports 2D or 3D.
+
     hull : scipy.spatial.ConvexHull, optional
         Precomputed convex hull. If None, it is computed.
+
     ax : matplotlib Axes or 3D Axes, optional
         Existing axes to draw on. If None, a new figure/axes is created.
+
     show : bool, default True
         If True, calls plt.show() at the end.
+
     hull_alpha : float, default 0.25
         Transparency of the hull surface.
 
-    Returns
-    -------
-    fig : matplotlib.figure.Figure
-    ax : matplotlib.axes.Axes or mplot3d.Axes3D
-    hull : scipy.spatial.ConvexHull
-    min_bound : ndarray
-    max_bound : ndarray
+    Returns:
+        fig : matplotlib.figure.Figure
+        ax : matplotlib.axes.Axes or mplot3d.Axes3D
+        hull : scipy.spatial.ConvexHull
+        min_bound : ndarray
+        max_bound : ndarray
     """
     xe = np.asarray(filtered_xe)
     if xe.ndim != 2:
@@ -359,20 +389,17 @@ def plot_convex_hull_with_bounds(
 
 
 def intersect_convex_hulls(hulls):
-    """
-    Compute intersection of several ConvexHull polytopes.
+    """Compute intersection of several ConvexHull polytopes.
     Works in 2D or 3D (and in principle higher).
 
-    Parameters
-    ----------
-    hulls : list of scipy.spatial.ConvexHull
+    args:
+        hulls : list of scipy.spatial.ConvexHull
 
-    Returns
-    -------
-    vertices : (m, d) ndarray
-        Vertices of the intersection polytope (may be empty).
-    hull_int : ConvexHull or None
-        ConvexHull of the intersection vertices, or None if empty.
+    returns:
+        vertices : (m, d) ndarray
+            Vertices of the intersection polytope (may be empty).
+        hull_int : ConvexHull or None
+            ConvexHull of the intersection vertices, or None if empty.
     """
     if not hulls:
         raise ValueError("Need at least one hull.")
@@ -420,27 +447,24 @@ def plot_multiple_convex_hulls(
     ax=None,
     show=True,
 ):
-    """
-    Plot multiple 2D point sets with their convex hulls.
+    """Plot multiple 2D point sets with their convex hulls.
 
-    Parameters
-    ----------
-    xe_list : list of ndarray
-        Each array must be shape (n_i, 2)
-    hulls : list of ConvexHull or None
-        If None, hulls are computed automatically.
-    show_bounds : bool
-        Whether to draw dashed bounding rectangles.
-    hull_alpha : float
-        Transparency of hull fill.
-    ax : matplotlib Axes
-        Optional existing axes.
-    show : bool
-        Whether to call plt.show()
+    args:
+        xe_list : list of ndarray
+            Each array must be shape (n_i, 2)
+        hulls : list of ConvexHull or None
+            If None, hulls are computed automatically.
+        show_bounds : bool
+            Whether to draw dashed bounding rectangles.
+        hull_alpha : float
+            Transparency of hull fill.
+        ax : matplotlib Axes
+            Optional existing axes.
+        show : bool
+            Whether to call plt.show()
 
-    Returns
-    -------
-    fig, ax, hulls
+    Returns:
+        fig, ax, hulls
     """
 
     # Convert inputs and validate dimensions

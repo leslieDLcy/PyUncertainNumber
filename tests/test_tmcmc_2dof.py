@@ -3,11 +3,10 @@ Test file for `tmcmc` implementation on a simple example of 2DOF system
 """
 
 from numpy.typing import ArrayLike
-
 import numpy as np
-import pytest
 from pyuncertainnumber.calibration import pdfs
 from pyuncertainnumber.calibration.tmcmc import TMCMC
+from pyuncertainnumber import pba
 
 # measurement data:
 # eigen values of first mode
@@ -18,7 +17,7 @@ data2 = np.array([2.3614, 2.5877, 2.7070, 2.3875, 2.7272])
 data3 = np.array([1.68245252, 1.71103903, 1.57876073, 1.58722342, 1.61878479])
 
 # number of particles (to approximate the posterior)
-N = 1000
+N = 100
 
 # prior distribution of parameters
 k1 = pdfs.Uniform(lower=0.8, upper=2.2)
@@ -27,8 +26,14 @@ k2 = pdfs.Uniform(lower=0.4, upper=1.2)
 # Required! a list of all parameter objects
 all_pars = [k1, k2]
 
+k1 = pba.Distribution("uniform", (0.8, 2.2))
+k2 = pba.Distribution("uniform", (0.4, 1.2))
 
-def log_likelihood(particle_num: int, s: ArrayLike) -> float:
+# Required! a list of all parameter objects
+all_pars = [k1, k2]
+
+
+def log_likelihood_case3(particle_num: int, s: ArrayLike) -> float:
     """
     Required!
 
@@ -63,20 +68,17 @@ def log_likelihood_case2(particle_num, s):
     """
     Log-likelihood for the 2DOF example - CASE 2 (two eigenvalues λ1 and λ2).
 
-    Parameters
-    ----------
-    particle_num : int
-        Index of the particle (not used in this function, but required by the TMCMC framework).
+    Args:
+        particle_num (int):
+            Index of the particle (not used in this function, but required by the TMCMC framework).
 
-    s : numpy array of shape (2,)
-        Current parameter vector:
-            s[0] = q1 (stiffness parameter 1)
-            s[1] = q2 (stiffness parameter 2)
+        s (ArrayLike): numpy array of shape (2,)
+            Parameter vector in this case:
+                s[0] = q1 (stiffness parameter 1)
+                s[1] = q2 (stiffness parameter 2)
 
-    Returns
-    -------
-    LL : float
-        Log-likelihood value at this parameter vector.
+    returns:
+        LL (float): Log-likelihood value at this parameter vector.
     """
     q1 = s[0]
     q2 = s[1]
@@ -118,11 +120,12 @@ def log_likelihood_case2(particle_num, s):
 def test_2dof_tmcmc(tmp_path):
     """Test TMCMC on 2DOF example"""
     # Use temporary directory for status file
-    status_file = tmp_path / "status_file_2DOF_class.txt"
+    status_file = tmp_path / "status_file_2DOF_case2_pba.txt"
 
     t = TMCMC(
-        N,
-        all_pars,
+        N=N,
+        parameters=all_pars,
+        names=["theta_1", "theta_2"],
         log_likelihood=log_likelihood_case2,
         status_file_name=str(status_file),
     )

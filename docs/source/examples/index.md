@@ -1,137 +1,118 @@
 # Examples
 
-<!-- Register the notebooks with Sphinx -->
+<!-- Register categories with Sphinx; notebooks are included in each category page -->
 ```{toctree}
 :maxdepth: 1
 :titlesonly:
 :hidden:
 
-work_with_interval
-example_dependency_dev_purpose
-repeated_variable
-linguistic_approximation
-significant_digits
-characterise_what_you_know
-aleatory_propagation_demo
-interval_propagation_demo
-mix_uncertainty_propagation_demo
+propagation/index
+calibration/index
+characterisation/index
 ```
 
-<!-- Show a grid of nice cards that link to each notebook -->
+## Propagation
+
 ::::{grid} 1 2 2 3
 :gutter: 2
 
-<!-- :::{card} Getting started
-:link: getting_started
-:link-type: doc
-:img-top: ../_static/illustration_get_started.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-Getting started with `pyuncertainnumber`
-::: -->
-
-<!-- :::{card} What is an uncertain number
-:link: what_is_un
-:link-type: doc
-:img-top: ../_static/what_is_un.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-A closed computation environment of uncertain numbers for uncertainty quantification
-::: -->
-
-
-:::{card} Work with intervals
-:link: work_with_interval
-:link-type: doc
-:img-top: ../_static/interval_illustration.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-Introduction to work with intervals
-:::
-
-
-
-:::{card} Dependency structures in uncertainty analysis
-:link: example_dependency_dev_purpose
-:link-type: doc
-:img-top: ../_static/distribution_dependency.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-Random dependencies can be known, partially known, or unknown
-:::
-
-:::{card} Interval dependency and repeated variables
-:link: repeated_variable
-:link-type: doc
-:img-top: ../_static/function_hint.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-Repeated variable prblem in interval analysis
-:::
-
-:::{card} Interpret linguistic hedges
-:link: linguistic_approximation
-:link-type: doc
-:img-top: ../_static/about_200.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-Interpret the uncertainty indicated by linguistic hedges (e.g. "about 7")
-:::
-
-:::{card} Significance of significant digits
-:link: significant_digits
-:link-type: doc
-:img-top: ../_static/illustration_sigdigits.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-Explore the uncertainty indicated by significant digits of numbers
-:::
-
-
-:::{card} Characterise what you know
-:link: characterise_what_you_know
-:link-type: doc
-:img-top: ../_static/free_pbox_constraint_demo.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-Empirical knowledge serving as constraints when characterising what you know
-:::
-
-
-:::{card} Propagation of aleatory uncertainty
-:link: aleatory_propagation_demo
+:::{card} Aleatory propagation
+:link: propagation/aleatory_propagation_demo
 :link-type: doc
 :img-top: ../_static/aleatory_propagation_demo.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-propagate random variables via a performance function
+Propagate random variables via performance functions.
 :::
-
 
 :::{card} Interval propagation
-:link: interval_propagation_demo
+:link: propagation/interval_propagation_demo
 :link-type: doc
 :img-top: ../_static/interval_propagation_demo.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-Propagate intervals via a performance function, intrusively or nonintrusively
+Epistemic/interval bounds, intrusive and non-intrusive.
 :::
-
-
 
 :::{card} Mixed uncertainty
-:link: mix_uncertainty_propagation_demo
+:link: propagation/mix_uncertainty_propagation_demo
 :link-type: doc
 :img-top: ../_static/illustration_get_started.png
-:class-card: sd-text-center        # optional: center content
-:class-img-top: card-img-square    # <-- add a class you’ll style
-Propagation mixed uncertainty via a performance function
+Hybrid aleatory–epistemic propagation examples.
 :::
 
+::::
 
+## Calibration
 
+::::{grid} 1 2 2 3
+:gutter: 2
 
+:::{card} Transitional MCMC (2-DOF)
+:link: calibration/2dof_tmcmc_demo
+:link-type: doc
+:img-top: ../_static/tmcmc_2dof.png
+Posterior inference of stiffness parameters with TMCMC.
+:::
 
+:::{card} KNN calibration
+:link: calibration/KNN_calibrator_demo
+:link-type: doc
+:img-top: ../_static/KNN_calibration_demo.png
+Data-driven likelihood-free calibration technique.
+:::
 
+:::{card} Data peeling algorithm
+:link: calibration/Data_peeling_demo
+:link-type: doc
+:img-top: ../_static/nested_ds.png
+Data peeling algorithm on a banana-shaped data generating process.
+:::
 
+::::
+
+## Characterisation
+
+::::{grid} 1 2 2 3
+:gutter: 2
+
+:::{card} Work with intervals
+:link: characterisation/work_with_interval
+:link-type: doc
+:img-top: ../_static/interval_illustration.png
+Basics of interval arithmetic and usage patterns.
+:::
+
+:::{card} Dependency structures
+:link: characterisation/example_dependency_dev_purpose
+:link-type: doc
+:img-top: ../_static/distribution_dependency.png
+Illustrates dependence assumptions in uncertainty analysis.
+:::
+
+:::{card} Repeated variables
+:link: characterisation/repeated_variable
+:link-type: doc
+:img-top: ../_static/function_hint.png
+Handling repeated-variable issues in interval analysis.
+:::
+
+:::{card} Linguistic approximation
+:link: characterisation/linguistic_approximation
+:link-type: doc
+:img-top: ../_static/about_200.png
+Interpret uncertainty expressed with linguistic hedges.
+:::
+
+:::{card} Significant digits
+:link: characterisation/significant_digits
+:link-type: doc
+:img-top: ../_static/illustration_sigdigits.png
+Explore information carried by significant digits.
+:::
+
+:::{card} Characterise what you know
+:link: characterisation/characterise_what_you_know
+:link-type: doc
+:img-top: ../_static/free_pbox_constraint_demo.png
+Empirical constraints for characterising uncertain numbers.
+:::
+
+::::
 ::::

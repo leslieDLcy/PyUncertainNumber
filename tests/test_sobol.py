@@ -24,7 +24,12 @@ def test_sobol_analysis():
 
     # 3. Run the analysis
     results = sobol_analysis(
-        inputs, my_model, calc_second_order=True, print_to_console=True, N=512
+        inputs,
+        my_model,
+        plot_results=False,
+        calc_second_order=True,
+        print_to_console=True,
+        N=512,
     )
 
     # 4. Print results for the first output

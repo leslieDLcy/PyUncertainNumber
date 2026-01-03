@@ -44,3 +44,71 @@ h2 {
     margin-right: auto;
     display: block;
 }
+
+/* typography: global sizing + fine-grained tweaks */
+
+/* Lower the global base size slightly; tweak if needed */
+html,
+:root {
+    font-size: 15px;
+    /* default ~16px; smaller overall typography */
+}
+
+/* Main article/content area */
+.content,
+.content>article,
+.page,
+.bd-article {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Headings: reduce sizes for better hierarchy on small screens */
+h1 {
+    font-size: 2.0rem;
+}
+
+h2 {
+    font-size: 1.6rem;
+}
+
+h3 {
+    font-size: 1.3rem;
+}
+
+h4 {
+    font-size: 1.15rem;
+}
+
+/* Sidebar navigation */
+.sidebar-tree .reference {
+    font-size: 0.95rem;
+}
+
+.sidebar-tree .caption {
+    font-size: 0.9rem;
+}
+
+/* Cards (sphinx-design) */
+.sd-card .sd-card-header,
+.sd-card .sd-card-title {
+    font-size: 1.1rem;
+}
+
+.sd-card .sd-card-body {
+    font-size: 0.95rem;
+}
+
+/* Code blocks and inline code */
+pre,
+code,
+.highlight pre,
+.literal-block {
+    font-size: 0.9rem;
+}
+
+/* Tables */
+table.docutils,
+.docutils .line-block {
+    font-size: 0.95rem;
+}
