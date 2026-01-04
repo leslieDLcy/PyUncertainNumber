@@ -27,10 +27,9 @@ if TYPE_CHECKING:
 # * --------------------- parametric cases --------------------- *#
 
 
-#! question: is Distribution class necessary?
 @dataclass
 class Distribution(NominalValueMixin):
-    """Two signature are currentlly supported, either a parametric specification or from a nonparametric empirical data set
+    """Two signatures are currentlly supported, either a parametric specification or from a nonparametric empirical data set.
 
     note:
         the nonparametric instasntiation via arrtribute `empirical_data` will be deprecated soon.
@@ -112,6 +111,10 @@ class Distribution(NominalValueMixin):
                 "Sampling not supported for sample-approximated distributions"
             )
 
+    def generate_rns(self, N):
+        """generate 'N' random numbers from the distribution"""
+        return self.sample(N)
+
     def alpha_cut(self, alpha):
         """alpha cut interface"""
         return self._dist.ppf(alpha)
@@ -168,6 +171,10 @@ class Distribution(NominalValueMixin):
     def pdf(self, x: ArrayLike):
         """compute the probability density function (pdf) at x"""
         return self._dist.pdf(x)
+
+    def log_pdf_eval(self, x: ArrayLike):
+        """compute the log of probability density function (pdf) at x"""
+        return self._dist.logpdf(x)
 
     def cdf(self, x: ArrayLike):
         """compute the cumulative distribution function (cdf) at x"""

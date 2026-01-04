@@ -6,21 +6,22 @@ requires = ["setuptools >= 61.0"]
 authors = [
   {name = "(Leslie) Yu Chen", email = "leslie.yuchen666@gmail.com"},
   {name = "Roberto Rocchetta", email = "roberto.rocchetta88@gmail.com"},
-  {name = "Ioanna Ioannou", email = "Ioanna.Ioannou@liverpool.ac.uk"},
+  {name = "Marco de Angelis", email = "marco.de-angelis@strath.ac.uk"},
   {name = "Scott Ferson", email = "sandp8@gmail.com"},
+  {name = "Ioanna Ioannou", email = "Ioanna.Ioannou@liverpool.ac.uk"},
 ]
 
 dependencies = [
   "matplotlib",
-  "numpy",
+  "numpy==1.26.4",
   "pandas",
   "seaborn",
   "Pint",
   "pymongo",
   "pymoo",
+  "rich",
   "scipy >=1.15, <1.15.2",
   "tqdm",
-  "pytest",
   "bayesian-optimization",
   "geneticalgorithm",
   "statsmodels >=0.14, <0.15", # Verified 0.14.4 compatibility
@@ -28,6 +29,7 @@ dependencies = [
   "SALib",
   "json5",
 ]
+
 description = "Rigorous computation with Uncertain Number in Python"
 license = {text = "MIT License"}
 maintainers = [
@@ -36,7 +38,12 @@ maintainers = [
 name = "pyuncertainnumber"
 readme = "README.md"
 requires-python = ">= 3.11"
-version = "0.1.2"
+version = "0.1.3"
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+]
 
 [tool.setuptools.packages.find]
 # All the following settings are optional:

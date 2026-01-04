@@ -26,14 +26,12 @@ def test_interval_aggregation():
     upper_endpoints = np.random.uniform(0.5, 1.5, 7)
     m_weights = [0.1, 0.1, 0.25, 0.15, 0.1, 0.1, 0.2]
     # a list of nInterval objects
-    nI = [pun.I(*couple) for couple in zip(lower_endpoints, upper_endpoints)]
+    nI = [pba.I(*couple) for couple in zip(lower_endpoints, upper_endpoints)]
 
-    pbox_mix = stochastic_mixture(
-        *nI, weights=m_weights, display=True, return_type="pbox"
-    )
+    pbox_mix = stochastic_mixture(*nI, weights=m_weights)
     print("the result of the mixture operation")
     assert isinstance(
-        pbox_mix, UN
+        pbox_mix, Pbox
     ), "Failed to aggregate weights intervals expert opinions into Pbox objects"
 
 

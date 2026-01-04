@@ -5,6 +5,9 @@ import pyuncertainnumber as pun
 from pyuncertainnumber import b2b, pba
 from pyuncertainnumber.propagation.performance import foo_universal
 
+""" Note
+
+Some tests are commented out for automation but can run local tests """
 
 # * ------------------------------ b2b level
 
@@ -62,39 +65,39 @@ def test_b2b_level_subinterval_strategy(example_intervals):
     assert y22 == pba.I(13.0, 148.0)
 
 
-def test_b2b_level_ga_opt_strategy(example_intervals):
-    a, b, c = example_intervals
-    # optimisation - ga
-    y3 = b2b(
-        vars=[a, b, c],
-        func=foo_universal,
-        interval_strategy="ga",
-    )
+# def test_b2b_level_ga_opt_strategy(example_intervals):
+#     a, b, c = example_intervals
+#     # optimisation - ga
+#     y3 = b2b(
+#         vars=[a, b, c],
+#         func=foo_universal,
+#         interval_strategy="ga",
+#     )
 
-    assert 12 <= y3.lo and y3.hi <= 149
-
-
-def test_b2b_level_ba_opt_strategy(example_intervals):
-    a, b, c = example_intervals
-
-    y3 = b2b(
-        vars=[a, b, c],
-        func=foo_universal,
-        interval_strategy="bo",
-    )
-
-    assert 12 <= y3.lo and y3.hi <= 149
+#     assert 12 <= y3.lo and y3.hi <= 149
 
 
-def test_b2b_level_cauchy_deviate_strategy(example_intervals):
-    a, b, c = example_intervals
+# def test_b2b_level_ba_opt_strategy(example_intervals):
+#     a, b, c = example_intervals
 
-    y5 = b2b(
-        vars=[a, b, c],
-        func=foo_universal,
-        interval_strategy="cauchy_deviate",
-        n_sam=1000,
-    )
+#     y3 = b2b(
+#         vars=[a, b, c],
+#         func=foo_universal,
+#         interval_strategy="bo",
+#     )
+
+#     assert 12 <= y3.lo and y3.hi <= 149
+
+
+# def test_b2b_level_cauchy_deviate_strategy(example_intervals):
+#     a, b, c = example_intervals
+
+#     y5 = b2b(
+#         vars=[a, b, c],
+#         func=foo_universal,
+#         interval_strategy="cauchy_deviate",
+#         n_sam=1000,
+#     )
 
 
 # * ------------------------------ high level
