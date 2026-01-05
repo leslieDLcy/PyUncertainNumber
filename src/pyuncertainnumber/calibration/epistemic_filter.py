@@ -9,6 +9,29 @@ from functools import partial
 
 
 class EpistemicFilter:
+    """The EpistemicFilter method to reduce the epistemic uncertainty space based on discrepancy scores.
+
+    args:
+        xe_samples (NDArray): Proposed Samples of epistemic parameters, shape (ne, n_dimensions).
+            Typically samples from a bounded set of some epistemic parameters.
+
+        discrepancy_scores (NDArray, optional): Discrepancy scores between the model simulations and the observation.
+            Associated with each xe sample, shape (ne,). Defaults to None.
+
+        sets_of_discrepancy (list, optional): List of sets of discrepancy scores for multiple datasets.
+            Each element should be an NDArray of shape (ne,). Defaults to None.
+
+    tip:
+        For performance functions that output multiple responses, some aggregation of discrepancy scores may be used.
+        Depending on the number of observation, either a single set of discrepancy scores or multiple sets can be provided.
+
+    .. figure:: /_static/convex_hull.png
+        :alt: convex hull with bounds
+        :align: center
+        :width: 50%
+
+        Convex hull with bounds illustration.
+    """
 
     def __init__(
         self,
@@ -16,29 +39,7 @@ class EpistemicFilter:
         discrepancy_scores: NDArray = None,
         sets_of_discrepancy: list = None,
     ):
-        """The EpistemicFilter method to reduce the epistemic uncertainty space based on discrepancy scores.
 
-        args:
-            xe_samples (NDArray): Proposed Samples of epistemic parameters, shape (ne, n_dimensions).
-                Typically samples from a bounded set of some epistemic parameters.
-
-            discrepancy_scores (NDArray, optional): Discrepancy scores between the model simulations and the observation.
-                Associated with each xe sample, shape (ne,). Defaults to None.
-
-            sets_of_discrepancy (list, optional): List of sets of discrepancy scores for multiple datasets.
-                Each element should be an NDArray of shape (ne,). Defaults to None.
-
-        tip:
-            For performance functions that output multiple responses, some aggregation of discrepancy scores may be used.
-            Depending on the number of observation, either a single set of discrepancy scores or multiple sets can be provided.
-
-        .. figure:: /_static/convex_hull.png
-            :alt: convex hull with bounds
-            :align: center
-            :width: 50%
-
-            Convex hull with bounds illustration.
-        """
         self.xe_samples = xe_samples
         self.discrepancy_scores = discrepancy_scores
         self.sets_of_discrepancy = (
