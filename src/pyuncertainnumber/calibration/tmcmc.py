@@ -53,6 +53,7 @@ class TMCMC:
         >>> from pyuncertainnumber import pba
         >>> # create an instance of TMCMC class and run tmcmc
         >>> parameters = [pba.D("uniform", (0.8, 2.2)), pba.D("uniform", (0.4, 1.2))] # dummy prior distributions
+
         >>> t = TMCMC(
         >>>     N=1000,                                             # number of particles
         >>>     parameters=parameters,                              # prior distributions
@@ -68,6 +69,7 @@ class TMCMC:
         >>> with open('tmcmc_trace.pkl', 'rb') as f:
         >>>     mytrace = pickle.load(f)
         >>> re = TMCMC(trace=mytrace, names=names)                  # create TMCMC instance with loaded trace and names
+
         >>> re.plot_updated_distribution(save=False)                # plot prior and posterior distribution
         >>> prior_samples = re.load_prior_samples()                 # load prior samples as DataFrame
         >>> posterior_samples = re.load_posterior_samples()         # load posterior samples as DataFrame
