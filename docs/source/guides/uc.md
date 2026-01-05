@@ -2,7 +2,7 @@
 
 ## Variability and incertitude
 
-Modern risk analysts distinguish between variability and incertitude. ***Variability*** (also called randomness, aleatory uncertainty, or irreducible uncertainty) arises from natural stochasticity, environmental or structural variation across space or time, manufacturing heterogeneity among components or individuals. **Incertitude***, also called ignorance, epistemic uncertainty, subjective uncertainty or reducible uncertainty, arises from incompleteness of knowledge. Sources of incertitude include measurement uncertainty, small sample sizes, and data censoring, ignorance about the details of physical mechanisms and processes.
+Modern risk analysts distinguish between variability and incertitude. ***Variability*** (also called randomness, aleatory uncertainty, or irreducible uncertainty) arises from natural stochasticity, environmental or structural variation across space or time, manufacturing heterogeneity among components or individuals. ***Incertitude***, also called ignorance, epistemic uncertainty, subjective uncertainty or reducible uncertainty, arises from incompleteness of knowledge. Sources of incertitude include measurement uncertainty, small sample sizes, and data censoring, ignorance about the details of physical mechanisms and processes.
 
 For an engineering analysis, the **challenge** lies in formulating suitable uncertainty models given available information, **without introducing unwarranted assumptions**. However, the available information is often vague, ambiguous, or qualitative. Available data are frequently limited and of poor quality, giving rise to challenges in eliciting precise probabilistic specifications. Solutions to this problem are discussed in the literature, under the framework of imprecise probability, from various perspectives using different mathematical concepts, including for example random sets, evidence theory, fuzzy stochastic concepts, info-gap theory, and probability bounds analysis.
 
@@ -10,13 +10,11 @@ For an engineering analysis, the **challenge** lies in formulating suitable unce
 It is suggested to use interval analysis for propagating ignorance and the methods of probability theory for propagating variability.
 ```
 
-```{seealso}
-See also in the [propagation](./up.md)
-```
+
 
 ## Bounding distributional parameters
 
-The mean of a normal distribution may be elicited from an expert but this expert cannot be precise to a certain value but rather give a range based on past experience.
+The mean of a normal distribution may be elicited from an expert, but this expert cannot be precise to a certain value but rather give a range based on past experience.
 
 ````{tab} verbose
 To comprehensively characterise a pbox, specify the bounds for the parameters along with many other ancillary fields.
@@ -42,9 +40,25 @@ un = pun.norm([0,12],[1,4])
 ```
 ````
 
-```{tip}
-shortcut may not work for some distribution families at the moment as an internal restructure is underway. Use the canonical verbose constructor for best compatibility.
+
+````{tab} pba API
+For low-level controls and customisation
+
+```python
+from pyuncertainnumber import pba
+pbox = pba.normal([0,12],[1,4])
 ```
+````
+
+
+```{tip}
+The different sub-types of uncertain number can normally convert to one another (though may not be one by one), ergo the uncertain number been said to be a unified representation.
+```
+
+```{seealso}
+See also the tutorial the [What is an uncertain number](https://pyuncertainnumber.readthedocs.io/en/latest/tutorials/what_is_un.html) to get started.
+```
+
 
 ## Aggregation of multiple sources of information
 
@@ -52,9 +66,11 @@ Expert elicitation has been a challenging topic, especially when knowledge is li
 
 Assume the expert opinions are expressed in closed intervals. There may well be multiple such intervals from different experts and these collections of intervals can be overlapping, partially contradictory or even completely contradictory. Their relative credibility may be expressed in probabilities. Essentially such information creates a **Dempster-Shafer structure**. On the basis of a mixture operation, such information can be aggregated into a **p-box**.
 
-```{tip}
-The different sub-types of uncertain number can normally convert to one another (though may not be one by one), ergo the uncertain number been said to be a unified representation.
+```{seealso}
+See also the tutorial [uncertainty aggregation](https://pyuncertainnumber.readthedocs.io/en/latest/tutorials/uncertainty_aggregation.html) to get started.
 ```
+
+## Inter-variable dependence
 
 P-box arithmetic also extends the convolution of probability distributions which has typically been done with the independence assumption. However, often in engineering modelling practices independence is assumed for mathematical easiness rather than warranted. Fortunately, the uncertainty about the dependency between random variables can be characterised by the probability bounds, as seen below. It should be noted that such dependency bound does not imply independence.
 
@@ -66,6 +82,11 @@ P-box arithmetic also extends the convolution of probability distributions which
 
 The sum of two random variables of lognormal distribution without dependency specification
 ```
+```{seealso}
+See also the tutorial [depenency structure](https://pyuncertainnumber.readthedocs.io/en/latest/examples/characterisation/example_dependency_dev_purpose.html) to get started .
+```
+
+
 
 ## Known statistical properties
 
@@ -77,6 +98,11 @@ When the knowledge of a quantity is limited to the point where only some statist
 :width: 1000px
 :align: center
 ```
+
+```{seealso}
+See also the tutorial [characterise as you go](https://pyuncertainnumber.readthedocs.io/en/latest/examples/characterisation/characterise_what_you_know.html) to get started.
+```
+
 
 ## Hedged numerical expression
 
@@ -107,6 +133,11 @@ pun.hedge_interpret('about 200', return_type='pbox').display()
 hedged numerical expression "about 200"
 ```
 
+```{seealso}
+See also the tutorial [Interpret linguistic hedges](https://pyuncertainnumber.readthedocs.io/en/latest/examples/characterisation/linguistic_approximation.html) to get started.
+```
+
+
 ## Data uncertainty
 
 Measurement uncertainty is another main source uncertainty of data uncertainty besides sampling uncertainty. Point estimates from samples vary from one to another. We will typically use confidence intervals (as interval estimators) to account for the sampling uncertainty. As an example, `PyUncertainNumber` provides support for Kolmogorov–Smirnov (KS) confidence limits to infer the confidence limits for empirical cumulative distribution function.
@@ -130,3 +161,4 @@ As to measurement uncertainty, `Intervals` turn out to be a natural means of mat
 :align: center
 :width: 400px
 ```
+
