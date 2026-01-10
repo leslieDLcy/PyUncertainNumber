@@ -166,7 +166,8 @@ def make_vec_interval(vec):
     """
     from ...characterisation.uncertainNumber import UncertainNumber as UN
 
-    assert len(vec) > 1, "Interval must have more than one element"
+    # TODO: this is bugg. Interval vector has len(x)=1
+    # assert len(vec) > 1, "Interval must have more than one element"
 
     if isinstance(vec, Interval):
         return vec
