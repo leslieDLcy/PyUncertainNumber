@@ -992,8 +992,8 @@ class Staircase(Pbox):
             np.true_divide: ("__truediv__", "__rtruediv__"),
             np.floor_divide: ("__floordiv__", "__rfloordiv__"),
             np.power: ("__pow__", "__rpow__"),
-            np.maximum: ("__max__", "__rmax__"),  # only if you define these
-            np.minimum: ("__min__", "__rmin__"),  # only if you define these
+            np.maximum: ("__max__", "__rmax__"),
+            np.minimum: ("__min__", "__rmin__"),
         }
 
         if ufunc in binary and len(inputs) == 2:
