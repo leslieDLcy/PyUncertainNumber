@@ -982,9 +982,34 @@ class Staircase(Pbox):
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         if method != "__call__":
             return NotImplemented
-        if len(inputs) != 1 or inputs[0] is not self:
+        if kwargs.get("out", None) is not None:
             return NotImplemented
-        if "out" in kwargs and kwargs["out"] is not None:
+
+        binary = {
+            np.add: ("__add__", "__radd__"),
+            np.subtract: ("__sub__", "__rsub__"),
+            np.multiply: ("__mul__", "__rmul__"),
+            np.true_divide: ("__truediv__", "__rtruediv__"),
+            np.floor_divide: ("__floordiv__", "__rfloordiv__"),
+            np.power: ("__pow__", "__rpow__"),
+            np.maximum: ("__max__", "__rmax__"),  # only if you define these
+            np.minimum: ("__min__", "__rmin__"),  # only if you define these
+        }
+
+        if ufunc in binary and len(inputs) == 2:
+            left, right = inputs
+            l_name, r_name = binary[ufunc]
+
+            if left is self:
+                # self (op) right
+                return getattr(self, l_name)(right)
+            elif right is self:
+                # left (op) self
+                return getattr(self, r_name)(left)
+            else:
+                return NotImplemented
+
+        if len(inputs) != 1 or inputs[0] is not self:
             return NotImplemented
 
         if ufunc is np.sin:
