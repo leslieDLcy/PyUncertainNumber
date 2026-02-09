@@ -863,7 +863,9 @@ class Staircase(Pbox):
         self.plot(*args, **kwargs)
         plt.show()
 
-    def plot_probability_bound(self, x: float, ax=None, **kwargs):
+    def plot_probability_bound(
+        self, x: float, ax=None, linecolor="r", markercolor="r", **kwargs
+    ):
         """plot the probability bound at a certain quantile x
 
         note:
@@ -880,12 +882,12 @@ class Staircase(Pbox):
         ax.plot(
             [x, x],
             [p_lo, p_hi],
-            c="r",
+            c=linecolor,
             label="probability bound",
             zorder=50,
         )
-        ax.scatter(x, p_lo, c="r", marker="^", zorder=50)
-        ax.scatter(x, p_hi, c="r", marker="v", zorder=50)
+        ax.scatter(x, p_lo, c=markercolor, marker="^", zorder=50)
+        ax.scatter(x, p_hi, c=markercolor, marker="v", zorder=50)
         return ax
 
     def plot_quantile_bound(self, p: float, ax=None, **kwargs):
