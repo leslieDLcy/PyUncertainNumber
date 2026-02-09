@@ -2,12 +2,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from abc import ABC, abstractmethod
-import numpy as np
 from numpy.typing import ArrayLike
 import scipy.stats as sps
 from numbers import Number
 from pyuncertainnumber.pba.pbox_abc import Pbox, Staircase
 from bisect import bisect_left
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Joint(ABC):
@@ -226,10 +227,6 @@ def am_diff_register(A, B, debug=False):
     return result
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-
 def intervals_from_res(res):
     """
     From a structured array `res` with fields: 'distance', 'x1', 'x2',
@@ -244,10 +241,6 @@ def intervals_from_res(res):
     hi = np.maximum(x1, x2)
     intervals = np.stack([lo, hi], axis=1)
     return mask, intervals
-
-
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 def plot_intervals_from_res(
@@ -315,9 +308,6 @@ def plot_intervals_from_res(
     ax.set_ylim(y.min() - 0.1, y.max() + 0.1)
 
     return ax
-
-
-import numpy as np
 
 
 def integrate_distance(res, p):
