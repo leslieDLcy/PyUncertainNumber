@@ -222,14 +222,20 @@ class Interval(NominalValueMixin):
 
     @property
     def lo(self) -> Union[ndarray, float]:
-        return self._lo
+        if self.scalar:
+            return self._lo.item()
+        else:
+            return self._lo
 
     # if len(self.shape)==0: return self._lo
     # return self._lo # return transpose(transpose(self.__val)[0]) # from shape (3,7,2) to (2,7,3) to (3,7)
 
     @property
     def hi(self) -> Union[ndarray, float]:
-        return self._hi
+        if self.scalar:
+            return self._hi.item()
+        else:
+            return self._hi
 
     @property
     def left(self):
