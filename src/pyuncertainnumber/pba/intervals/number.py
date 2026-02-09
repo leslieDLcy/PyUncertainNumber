@@ -146,7 +146,7 @@ class Interval(NominalValueMixin):
     def to_numpy(self) -> np.ndarray:
         """transform interval objects to numpy arrays"""
         if self.scalar:
-            return np.array([self.lo.item(), self.hi.item()])
+            return np.array([self.lo, self.hi])
         else:
             return np.asarray((self.lo, self.hi)).T
 
