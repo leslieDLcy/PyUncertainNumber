@@ -403,9 +403,7 @@ class Interval(NominalValueMixin):
         leftType = left.__class__.__name__
         # lo,hi = numpy.empty(self._lo.shape),numpy.empty(self._hi.shape)
         self_lo, self_hi = self.lo, self.hi
-        self_straddle_zero = numpy.any(
-            (self_lo.flatten() <= 0) & (self_hi.flatten() >= 0)
-        )
+        self_straddle_zero = numpy.any((self_lo <= 0) & (self_hi >= 0))
         if self_straddle_zero:
             raise ZeroDivisionError
         if (leftType == "ndarray") | (leftType in NUMERIC_TYPES):
