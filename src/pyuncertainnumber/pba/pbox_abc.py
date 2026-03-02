@@ -1062,6 +1062,26 @@ class Staircase(Pbox):
         alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
         return self.alpha_cut(alpha)
 
+    def precise_sample(
+        self,
+        n_a: int,
+        theta: float = None,
+        n_e: int = None,
+    ):
+        """Generate precise samples from a p-box"""
+        if (theta is None) and (n_e is None):
+            raise ValueError("Either theta or n_e must be provided.")
+        if theta is not None and n_e is None:
+            assert 0 <= theta <= 1, "Theta must be in the range [0, 1]."
+            focal_elements = self.sample(n_a)
+            return (focal_elements.hi - focal_elements.lo) * theta + focal_elements.lo
+        if n_e is not None and theta is None:
+            theta = np.random.uniform(0, 1, size=n_e)
+            focal_elements = self.sample(n_a)
+            return (focal_elements.hi - focal_elements.lo)[None, :] * theta[
+                :, None
+            ] + focal_elements.lo[None, :]
+
     def discretise(self, n=None) -> Interval:
         """alpha-cut discretisation of the p-box without outward rounding
 
