@@ -2,12 +2,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from abc import ABC, abstractmethod
-import numpy as np
 from numpy.typing import ArrayLike
 import scipy.stats as sps
 from numbers import Number
 from pyuncertainnumber.pba.pbox_abc import Pbox, Staircase
+from pyuncertainnumber.pba.intervals import Interval
 from bisect import bisect_left
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Joint(ABC):
@@ -119,6 +121,13 @@ def area_metric_sample(a: ArrayLike, b: ArrayLike):
     return sps.wasserstein_distance(a, b)
 
 
+#! not in use.
+def area_metric_np_numbers(a, b):
+    """when a and b are both numpy arrays of scalar numbers, compute the area metric accordingly"""
+    assert np.isscalar(a) and np.isscalar(b), "Both a and b must be scalar numbers."
+    return abs(a - b)
+
+
 def area_metric_number(a: Pbox | Number, b: Pbox | Number) -> float:
     """if any of a or b is a number, compute area metric accordingly"""
     from pyuncertainnumber import pba
@@ -226,10 +235,6 @@ def am_diff_register(A, B, debug=False):
     return result
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-
 def intervals_from_res(res):
     """
     From a structured array `res` with fields: 'distance', 'x1', 'x2',
@@ -244,10 +249,6 @@ def intervals_from_res(res):
     hi = np.maximum(x1, x2)
     intervals = np.stack([lo, hi], axis=1)
     return mask, intervals
-
-
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 def plot_intervals_from_res(
@@ -315,9 +316,6 @@ def plot_intervals_from_res(
     ax.set_ylim(y.min() - 0.1, y.max() + 0.1)
 
     return ax
-
-
-import numpy as np
 
 
 def integrate_distance(res, p):
@@ -531,3 +529,28 @@ def slide_pbox_towards_scalar(a, b):
             d2 = proposal_dd
 
     return Staircase(a.left - d1, a.right + d2)
+
+
+def double_metric(p: Number | Pbox | Interval, o: Number | Pbox | Interval):
+    """Double metric for two uncertain numbers.
+
+    args:
+        p: a prediction uncertain number (Pbox)
+        o: an observation uncertain number (Pbox or scalar)
+
+    note:
+        Typical case is for validation between prediction and observation where both are uncertain numbers.
+
+    """
+    if isinstance(p, Number):
+        p = Interval(p)
+
+    if isinstance(o, Number):
+        o = Interval(o)
+
+    return area_metric(p.left, o.left), area_metric(p.right, o.right)
+
+
+def conformal_double_metric(p: Number | Pbox | Interval, o: Number | Pbox | Interval):
+    """Propsed conformal version of the double metric, which takes the maximum of the two area metrics."""
+    return max(double_metric(p, o))
