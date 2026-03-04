@@ -226,6 +226,7 @@ class Pbox(NominalValueMixin, ABC):
     def degenerate_flag(self) -> bool:
         """check if the pbox is degenerate (i.e. left == right everywhere)"""
         self._degenerate = np.array_equal(self.left, self.right)
+        return self._degenerate
 
     @property
     def degenerate(self) -> bool:
