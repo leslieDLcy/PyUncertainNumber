@@ -1,4 +1,5 @@
 import numpy as np
+from pyuncertainnumber.pba.pbox_abc import Pbox, Staircase
 
 
 def ascloseas_bounds(u, r, output_type="pbox"):
@@ -36,6 +37,40 @@ def ascloseas_bounds(u, r, output_type="pbox"):
         return pbox_from_ecdf_bundle(b_l, b_r)
     else:
         raise ValueError(f"Invalid output_type: {output_type}")
+
+
+def ascloseas_left(b: Pbox, a):
+    """Bounds on all distributions that have area metric with b as small as or smaller than a.
+
+    note:
+        Scott's version of the implementation.
+    """
+
+    if not isinstance(b, Pbox):
+        # b = Pbox(b)
+        raise ValueError("b must be a Pbox for now")
+
+    # u is left whle d is right edge.
+    u, d = b.left.copy(), b.right.copy()
+    n = len(u)
+    A = a * n
+    vu = np.empty(n, dtype=float)
+    for i in range(n):
+        s = np.sum(u[: i + 1])
+        x = (s - A) / (i + 1)
+        x = min(x, np.min(u[: i + 1]))
+        vu[i] = x
+    # vu = np.maximum.accumulate(vu)       # enforce monotonicity (nondecreasing)
+    vd = np.empty(n, dtype=float)
+    for i in range(n):
+        tail = d[i:]  # work on the tail i..n-1
+        m = len(tail)
+        s = np.sum(tail)
+        x = (s + A) / m  # sign flips because we push right
+        x = max(x, np.max(tail))  # deviations nonnegative: x >= max(d[i..n-1])
+        vd[i] = x
+    # vd = np.maximum.accumulate(vd)       # enforce monotonicity (nondecreasing)
+    return Staircase(left=vu, right=vd)
 
 
 def wasserstein_w1_cdf_envelope(xs, ws, r, x_grid=None):
@@ -76,10 +111,29 @@ def wasserstein_w1_cdf_envelope(xs, ws, r, x_grid=None):
     W[1:] = np.cumsum(ws)
     XW[1:] = np.cumsum(ws * xs)
 
+    # # Grid of x values to evaluate
+    # if x_grid is None:
+    #     # Good default: evaluate at sorted unique support points
+    #     xg = np.unique(xs)
+    # else:
+    #     xg = np.sort(np.asarray(x_grid, dtype=float))
+
     # Grid of x values to evaluate
     if x_grid is None:
-        # Good default: evaluate at sorted unique support points
-        xg = np.unique(xs)
+        # Use support points + midpoints + small extension beyond support
+        xs_u = np.unique(np.sort(xs))
+
+        if xs_u.size > 1:
+            mid = (xs_u[:-1] + xs_u[1:]) / 2
+            margin = r * 2  # a tuning parameter for plotting purpose
+            xg = np.sort(
+                np.concatenate([[xs_u[0] - margin], xs_u, mid, [xs_u[-1] + margin]])
+            )
+        else:
+            # Degenerate case: single atom
+            margin = r
+            xg = np.array([xs_u[0] - margin, xs_u[0], xs_u[0] + margin])
+
     else:
         xg = np.sort(np.asarray(x_grid, dtype=float))
 
@@ -207,21 +261,3 @@ def wasserstein_w1_cdf_envelope(xs, ws, r, x_grid=None):
         G_lower[k] = max(0.0, Fk - moved_out)
 
     return xg, F, G_upper, G_lower
-
-
-# * ---------------- to put into test
-# # --- Example usage ---
-# if __name__ == "__main__":
-#     xs = [0, 2, 5]
-#     ws = [0.5, 0.3, 0.2]
-#     r = 0.6
-
-#     xg, F, Gu, Gl = wasserstein_w1_cdf_envelope(
-#         xs, ws, r, x_grid=np.linspace(-1, 6, 50)
-#     )
-
-#     # Print a few sample points
-#     for idx in [0, 10, 20, 30, 40, 49]:
-#         print(
-#             f"x={xg[idx]:.2f}  F={F[idx]:.3f}  lower={Gl[idx]:.3f}  upper={Gu[idx]:.3f}"
-#         )
