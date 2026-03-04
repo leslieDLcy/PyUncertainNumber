@@ -42,7 +42,11 @@ def pl_ecdf_bounds_2(q1, p1, q2, p2, ax=None, marker="+"):
 
 
 def plot_two_eCDF_bundle(cdf1, cdf2, ax=None, **kwargs):
-    """plot upper and lower eCDF_bundle objects"""
+    """plot upper and lower eCDF_bundle objects
+
+    note:
+        plain code for ploting two CDF curves.
+    """
     if ax is None:
         fig, ax = plt.subplots()
     q1, p1 = cdf1.quantiles, cdf1.probabilities
