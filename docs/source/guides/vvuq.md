@@ -18,7 +18,9 @@ Furthermore, the main purpose of any model is to be used where experiments are i
 
 ## The discrepancy between non-determinstic simulations and experiments
 
+```{tip}
 Validation is a process of determining the degree to which a (non-deterministic) model simulation is an accurate representation of the corresponding (imperfect) physical experiment.
+```
 
 - Both model predictions and empirical data may contain both aleatory and epistemic uncertainty.
 
@@ -34,6 +36,29 @@ Validation is a process of determining the degree to which a (non-deterministic)
 
 Illustration of the stochastic area metric
 ```
+
+```python
+from pyuncertainnumber import area_metric
+
+dist = pba.normal(4, 1) data_sample = dist.sample(5)
+ecdf_ = pba.ECDF(data_sample)
+area_metric(dist, ecdf_) 
+0.33125451465728933
+```
+
+## Predictive capability
+
+Predictive capability suggests the prediction, along with its uncertainty estimation, with respect to a scenario in the application domain that is likely to be beyond the validation domain. Such predictive uncertainty shall comprise all the possible sources of uncertainties during the computational pipeline, as mentioned above. Notably, some uncertainties are of aleatory nature while others are of epistemic nature. The mechanism of probability bounding is employed to aggregate the effects of all these uncertainties to produce a reliable prediction.
+
+```{image} ../_static/pbox_layers_static.png
+:alt: Predictive capability
+:class: bg-primary
+:width: 400px
+:align: center
+
+Predictive capability
+```
+
 
 
 ## An open challenge of VVUQ on aerodynamics
