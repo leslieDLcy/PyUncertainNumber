@@ -60,7 +60,7 @@ from pyuncertainnumber.propagation.mixed_up import (
 
 
 # * --------------------- validation ---------------------*#
-from .pba.core import area_metric
+from pyuncertainnumber.validation.area_metric import area_metric
 
 # * ---------------------  utils ---------------------*#
 from pyuncertainnumber.gutils import inspect_un

@@ -1,5 +1,8 @@
 from pyuncertainnumber import pba
-from pyuncertainnumber.pba.core import double_metric, conformal_double_metric
+from pyuncertainnumber.validation.area_metric import (
+    double_metric,
+    conformal_double_metric,
+)
 
 
 def test_double_metric():
