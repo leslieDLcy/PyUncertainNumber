@@ -61,14 +61,14 @@ Predictive capability
 
 
 
-## An open challenge of VVUQ on aerodynamics
+## An open challenge for VVUQ on aerodynamics
 
 An open challenge has been proposed to focuses on estimating the predictive capability of an aerodynamic analysis tool (XFOIL) given a set of synthetic experimental data in AIAA Sci-Tech Forum 2026 {cite:p}`cary2026summary`.
 
 ```{image} ../_static/aiaa_challenge_statement.png
 :alt: Problem statement 
 :class: bg-primary
-:width: 400px
+:width: 600px
 :align: center
 
 Problem statement of the AIAA Second Uncertainty Quantification Challenge Problem for Aerodynamics
