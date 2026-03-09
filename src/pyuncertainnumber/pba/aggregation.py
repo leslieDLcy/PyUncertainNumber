@@ -135,6 +135,7 @@ def stochastic_mixture(
         return mixture_pbox(*converted_constructs, weights)
 
 
+# TODO. weights cannot be None for intervals with same weights
 def stacking(
     vec_interval: Interval | list[Interval],
     *,

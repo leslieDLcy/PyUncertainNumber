@@ -146,7 +146,7 @@ class Interval(NominalValueMixin):
     def to_numpy(self) -> np.ndarray:
         """transform interval objects to numpy arrays"""
         if self.scalar:
-            return np.array([self.lo.item(), self.hi.item()])
+            return np.array([self.lo, self.hi])
         else:
             return np.asarray((self.lo, self.hi)).T
 
@@ -222,14 +222,20 @@ class Interval(NominalValueMixin):
 
     @property
     def lo(self) -> Union[ndarray, float]:
-        return self._lo
+        if self.scalar:
+            return self._lo.item()
+        else:
+            return self._lo
 
     # if len(self.shape)==0: return self._lo
     # return self._lo # return transpose(transpose(self.__val)[0]) # from shape (3,7,2) to (2,7,3) to (3,7)
 
     @property
     def hi(self) -> Union[ndarray, float]:
-        return self._hi
+        if self.scalar:
+            return self._hi.item()
+        else:
+            return self._hi
 
     @property
     def left(self):
@@ -397,9 +403,7 @@ class Interval(NominalValueMixin):
         leftType = left.__class__.__name__
         # lo,hi = numpy.empty(self._lo.shape),numpy.empty(self._hi.shape)
         self_lo, self_hi = self.lo, self.hi
-        self_straddle_zero = numpy.any(
-            (self_lo.flatten() <= 0) & (self_hi.flatten() >= 0)
-        )
+        self_straddle_zero = numpy.any((self_lo <= 0) & (self_hi >= 0))
         if self_straddle_zero:
             raise ZeroDivisionError
         if (leftType == "ndarray") | (leftType in NUMERIC_TYPES):
@@ -465,6 +469,33 @@ class Interval(NominalValueMixin):
         if method != "__call__":
             return NotImplemented
         if "out" in kwargs and kwargs["out"] is not None:
+            return NotImplemented
+
+        binary = {
+            np.add: ("__add__", "__radd__"),
+            np.subtract: ("__sub__", "__rsub__"),
+            np.multiply: ("__mul__", "__rmul__"),
+            np.true_divide: ("__truediv__", "__rtruediv__"),
+            np.floor_divide: ("__floordiv__", "__rfloordiv__"),
+            np.power: ("__pow__", "__rpow__"),
+            np.maximum: ("__max__", "__rmax__"),
+            np.minimum: ("__min__", "__rmin__"),
+        }
+
+        if ufunc in binary and len(inputs) == 2:
+            left, right = inputs
+            l_name, r_name = binary[ufunc]
+
+            if left is self:
+                # self (op) right
+                return getattr(self, l_name)(right)
+            elif right is self:
+                # left (op) self
+                return getattr(self, r_name)(left)
+            else:
+                return NotImplemented
+
+        if len(inputs) != 1 or inputs[0] is not self:
             return NotImplemented
 
         if ufunc is np.sin:

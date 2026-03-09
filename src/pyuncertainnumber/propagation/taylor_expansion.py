@@ -1,10 +1,5 @@
 import os
 
-os.environ["JAX_PLATFORMS"] = "cpu"
-import jax
-import jax.numpy as jnp
-
-
 """ Taylor expansions for the moments of functions of random variables """
 
 
@@ -36,6 +31,8 @@ def taylor_expansion_method(func, mean, *, var=None, cov=None) -> tuple:
         >>> mu_, var_ = taylor_expansion_method(func=bar, mean=MEAN, cov=COV)
 
     """
+    os.environ["JAX_PLATFORMS"] = "cpu"
+
     if mean.ndim == 1:  # random vector
         return taylor_expansion_method_vector(func, mean, cov)
     elif mean.ndim == 0:  # scalar random variable
@@ -44,6 +41,9 @@ def taylor_expansion_method(func, mean, *, var=None, cov=None) -> tuple:
 
 def taylor_expansion_method_scalar(func, mean, var) -> tuple:
     """For scalar random variable only"""
+
+    import jax
+    import jax.numpy as jnp
 
     # gradient
     d1f = jax.grad(func)(mean)
@@ -60,6 +60,9 @@ def taylor_expansion_method_scalar(func, mean, var) -> tuple:
 
 def taylor_expansion_method_vector(func, mean, cov) -> tuple:
     """For random vector only"""
+
+    import jax
+    import jax.numpy as jnp
 
     # gradient
     d1f = jax.grad(func)(mean)

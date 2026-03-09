@@ -863,7 +863,9 @@ class Staircase(Pbox):
         self.plot(*args, **kwargs)
         plt.show()
 
-    def plot_probability_bound(self, x: float, ax=None, **kwargs):
+    def plot_probability_bound(
+        self, x: float, ax=None, linecolor="r", markercolor="r", **kwargs
+    ):
         """plot the probability bound at a certain quantile x
 
         note:
@@ -880,12 +882,12 @@ class Staircase(Pbox):
         ax.plot(
             [x, x],
             [p_lo, p_hi],
-            c="r",
+            c=linecolor,
             label="probability bound",
             zorder=50,
         )
-        ax.scatter(x, p_lo, c="r", marker="^", zorder=50)
-        ax.scatter(x, p_hi, c="r", marker="v", zorder=50)
+        ax.scatter(x, p_lo, c=markercolor, marker="^", zorder=50)
+        ax.scatter(x, p_hi, c=markercolor, marker="v", zorder=50)
         return ax
 
     def plot_quantile_bound(self, p: float, ax=None, **kwargs):
@@ -982,9 +984,34 @@ class Staircase(Pbox):
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         if method != "__call__":
             return NotImplemented
-        if len(inputs) != 1 or inputs[0] is not self:
+        if kwargs.get("out", None) is not None:
             return NotImplemented
-        if "out" in kwargs and kwargs["out"] is not None:
+
+        binary = {
+            np.add: ("__add__", "__radd__"),
+            np.subtract: ("__sub__", "__rsub__"),
+            np.multiply: ("__mul__", "__rmul__"),
+            np.true_divide: ("__truediv__", "__rtruediv__"),
+            np.floor_divide: ("__floordiv__", "__rfloordiv__"),
+            np.power: ("__pow__", "__rpow__"),
+            np.maximum: ("__max__", "__rmax__"),
+            np.minimum: ("__min__", "__rmin__"),
+        }
+
+        if ufunc in binary and len(inputs) == 2:
+            left, right = inputs
+            l_name, r_name = binary[ufunc]
+
+            if left is self:
+                # self (op) right
+                return getattr(self, l_name)(right)
+            elif right is self:
+                # left (op) self
+                return getattr(self, r_name)(left)
+            else:
+                return NotImplemented
+
+        if len(inputs) != 1 or inputs[0] is not self:
             return NotImplemented
 
         if ufunc is np.sin:
@@ -1034,6 +1061,26 @@ class Staircase(Pbox):
 
         alpha = np.squeeze(qmc.LatinHypercube(d=1).random(n=n_sam))
         return self.alpha_cut(alpha)
+
+    def precise_sample(
+        self,
+        n_a: int,
+        theta: float = None,
+        n_e: int = None,
+    ):
+        """Generate precise samples from a p-box"""
+        if (theta is None) and (n_e is None):
+            raise ValueError("Either theta or n_e must be provided.")
+        if theta is not None and n_e is None:
+            assert 0 <= theta <= 1, "Theta must be in the range [0, 1]."
+            focal_elements = self.sample(n_a)
+            return (focal_elements.hi - focal_elements.lo) * theta + focal_elements.lo
+        if n_e is not None and theta is None:
+            theta = np.random.uniform(0, 1, size=n_e)
+            focal_elements = self.sample(n_a)
+            return (focal_elements.hi - focal_elements.lo)[None, :] * theta[
+                :, None
+            ] + focal_elements.lo[None, :]
 
     def discretise(self, n=None) -> Interval:
         """alpha-cut discretisation of the p-box without outward rounding

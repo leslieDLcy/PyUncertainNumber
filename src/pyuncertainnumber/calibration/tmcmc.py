@@ -1203,6 +1203,23 @@ def get_hdi_bounds(
     return pd.DataFrame(out).rename_axis("column").reset_index()
 
 
+def filter_hdi_bounds(df, level: int = 95) -> pd.DataFrame:
+    """Extract HDI bounds for a given credibility level.
+
+    args:
+        df (pd.DataFrame): HDI dataframe containing columns like `hdi_95_low`, `hdi_95_high`
+
+        level (int | str): significance level (e.g. 95, 90, 20)
+
+    returns:
+        (pd.DataFrame): DataFrame with columns [hdi_<level>_low, hdi_<level>_high]
+
+    """
+    level = str(level)
+    cols = [f"hdi_{level}_low", f"hdi_{level}_high"]
+    return df.loc[:, cols]
+
+
 def transform_old_trace_to_new(trace: list[list]) -> list[Stage]:
     """Transform old trace format to new Stage class format.
 
