@@ -11,6 +11,7 @@ what_is_un
 uncertainty_characterisation
 uncertainty_aggregation
 uncertainty_propagation
+validation_assessment
 ```
 
 ::::{grid} 1 2 2 3
@@ -49,6 +50,14 @@ Techniques for combining multiple sources of uncertainty.
 :link-type: doc
 :img-top: ../_static/pbox_array.png
 Propagate uncertainty through computational models and functions.
+:::
+
+
+:::{card} Discrepancy assessment by validation 
+:link: validation_assessment
+:link-type: doc
+:img-top: ../_static/pbox_layers_static.png
+Validation of imprecise probability models.
 :::
 
 ::::

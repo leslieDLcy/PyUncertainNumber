@@ -14,6 +14,7 @@ guides/up
 pbox
 cbox
 interval_analysis
+guides/vvuq
 ```
 
 ```{toctree}

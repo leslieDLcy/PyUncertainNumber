@@ -15,4 +15,3 @@ from pyuncertainnumber.pba.ecdf import get_ecdf
 from .operation import convert
 from .aggregation import *
 from .pbox_free import KS_bounds
-from .core import area_metric
