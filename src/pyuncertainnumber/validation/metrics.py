@@ -9,6 +9,8 @@ def ascloseas_bounds(u, r, tail_tol=0.01, output_type="pbox"):
         u: a distribution (e.g. an UncertainNumber)
         r: the radius of the Wasserstein-1 ball around u
 
+    note:
+        Even when `r` is nagative, the function will return save result as |r|.
     returns:
         envelope function that takes x and returns (lower_bound, upper_bound) for CDF of any Q with W1(u, Q) <= r
     """
