@@ -1235,7 +1235,7 @@ class Staircase(Pbox):
 
         return Staircase(left=nleft, right=nright)
 
-    def get_PI(self, alpha: Number = 0.95, style="narrowest") -> Interval:
+    def get_PI(self, alpha: Number = 0.95, style="widest") -> Interval:
         """Compute the predictive interval at the coverage level of `alpha`
 
         args:
@@ -1273,6 +1273,8 @@ class Staircase(Pbox):
             hi = self.alpha_cut(hi_cut_level).hi
             lo = self.alpha_cut(lo_cut_level).lo
             return Interval(lo=lo, hi=hi)
+        else:
+            raise ValueError("style must be either 'narrowest' or 'widest'")
 
     # * --------------------- states --------------------- *#
 

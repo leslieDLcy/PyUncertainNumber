@@ -261,7 +261,7 @@ def recover_trace_samples(mytrace: list[Stage], names: list[str]) -> pd.DataFram
 # * ----------------------------------- tmcmc
 
 
-def plot_updated_distribution(mytrace, names: list[str], save=False):
+def plot_updated_distribution(mytrace, names: list[str], save=False, save_dir=None):
     """Plot the prior and posterior distribution of the parameters
 
     args:
@@ -311,10 +311,13 @@ def plot_updated_distribution(mytrace, names: list[str], save=False):
             ax=g.axes[i, j],
         )
     if save == True:
-        print("Note: figure saved")
-        plt.savefig("updated_distribution.png")
-    plt.show()
-
+        if save_dir is None:
+            raise ValueError("save_dir must be provided when save is True.")
+        else:
+            print("Note: figure saved")
+            plt.savefig(f"{save_dir}/updated_distribution.png")
+    else:
+        plt.show()
 
 def initial_population(N: float, all_pars: list) -> NDArray:
     """Generates initial population from prior distribution
