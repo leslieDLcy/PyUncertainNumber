@@ -261,7 +261,7 @@ def recover_trace_samples(mytrace: list[Stage], names: list[str]) -> pd.DataFram
 # * ----------------------------------- tmcmc
 
 
-def plot_updated_distribution(mytrace, names: list[str], save=False, save_dir=None):
+def plot_updated_distribution(mytrace, names: list[str], save=False, save_name=None, save_dir=None):
     """Plot the prior and posterior distribution of the parameters
 
     args:
@@ -315,7 +315,7 @@ def plot_updated_distribution(mytrace, names: list[str], save=False, save_dir=No
             raise ValueError("save_dir must be provided when save is True.")
         else:
             print("Note: figure saved")
-            plt.savefig(f"{save_dir}/updated_distribution.png")
+            plt.savefig(f"{save_dir}/{save_name}.png")
     else:
         plt.show()
 
