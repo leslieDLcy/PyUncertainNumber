@@ -461,7 +461,9 @@ class Staircase(Pbox):
             left_line_kwargs (dict): additional kwargs for left bound line
             right_line_kwargs (dict): additional kwargs for right bound line
             nuance (str): 'step' or 'curve' for bound line styles
-            alpha (float): transparency level for the box fill (only for 'box' style)
+            alpha (float): transparency level for the fill and bound lines. The
+                bound-line alpha can be overridden with ``left_line_kwargs`` or
+                ``right_line_kwargs``.
             **kwargs: additional keyword arguments for the plot
 
         note:
@@ -507,8 +509,16 @@ class Staircase(Pbox):
         left_line_kwargs = {} if left_line_kwargs is None else dict(left_line_kwargs)
         right_line_kwargs = {} if right_line_kwargs is None else dict(right_line_kwargs)
 
-        left_defaults = {"c": plot_bound_colors[0], "linestyle": bound_styles[0]}
-        right_defaults = {"c": plot_bound_colors[1], "linestyle": bound_styles[1]}
+        left_defaults = {
+            "c": plot_bound_colors[0],
+            "linestyle": bound_styles[0],
+            "alpha": alpha,
+        }
+        right_defaults = {
+            "c": plot_bound_colors[1],
+            "linestyle": bound_styles[1],
+            "alpha": alpha,
+        }
 
         left_kwargs = {**left_defaults, **left_line_kwargs}
         right_kwargs = {**right_defaults, **right_line_kwargs}
